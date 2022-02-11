@@ -1,0 +1,111 @@
+# GCP Cloud Config Source
+
+The GCP cloud config source takes configuration properties from GCP Secret Manager.
+
+## GCP Service Account
+
+In order to connect to GCP Secret Manager you need to know your project name as well as have a service account access token. Assuming you already have a GCP project and a secret created in GCP Secrets Manager, you need to create a service account which Payara Server will use to access your GCP Secrets.
+
+Visit the GCP cloud console: https://console.cloud.google.com/
+
+Firstly, make sure you're on the right project. You can find your project name at the top of the GCP console.
+
+image:microprofile/config/cloud/gcp/project-name.png[GCP Project name]
+
+Next, visit the service account section of the project. You can find this from the top left menu -> __IAM & Admin__ -> __Service Accounts__.
+
+image:microprofile/config/cloud/gcp/service-accounts.png[GCP Service Accounts]
+
+From here you can create a new service account. Skip this step if you already have a service account you want to use.
+
+image:microprofile/config/cloud/gcp/new-service-account.png[GCP new Service Account]
+
+After this you'll need to add roles to your service account
+
+image:microprofile/config/cloud/gcp/service-account-roles.png[GCP Service Account roles]
+
+You have a selection of roles:
+
+- _**Secret Manager Admin**_ - full admin rights to manage secrets. Recommended when you want to delete or modify secrets through Payara Server
+- _**Secret Manager Secret Accessor**_ - ability to view secrets. Recommended when you only want to retrieve secrets through Payara Server
+- _**Secret Manager Secret Version Adder**_ - allows setting secret values
+- _**Secret Manager Secret Version Manager**_ - allows deleting secret values
+
+Add whichever of these is appropriate for your use case.
+
+Skip step 3 if following the wizard, as no physical user will be requires to use this service account.
+
+Next, you'll need to download the access key for this service account.
+
+Select the options icon for the service account you plan to use.
+
+image:microprofile/config/cloud/gcp/service-account-key.png[GCP Service Account Access Key]
+
+You'll be presented with an option to download the key in `JSON` or `P12` format. The GCP config source currently requires that the `JSON` format be used, so select this one.
+
+image:microprofile/config/cloud/gcp/json-key-type.png[JSON Access Key]
+
+This downloaded file can now be used by Payara Server to access GCP Secrets.
+
+[[configuration]]
+## Configuration
+
+You can configure GCP Secrets either via the admin console or the _asadmin_ utility. You'll need the JSON key file created from the GCP console in the previous section, as well as the name of the project that you intend to use. Make sure that the GCP Secret Manager has been enabled for the specified project.
+
+NOTE: The JSON key file will be copied into the Payara Server `config/` directory, so it isn't required after passing it to the GCP Config Source configuration.
+
+### From the Admin Console
+
+To configure the config source from the admin console, go to `Configs` -> `your-config` -> `MicroProfile` -> `Config` -> `GCP Secrets`.
+
+image:microprofile/config/cloud/gcp/admin-console-config.png[Payara Server Administration Console configuration route]
+
+From here you can pass the absolute path to the json key file downloaded in the previous section, as well as the project name. You can also decide whether to apply these changes dynamically or on the next server restart. If the config source is enabled or disabled dynamically it will take effect across the server immediately.
+
+### From the Command Line
+
+To configure the GCP Secrets Cloud Config Source from the command line, use the `set-gcp-config-source-configuration` asadmin command, specifying the required parameters like this:
+
+[source, shell]
+----
+asadmin> set-gcp-config-source-configuration --dynamic true --enabled true --jsonKeyFile /path/to/token/file.json --projectName project-name
+----
+
+You can use the `--enabled` and `--dynamic` options to enable or disable the GCP Config Source on demand. You should pass the path to the json key file downloaded in the previous section to the `--jsonKeyFile` parameter.
+
+Also, you can retrieve the current configuration for the GCP Config Source using the `get-gcp-config-source-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin> get-gcp-config-source-configuration
+
+Enabled  Project Name  JSON Key File
+true     payara-test   payara-test-8a8aa4fbb520.json
+----
+
+## Usage
+
+Provided the required roles have been assigned to the Service Account in the GCP console, the secrets can be injected into any applicable MicroProfile Config injection point as with any other Config Source. The secrets can also be fetched, created and deleted from the `asadmin` utility.
+
+To fetch a secret from GCP Secret Manager:
+
+[source, shell]
+----
+asadmin> get-config-property --source cloud --sourceName gcp --propertyName mysecret
+
+secretvalue
+----
+
+To create or change a secret from GCP Secret Manager:
+
+[source, shell]
+----
+asadmin> set-config-property --source cloud --sourceName gcp --propertyName mysecret --propertyValue secretvalue
+----
+
+To delete a secret from GCP Secret Manager:
+
+[source, shell]
+----
+asadmin> delete-config-property --source cloud --sourceName gcp --propertyName mysecret
+----

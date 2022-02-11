@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Deploying Applications :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../../index.html">docs</a></li>
+    <li><a href="Deploy%20Applications.html">Deploying Applications</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Micro%20Documentation/Payara%20Micro%20Configuration%20and%20Management/Micro%20Management/Deploying%20Applications/Deploy%20Applications.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Deploying Applications</h1>
+<div class="sect1">
+<h2 id="deploying-an-application"><a class="anchor" href="#deploying-an-application"></a>Deploying an Application From the Command Line</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you wish to deploy multiple packages, you must specify the <code>--deploy</code> again, or point to a <code>--deploymentDir</code> with multiple applications.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="deploying-an-application-package"><a class="anchor" href="#deploying-an-application-package"></a>Deploying an Application Package</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All Payara Micro actions are run for the Payara Micro JAR, all in one command.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To deploy a WAR file to an instance, you need to use the <code>--deploy</code> option, followed by the path to the application to deploy. See below for an example of starting a Payara Micro instance and deploying a WAR file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --deploy /home/user/example.war</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The <code>--deploy</code> option is optional if your deployment file ends with <code>.jar</code>, <code>.rar</code> or <code>.war</code> therefore the command line below can also be used
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar /home/user/example.war</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deploying-an-exploded-war"><a class="anchor" href="#deploying-an-exploded-war"></a>Deploying an Exploded War</h3>
+<div class="paragraph">
+<p>An exploded WAR can be deployed to a Payara Micro instance just by specifying the path to the exploded WAR root directory on the <code>--deploy</code> command line or programmatically via the API. The exploded WAR can be redeployed by creating an empty <code>.reload</code>
+file in the root directory and updating its timestamp.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+On a Linux OS host, a simple <code>touch .reload</code> command can update the timestamp of the file.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deploying-applications-from-a-maven-repository"><a class="anchor" href="#deploying-applications-from-a-maven-repository"></a>Deploying Applications from a Maven repository</h3>
+<div class="paragraph">
+<p>You can deploy an application directly from a Maven repository using the <code>--deployFromGAV</code> option. This option accepts a comma separated string denoting a Maven artefact&#8217;s <code>groupId</code>, <code>artifactId</code>, and <code>version</code> attributes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --deployFromGAV "fish.payara.examples,test,1.0-SNAPSHOT"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This option can be used multiple times, and in conjunction with the standard <code>--deploy</code> options.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+By default, Payara Micro will only search for artefacts in the Maven Central repository. If you wish to search additional repositories, you can add them to the list of repositories to search with the <code>--additionalRepository</code> option:
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --deployFromGAV "fish.payara.examples,test,1.0-SNAPSHOT" --additionalRepository https://maven.java.net/content/repositories/promoted/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To search through multiple additional repositories, you can use the option multiple times:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --deployFromGAV "fish.payara.examples,test,1.0-SNAPSHOT" --additionalRepository https://maven.java.net/content/repositories/promoted/ --additionalRepository https://raw.github.com/payara/Payara_PatchedProjects/master/</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="define-context-root"><a class="anchor" href="#define-context-root"></a>Define context root</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The context root of an application can be specified using the option <code>--contextroot</code> or by appending the path to the war-file name given with the <code>--deploy</code> option.</p>
+</div>
+<div class="paragraph">
+<p>A context root set using <code>--contextroot &lt;context-path&gt;</code> option applies to the application of the first <code>--deploy</code> use that does not already specify a context root. Let&#8217;s take the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --deploy /home/user/example.war --contextroot hello-world</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The root context of the <code>example.war</code> application is now set to <code>/hello-world</code>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively the context root can be included in the value of the <code>--deploy</code> option. It follows the path to the war file separated by <code>File.pathSeparator</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>--deploy &lt;war-file&gt;:&lt;context-path&gt;</code> (Linux uses <code>:</code>)</p>
+</li>
+<li>
+<p><code>--deploy &lt;war-file&gt;;&lt;context-path&gt;</code> (Windows uses <code>;</code>)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --deploy /home/user/example.war:hello-world</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above command again results in the effective root context <code>/hello-world</code>.</p>
+</div>
+<div class="paragraph">
+<p>The two alternative mechanisms can also be used together:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --contextroot bar
+    --deploy /home/user/example.war:foo
+    --deploy /home/user/test.war</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here <code>example.war</code> is deployed in <code>/foo</code> while <code>test.war</code> is deployed in <code>/bar</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>--deploy example.war:</code> is identical to <code>--deploy example.war:/</code> and deploys to the effective context root <code>/</code> while <code>--deploy example.war</code> deploys to <code>/example</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+It follows that leading <code>/</code> can be given but aren&#8217;t required. However, tailing <code>/</code> must not be given. Using <code>--deploy example.war:/foo/</code> will render the <code>&lt;host&gt;/foo/</code> endpoint inaccessible.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-rootdir"><a class="anchor" href="#using-rootdir"></a>Using Root Configuration Directory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When a configuration root directory is reused across restarts (i.e. not running in a container), it is recommended not to setup a deployment each time a Payara Micro instance is started using that directory.</p>
+</div>
+<div class="paragraph">
+<p>Doing so will cause the application to be deployed twice: Once at startup and second time when deployment section of the command line is processed.</p>
+</div>
+<div class="paragraph">
+<p>The best approach is to use a warmup run for deployment the first time the root directory is created:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"># Perform deployments and configuration the first time
+java -jar payara-micro.jar --rootdir micro-root --warmup application.war
+
+# All further invocations do not setup deployment
+java -jar payara-micro.jar --rootdir micro-root</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively a launcher can be generated from a configuration root directory as well:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"># Perform deployments and configuration the first time
+java -jar payara-micro.jar --rootdir micro-root --warmup application.war
+java -jar payara-micro.jar --rootdir micro-root --outputlauncher
+
+# All further invocations use the launcher JAR in the configuration directory
+java -jar micro-root/launch-micro.jar</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="payara-micro-post-boot-output"><a class="anchor" href="#payara-micro-post-boot-output"></a>Payara Micro Post Boot Output</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following information about the output made by Payara Micro after its booting has completed will be available for examination:</p>
+</div>
+<div class="sect2">
+<h3 id="deployed-apps"><a class="anchor" href="#deployed-apps"></a>Deployed Apps</h3>
+<div class="paragraph">
+<p>After Payara Micro has booted, the log output will list data about the instance and all deployed applications, which includes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The name of the host machine</p>
+</li>
+<li>
+<p>The HTTP port(s) in use by the instance</p>
+</li>
+<li>
+<p>The HTTPS port(s) in use by the instance</p>
+</li>
+<li>
+<p>The generated instance name</p>
+</li>
+<li>
+<p>The instance&#8217;s group name</p>
+</li>
+<li>
+<p>The Hazelcast member UUID</p>
+</li>
+<li>
+<p>A list of all deployed application names and their entry-point URLs</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Here is an example of this output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-log hljs" data-lang="log">[DATE:TIME+TIMEZONE] [] [INFO] [] [PayaraMicro] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: EPOCHTIME] [levelValue: 800] [[[DATE:TIME+TIMEZONE] [] [INFO] [] [PayaraMicro] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: EPOCHTIME] [levelValue: 800] [[
+Instance Configuration
+Host: Example-Host
+HTTP Port(s): 8080
+HTTPS Port(s):
+Instance Name: Adjective-Fish
+Instance Group: MicroShoal
+Hazelcast Member UUID 000a0aa0-000a-0a00-000a-a00000a00aa0
+Deployed: ExampleApp01 ( exampleapp01 war /exampleappendpoint1 )
+Deployed: ExampleApp02 ( exampleapp02 war /exampleappendpoint2 )
+]]
+
+[DATE:TIME+TIMEZONE] [] [INFO] [] [PayaraMicro] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: EPOCHTIME] [levelValue: 800] [[[DATE:TIME+TIMEZONE] [] [INFO] [] [PayaraMicro] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: EPOCHTIME] [levelValue: 800] [[
+
+Payara Micro URLs
+http://example:port/exampleappendpoint1
+https://example:port/exampleappendpoint1
+http://example:port/exampleappendpoint2
+https://example:port/exampleappendpoint2
+]]</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

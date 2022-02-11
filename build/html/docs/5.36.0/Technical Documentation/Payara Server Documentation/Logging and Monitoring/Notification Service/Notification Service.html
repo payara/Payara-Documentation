@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Notification Service :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="Notification%20Service.html">Notification Service</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Logging%20and%20Monitoring/Notification%20Service/Notification%20Service.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Notification Service</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Payara Server comes with a general Notification service that can be used to log events which come from other services, such as the <a href="#/documentation/payara-server/jmx-monitoring-service/jmx-monitoring-service.adoc" class="page unresolved">JMX Monitoring Service</a>, the <a href="#/documentation/payara-server/health-check-service/Overview.adoc" class="page unresolved">HealthCheck service</a> or the <a href="#/documentation/payara-server/request-tracing-service/request-tracing-service.adoc" class="page unresolved">Request Tracing service</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="notifiers"><a class="anchor" href="#notifiers"></a>Notifiers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Notification service provides the ability to disseminate notification events through various channels or <strong>notifiers</strong>, which relay them to different destinations. The following is a list of the default set of notifiers available in Payara Server.</p>
+</div>
+<div class="sect2">
+<h3 id="log-notifier"><a class="anchor" href="#log-notifier"></a>Log Notifier</h3>
+<div class="paragraph">
+<p>The log notifier is the only notifier that is enabled by default when the notification service is activated.</p>
+</div>
+<div class="paragraph">
+<p>The default output for the log notifier is the configured instance&#8217;s log file, which is either the <em>server.log</em> file or <em>cluster.log</em> file, depending on the instance configuration. The log notifier only handles the output of notifications from the notification service sent to the log and is not responsible for any other log output.</p>
+</div>
+<div class="sect3">
+<h4 id="log-configuration"><a class="anchor" href="#log-configuration"></a>Configuration</h4>
+<div class="paragraph">
+<p>Because the log notifier is the default notifier for the notification service it can be configured on the same page as the notification service, as shown in the image below:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/notification-service/log/log-notifier.png" alt="Log Notifier Configuration"></span></p>
+</div>
+<div class="paragraph">
+<p>For any new domain, the notification service will be disabled by default. It can be enabled through the admin console as shown above, or via the Asadmin CLI.</p>
+</div>
+<div class="paragraph">
+<p>To configure the log notifier through the Asadmin CLI, use the <code>set-log-notifier-configuration</code> subcommand:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-log-notifier-configuration --enabled=true --dynamic=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To get the current configuration of the log notifier, use the <code>get-log-notifier-configuration</code> subcommand:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-log-notifier-configuration
+
+Enabled  Noisy  Use Separate Log File
+true     true   false
+Command get-log-notifier-configuration executed successfully.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jms-notifier"><a class="anchor" href="#jms-notifier"></a>JMS Notifier</h3>
+<div class="paragraph">
+<p>The JMS notifier makes use of a JMS queue to send notification events from services such as the Request Tracing and HealthCheck services. These messages can then be consumed by a Message Driven Bean or any other JMS compatible client implementation.</p>
+</div>
+<div class="sect3">
+<h4 id="jms-requirements"><a class="anchor" href="#jms-requirements"></a>Requirements</h4>
+<div class="paragraph">
+<p>To use JMS as a notification target, you will need the following a JMS-compatible message broker.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The Payara Server Web Profile distribution does not come with JMS capabilities, so this notifier isn&#8217;t supported.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The easiest way to configure the JMS notifier is to use the embedded OpenMQ broker, since Payara Server already comes with it by default.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="jms-configuration"><a class="anchor" href="#jms-configuration"></a>JMS Notifier Configuration</h4>
+<div class="paragraph">
+<p>The notifier configuration requires following a few steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a new <strong>JMS Queue</strong> to receive the notification messages from the notifier:</p>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/notification-service/jms/prepare-jms-destination.png" alt="Create JMS Queue"></span></p>
+</div>
+<div class="paragraph">
+<p>To make this change via the Asadmin CLI, use the following subcommand which mirrors the above screenshot:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin create-jms-resource --enabled=true --property=Name=notifierQueue --restype=javax.jms.queue jms/notifierQueue</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Set the JMS Notifier settings:</p>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/notification-service/jms/admin-console-configuration.png" alt="Configure JMS Notifier in Admin Console"></span></p>
+</div>
+<div class="paragraph">
+<p>The above example uses the embedded OpenMQ broker&#8217;s default configuration.</p>
+</div>
+<div class="paragraph">
+<p>To make this change via the Asadmin CLI, use the following command which mirrors the above screenshot:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin set-jms-notifier-configuration --dynamic=true --enabled=true --contextFactoryClass=com.sun.enterprise.naming.SerialInitContextFactory --target=server-config --queueName=notifierQueue --url=localhost:7676 --connectionFactoryName=jms/_defaultConnectionFactory</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="verify-the-configuration"><a class="anchor" href="#verify-the-configuration"></a>Verifying the Configuration</h4>
+<div class="paragraph">
+<p>For verification purposes, it may be useful to enable a service to push notifications through the JMS notifier to demonstrate that it is working. To do this, you will also need to setup a Message-Driven Bean (MDB) to consume the notifications and demonstrate that they are being stored in the queue.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>First, enable a service to push data through the notifier. For example, the HealthCheck service&#8217;s CPU metric can be configured to push CPU metrics to a notifier every <em>5 seconds</em>:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; healthcheck-configure --enabled=true --dynamic=true --enableNotifiers=jms-notifier
+asadmin&gt; healthcheck-configure-service --serviceName=healthcheck-cpu --enabled=true --dynamic=true --time=5 --unit=SECONDS</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This also configures the HealthCheck service to send notifications to the JMS notifier, which will cause the messages to be sent right away.</p>
+</div>
+</li>
+<li>
+<p>To consume the messages using a <strong>JMS 2.0</strong> compliant MDB, the following class will work for a pre-configured queue named <code>notifierQueue</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@MessageDriven(activationConfig = {
+    @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "jms/notifierQueue"),
+    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+    @ActivationConfigProperty(propertyName = "destination", propertyValue = "notifierQueue"),
+})
+public class NotificationConsumer implements MessageListener {
+
+    @Override
+    public void onMessage(Message message) {
+        try {
+            System.out.println("Message received: " + message.getBody(String.class));
+        }
+        catch (JMSException ex) {}
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>View the result of the MessageDrivenBean&#8217;s <code>onMessage()</code> command. In this example, the CPU metric of the health check service was configured to notify every <em>5 seconds</em>, so the result of simply printing to <code>System.out</code> is following log entries:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-log hljs" data-lang="log">[2017-02-24T14:25:02.019+0000] [INFO] [] [fish.payara.nucleus.healthcheck.HealthCheckService] [tid: _ThreadID=151 _ThreadName=admin-thread-pool::admin-listener(9)] [timeMillis: 1487946302019] [levelValue: 800] [[Scheduling Health Check for task: CPUC]]
+
+[2017-02-24T14:25:02.019+0000] [INFO] [] [fish.payara.nucleus.healthcheck.HealthCheckService] [tid: _ThreadID=151 _ThreadName=admin-thread-pool::admin-listener(9)] [timeMillis: 1487946302019] [levelValue: 800] [[Payara Health Check Service Started.]]
+
+[2017-02-24T14:25:02.376+0000] [INFO] [] [] [tid: _ThreadID=48 _ThreadName=p: thread-pool-1; w: 3] [timeMillis: 1487946302376] [levelValue: 800] [[Message received: Health Check notification with severity level: INFO. (host:mike-payara, server:server, domain:domain1,instance:server) CPUC:Health Check Result:[[status=GOOD, message='CPU%: 1.45, Time CPU used: 3 seconds 797 milliseconds'']']]]
+
+[2017-02-24T14:25:02.380+0000] [INFO] [] [] [tid: _ThreadID=50 _ThreadName=p: thread-pool-1; w: 5] [timeMillis: 1487946302380] [levelValue: 800] [[Message received: Health Check notification with severity level: SEVERE. (host:mike-payara, server:server, domain:domain1,instance:server) CPUC:Health Check Result:[[status=CRITICAL, message='CPU%: 109.71, Time CPU used: 7 milliseconds'']']]]</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="asadmin-commands"><a class="anchor" href="#asadmin-commands"></a>Asadmin Commands</h4>
+<div class="sect4">
+<h5 id="set-the-jms-notifier-configuration"><a class="anchor" href="#set-the-jms-notifier-configuration"></a>Set the JMS notifier configuration</h5>
+<div class="paragraph">
+<p>To set the JMS notifier configuration, the following asadmin command will reflect the configuration done in the previous section:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-jms-notifier-configuration --dynamic=true --enabled=true
+  --contextFactoryClass=com.sun.enterprise.naming.SerialInitContextFactory
+  --connectionFactoryName=jms/__defaultConnectionFactory
+  --queueName=notifierQueue
+  --url=localhost:7676
+  --username=****
+  --password=****
+  --target=server-config</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="get-the-jms-notifier-configuration"><a class="anchor" href="#get-the-jms-notifier-configuration"></a>Get the JMS notifier configuration</h5>
+<div class="paragraph">
+<p>To get the JMS notifier configuration using the Asadmin CLI, run the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-jms-notifier-configuration
+
+Enabled  Noisy  Context Factory Class  Connection Factory Name  Queue Name  URL  Username  Password
+true     true   com.sun.enterprise.naming.SerialInitContextFactory  jms/__defaultConnectionFactory  notifierQueue  localhost:7676  myusername  mypassword
+Command get-jms-notifier-configuration executed successfully.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It will return the details of the current JMS notifier configuration, like in the following example:</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="event-bus-notifier"><a class="anchor" href="#event-bus-notifier"></a>Event Bus Notifier</h3>
+<div class="paragraph">
+<p>The Event Bus Notifier provides a way to send notifications from the notification service into the internal Payara Server event bus, which is based on Hazelcast distributed topics.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Notifications sent to the internal event bus using this notifier are intended to be received by internal server components and not by user applications. Currently, no built-in internal components consume event bus notifications yet and there are no available APIs that allow applications to consume these events.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The Data Grid (and Hazelcast by extension) must be enabled for the Event Bus to be available.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="event-bus-notifier-configuration"><a class="anchor" href="#event-bus-notifier-configuration"></a>Event Bus Notifier Configuration</h4>
+<div class="paragraph">
+<p>This notifier provides only one configuration option, the <strong>Topic Name</strong>, which is mandatory.</p>
+</div>
+<div class="paragraph">
+<p>In the Admin Console, simply set the <strong>Topic Name</strong> to a desired name, which will be used to setup the Hazelcast topic that will receive the notifications.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/notification-service/event-bus/event-bus-notif-config.png" alt="Event Bus Configuration"></span></p>
+</div>
+<div class="paragraph">
+<p>Make sure that the "Enabled" box is ticked so that the notifier will be used. If you would like the changes to take effect without needing a restart, tick the "Dynamic" box as well.</p>
+</div>
+<div class="paragraph">
+<p>To make these changes via the Asadmin CLI, use the following subcommand:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-eventbus-notifier-configuration --topicName=my-topic --dynamic=true --enabled=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To check the current applied configuration from asadmin, run the command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-eventbus-notifier-configuration
+
+Enabled  Noisy  Topic Name
+false    true   payara.notification.event
+
+Command get-eventbus-notifier-configuration executed successfully.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cdi-event-bus-notifier"><a class="anchor" href="#cdi-event-bus-notifier"></a>CDI Event Bus Notifier</h3>
+<div class="paragraph">
+<p>The CDI Event Bus notifier provides a way to send notifications from the notification service into the internal Payara Server&#8217;s CDI Event bus. These notifications consists on CDI asynchronous events that can be consumed by user applications with valid CDI beans set up as listeners.</p>
+</div>
+<div class="sect3">
+<h4 id="notifier-configuration-2"><a class="anchor" href="#notifier-configuration-2"></a>CDI Event Bus Notifier Configuration</h4>
+<div class="paragraph">
+<p>You can configure the CDI Event Bus notifier from the Admin Console like this:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/notification-service/cdi-event-bus/cdi-event-bus-notif-config.png" alt="CDI Event Bus Configuration"></span></p>
+</div>
+<div class="paragraph">
+<p>The following options are available:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>Enabled</code></dt>
+<dd>
+<p>Enables/disables the notifier.</p>
+</dd>
+<dt class="hdlist1"><code>Dynamic</code></dt>
+<dd>
+<p>Applies changes to the notifier without a server restart.</p>
+</dd>
+<dt class="hdlist1"><code>Loop Back</code></dt>
+<dd>
+<p>Whether events should also be observed on the same instance that triggered the instance or not.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>To make these changes via the Asadmin CLI, use the following subcommand:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-cdieventbus-notifier-configuration --loopBack=true --dynamic=true --enabled=true --hazelcastEnabled=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To check the current applied configuration from asadmin, run the command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-cdieventbus-notifier-configuration
+
+Enabled  Noisy  Loopback
+false    true   false
+Command get-cdieventbus-notifier-configuration executed successfully.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="observing-events"><a class="anchor" href="#observing-events"></a>Observing Notification Events</h4>
+<div class="paragraph">
+<p>Any application deployed to any instance in the Data Grid can observe notification events triggered by the CDI Event bus notifier.</p>
+</div>
+<div class="paragraph">
+<p>Event  messages are instances of the <code>EventbusMessage</code> class, which provides structured data about the specific event type, such as <code>HealthCheckNotificationData</code> or <code>RequestTracingNotificationData</code>. It also provides the same information in a String form in the <code>title</code> and <code>message</code> fields.</p>
+</div>
+<div class="paragraph">
+<p>Notification events can be observed as a standard <code>@Inbound</code> CDI event of type <code>EventbusMessage</code> or its super-types:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public void observe(@Observes @Inbound EventbusMessage event) {
+    String shortInfo = event.getSubject()
+    String detailedMessage = event.getMessage();
+
+    String domainName = event.getDomain();
+    String sourceInstanceName = event.getInstance();
+
+    if (event.getData() instanceof HealthCheckNotificationData) {
+        Optional&lt;HealthCheckResultEntry&gt; mostCritical = event.getData()
+        .as(HealthCheckNotificationData.class).getEntries()
+        .stream().sorted().findFirst();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+For an application to use the <code>Inbound</code> annotation and <code>EventbusMessage</code> class, it will have to define the <a href="../../../Public%20API/Overview.html" class="page">Payara Public API</a> as a dependency.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="notification-service-command-reference"><a class="anchor" href="#notification-service-command-reference"></a>Notification Service Configuration Commands</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following Asadmin CLI subcommands can be used to configure the notification service in general.</p>
+</div>
+<div class="sect2">
+<h3 id="notification-configure"><a class="anchor" href="#notification-configure"></a><code>notification-configure</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; notification-configure --enabled=true --dynamic=true</code></p>
+</dd>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Enables or disables the notification  service.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options"><a class="anchor" href="#command-options"></a>Command Options</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--enabled=true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables or disables the service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">False</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--dynamic=true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When set to <code>true</code>, applies the changes without a restart. Otherwise a restart is required.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">False</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+The argument <code>--dynamic=true</code> is necessary to turn on the service for a running server, otherwise the change would only be applied after a server restart.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="example"><a class="anchor" href="#example"></a>Example</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; notification-configure --enabled=true --dynamic=true</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="list-notifiers"><a class="anchor" href="#list-notifiers"></a><code>list-notifiers</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; list-notifiers</code></p>
+</dd>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Lists all available notifiers. These can then be configured individually or referenced by other service commands, like for example the <a href="#/documentation/payara-server/request-tracing-service/asadmin-commands.adoc" class="page unresolved"><code>Request Tracing Configuration</code></a> commands.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options-1"><a class="anchor" href="#command-options-1"></a>Command Options</h4>
+<div class="paragraph">
+<p>There are no available options for this command.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="example-1"><a class="anchor" href="#example-1"></a>Example</h4>
+<div class="paragraph">
+<p>Here&#8217;s an example on the output generated by the command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt;  list-notifiers
+Available Notifier Services:
+        cdieventbus-notifier
+        eventbus-notifier
+        log-notifier
+        jms-notifier
+
+Command list-notifiers executed successfully.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="get-notification-configuration"><a class="anchor" href="#get-notification-configuration"></a><code>get-notification-configuration</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; get-notification-configuration</code></p>
+</dd>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>This command can be used to view the current configuration of the notification service.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options-3"><a class="anchor" href="#command-options-3"></a>Command Options</h4>
+<div class="paragraph">
+<p>There are no available options for this command.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="example-3"><a class="anchor" href="#example-3"></a>Example</h4>
+<div class="paragraph">
+<p>Running the command will give output similar to the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt;
+Enabled  Notifier Enabled  Notifier Name
+false    false             service-log
+
+Command get-notification-configuration executed successfully.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="set-notification-configuration"><a class="anchor" href="#set-notification-configuration"></a><code>set-notification-configuration</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; set-notification-configuration --enabled=true --dynamic=true --notifierEnabled=true --notifierDynamic=true --useseparatelogfile=true</code></p>
+</dd>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>This command can be used to set the the configuration of the Notification Service and the Log Notifier at the same time.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options-4"><a class="anchor" href="#command-options-4"></a>Command Options</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--enabled=true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables or disables the service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--dynamic=true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When set to true, applies the changes without a restart. Otherwise a restart is required.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--notifierEnabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables or disables the log notifier</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--notifierDynamic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When set to true, applies the changes to the log notifier without a restart. Otherwise a restart is required.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--useseparatelogfile</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When set to true, prints notifications to the configured log file</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="example-4"><a class="anchor" href="#example-4"></a>Example</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-notification-configuration
+    --enabled=true
+    --dynamic=true
+    --notifierEnabled=true
+    --notifierDynamic=true
+    --useseparatelogfile=false</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="see-also"><a class="anchor" href="#see-also"></a>See Also</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#/documentation/payara-server/logging/logging.adoc" class="page unresolved">Logging Configuration</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

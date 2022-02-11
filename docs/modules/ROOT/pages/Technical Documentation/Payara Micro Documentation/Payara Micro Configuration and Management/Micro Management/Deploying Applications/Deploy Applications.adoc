@@ -1,0 +1,173 @@
+= Deploying Applications
+
+[[deploying-an-application]]
+== Deploying an Application From the Command Line
+
+NOTE: If you wish to deploy multiple packages, you must specify the `--deploy` again, or point to a `--deploymentDir` with multiple applications.
+
+[[deploying-an-application-package]]
+=== Deploying an Application Package
+
+NOTE: All Payara Micro actions are run for the Payara Micro JAR, all in one command.
+
+To deploy a WAR file to an instance, you need to use the `--deploy` option, followed by the path to the application to deploy. See below for an example of starting a Payara Micro instance and deploying a WAR file:
+
+[source, shell]
+----
+java -jar payara-micro.jar --deploy /home/user/example.war
+----
+
+TIP: The `--deploy` option is optional if your deployment file ends with `.jar`, `.rar` or `.war` therefore the command line below can also be used
+
+[source, shell]
+----
+java -jar payara-micro.jar /home/user/example.war
+----
+
+[[deploying-an-exploded-war]]
+=== Deploying an Exploded War
+
+An exploded WAR can be deployed to a Payara Micro instance just by specifying the path to the exploded WAR root directory on the `--deploy` command line or programmatically via the API. The exploded WAR can be redeployed by creating an empty `.reload`
+file in the root directory and updating its timestamp. 
+
+TIP: On a Linux OS host, a simple `touch .reload` command can update the timestamp of the file.
+
+[[deploying-applications-from-a-maven-repository]]
+=== Deploying Applications from a Maven repository
+
+You can deploy an application directly from a Maven repository using the `--deployFromGAV` option. This option accepts a comma separated string denoting a Maven artefact's `groupId`, `artifactId`, and `version` attributes.
+
+[source, shell]
+----
+java -jar payara-micro.jar --deployFromGAV "fish.payara.examples,test,1.0-SNAPSHOT"
+----
+
+This option can be used multiple times, and in conjunction with the standard `--deploy` options.
+
+IMPORTANT: By default, Payara Micro will only search for artefacts in the Maven Central repository. If you wish to search additional repositories, you can add them to the list of repositories to search with the `--additionalRepository` option:
+
+[source, shell]
+----
+java -jar payara-micro.jar --deployFromGAV "fish.payara.examples,test,1.0-SNAPSHOT" --additionalRepository https://maven.java.net/content/repositories/promoted/
+----
+To search through multiple additional repositories, you can use the option multiple times:
+
+[source, shell]
+----
+java -jar payara-micro.jar --deployFromGAV "fish.payara.examples,test,1.0-SNAPSHOT" --additionalRepository https://maven.java.net/content/repositories/promoted/ --additionalRepository https://raw.github.com/payara/Payara_PatchedProjects/master/
+----
+
+[[define-context-root]]
+== Define context root
+
+The context root of an application can be specified using the option `--contextroot` or by appending the path to the war-file name given with the `--deploy` option.
+
+A context root set using `--contextroot <context-path>` option applies to the application of the first `--deploy` use that does not already specify a context root. Let's take the following example:
+
+[source, shell]
+----
+java -jar payara-micro.jar --deploy /home/user/example.war --contextroot hello-world
+----
+
+The root context of the `example.war` application is now set to `/hello-world`. 
+
+Alternatively the context root can be included in the value of the `--deploy` option. It follows the path to the war file separated by `File.pathSeparator`:
+
+* `--deploy <war-file>:<context-path>` (Linux uses `:`)
+* `--deploy <war-file>;<context-path>` (Windows uses `;`)
+
+[source, shell]
+----
+java -jar payara-micro.jar --deploy /home/user/example.war:hello-world
+----
+
+The above command again results in the effective root context `/hello-world`.
+
+The two alternative mechanisms can also be used together:
+
+[source, shell]
+----
+java -jar payara-micro.jar --contextroot bar
+    --deploy /home/user/example.war:foo 
+    --deploy /home/user/test.war 
+----
+
+Here `example.war` is deployed in `/foo` while `test.war` is deployed in `/bar`.
+
+NOTE: `--deploy example.war:` is identical to `--deploy example.war:/` and deploys to the effective context root `/` while `--deploy example.war` deploys to `/example`. 
+
+IMPORTANT: It follows that leading `/` can be given but aren't required. However, tailing `/` must not be given. Using `--deploy example.war:/foo/` will render the `<host>/foo/` endpoint inaccessible.
+
+[[using-rootdir]]
+== Using Root Configuration Directory
+
+When a configuration root directory is reused across restarts (i.e. not running in a container), it is recommended not to setup a deployment each time a Payara Micro instance is started using that directory.
+
+Doing so will cause the application to be deployed twice: Once at startup and second time when deployment section of the command line is processed.
+
+The best approach is to use a warmup run for deployment the first time the root directory is created:
+
+[source,shell]
+----
+# Perform deployments and configuration the first time
+java -jar payara-micro.jar --rootdir micro-root --warmup application.war
+
+# All further invocations do not setup deployment
+java -jar payara-micro.jar --rootdir micro-root
+----
+
+Alternatively a launcher can be generated from a configuration root directory as well:
+
+[source,shell]
+----
+# Perform deployments and configuration the first time
+java -jar payara-micro.jar --rootdir micro-root --warmup application.war
+java -jar payara-micro.jar --rootdir micro-root --outputlauncher
+
+# All further invocations use the launcher JAR in the configuration directory
+java -jar micro-root/launch-micro.jar
+----
+
+[[payara-micro-post-boot-output]]
+== Payara Micro Post Boot Output
+
+The following information about the output made by Payara Micro after its booting has completed will be available for examination:
+
+[[deployed-apps]]
+=== Deployed Apps
+
+After Payara Micro has booted, the log output will list data about the instance and all deployed applications, which includes:
+
+* The name of the host machine
+* The HTTP port(s) in use by the instance
+* The HTTPS port(s) in use by the instance
+* The generated instance name
+* The instance's group name
+* The Hazelcast member UUID
+* A list of all deployed application names and their entry-point URLs
+
+Here is an example of this output:
+
+[source, log]
+----
+[DATE:TIME+TIMEZONE] [] [INFO] [] [PayaraMicro] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: EPOCHTIME] [levelValue: 800] [[[DATE:TIME+TIMEZONE] [] [INFO] [] [PayaraMicro] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: EPOCHTIME] [levelValue: 800] [[
+Instance Configuration
+Host: Example-Host
+HTTP Port(s): 8080
+HTTPS Port(s):
+Instance Name: Adjective-Fish
+Instance Group: MicroShoal
+Hazelcast Member UUID 000a0aa0-000a-0a00-000a-a00000a00aa0
+Deployed: ExampleApp01 ( exampleapp01 war /exampleappendpoint1 )
+Deployed: ExampleApp02 ( exampleapp02 war /exampleappendpoint2 )
+]]
+
+[DATE:TIME+TIMEZONE] [] [INFO] [] [PayaraMicro] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: EPOCHTIME] [levelValue: 800] [[[DATE:TIME+TIMEZONE] [] [INFO] [] [PayaraMicro] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: EPOCHTIME] [levelValue: 800] [[
+
+Payara Micro URLs
+http://example:port/exampleappendpoint1
+https://example:port/exampleappendpoint1
+http://example:port/exampleappendpoint2
+https://example:port/exampleappendpoint2
+]]
+----

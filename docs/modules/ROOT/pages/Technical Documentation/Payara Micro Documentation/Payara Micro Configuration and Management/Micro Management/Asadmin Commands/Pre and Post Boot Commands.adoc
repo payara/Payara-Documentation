@@ -1,0 +1,89 @@
+[[running-asadmin-commands-using-preboot-and-posboot-scripts]]
+= Running asadmin commands using Pre-boot and Post-boot Scripts
+
+Administration commands can also be run against a Payara Micro instance at specific moments in its lifecycle. To do this, you must provide the commands you wish to execute in special scripts via a command line option.
+
+[[structure-of-a-boot-script]]
+== Structure of a Boot Script
+
+Boot scripts are simple text files that contain the _asadmin_ subcommands used to configure the instance. These scripts will follow these set of rules:
+
+. Each _asadmin_ command must be represented in one line of text in the script. No line breaks are allowed.
+. Each _asadmin_ command must be formatted on the syntax `subcommand [options] [operands]`,
+as if you were running the commands in a multimode session from the command line.
+. Empty lines and comment lines (starting with the `#` character) are ignored.
+. Each _asadmin_ command may contain variable references (e.g. to environment variables or system properties) as described in xref:/documentation/payara-server/server-configuration/var-substitution/usage-of-variables.adoc[Using variables]
+
+NOTE: _asadmin_ commands that contain spaces in the value should be surrounded with quotations marks.
+
+Here's a sample of a post boot script used to configure an instance for production uses:
+
+[source, shell]
+----
+#Disable dynamic reloading of applications
+set configs.config.server-config.admin-service.das-config.dynamic-reload-enabled=false
+
+# Set a system property which contains spaces
+create-system-properties "property.name=This is a property value"
+#Disable auto deployment
+set configs.config.server-config.admin-service.das-config.autodeploy-enabled=false
+
+#Optimizing Heap size
+delete-jvm-options -client:-Xmx1024:-Xms512
+create-jvm-options -server:-Xmx2048:-Xms2048
+
+#Configuring Hazelcast cluster
+set-hazelcast-configuration --clusterName=my-production-cluster --target=server-config
+
+#Using a reference to a system property payara.deployed-app-name
+set configs.config.server-config.http-service.virtual-server.server.default-web-module=${payara.deployed-app-name}
+
+#Using a reference to an environment variable security-enabled
+set configs.config.server-config.network-config.protocols.protocol.http-listener-1.security-enabled=${ENV=security-enabled}
+----
+
+[[configuring-boot-scripts]]
+== Configuring Boot Scripts
+
+When running Payara Micro from the command line, use appropriate command file options to specify the script file locations and the moment in the boot lifecycle when they should be executed:
+
+`--prebootcommandfile`:: provides a file of asadmin commands to run before booting the server (only some commands work at this point)
+`--postbootcommandfile`:: provides a file of asadmin commands to run after booting the server
+`--postdeploycommandfile`:: provides a file of asadmin commands to run after all deployments have completed
+
+For example:
+
+[source, shell]
+----
+java -jar payara-micro.jar --prebootcommandfile prepare-resources.txt --postbootcommandfile ready-production-use.txt --postdeploycommandfile post-process-apps.txt
+----
+
+When creating an Uber JAR using the `--outputUberJAR` option, the scripts are transferred into the `MICRO-INF/` directory of the resulting JAR artifact as the `pre-boot-commands.txt`, `post-boot-commands.txt` and `post-deploy-commands.txt` files.
+
+For example, when generating the Uber JAR like this:
+
+[source, shell]
+----
+java -jar payara-micro.jar --prebootcommandfile prepare-resources.txt --postbootcommandfile ready-production-use.txt --outputUberJar custom-micro.jar
+----
+
+Examining the JAR structure will confirm that the scripts have been transferred correctly:
+
+image:payara-micro/uber-jar-command-scripts-structure.png[Uber JAR Command scripts structure]
+
+[[boot-scripts-with-persistent-rootdir]]
+== Boot Scripts with Persistent Root Directory
+
+A command in a boot script usually results in change of configuration in `config/domain.xml`.
+When persistent root directory is reused between restarts, it may cause some commands to fail, particularly those that create new resources, like for example `create-jdbc-connection-pool`. However, failure of a script command is not critical for server startup, just a warning is logged in such case.
+
+By utilizing <<../configuring/config-cmd-line.adoc#warmup, warmup run>>, these commands can be run as part of preparation of root directory rather than run on every startup. That also spares startup time for productive instance.
+
+When a command uses xref:/documentation/payara-server/server-configuration/var-substitution/usage-of-variables.adoc[variable references], the values for variables are determined during execution of the script, before executing the command and changing the configuration. If a variable value should be evaluated each time Payara Micro starts, then executing a script in `--warmup` mode will not suffice and the script needs to be passed as argument also for productive runs.
+
+[[restrictions-on-preboot-scripts]]
+== Restrictions on Pre-boot Scripts
+
+Keep in mind when writing a *pre-boot* command script, that the commands prepared will be running before the server has booted, which means not all available asadmin subcommands will yield results (for example deploying or listing applications).
+
+TIP: It's recommended to create _preboot_ scripts that use simple set commands to change the configuration of existing resources (adding new resources might not work in all cases) like network listeners, standard domain configuration and such.

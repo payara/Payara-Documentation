@@ -1,0 +1,32 @@
+[[terminology]]
+= Terminology
+
+[[traces-and-spans]]
+== Traces & Spans
+
+A Span is a named, timed operation that represents an individual unit of work, such as the execution of
+a JAX-RS method. Since a Span is a unit of work, they typically contain references to other Spans to
+represent the work in its entirety.
+
+A Trace is the term used to describe the collection of Spans that make up an entire request’s
+lifecycle from the viewpoint of the Payara Platform: from the request hitting the server to it leaving.
+A Trace can be made up of simply one Span.
+
+[[references]]
+== References
+
+The references between Spans are of one of two types: "Child of" or "Follows from".
+
+"Child of" references are used to denote that a Span is the child of another Span, e.g. a sub-unit of work.
+
+"Follows from" references are used to denote that a Span was spawned by another Span, but is not a sub-unit
+of work of the parent Span (the parent Span does not depend on the child Span).
+
+[[tags-and-logs]]
+== Tags and Logs
+
+A Span Tag is simply a key:value pair of information that is added to a Span to provide details about the unit of work.
+For example, JAX-RS methods automatically set the `http.url` tag to provide information about the URL traced.
+
+A Span Log is a Tag that is paired with a timestamp. As denoted by the name, this is typically used to add information
+to a Span about an event happening at a specific time during the duration of the Span (e.g. an error).

@@ -1,0 +1,78 @@
+# HashiCorp Secrets Config Source
+
+The HashiCorp Secrets Config Source takes configuration properties from HashiCorp Vault. You can learn more about HashiCorp on: https://www.vaultproject.io/  
+
+## Prerequisite
+
+This documentation assumes the following:
+
+* You have successfully installed the HashiCorp Vault and have a running Vault server
+* You are familiar with most, if not all, of the HashiCorp Vault technology and terminology. If not please read through their documentation before you attempt to use HashiCorp Secrets Config Source
+* Your HashiCorp Vault is unsealed
+
+IMPORTANT: Hashicorp config source only supports the Vault KV Secrets Engine.
+
+[[configuration]]
+## Configuration in Payara Server
+
+You can configure HashiCorp Secrets Config Source either via the admin console or the _asadmin_ utility. You'll need a client token, the KV Secrets Engine API version, Vault's address represented as URL and port, the path where the KV Secrets Engine is enabled and the path where your secrets are stored.
+
+NOTE: By default, the KV Secrets Engine is enabled at the /secret path in Vault.
+
+### From the Admin Console
+
+To configure the `HASHICORP_VAULT_TOKEN` password alias from the admin console, refer to the xref:documentation/payara-server/password-aliases/password-alias-admin-console-commands.adoc[Password Aliases Admin Console configuration] guide.
+
+To configure the config source from the admin console, go to `Configs` -> `your-config` -> `MicroProfile` -> `Config` -> `HashiCorp Secrets`.
+
+image:microprofile/config/cloud/hashicorp/admin-console-config.png[Payara Server Administration Console configuration route]
+
+From here you can select the KV Secrets Engine API version you want to use, configure the vault address, the path where the KV Secrets Engine is enabled and the path where your secrets are stored. You can also decide whether to apply these changes dynamically or on the next server restart. If the config source is enabled or disabled dynamically it will take effect across the server immediately.
+
+### From the Command Line
+
+To configure the `HASHICORP_VAULT_TOKEN` password alias from the admin console, refer to the xref:documentation/payara-server/password-aliases/password-alias-admin-console-commands.adoc[Password Aliases Admin Console configuration] guide.
+
+To configure the HashiCorp Secrets Config Source from the command line, use the `set-hashicorp-config-source-configuration` asadmin command, specifying the required parameters like this:
+
+[source, shell]
+----
+asadmin> set-hashicorp-config-source-configuration --enabled true --dynamic true --api-version 2 --vault-address https://127.0.0.1:8200 --secrets-engine-path secret --secrets-path my-secret
+----
+
+You can use the `--enabled` and `--dynamic` options to enable or disable the HashiCorp Secrets Config Source on demand. 
+
+Also, you can retrieve the current configuration for the HashiCorp Secrets Config Source using the `get-hashicorp-config-source-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin> get-hashicorp-config-source-configuration
+
+Enabled  API Version  Secrets Engine Path  Secrets Path  Vault Address
+true     2            secret               my-secret     https://127.0.0.1:8200
+----
+
+## Usage
+
+Provided that all of the above sections are configured correctly, the secrets can be injected into any applicable MicroProfile Config injection point as with any other Config Source. The secrets can also be fetched, created and deleted using the asadmin utility.
+
+To fetch a secret form a HashiCorp Vault:
+
+[source, shell]
+----
+asadmin> get-config-property --source cloud --sourcename hashicorp --propertyname mysecret
+----
+
+To create or change a secret from a HashiCorp Vault:
+
+[source, shell]
+----
+asadmin> set-config-property --source cloud --sourcename hashicorp --propertyname mysecret --propertyValue secretvalue
+----
+
+To delete a secret from a HashiCorp Vault:
+
+[source, shell]
+----
+asadmin> delete-config-property --source cloud --sourcename hashicorp --propertyname mysecret
+----

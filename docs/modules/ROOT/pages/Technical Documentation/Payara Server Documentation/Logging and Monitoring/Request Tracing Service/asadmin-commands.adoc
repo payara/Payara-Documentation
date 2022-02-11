@@ -1,0 +1,295 @@
+[[request-tracing-command-reference]]
+= Administration Commands
+
+The following is a detailed list of the administration commands that can be used
+to correctly configure the Request Tracing Service.
+
+[[set-requesttracing-configuration]]
+== `set-requesttracing-configuration`
+
+*Usage*::
+`asadmin> set-requesttracing-configuration`
+
+*Aim*::
+This command can be used to set all configuration of the request
+tracing service at once.
+
+[[command-options]]
+=== Command Options
+
+[cols="4,1,4,1,1",options="header",]
+|=======================================================================
+|Option |Type |Description |Default |Mandatory
+|`--enabled` |Boolean |Enables or disables the service |false |Yes
+|`--dynamic` |Boolean |When set to true, applies the changes
+without a restart. Otherwise a restart is required. |false |No
+|`--sampleRate` |Double |The probability of a trace being sampled. Number must be between 0 and 1.0 |1.0 |No
+|`--adaptiveSamplingEnabled` |Boolean |Whether or not to use an adaptive sampling rate |False |No
+|`--adaptiveSamplingTargetCount` |Integer |The target number of traces to sample per the configured time window |6 |No
+|`--adaptiveSamplingTimeValue` |Integer |The period of time to attempt to hit the adaptive sample target count in |1 |No
+|`--adaptiveSamplingTimeUnit` |String |The time unit for the _adaptiveSampleTimeValue_ option |MINUTES |No
+|`--applicationsOnlyEnabled` |Boolean |Whether or not to only sample traces related to applications |True |No
+|`--thresholdValue` |Integer |Sets the number of time units which trigger the tracing of a request. Only used if _adaptiveSamplingEnabled_ is set to false |30 |No
+|`--thresholdUnit` |TimeUnit |Sets the time unit to use for the threshold. Only used if _adaptiveSamplingEnabled_ is set to false |`SECONDS` |No
+|`--sampleRateFirstEnabled` |Boolean |Whether to perform the sampling check before or after threshold calculation. |True |No
+|`--traceStoreSize` |Integer |Sets how many request traces will be stored |20 |No
+|`--traceStoreTimeout` |Integer |Sets how long before Request Tracing messages are removed. This field is specified in the format "%d %h %m %s" where % is an integer. Any of the units can also be omitted. Ignored when reservoir sampling is enabled. |- |No
+|`--reservoirSamplingEnabled` |Boolean |Whether to use reservoir sampling, or time based sampling. |False |No
+|`--historictracestoreenabled` |Boolean |When present, enables storage of the slowest sampled historical request traces in a separate trace store. |false |No
+|`--historictracestoresize` |Integer |Sets how many request traces will be stored for historical purposes. |20 |No
+|`--historictracestoretimeout` |String |Sets how long before Request Tracing messages are removed from the historical trace store. This field is specified in the format "%d %h %m %s" where % is an integer. Any of the units can also be omitted. Ignored when reservoir sampling is enabled. |N/A |No
+|=======================================================================
+
+[[example]]
+=== Example
+
+[source, shell]
+----
+asadmin> set-requesttracing-configuration
+    --enabled=true
+    --thresholdValue=10
+    --thresholdUnit="SECONDS"
+    --dynamic=true
+    --historictracestoreenabled=true
+    --historictracestoresize=20
+    --historictracestoretimeout='1d 2h 3m 30s'
+----
+
+
+[[requesttracing-notifier-configure]]
+== `requesttracing-[NOTIFIER_NAME]-notifier-configure`
+
+*Usage*::
+`asadmin> requesttracing-[NOTIFIER_NAME]-notifier-configure --enabled=true --dynamic=true`
+
+*Aim*::
+This command can be used to enable or disable the notifier represented by the
+_[NOTIFIER_NAME]_ placeholder.
+
+[[command-options-3]]
+=== Command Options
+
+[cols=",,,,",options="header",]
+|=======================================================================
+|Option |Type |Description |Default |Mandatory
+|`--enabled` |Boolean |Enables or disables the notifier |false|Yes
+|`--dynamic` |Boolean |When set to true, applies the changes
+without a server/instance restart. |false |No
+|=======================================================================
+
+[[example-3]]
+=== Examples
+
+. To enable the log notifier for the Request Tracing Service without having to
+restart the server, use the following command:
++
+[source, shell]
+----
+asadmin> requesttracing-log-notifier-configure
+    --enabled=true
+    --dynamic=true
+----
+
+. To disable the
+xref:/documentation/payara-server/notification-service/notifiers/slack-notifier.adoc[Slack notifier]
+without having to restart the server, use the following command:
++
+[source, shell]
+----
+asadmin> requesttracing-slack-notifier-configure
+    --enabled=false
+    --dynamic=true
+----
+
+[[get-requesttracing-configuration]]
+== `get-requesttracing-configuration`
+
+*Usage*::
+`asadmin> get-requesttracing-configuration`
+
+*Aim*::
+This command can be used to list the configuration settings of the Request Tracing
+Service.
+
+[[command-options-4]]
+=== Command Options
+
+There are no available options for this command.
+
+[[example-4]]
+=== Example
+
+[source, shell]
+----
+asadmin> get-requesttracing-configuration
+----
+
+Will give an output similar to the following:
+
+----
+Request Tracing Service Enabled?: true
+Request Tracing Service Sample Rate: 1.0
+Request Tracing Service Adaptive Sampling Enabled?: false
+Request Tracing Service Application Only?: true
+Request Tracing Service Threshold Value: 30
+Request Tracing Service Threshold Unit: SECONDS
+Request Tracing Service Sample Rate First?: true
+Request Tracing Service Reservoir Sampling Enabled?: false
+Request Tracing Service Trace Store Size: 20
+Request Tracing Service Historic Trace Store Enabled?: false
+Below are the configuration details of each notifier listed by its name.
+
+Notifier Name  Notifier Enabled  
+service-log    false
+Command get-requesttracing-configuration executed successfully.
+----
+
+
+
+[[list-requesttraces]]
+== `list-requesttraces`
+
+*Usage*::
+`asadmin> list-requesttraces`
+
+*Aim*::
+This command can be used to list a number of previous request trace messages from either the current or historic trace stores of the Request Tracing Service. 
+
+[[command-options-5]]
+=== Command Options
+
+[cols=",,,,",options="header",]
+|=======================================================================
+|Option |Type |Description |Default |Mandatory
+|`--first` |Integer |A limit for the number of Request Tracing messages to return |false|No
+|`--historicTraces` |Boolean |Whether to get the traces from the historic trace store or not |True |No
+|=======================================================================
+
+[[example-5]]
+=== Example
+
+[source, shell]
+----
+asadmin> list-requesttraces --historictraces false
+----
+
+Will give an output similar to the following:
+
+----
+Occurring Time            Elapsed Time  Traced Message                                                                  
+2018-03-15T12:36:07.391Z  169           {"traceSpans":[
+{"operationName":"processContainerRequest","spanContext":{"spanId":"61fa3c1c-9f62-43fe-8e55-faba2ce77f92","traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"},"startTime":"2018-03-15T12:36:07.391Z[Europe/London]","endTime":"2018-03-15T12:36:07.560Z[Europe/London]","traceDuration":"169000000","spanTags":[{"Server": "server"},{"Domain": "domain1"}]},
+{"operationName":"authenticateJaspic","spanContext":{"spanId":"fb929e4d-1477-4841-a088-0d07888608a6","traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"},"startTime":"2018-03-15T12:36:07.391Z[Europe/London]","endTime":"2018-03-15T12:36:07.392Z[Europe/London]","traceDuration":"1000000","spanTags":[{"Context": ""},{"AppContext": "__asadmin "},{"AuthResult": "true"},{"Principal": "admin"}]},
+{"operationName":"processServletRequest","spanContext":{"spanId":"94cc4722-0990-4230-aa34-f0e0f629b1d8","traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"},"startTime":"2018-03-15T12:36:07.392Z[Europe/London]","endTime":"2018-03-15T12:36:07.559Z[Europe/London]","traceDuration":"167000000","spanTags":[{"referer": "[http://localhost:4848/common/index.jsf]"},{"accept-language": "[en-GB,en;q=0.8,de;q=0.5,zh-CN;q=0.3]"},{"cookie": "[JSESSIONID=99ce446fd68ec4adb3a3aa61b087; treeForm_tree-hi=treeForm:tree:nodes:hazelcast]"},{"QueryString": "bare=true"},{"Method": "GET"},{"URL": "http://localhost:4848/cluster/cluster/clusters.jsf"},{"accept": "[*/*]"},{"host": "[localhost:4848]"},{"connection": "[keep-alive]"},{"Class": "javax.faces.webapp.FacesServlet"},{"accept-encoding": "[gzip, deflate]"},{"user-agent": "[Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0]"}],"references":[{"spanContext":{"spanId":"61fa3c1c-9f62-43fe-8e55-faba2ce77f92","traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"},"relationshipType":"ChildOf"}]}
+]}
+----
+
+The request tracing messages are in JSON format, so can be parsed by log parsing
+tools as if it were in the following format:
+
+[source, json]
+----
+{
+   "traceSpans":[
+      {
+         "operationName":"processContainerRequest",
+         "spanContext":{
+            "spanId":"61fa3c1c-9f62-43fe-8e55-faba2ce77f92",
+            "traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"
+         },
+         "startTime":"2018-03-15T12:36:07.391Z[Europe/London]",
+         "endTime":"2018-03-15T12:36:07.560Z[Europe/London]",
+         "traceDuration":"169000000",
+         "spanTags":[
+            {
+               "Server":"server"
+            },
+            {
+               "Domain":"domain1"
+            }
+         ]
+      },
+      {
+         "operationName":"authenticateJaspic",
+         "spanContext":{
+            "spanId":"fb929e4d-1477-4841-a088-0d07888608a6",
+            "traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"
+         },
+         "startTime":"2018-03-15T12:36:07.391Z[Europe/London]",
+         "endTime":"2018-03-15T12:36:07.392Z[Europe/London]",
+         "traceDuration":"1000000",
+         "spanTags":[
+            {
+               "Context":""
+            },
+            {
+               "AppContext":"__asadmin "
+            },
+            {
+               "AuthResult":"true"
+            },
+            {
+               "Principal":"admin"
+            }
+         ]
+      },
+      {
+         "operationName":"processServletRequest",
+         "spanContext":{
+            "spanId":"94cc4722-0990-4230-aa34-f0e0f629b1d8",
+            "traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"
+         },
+         "startTime":"2018-03-15T12:36:07.392Z[Europe/London]",
+         "endTime":"2018-03-15T12:36:07.559Z[Europe/London]",
+         "traceDuration":"167000000",
+         "spanTags":[
+            {
+               "referer":"[http://localhost:4848/common/index.jsf]"
+            },
+            {
+               "accept-language":"[en-GB,en;q=0.8,de;q=0.5,zh-CN;q=0.3]"
+            },
+            {
+               "cookie":"[JSESSIONID=99ce446fd68ec4adb3a3aa61b087; treeForm_tree-hi=treeForm:tree:nodes:hazelcast]"
+            },
+            {
+               "QueryString":"bare=true"
+            },
+            {
+               "Method":"GET"
+            },
+            {
+               "URL":"http://localhost:4848/cluster/cluster/clusters.jsf"
+            },
+            {
+               "accept":"[*/*]"
+            },
+            {
+               "host":"[localhost:4848]"
+            },
+            {
+               "connection":"[keep-alive]"
+            },
+            {
+               "Class":"javax.faces.webapp.FacesServlet"
+            },
+            {
+               "accept-encoding":"[gzip, deflate]"
+            },
+            {
+               "user-agent":"[Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0]"
+            }
+         ],
+         "references":[
+            {
+               "spanContext":{
+                  "spanId":"61fa3c1c-9f62-43fe-8e55-faba2ce77f92",
+                  "traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"
+               },
+               "relationshipType":"ChildOf"
+            }
+         ]
+      }
+   ]
+}
+----

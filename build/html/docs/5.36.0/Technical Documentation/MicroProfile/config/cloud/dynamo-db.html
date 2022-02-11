@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>DynamoDB Config Source :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="dynamo-db.html">DynamoDB Config Source</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/MicroProfile/config/cloud/dynamo-db.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">DynamoDB Config Source</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The DynamoDB config source reads configuration properties from a DynamoDB database table. DynamoDB is a managed NoSQL database service provided by Amazon.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_aws_iam_user"><a class="anchor" href="#_aws_iam_user"></a>AWS IAM User</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to access DynamoDB, you need an AWS access key. If you don&#8217;t have an access key, you can create them from the AWS Management Console. To create access keys for an IAM user which Payara Server will use to access your DynamoDB.</p>
+</div>
+<div class="paragraph">
+<p>From the AWS console, visit the <em>IAM Users</em> dashboard by searching 'IAM' in the top search bar. From here, head to <em>Users</em> in the left menu. You&#8217;ll see all your IAM users associated with this region.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/iam-users.png" alt="AWS IAM users"></span></p>
+</div>
+<div class="paragraph">
+<p>From here you can create a new IAM user. Skip this step if you already have an IAM user you want to use.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/new-iam-user.png" alt="AWS new IAM user"></span></p>
+</div>
+<div class="paragraph">
+<p>Set the IAM user name. This isn&#8217;t used by Payara Server but will be helpful for your own reference. Make sure you enable <em>Programmatic access</em>, as this will be used by Payara Server to access your AWS Secrets.</p>
+</div>
+<div class="paragraph">
+<p>Next, select your IAM user permissions.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/iam-user-permissions.png" alt="AWS IAM user permissions"></span></p>
+</div>
+<div class="paragraph">
+<p>Whether you assign a group or select individual permissions, make sure the IAM user contains the <em>SecretsManagerReadWrite</em> permission, which will allow the user access to your secrets.</p>
+</div>
+<div class="paragraph">
+<p>When you finish creating the IAM user, you&#8217;ll be given an access key id and secret access key. These will need to be recorded and passed to Payara Server as <a href="#documentation/payara-server/password-aliases/Overview.adoc" class="page unresolved">Password Aliases</a> <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code> respectively.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuration_in_payara_server"><a class="anchor" href="#_configuration_in_payara_server"></a>Configuration in Payara Server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>DynamoDB config source configuration is disabled by default but can be configured dynamically or statically like any other Payara service.</p>
+</div>
+<div class="paragraph">
+<p>You can configure DynamoDB Config Source either via the admin console or the <em>asadmin</em> utility. You&#8217;ll need the name of a database table, name of the key column containing the key and name of the column containing the value, as well as the name of the AWS region the DynamoDB table has been created in. The values from the key column will be used as the config property names and the values from the value column will be used as the config property value.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The type of the database columns for the <em>key</em> and <em>value</em> columns needs to be of type <em>`String`</em> or compatible.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To find the region in the AWS console, check the top right dropdown:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/region.png" alt="AWS region selection"></span></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The region name is the snake-case notation, not the full words. E.g. <code>eu-west-2</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_from_the_admin_console"><a class="anchor" href="#_from_the_admin_console"></a>From the Admin Console</h3>
+<div class="paragraph">
+<p>To configure the <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code> password aliases from the admin console, refer to the <a href="#documentation/payara-server/password-aliases/password-alias-admin-console-commands.adoc" class="page unresolved">Password Aliases Admin Console configuration</a> guide.</p>
+</div>
+<div class="paragraph">
+<p>To configure the config source from the admin console, go to <code>Configs</code> &#8594; <code>your-config</code> &#8594; <code>MicroProfile</code> &#8594; <code>Config</code> &#8594; <code>DynamoDB</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/dynamodb/admin-console-config.png" alt="Payara Server Administration Console configuration route"></span></p>
+</div>
+<div class="paragraph">
+<p>From here you configure the name of the database table, the region name, name of the key column containing the key, name of the column containing the value and the maximum number of items to retrieves from the database table.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_from_the_command_line"><a class="anchor" href="#_from_the_command_line"></a>From the Command Line</h3>
+<div class="paragraph">
+<p>To configure the <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code> password aliases from the command line, refer to the <a href="#documentation/payara-server/password-aliases/password-alias-asadmin-commands.adoc" class="page unresolved">Password Aliases Asadmin configuration</a> guide.</p>
+</div>
+<div class="paragraph">
+<p>To configure the DynamoDB config source from the command line, use the <code>set-dynamodb-config-source-configuration</code> asadmin command, specifying the required parameters like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-dynamodb-config-source-configuration --enabled true --dynamic true --region-name eu-west-2 --table-name Books --key-column-name ISBN --value-column-name Title --limit 10</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can use the <code>--enabled</code> and <code>--dynamic</code> options to enable or disable the DynamoDB Config Source on demand.</p>
+</div>
+<div class="paragraph">
+<p>Also, you can retrieve the current configuration for the DynamoDB Config Source using the <code>get-dynamodb-config-source-configuration</code> asadmin command like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-dynamodb-config-source-configuration
+Enabled  Region Name  Table Name  Key Column Name  Value Column Name  Limit
+true     eu-west-2    Books       ISBN             Title              10</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_usage"><a class="anchor" href="#_usage"></a>Usage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once all of the required options are configured. You should be able to read configuration properties from a database table. For example, let&#8217;s look at the following diagram. It shows a table named Books with columns ISBN, Author and Title.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/dynamodb/database-example.png" alt="Database Example"></span></p>
+</div>
+<div class="paragraph">
+<p>If the key column name is set to ISBN and the value column name to Title. You can get the value of the Title column in relation to the ISBN column using the following command along with the ISBN value:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-config-property --source cloud --sourcename dynamodb --propertyName 9780345916419
+The Subtle Knife
+Command get-config-property executed successfully.</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Currently DynamoDB config source only supports the <code>get-config-property</code> command and doesn&#8217;t support the <code>set-config-property</code> and <code>delete-config-property</code> commands.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

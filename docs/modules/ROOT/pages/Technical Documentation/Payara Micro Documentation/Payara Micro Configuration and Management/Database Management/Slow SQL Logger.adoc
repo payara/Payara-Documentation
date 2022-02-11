@@ -1,0 +1,56 @@
+[[slow-sql-logger-in-micro]]
+= Slow SQL Logging in Payara Micro
+
+Payara Micro supports slow logging of SQL queries which brings powerful operational
+diagnostics to your micro-services platform.
+
+[[enabling]]
+== Enabling Slow SQL Logging
+
+To enable it on applications deployed on
+Payara Micro, you can use the annotation or deployment descriptor methods described below.
+
+[[deployment]]
+=== Application Deployment
+
+In Java EE 7+ applications, a JDBC data source can be deployed by adding the
+`@DataSourceDefinition` annotation to  a managed component (like and `@Stateless`
+EJB bean for example). The *Slow Query Log Threshold* time can be configured
+using this annotation, like in the following example:
+
+[source, java]
+----
+@DataSourceDefinition(
+    name = "java:app/MyApp/MyDS",
+    className = "org.h2.jdbcx.JdbcDataSource",
+    url = "jdbc:h2:mem:test",
+    properties = {"fish.payara.slow-query-threshold-in-seconds=5"})
+----
+
+The Data source definition can also be added to a deployment descriptor of
+an application, for example in the _web.xml_ standard deployment descriptor:
+
+[source, xml]
+----
+<data-source>
+    <name>java:global/ExampleDataSource</name>
+    <class-name>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</class-name>
+    <server-name>localhost</server-name>
+    <port-number>3306</port-number>
+    <database-name>mysql</database-name>
+    <user>test</user>
+    <password>test</password>
+    <!-- Example of how to use a Payara specific custom connection pool setting -->
+    <property>
+       <name>fish.payara.slow-query-threshold-in-seconds</name>
+       <value>5</value>
+    </property>
+</data-source>
+----
+
+[[see-also]]
+== See Also
+
+* xref:Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Database Management/Log JDBC Calls.adoc[JDBC Call Logging in Payara Micro]
+* xref:Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Database Management/SQL Trace Listeners.adoc[SQL Trace Listeners in Payara Micro]
+* xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/JDBC Resource Management/SQL.adoc[SQL in Payara Server]

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Docker Instances :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="docker-instances.html">Docker Instances</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Server%20Configuration%20And%20Management/Docker%20Host%20Support/docker-instances.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Docker Instances</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>A Docker instance is the term used to refer to an instance created on a Docker node.
+These instances exist within their own Docker containers, with the lifecycle of Docker containers
+being tied to the instance it was created for.</p>
+</div>
+<div class="paragraph">
+<p>Note about prerequisities of examples used in this part:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>payaraDas</code> and <code>dockerHost1</code> are hostnames known to local naming service (or you can use IP addresses)</p>
+</li>
+<li>
+<p>DAS is listening on port 4848 on <code>payaraDas</code></p>
+</li>
+<li>
+<p>Docker is listening on port 2376 on <code>dockerHost1</code></p>
+</li>
+<li>
+<p>DAS can access <code><a href="http://dockerHost1:2376" class="bare">http://dockerHost1:2376</a></code></p>
+</li>
+<li>
+<p>Docker containers can access <code><a href="https://payaraDas:4848" class="bare">https://payaraDas:4848</a></code></p>
+</li>
+<li>
+<p>user is on <code>payaraDas</code></p>
+</li>
+<li>
+<p>there are no Docker containers yet, no Docker nodes and no instances registered in the DAS</p>
+</li>
+<li>
+<p>in <code>/app/passwordfile.txt</code> on <code>payaraDas</code> is at least one line with a correct password:
+<code>AS_ADMIN_PASSWORD=admin123</code></p>
+</li>
+<li>
+<p>in /app/passwordfile-docker.txt on <code>dockerHost1</code> is the same line.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You should avoid to use the <code>payara/server-node:latest</code> tag, because it is changing without warning.
+If you really have intention to use it, you can retag the image and use your own stable Docker image tag:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">&gt;&gt; docker tag payara/server-node:latest payara/server-node:mytag</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="managing-an-instance"><a class="anchor" href="#managing-an-instance"></a>Managing an Instance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Docker instances are manageable in much the same way as any other instance.
+Deployment of applications, assignation to Deployment Groups, editing of config,
+should all be done just as if the instance was a standard SSH or CONFIG instance.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Please note that it is required that secure-admin be enabled for Docker instances to start
+(which is why a passwordfile is mandatory when creating a Docker node).
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="creating-an-instance"><a class="anchor" href="#creating-an-instance"></a>Creating an Instance</h3>
+<div class="paragraph">
+<p>There are two ways how to create a Payara Docker instance belonging to a Domain Administration Server (DAS).
+You can create a Docker container node and instances on it using the DAS, but you can also create
+a Docker container with a temporary node and instance directly from Docker.
+These two use cases differ a bit in their lifecycles.</p>
+</div>
+<div class="sect3">
+<h4 id="_from_domain_administration_server"><a class="anchor" href="#_from_domain_administration_server"></a>From Domain Administration Server</h4>
+<div class="paragraph">
+<p>Creating a Docker instance is done in exactly the same way as when creating a normal one.
+You will create a Docker node and then you can create one or more Payara Server instances on it.
+The Payara DAS will use the same version of the Docker container as the DAS by default.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">&gt;&gt; asadmin --passwordfile /app/passwordfile.txt create-node-docker --nodehost dockerHost1 --dockerpasswordfile /app/passwordfile-docker.txt --dockerport 2376 DockerNode1
+Command create-node-docker executed successfully.
+
+&gt;&gt; asadmin --passwordfile /app/passwordfile.txt create-instance --node DockerNode1 DockerInstance1
+Port Assignments for server instance DockerInstance1:
+OSGI_SHELL_TELNET_PORT=26666
+JAVA_DEBUGGER_PORT=29009
+JMS_PROVIDER_PORT=27676
+HTTP_LISTENER_PORT=28080
+IIOP_SSL_LISTENER_PORT=23820
+ASADMIN_LISTENER_PORT=24848
+IIOP_SSL_MUTUALAUTH_PORT=23920
+JMX_SYSTEM_CONNECTOR_PORT=28686
+HTTP_SSL_LISTENER_PORT=28181
+IIOP_LISTENER_PORT=23700
+
+Successfully registered instance with DAS, now attempting to create Docker container...
+Command create-instance executed successfully.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When you invoke these commands, a Docker container of the name DockerInstance1 will be created.
+If a Docker container of the same name already exists, the create-instance command will fail,
+and Payara Server will attempt to unregister the instance from the DAS.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+When autonaming is enabled, Payara Server will only attempt to resolve conflicts with
+instance names - it will not attempt to resolve conflicts in container name.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+This type of instance is completely managed by the DAS - when you delete it, it will
+be deleted also the Docker container including it&#8217;s logs.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_from_docker"><a class="anchor" href="#_from_docker"></a>From Docker</h4>
+<div class="paragraph">
+<p>Payara Server Community supports creating instances from Docker itself, making use of the
+<a href="#documentation/payara-server/asadmin-commands/auto-naming.adoc" class="page unresolved">auto-naming</a> feature to resolve any conflicts.
+The <code>docker container create</code> command creates a Payara Docker container without any contact with the DAS.
+This is also the reason why Docker container has different name than the Payara instance - they
+have different contexts and it is not possible to avoid naming conflicts, only to minimize them.</p>
+</div>
+<div class="paragraph">
+<p>You can also specify an existing Docker node name in <code>PAYARA_NODE_NAME</code> property (and ideally
+also <code>DOCKER_CONTAINER_IP</code>) and/or <a href="#documentation/payara-server/deployment-groups/Overview.adoc" class="page unresolved">Deployment Group</a> in <code>PAYARA_DEPLOYMENT_GROUP</code> property, then the Docker instance will be created as if it would be created
+from the DAS, except the fact that the DAS will be informed about that later with the first
+startup of the new Docker container.</p>
+</div>
+<div class="paragraph">
+<p>If the property was not specified or the node does not exist, a temporary Docker node and instance
+will be created on the DAS.
+The temporary Docker node is bound to the instance, so when you delete the instance,
+the temporary Docker node will be deleted too.
+This type of node is also not listed in the DAS or offered in inputs and cannot be edited.</p>
+</div>
+<div class="paragraph">
+<p>If the instance running on a temporary Docker node is stopped from the DAS, it is immediately
+unregistered from the DAS.
+The next start of the same Docker container creates new a Payara Server Instance and a new temporary
+Docker node again despite the fact that it uses the same Docker container.</p>
+</div>
+<div class="paragraph">
+<p>If the Docker containers are stopped externally to Payara (ie. by the <code>docker</code> command), the node
+and instance will be marked for deletion and cleaned up on shutdown of the DAS.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">&gt;&gt; docker container create --network host --mount type=bind,source="/app/passwordfile-docker.txt",target="/pathInDocker/passwordfile.txt",readonly -e PAYARA_DAS_HOST=payaraDas -e PAYARA_DAS_PORT=4848 -e PAYARA_PASSWORD_FILE=/pathInDocker/passwordfile.txt payara/server-node:mytag
+994e6d5db276304843481601932857fa224dfd9f9cda8578f3b09f8f11bf6004
+
+&gt;&gt; docker start 994e6d5db276
+994e6d5db276
+
+&gt;&gt; docker logs 994e6d5db276
+Docker Container ID is: 994e6d5db276304843481601932857fa224dfd9f9cda8578f3b09f8f11bf6004
+No Docker container IP override given, setting to first result from 'hostname -I'
+Hostname is 192.168.1.103
+Docker Container IP is: 192.168.1.103
+No Instance name given.
+No node name given.
+WARNING: Could not find a matching Docker Node: Creating a temporary node specific to this container - cleanup of this container cannot be done by Payara Server
+Creating a temporary node with an autogenerated name.
+./payara5/bin/asadmin -I false -T -a -H payaraDas -p 4848 -W /pathInDocker/passwordfile.txt _create-node-temp --nodehost 192.168.1.103
+Running command create-local-instance:
+./payara5/bin/asadmin -I false -T -a -H payaraDas -p 4848 -W /pathInDocker/passwordfile.txt create-local-instance --node Sarcastic-Catfish --dockernode true --ip 192.168.1.103
+Setting Docker Container ID for instance Cooperative-Spookfish: 994e6d5db276304843481601932857fa224dfd9f9cda8578f3b09f8f11bf6004
+./payara5/bin/asadmin -I false -H payaraDas -p 4848 -W /pathInDocker/passwordfile.txt _set-docker-container-id --instance Cooperative-Spookfish --id 994e6d5db276304843481601932857fa224dfd9f9cda8578f3b09f8f11bf6004
+Command _set-docker-container-id executed successfully.
+Starting instance Cooperative-Spookfish
+...</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Don&#8217;t forget that you are configuring connection to DAS from the viewpoint
+of the instance container, so configure also the Docker networking appropriately.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="starting-an-instance"><a class="anchor" href="#starting-an-instance"></a>Starting and Stopping an Instance</h3>
+<div class="paragraph">
+<p>Instances on temporary Docker nodes have their lifecycle bound to a started container.
+So from the DAS point of view they are started or do not exist.</p>
+</div>
+<div class="paragraph">
+<p>Starting a Docker instance on standard Docker node should be done just as if it were an instance on an SSH node.
+When the <code>asadmin start-instance</code> command is invoked, the DAS will contact the Docker Rest API
+as configured in the node config, and start the Docker container and the instance within it.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+If the command hangs, the Docker instance probably failed to start.
+Use the <code>docker logs</code> command to see what happened.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">&gt;&gt; asadmin --passwordfile /app/passwordfile.txt start-instance DockerInstance1
+Command start-instance executed successfully.
+
+&gt;&gt; asadmin --passwordfile /app/passwordfile.txt stop-instance DockerInstance1
+The instance, DockerInstance1, is stopped.
+Command stop-instance executed successfully.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deleting-an-instance"><a class="anchor" href="#deleting-an-instance"></a>Deleting an Instance</h3>
+<div class="paragraph">
+<p>Much as with when creating a standard Docker instance, deleting a Docker instance is done
+in the same way as other instances: with the <code>asadmin delete-instance</code> command.
+This will unregister the instance from the DAS, and delete the Docker container.</p>
+</div>
+<div class="paragraph">
+<p>Containers on temporary Docker nodes are not deleted by the DAS, they will be only stopped
+and removed from the DAS management including the temporary Docker node.
+The container management is controlled by the Docker.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">&gt;&gt; asadmin --passwordfile /app/passwordfile.txt delete-instance DockerInstance1
+Successfully removed instance DockerInstance1 from the DAS configuration, and removed the container from node DockerNode1 (dockerHost1).
+Command delete-instance executed successfully.</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+if you would delete the container directly with the <code>docker</code> command, the DAS would not know it.
+Such inconsistency can be resolved only by deletion of the instance from the DAS.
+This is automatically done on DAS restart.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-the-docker-container"><a class="anchor" href="#configuring-the-docker-container"></a>Configuring the Docker Container</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Configuration of the Docker containers is done via system properties in an instances config
+(and so can be shared across multiple instances).</p>
+</div>
+<div class="paragraph">
+<p>A complete list of the available configuration options can be found in the Docker Engine REST API here:
+<a href="https://docs.docker.com/engine/api/v1.39/#operation/ContainerCreate" class="bare">https://docs.docker.com/engine/api/v1.39/#operation/ContainerCreate</a></p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The image name is not configurable - Payara Server expects the image name to
+match the value from the node config
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The configuration within Payara Server Community of the settings denoted in the above link takes the form of dotted names. These
+names adhere to the following syntax:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Each property is prepended with "Docker"</p>
+</li>
+<li>
+<p>Each child object is specified individually, with all of its parents prepended to it</p>
+</li>
+<li>
+<p>Arrays must be surrounded with square braces</p>
+</li>
+<li>
+<p>Array values are separated using the vertical bar symbol "|"</p>
+</li>
+<li>
+<p>The colon character is used to denote the value of an object within an array</p>
+</li>
+<li>
+<p>Objects within an array are separated using a comma</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Properties that are denoted by arrays of objects containing further objects or arrays are not currently supported.
+The Env property is unique in that the colon character is used to denote the equals sign, as Payara Server does not
+currently support properties that contain an equals in their value.</p>
+</div>
+<div class="paragraph">
+<p>See below for some examples:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Example</th>
+<th class="tableblock halign-left valign-top">Original JSON</th>
+<th class="tableblock halign-left valign-top">Payara System Properties</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Arrays must be surrounded with square braces &amp; array values separated using the vertical bar symbol "|"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{ENV: [arg1=foo,arg2=bar]}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Docker.Env=[arg1:foo|arg2:bar]</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Each child object of a parent object is specified individually</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{HostConfig: {Memory: 2048, CpuShares: 3}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Docker.HostConfig.Memory=2048
+ Docker.HostConfig.CpuShares=3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The colon character is used to denote the value of an object within an array &amp; objects within an array are
+ separated using a comma</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{HostConfig: {BlkioDeviceReadBps: [{Path: /opt/foo, Rate: 24},{Path: /opt/bar, Rate: 48}]}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Docker.HostConfig.BlkioDeviceReadBps=[Path:/opt/foo,Rate:24|Path:/opt/bar,Rate:48]</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="reserved-environment-properties"><a class="anchor" href="#reserved-environment-properties"></a>Reserved Environment Properties</h3>
+<div class="paragraph">
+<p>The following Docker Environment properties are used by the default Docker image, <em>payara/server-node</em>, which you may
+wish to override to match your configuration (particularly if creating containers directly from Docker):</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Environment Property</th>
+<th class="tableblock halign-left valign-top">Use</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PAYARA_DAS_HOST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The IP address or hostname of the Domain Administration Server that the instance will register itself to.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">localhost</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PAYARA_DAS_PORT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port that the Domain Administration Server is running on</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4848</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PAYARA_NODE_NAME</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the node that the instance should be created on.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">""</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PAYARA_INSTANCE_NAME</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the instance to be created.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">""</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PAYARA_CONFIG_NAME</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the config that the created instance should use.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">""</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DOCKER_CONTAINER_IP</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The IP address or hostname that the Docker Container should use. This is used for verifying that a given node&#8217;s
+network config maps to this container, or for when creating new nodes and instances.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">First result of <code>hostname -I</code> (all IP addresses, excluding loopback)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PAYARA_DEPLOYMENT_GROUP</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the <a href="#documentation/payara-server/deployment-groups/Overview.adoc" class="page unresolved">Deployment Group</a> that the instance should join. Once the instance joins the Deployment Group, all the application targeted at the Deployment Group will automatically deploy to it.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">""</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The DAS expects to be able to talk to each instance using the port listed in its config.
+Don&#8217;t forget to properly configure used networks.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_other_examples"><a class="anchor" href="#_other_examples"></a>Other examples</h3>
+<div class="sect3">
+<h4 id="_creating_a_container_using_the_docker_rest_api"><a class="anchor" href="#_creating_a_container_using_the_docker_rest_api"></a>Creating a container using the Docker REST API</h4>
+<div class="paragraph">
+<p>Note: you can alternatively create a json file and then use curl syntax for sending files (ie. @create.json).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">&gt;&gt; curl -H 'Accept: application/json' -H 'Content-Type: application/json' -i 'http://dockerHost1:2376/containers/create?name=ManagedContainer2' --data '{
+  "Image": "payara/server-node:mytag",
+  "HostConfig": {
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/app/passwordfile-docker.txt",
+        "Target": "/opt/payara/passwords/passwordfile.txt",
+        "ReadOnly": true
+      }
+    ],
+    "NetworkMode": "host"
+  },
+  "Env": [
+    "PAYARA_DAS_HOST=payaraDas",
+    "PAYARA_DAS_PORT=4848",
+    "PAYARA_NODE_NAME=DockerNode1",
+    "PAYARA_INSTANCE_NAME=ManagedContainer2",
+    "DOCKER_CONTAINER_IP=dockerHost1"
+  ]
+}
+
+HTTP/1.1 201 Created
+Api-Version: 1.39
+Content-Type: application/json
+Docker-Experimental: false
+Ostype: linux
+Server: Docker/18.09.7 (linux)
+Date: Mon, 04 Nov 2019 13:15:13 GMT
+Content-Length: 90
+
+{"Id":"e7803ce3ec964805c41d8a0eef5838299b5b8d38aa9e0801f05f3bc56b8d5fa1","Warnings":null}
+
+&gt;&gt; curl -i 'http://dockerHost1:2376/containers/ManagedContainer2/start' --data ''
+HTTP/1.1 204 No Content
+Api-Version: 1.39
+Docker-Experimental: false
+Ostype: linux
+Server: Docker/18.09.7 (linux)
+Date: Mon, 04 Nov 2019 13:17:15 GMT</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_creating_a_container_with_a_set_instance_name_resolving_conflicts"><a class="anchor" href="#_creating_a_container_with_a_set_instance_name_resolving_conflicts"></a>Creating a container with a set instance name, resolving conflicts</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">&gt;&gt; docker container create --network host --mount type=bind,source="/app/passwordfile-docker.txt",target="/pathInDocker/passwordfile.txt",readonly -e PAYARA_DAS_HOST=payaraDas -e PAYARA_DAS_PORT=4848 -e DOCKER_CONTAINER_IP=dockerHost1 -e PAYARA_PASSWORD_FILE=/pathInDocker/passwordfile.txt -e PAYARA_NODE_NAME=DockerNode1 -e PAYARA_INSTANCE_NAME=ManagedContainer2 payara/server-node:mytag
+af48bec58c144bad8ac83c9344dcebc4b9a6d528dd8673a6e6f5275e8b3ed2a2
+
+&gt;&gt; docker start af48bec58c14
+af48bec58c14
+
+&gt;&gt; docker logs af48bec58c14
+Docker Container ID is: af48bec58c144bad8ac83c9344dcebc4b9a6d528dd8673a6e6f5275e8b3ed2a2
+Docker Container IP is: dockerHost1
+Instance name provided, but local file system for instance missing, checking if file system or new instance needs to be created.
+Checking if an instance with name ManagedContainer2 has been registered with the DAS
+./payara5/bin/asadmin -I false -t -H payaraDas -p 4848 -W /pathInDocker/passwordfile.txt list-instances --nostatus ManagedContainer2
+Found an instance with name ManagedContainer2 registered to the DAS, checking if registered Docker Container ID matches this container's ID
+./payara5/bin/asadmin -I false -t -H payaraDas -p 4848 -W /pathInDocker/passwordfile.txt _get-docker-container-id --instance ManagedContainer2
+Registered Docker Container ID is: e7803ce3ec964805c41d8a0eef5838299b5b8d38aa9e0801f05f3bc56b8d5fa1
+Docker Container IDs do not match, creating a new instance.
+Node name provided, checking if node details match this container.
+Node with matching name found, checking node details.
+Node Host of matching node is nodes.node.DockerNode1.node-host=dockerHost1
+Node details match, no need to create a new node.
+Running command create-local-instance:
+./payara5/bin/asadmin -I false -T -a -H payaraDas -p 4848 -W /pathInDocker/passwordfile.txt create-local-instance --node DockerNode1 --dockernode true --ip dockerHost1 ManagedContainer2
+Setting Docker Container ID for instance ManagedContainer2-PerfectZiege: af48bec58c144bad8ac83c9344dcebc4b9a6d528dd8673a6e6f5275e8b3ed2a2
+./payara5/bin/asadmin -I false -H payaraDas -p 4848 -W /pathInDocker/passwordfile.txt _set-docker-container-id --instance ManagedContainer2-PerfectZiege --id af48bec58c144bad8ac83c9344dcebc4b9a6d528dd8673a6e6f5275e8b3ed2a2
+Command _set-docker-container-id executed successfully.
+Starting instance ManagedContainer2-PerfectZiege
+...</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_listings"><a class="anchor" href="#_listings"></a>Listings</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">&gt;&gt; docker ps -a
+CONTAINER ID        IMAGE                              COMMAND                  CREATED             STATUS              PORTS               NAMES
+af48bec58c14        payara/server-node:mytag   "/opt/payara/entrypo…"   3 minutes ago       Up 2 minutes                            gentle_piranha
+e7803ce3ec96        payara/server-node:mytag   "/opt/payara/entrypo…"   7 minutes ago       Up 5 minutes                            ManagedContainer2
+994e6d5db276        payara/server-node:mytag   "/opt/payara/entrypo…"   16 minutes ago      Up 15 minutes                           musing_euclid
+
+&gt;&gt; docker images payara/server-node
+REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE
+payara/server-node   pandrex191104       386a996b3649        About an hour ago   511MB
+payara/server-node   dmatej191104        27fadc4f48ca        5 hours ago         511MB
+payara/server-node   5.193.1             f5cf02e10dc2        4 weeks ago         525MB
+payara/server-node   latest              f5cf02e10dc2        4 weeks ago         525MB
+payara/server-node   mytag               f5cf02e10dc2        4 weeks ago         525MB
+
+&gt;&gt; asadmin --passwordfile /app/appservers/passwordfile.txt list-nodes
+localhost-domain1  CONFIG  localhost
+DockerNode1  DOCKER  dockerHost1
+Command list-nodes executed successfully.
+
+&gt;&gt; asadmin --passwordfile /app/appservers/passwordfile.txt list-instances
+Cooperative-Spookfish            running
+ManagedContainer2                running
+ManagedContainer2-PerfectZiege   running
+Command list-instances executed successfully.</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

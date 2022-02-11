@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SNMP Notifier :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="SNMP.html">SNMP Notifier</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Extensions/Notifiers/SNMP.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">SNMP Notifier</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <strong>S</strong>imple <strong>N</strong>etwork <strong>M</strong>anagement <strong>P</strong>rotocol is a standard Internet Protocol that was designed to collect and organize information about all managed devices and services that belong to the same network. <strong>SNMP</strong> is supported by a huge variety of devices, including network devices like routers, modems and switches, servers and in the latter years extended to cover IoT devices and specialized equipment connected to the cloud.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="downloads"><a class="anchor" href="#downloads"></a>Downloads</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/snmp-notifier-core/1.0/snmp-notifier-core-1.0.jar">SNMP Notifier Core 1.0</a></p>
+</li>
+<li>
+<p><a href="https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/snmp-notifier-console-plugin/1.0/snmp-notifier-console-plugin-1.0.jar">SNMP Notifier Console Plugin 1.0</a></p>
+</li>
+<li>
+<p><a href="https://repo1.maven.org/maven2/org/snmp4j/snmp4j/3.4.3/snmp4j-3.4.3.jar">Dependency: SNMP4J 3.4.3</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="snmp-concepts"><a class="anchor" href="#snmp-concepts"></a>SNMP Concepts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The basic elements in every SNMP communication are the following:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Managed Component</strong></dt>
+<dd>
+<p>This is the device or service that is managed and monitored by SNMP, in this specific case, Payara Server.</p>
+</dd>
+<dt class="hdlist1"><strong>SNMP Agent</strong></dt>
+<dd>
+<p>A specialized software that gathers data on the overall status of the managed component and exposes specific instructions over interfaces for its management. In our case, the SNMP Notifier acts as a SNMP agent.</p>
+</dd>
+<dt class="hdlist1"><strong>SNMP Manager</strong></dt>
+<dd>
+<p>A server machine that runs a network management system, which is configured to monitor and manage all devices and services in a network by <em>"talking"</em> to the agents and gathering all relevant information.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The SNMP protocol works using <em>PDUs (Protocol Data Units)</em> in order to allow managers and agents to work with a defined set of instructions. The notifier currently operates using the <strong>TRAP</strong> PDU to handle notification events.</p>
+</div>
+<div class="sect2">
+<h3 id="snmp-traps"><a class="anchor" href="#snmp-traps"></a>SNMP Traps</h3>
+<div class="paragraph">
+<p>Payara Server Enterprise notifies network management systems using SNMP traps. A SNMP trap is a special PDU that is used to generate an asynchronous notification from an <em>agent</em> to a <em>manager</em>. An important point to stress with traps is that they are asynchronous events that can occur at any time, which means that a <em>manager</em> expects to receive updates in a <strong>PASSIVE</strong> manner, thus saving resources.</p>
+</div>
+<div class="paragraph">
+<p>In order to correctly configure Payara Server Enterprise to send traps to a manager, the following information must be reviewed in tandem with the configuration of the <em>manager</em>:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Hostname</strong></dt>
+<dd>
+<p>This is the hostname of the server&#8217;s where the manager software resides.</p>
+</dd>
+<dt class="hdlist1"><strong>Port</strong></dt>
+<dd>
+<p>This is the UDP port where the manager software is receiving SNMP traps. By default the protocol usually uses port <strong>162</strong>.</p>
+</dd>
+<dt class="hdlist1"><strong>Version</strong></dt>
+<dd>
+<p>The version used by the SNMP trap.</p>
+</dd>
+<dt class="hdlist1"><strong>Community</strong></dt>
+<dd>
+<p>This is the community string used to "secure" the communication to the manager</p>
+</dd>
+<dt class="hdlist1"><strong>OID</strong></dt>
+<dd>
+<p>The object identifier used by the trap in order to allow the manager to correctly interpret the status of the server.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="version"><a class="anchor" href="#version"></a>Version</h3>
+<div class="paragraph">
+<p>Currently, the SNMP protocol is supported on three versions: <strong>v1</strong>, <strong>v2c</strong> and <strong>v3</strong>. Version 1 is extremely unsecure since authentication is managed only with the community string. Version 2c is an enhanced version of v1 in that improves the message formats and the protocol operations, using stronger authentication guards using the simplistic community string mechanism. Finally, Version 3 improves security and remote management discarding the use of community strings.</p>
+</div>
+<div class="paragraph">
+<p>Currently the notifier configuration only supports <strong>v1</strong> and <strong>v2c</strong>, hence the need to correctly configure a community string as well. By default all traps are configured to use <strong>v2c</strong>, since it&#8217;s guaranteed to be supported by almost all network manager systems.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="community"><a class="anchor" href="#community"></a>Community</h3>
+<div class="paragraph">
+<p>The community string is used to establish trust between managers and agents. The community names are essentially passwords; most vendors ship their equipment with default community strings: <code>public</code> for a read-only community (allows reading data values, but doesn&#8217;t allow modification) and <code>private</code> for the read-write community (allowed to read and modify data values). It&#8217;s important to change these defaults on production environments.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The notifier configures all traps with the <code>public</code> community string by default.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oid---object-identifier"><a class="anchor" href="#oid---object-identifier"></a>OID - Object Identifier</h3>
+<div class="paragraph">
+<p>Agents expose management data as variables composed in a structured hierarchy. SNMP does not define which variables are exposed by a managed component. Instead, SNMP uses an extensible design which allows applications and services to define their own hierarchies and other metadata (such as type and description of the variable), which are described in a <strong>Management Information Base (MIB)</strong>. MIBs describe the structure of the management data of a device subsystem using a hierarchical namespace composed of Object Identifiers (OID). Each OID uniquely identifies a variable sent in the SNMP trap by the agent.</p>
+</div>
+<div class="paragraph">
+<p>In order for a <strong>network management system</strong> to understand a trap sent to it by an agent, the management system must know what the OID defines. Therefore, it must have the MIB for that trap loaded in its configuration.</p>
+</div>
+<div class="paragraph">
+<p>The default value used by the notification service is <code>.1.3.6.1.2.1.1.8</code>. This OID represents a simple octet string that is used to hold the content of the notification event.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+In most cases there is no need to change the default OID, since its verified by most of the standard MIBs included on SNMP management systems and tools.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="payara-server-configuration"><a class="anchor" href="#payara-server-configuration"></a>Payara Server Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To setup the SNMP notifier on Payara Server Enterprise you need to input the values mentioned earlier in the domain configuration.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Keep in mind that the only required value to configure the notifier is the <strong>hostname</strong> of your network management system. All other values will assume the defaults discussed earlier if not configured explicitly.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="using-the-admin-console"><a class="anchor" href="#using-the-admin-console"></a>Using the Admin Console</h3>
+<div class="paragraph">
+<p>To configure the Notification Service in the Administration Console, go to <em>Configuration &#8594; [instance-configuration (like server-config)] &#8594; Notification Service</em> and click on the <strong>SNMP</strong> tab:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/notification-service/snmp/admin-console-configuration.png" alt="Notification Service in Admin Console"></span></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-the-asadmin-cli"><a class="anchor" href="#using-the-asadmin-cli"></a>Using the Asadmin CLI</h3>
+<div class="paragraph">
+<p>To configure the Notification Service from the command line, use the <code>set-snmp-notifier-configuration</code> asadmin command like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-snmp-notifier-configuration --enabled=true --dynamic=true --hostname=localhost --snmpport=162 --community=public --oid=".1.3.6.1.2.1.1.8" --version=v2c</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can use the <code>--enabled</code> and <code>--dynamic</code> options to enable or disable the SNMP notifier on demand.</p>
+</div>
+<div class="paragraph">
+<p>Also, you can retrieve the current configuration for the SNMP notifier using the <code>get-snmp-notifier-configuration</code> asadmin command like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin &gt; get-snmp-notifier-configuration</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will return the details of the current SNMP configuration; see below for an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">Enabled  Noisy  Community  OID                Version  Host       SNMP Port
+true     false  example    .1.3.6.1.2.1.1.8   v2c      127.0.0.1  162</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="troubleshooting"><a class="anchor" href="#troubleshooting"></a>Troubleshooting</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When you have correctly configured the SNMP notifier, it can be used to push notifications to your configured server. You can visualize the notification messages on your network management system of your choice. If you do not see any notification event messages, check the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Is the SNMP notifier enabled?</p>
+</li>
+<li>
+<p>Is the Notification Service itself enabled?</p>
+</li>
+<li>
+<p>Is there a service configured to use the notifier? (e.g. the HealthCheck service)</p>
+</li>
+<li>
+<p>Is the service configured to send notifications frequently enough to observe?</p>
+</li>
+<li>
+<p>Have you enabled the service after configuring it?</p>
+</li>
+<li>
+<p>Does the SNMP network management supports SNMP traps?</p>
+</li>
+<li>
+<p>Does the SNMP network management system support the configured protocol version?</p>
+</li>
+<li>
+<p>Is the community string correctly supported by the SNMP network management system?</p>
+</li>
+<li>
+<p>Are the SNMP management system&#8217;s MIB correctly configured to verify traps sent with the configured OID?</p>
+</li>
+<li>
+<p>Is there a firewall between Payara Server and the network management system that is correctly configured to allow sending SNMP traps in the
+respective port?</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a sample of how the SNMP traps are visualized using <a href="http://www.mg-soft.com/tringer.html">MG-Soft&#8217;s Trap Ringer</a> software:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/notification-service/snmp/trap-ringer-pro-output.png" alt="SNMP Traps on TRinger"></span></p>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

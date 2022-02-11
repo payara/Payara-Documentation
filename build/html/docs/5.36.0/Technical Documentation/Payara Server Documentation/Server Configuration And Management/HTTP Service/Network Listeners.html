@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Network Listeners :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="Network%20Listeners.html">Network Listeners</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Server%20Configuration%20And%20Management/HTTP%20Service/Network%20Listeners.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Network Listeners</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>A network listener is a listener socket that has an IP address, port number, protocol,
+as well as various other configuration options. A listener can listen on a specific
+port on all network interfaces by using the IP <code>0.0.0.0</code>, and a configured port.
+A virtual server will then be used to select a combination of network listeners to
+use for an application. For example, Payara Server Community has two default network listeners
+for user deployed applications: an insecure listener on port 8080 (<code>http-listener-1</code>),
+and a secure listener on port 8181 (<code>http-listener-2</code>).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration"><a class="anchor" href="#configuration"></a>Configuration</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+When configuring network listeners from the admin console, there are some visible
+configuration options that transparently configure the protocol being used. If a
+configuration property isn&#8217;t shown here but is visible in the admin console, see the page
+on <a href="#protocols.adoc" class="page unresolved">protocols</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Existing network listeners can be configured from the admin console or with asadmin
+commands. The network listener configurations can be found in the admin console under
+<strong>Configurations</strong> &#8594; <strong>your-config</strong> &#8594; <strong>Network Config</strong> &#8594; <strong>Network Listeners</strong>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../../_images/http/network-listener-config.png" alt="Configuration Page Location">
+</div>
+</div>
+<div class="paragraph">
+<p>The following fields can be configured for network listeners:</p>
+</div>
+<hr>
+<div class="sect2">
+<h3 id="configuration-name"><a class="anchor" href="#configuration-name"></a>Name</h3>
+<div class="paragraph">
+<p>The unique name of the network listener. This cannot be edited from the admin console.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asadmin Command:</strong></p>
+</div>
+<div class="paragraph">
+<p><code>set configs.config.server-config.network-config.network-listeners.network-listener.${network-listener-name}.name=value</code></p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="configuration-protocol"><a class="anchor" href="#configuration-protocol"></a>Protocol</h3>
+<div class="paragraph">
+<p>The protocol used by the network listener. This cannot be edited from the admin console.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asadmin Command:</strong></p>
+</div>
+<div class="paragraph">
+<p><code>set configs.config.server-config.network-config.network-listeners.network-listener.${network-listener-name}.protocol=${protocol-name}</code></p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="configuration-status"><a class="anchor" href="#configuration-status"></a>Status</h3>
+<div class="paragraph">
+<p>The status of the network listener. This determines whether the listener will be actively listening for requests.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asadmin Command:</strong></p>
+</div>
+<div class="paragraph">
+<p><code>set configs.config.server-config.network-config.network-listeners.network-listener.${network-listener-name}.status=[true/false]</code></p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="configuration-jk-listener"><a class="anchor" href="#configuration-jk-listener"></a>JK Enabled</h3>
+<div class="paragraph">
+<p>Whether <code>mod_jk</code> support should be enabled for this listener. Should only be enabled if <code>mod_jk</code> is being
+explicitly configured on an Apache Web Server in conjunction with Payara Server Community.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asadmin Command:</strong></p>
+</div>
+<div class="paragraph">
+<p><code>set configs.config.server-config.network-config.network-listeners.network-listener.${network-listener-name}.jk-enabled=[true/false]</code></p>
+</div>
+<hr>
+<div class="sect3">
+<h4 id="configuration-jk-config-file"><a class="anchor" href="#configuration-jk-config-file"></a>JK Configuration File</h4>
+<div class="paragraph">
+<p>The location of the <code>mod_jk</code> configuration file. Defaults to <code>${com.sun.aas.instanceRoot}/config/glassfish-jk.properties</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asadmin Command:</strong></p>
+</div>
+<div class="paragraph">
+<p><code>set configs.config.server-config.network-config.network-listeners.network-listener.${network-listener-name}.jk-configuration-file=/location/to/file</code></p>
+</div>
+<hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration-port"><a class="anchor" href="#configuration-port"></a>Port</h3>
+<div class="paragraph">
+<p>The port used by the network listener. The selected port will be used to listen for requests.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asadmin Command:</strong></p>
+</div>
+<div class="paragraph">
+<p><code>set configs.config.server-config.network-config.network-listeners.network-listener.${network-listener-name}.port=value</code></p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="configuration-address"><a class="anchor" href="#configuration-address"></a>Address</h3>
+<div class="paragraph">
+<p>The address used by the network listener. <code>0.0.0.0</code> corresponds to all addresses.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asadmin Command:</strong></p>
+</div>
+<div class="paragraph">
+<p><code>set configs.config.server-config.network-config.network-listeners.network-listener.${network-listener-name}.address=value</code></p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="configuration-transport"><a class="anchor" href="#configuration-transport"></a>Transport</h3>
+<div class="paragraph">
+<p>The transport used by the network listener. This cannot be edited from the admin console. Defaults to <code>tcp</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asadmin Command:</strong></p>
+</div>
+<div class="paragraph">
+<p><code>set configs.config.server-config.network-config.network-listeners.network-listener.${network-listener-name}.transport=${transport-name}</code></p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="configuration-thread-pool"><a class="anchor" href="#configuration-thread-pool"></a>Thread Pool</h3>
+<div class="paragraph">
+<p>The thread pool used by the network listener. This determines the pool of threads used to service requests.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asadmin Command:</strong></p>
+</div>
+<div class="paragraph">
+<p><code>set configs.config.server-config.network-config.network-listeners.network-listener.${network-listener-name}.thread-pool=${thread-pool-name}</code></p>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sni"><a class="anchor" href="#sni"></a>Server Name Indication - SNI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Server Name Indication, SNI for short, allows you to use multiple SSL certificates with the same IP address. When enabled, the server will look for a certificate in the configured keystore using a nickname that matches the host name requested.</p>
+</div>
+<div class="paragraph">
+<p>SNI can be enabled by configuring a network listener. Existing network listeners can be configured from the admin console or with asadmin commands. The network listener configurations can be found in the admin console under <strong>Configurations &#8594; &lt;your-config&gt; &#8594; Network Config &#8594; Network Listeners</strong>.</p>
+</div>
+<div class="paragraph">
+<p>From here, click on the <strong>SSL</strong> tab, and make sure that the <strong>SNI Support</strong> checkbox is ticked.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+For SNI to take effect, the network listener must have security enabled by providing a default keypair and certificate, and by checking the <strong>Security</strong> box on the <strong>HTTP</strong> tab.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="asadmin"><a class="anchor" href="#asadmin"></a>Asadmin Commands</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following asadmin commands are available for administering network listeners instead of using the admin console.
+The parameters are all explained in the configuration options above.</p>
+</div>
+<div class="sect2">
+<h3 id="_create_network_listener"><a class="anchor" href="#_create_network_listener"></a>create-network-listener</h3>
+<div class="paragraph">
+<p>The <code>create-network-listener</code> command creates a network listener. It requires an already created transport and protocol.
+For more information on creating protocols, see <a href="#protocols.adoc" class="page unresolved">protocols</a>. The parameters are all explained
+in the configuration options above.</p>
+</div>
+<div class="sect3">
+<h4 id="_format"><a class="anchor" href="#_format"></a>Format</h4>
+<div class="listingblock">
+<div class="content">
+<pre>asadmin&gt; create-network-listener [--help]
+           [--address address]
+           --listenerport listener-port
+           [--threadpool thread-pool]
+           --protocol protocol
+           [--transport transport]
+           [--enabled={true|false}]
+           [--jkenabled={false|true}]
+           [--target target]
+           listener-name</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_restart_http_listeners"><a class="anchor" href="#_restart_http_listeners"></a>restart-http-listeners</h3>
+<div class="paragraph">
+<p>The <code>restart-http-listeners</code> commands restarts all HTTP listeners but the <code>admin-listener</code> of the targeted instance(s).
+It is either used with the <code>--all</code> flag to target all instances or with a particular target instance, deployment group or cluster following the <code>--target</code> parameter.
+When <code>target</code> and <code>all</code> parameters are both omitted the default target is the DAS.
+When <code>--all</code> is used together with a target the target is ignored and the command affects all instances.
+NOTE: This command only restarts all HTTP listeners except the <code>admin-listener</code>. IIOP listeners are not affected and may require a server restart to make changes take effect.</p>
+</div>
+<div class="sect3">
+<h4 id="_format_2"><a class="anchor" href="#_format_2"></a>Format</h4>
+<div class="listingblock">
+<div class="content">
+<pre>asadmin&gt; restart-http-listeners [--all] [--target target]</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_examples"><a class="anchor" href="#_examples"></a>Examples</h4>
+<div class="listingblock">
+<div class="content">
+<pre>asadmin&gt; restart-http-listeners --all
+asadmin&gt; restart-http-listeners --target FlyingFish
+asadmin&gt; restart-http-listeners FlyingFish
+asadmin&gt; restart-http-listeners</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>First line affects all instances, second line affects only instance named <code>FlyingFish</code>, third is a short hand for the second, last is a short hand for <code>restart-http-listeners server</code> or <code>restart-http-listeners --target=server</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

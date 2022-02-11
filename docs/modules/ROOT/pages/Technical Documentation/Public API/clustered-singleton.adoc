@@ -1,0 +1,165 @@
+= Clustered Singleton
+
+_Since versions 4.1.2.182 and 5.181_
+
+The Payara API provides a `@Clustered` annotation that makes
+`@ApplicationScoped` CDI beans or `@Singleton` EJB beans cluster-wide. This
+allows a single bean to be shared across an entire cluster.
+
+[[howitworks]]
+== How It Works
+The singleton bean is deployed and will be available to all members of the cluster.
+Prior to any call to this bean, its latest version will be retrieved from a Hazelcast map,
+which will be possibly updated after the call is finished. In order to avoid race conditions or data corruption,
+a *Hazelcast distributed lock* for the bean will be optionally acquired so that only
+one method call can be executed in the cluster at a time.
+
+[[examples]]
+== Examples
+Examples can be found here: https://github.com/payara/Payara-Examples/tree/master/javaee/clustered-singleton
+
+[[timers]]
+== `@Clustered` and EJB Timers
+Persistent EJB Timers (which are the default) will work correctly with clustered singletons since they will only be executed in a single node of the cluster
+
+[[initialization]]
+== `@Clustered` and `@Startup` / `@Initialized` `@ApplicationScoped`
+Care must be taken in this scenario. By default, `@PostConsctuct` is called for every instance in the cluster for these beans. This behavior needs to be disabled by using `@Clustered(callPostConstructOnAttach = false)` and possibly `callPreDestoyOnDetach = false` as well, so only the `@PostConstcut` method will be called only once per cluster.
+`@Observed` `@Initialzed` methods are called for every instance in the cluster. The only valid method for cluster-wide initialization is @PostConstruct method configured as described above.
+
+[[cdinotes]]
+== CDI Considerations and Notes
+Since there are no default locks for CDI, `@Clustered` CDI `@ApplicationScoped` beans do not have distributed locks on by default.
+It is highly recommended to enable distributed locks for CDI Clustered beans: `@Clustered(lock = DistributedLockType.LOCK)` so there is no chance of race condition / data corruption for CDI Clustered beans
+
+[[requirementss]]
+== Requirements and assumption
+
+- Hazelcast is required to be enabled (default on Payara 5)
+- `@Clustered` only works with `@ApplicationScoped` or `@Singleton` annotation, and in no other circumstance
+- All fields in the `@Clustered @Singleton` class need to be correctly Serializable
+- Works correctly only if accessed via @Injected proxy, not through direct access
+- Works with EJB timers correctly only if all timers are persistent (default)
+- All method calls to `@Clustered` beans operate on a local instance
+- Data corruption is possible if distributed lock is turned off and there is a race condition between method calls to the same bean on multiple cluster nodes simultaneously. In such a case, last method call wins the singleton state
+- Clustered singletons are stored in Hazelcast map under "Payara/(EJB/CDI)/singleton/<singletonComponentName>/[lock]"
+
+[[usage]]
+== Usage
+
+A singleton bean is made cluster-wide by annotating the class
+with the `@fish.payara.cluster.Clustered` qualifier as well as
+it's scope annotation.
+
+Alternatively, you can use the `glassfish-ejb-jar.xml` to configure a Singleton EJB
+to be cluster-wide.
+
+[[usage-example]]
+=== Example
+
+An example for a CDI bean:
+
+[source, java]
+----
+@Clustered
+@javax.enterprise.context.ApplicationScoped
+public class ClusterSingletonBean implements Serializable {
+
+}
+----
+
+An example for a Singleton EJB:
+
+[source, java]
+----
+@Clustered
+@javax.ejb.Singleton
+public class ClusterSingletonBean implements Serializable {
+
+}
+----
+
+An example for a Singleton EJB using `glassfish-ejb.jar` (`clustered-key-name` is optional):
+
+[source, xml]
+----
+<glassfish-ejb-jar>
+    <enterprise-beans>
+        <ejb>
+            <ejb-name>ClusteredSingleton</ejb-name>
+            <clustered-bean>true</clustered-bean>
+            <clustered-key-name>ClusteredSingleton</clustered-key-name>
+        </ejb>
+    </enterprise-beans>
+</glassfish-ejb-jar>
+----
+
+[[configuration]]
+== Configuration
+
+The `@Clustered` annotation has several configuration options. They are detailed below.
+
+.Configuration Options
+|===
+| Option | XML element | Description | Default
+
+| keyName
+| clustered-key-name
+| The key in the distributed map to bind the clustered object to.
+| The name of the bean. If the bean is a CDI bean and has no assigned name,
+the bean class name will be used.
+
+| lock
+| clustered-lock-type
+| The type of distributed locking to be performed.
+For EJB beans, only `INHERIT` and `LOCK_NONE` are valid.
+For CDI beans, valid values are `LOCK` and `INHERIT`, which
+is equivalent to using `LOCK_NONE`.
+| `INHERIT`
+
+| callPostConstructOnAttach
+| clustered-attach-postconstruct
+| Whether to call `@PostConstruct` each time the bean is created
+on a different node. Will result in multiple calls.
+| `true`
+
+| callPreDestroyOnDetach
+| clustered-detach-predestroy
+| Whether to call `@PreDestroy` when the singleton is destroyed on an
+instance while still being available on another. Will result in
+multiple calls.
+| `true`
+|===
+
+[[locking]]
+== Distributed Locking
+
+Clustered singleton beans allow a locking type, to specify how the
+distributed object is locked when being accessed by multiple instances.
+The lock options are members of the class
+`fish.payara.cluster.DistributedLockType`, which are as follows:
+
+* `LOCK` - Distributed locking will be performed.
+* `LOCK_NONE` - No distributed locking will be performed.
+* `INHERIT` - The locking behaviour will be inherited from
+the inherited class.
+
+By default, `@Singleton` EJBs will use a distributed lock, and
+`@ApplicationScoped` CDI beans won't.
+
+When a distributed object is locked, it will only be written
+by one thread across the entire cluster at any one time. Locks use system
+resources, but prevent synchronisation errors with the singleton data.
+
+NOTE: If a member holding a lock goes offline, the lock will become
+available again.
+
+[[transactions]]
+== Transactions
+
+Transactions in a clustered singleton work the same way that they would work
+in EJB or CDI depending on which scope annotation you're using. Transactions
+are not distributed through the whole cluster. When a transaction is created
+in a thread in one JVM, it must be handled and closed in the same thread;
+it cannot be passed onto a different server instance. Once the transaction
+is closed, the changes will be replicated to the rest of the cluster.

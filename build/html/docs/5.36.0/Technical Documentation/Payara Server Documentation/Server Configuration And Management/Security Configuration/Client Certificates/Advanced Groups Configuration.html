@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Advanced Groups Configuration :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../../index.html">docs</a></li>
+    <li><a href="Advanced%20Groups%20Configuration.html">Advanced Groups Configuration</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Server%20Configuration%20And%20Management/Security%20Configuration/Client%20Certificates/Advanced%20Groups%20Configuration.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Advanced Groups Configuration</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Payara Server allows the advanced configuration mapping of a client certificate&#8217;s distinguished name (DN) to specific realm groups, which allows the realm to automatically assign groups based on the values of each DN part to all principals registered in the realm.</p>
+</div>
+<div class="paragraph">
+<p>This feature can be configured by using the <code>dn-parts-used-for-groups</code> property  of any security realm of type <code>com.sun.enterprise.security.auth.realm.certificate.CertificateRealm</code>. It must define a comma separated list of identifiers of DN parts, i.e. <code>EMAILADDRESS,DC,OU</code>,
+and it is empty by default.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The default empty value means that only content of the <code>assign-groups</code> property value will be used as the list of assigned groups.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If both properties are set, a principal who completed the certificate validation will have all groups from both <code>assign-groups</code> settings.</p>
+</div>
+<div class="paragraph">
+<p>Not all DN parts are supported. The following is the list of all parts that are supported, categorized by their OIDs:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Supported OIDs</caption>
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 33.3333%;">
+<col style="width: 50.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">DN Part</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Object ID</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Common Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SURNAME</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Surname</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SERIALNUMBER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Serial Number of the certificate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Country</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.6</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">L</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Locality</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.7</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">State</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.8</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">STREET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Street</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.9</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Organisation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.10</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OU</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Organisation Unit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.11</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">T</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Title</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.12</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GIVENNAME</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Given Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.42</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INITIALS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Initials</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.43</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GENERATION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Generation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.44</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DNQUALIFIER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DN Qualifier</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.5.4.46</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User ID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.9.2342.19200300.100.1.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Domain Component</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0.9.2342.19200300.100.1.25</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EMAILADDRESS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">E-Mail address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2.840.113549.1.9.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IP</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IP Address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.3.6.1.4.1.42.2.11.2.1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration"><a class="anchor" href="#configuration"></a>Payara Server Configuration</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="configuration-using-admin-console"><a class="anchor" href="#configuration-using-admin-console"></a>Using the Admin Console</h3>
+<div class="paragraph">
+<p>This feature can be configured on the default certificate realm with the following steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Navigate to the applicable configuration page for your use (e.g. <code>server-config</code>) under the <code>Configurations</code> option in the side menu</p>
+</li>
+<li>
+<p>Head to <code>Security</code> &#8594; <code>Realms</code> and select the <code>certificate</code> realm</p>
+</li>
+<li>
+<p>Click the <code>Add Property</code> button</p>
+</li>
+<li>
+<p>Set the property <em>Name</em> to be <code>dn-parts-used-for-groups</code> and set the <em>Value</em> to a comma separated list of OID names.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration-using-asadmin-cli"><a class="anchor" href="#configuration-using-asadmin-cli"></a>Using the Asadmin CLI</h3>
+<div class="paragraph">
+<p>You can also use the following asadmin command to set the value of the property in the security realm:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set configs.config.${YOUR_INSTANCE_CONFIG}.security-service.auth-realm.certificate.property.dn-parts-used-for-groups=EMAILADDRESS,DC,OU</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+After setting the value of the property, make sure that you <strong>restart the server instance</strong> for the changes to take effect.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+Keep in mind that the set of DN parts used to configure the realm groups must be predictable to be useful, so be careful to use DN parts that do not create group name collisions.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mapping-groups-to-roles-in-applications"><a class="anchor" href="#mapping-groups-to-roles-in-applications"></a>Mapping Groups to Security Roles in Applications</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>After configuring the realm groups, you can map these groups to application roles as you&#8217;d do by using the Payara Server specific deployment descriptors. You can even map these roles to principals that are configured as documented in the <a href="#Technical Documentation/Payara Server Documentation/Server Configuration and Management/Security Configuration/Client Certificates/Advanced Principal Name Configuration.adoc" class="page unresolved">advanced Principal Name configuration</a> section.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a quick summary of the authentication and authorization process would work in this scenario:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The principal receives principal name as configured (whole DN or only CN part)</p>
+</li>
+<li>
+<p>The principal receives all groups from realm&#8217;s <code>assign-groups</code> list</p>
+</li>
+<li>
+<p>The principal receives all groups from certificate&#8217;s DN parts listed in <code>dn-parts-used-for-groups</code> realm property
+(limited to those listed in table)</p>
+</li>
+<li>
+<p>The server allows the principal to access the application</p>
+</li>
+<li>
+<p>The client receives all roles from application&#8217;s security role mapping, where at least one of his principal names
+or groups matches their respective element.</p>
+</li>
+<li>
+<p>The security roles are then used for authorization to access application resources</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For example, if user roles were mapped like this in the <code>payara-web.xml</code> deployment descriptor of an application and we
+enabled using <code>CN</code> as a principal name and set the <code>dn-parts-used-for-groups</code> to <code>OU</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}"&gt;
+&lt;payara-web-app error-url=""&gt;
+  &lt;context-root&gt;/health-services&lt;/context-root&gt;
+  &lt;security-role-mapping&gt;
+    &lt;role-name&gt;role1&lt;/role-name&gt;
+    &lt;principal-name&gt;C=UK, S=lak, L=zak, OU=unitA, CN=foo1&lt;/principal-name&gt;
+    &lt;principal-name&gt;C=UK, S=lak, L=zak, OU=unitA, CN=foo2&lt;/principal-name&gt;
+    &lt;principal-name&gt;C=UK, S=lak, L=zak, OU=unitC, CN=foo4&lt;/principal-name&gt;
+    &lt;principal-name&gt;C=UK, S=lak, L=zak, OU=unitD, CN=foo-director&lt;/principal-name&gt;
+  &lt;/security-role-mapping&gt;
+  &lt;security-role-mapping&gt;
+    &lt;role-name&gt;role2&lt;/role-name&gt;
+    &lt;principal-name&gt;C=UK, S=lak, L=zak, OU=unitB, CN=foo3&lt;/principal-name&gt;
+    &lt;principal-name&gt;C=UK, S=lak, L=zak, OU=unitD, CN=foo-director&lt;/principal-name&gt;
+  &lt;/security-role-mapping&gt;
+&lt;/payara-web-app&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then the role mapping can be based on organizational unit in this case. But you can still use the principal name as in any normal case:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}"&gt;
+&lt;payara-web-app error-url=""&gt;
+  &lt;context-root&gt;/health-services&lt;/context-root&gt;
+  &lt;security-role-mapping&gt;
+    &lt;role-name&gt;role1&lt;/role-name&gt;
+    &lt;group-name&gt;unitA&lt;/group-name&gt;
+    &lt;group-name&gt;unitC&lt;/group-name&gt;
+    &lt;group-name&gt;unitD&lt;/group-name&gt;
+  &lt;/security-role-mapping&gt;
+  &lt;security-role-mapping&gt;
+    &lt;role-name&gt;role2&lt;/role-name&gt;
+    &lt;group-name&gt;unitB&lt;/group-name&gt;
+    &lt;principal-name&gt;foo-director&lt;/principal-name&gt;
+  &lt;/security-role-mapping&gt;
+&lt;/payara-web-app&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

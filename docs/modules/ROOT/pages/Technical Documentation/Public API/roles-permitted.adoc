@@ -1,0 +1,134 @@
+[[roles-permitted]]
+= RolesPermitted Support
+
+_Since Payara Server & Payara Micro 4.1.2.182 and 5.182_
+
+The Payara Public API provides a `@RolesPermitted` annotation that creates an authorisation interceptor for usage with CDI beans. This largely works in the same way as the `@RolesAllowed` common annotation, which in Java EE/Jakarta EE is primarily used by the EJB specification.
+
+[[usage]]
+== Usage
+
+The authorisation interceptor is defined through the `@RolesPermitted` annotation. Specifying this on an interceptable method of a non-passivation capable CDI bean will make that method eligible for interception by the corresponding interceptor. This interceptor will check that the caller of a method is any or all of the specified roles. If this holds, the call to the method proceeds. If not, an exception of type `CallerAccessException` is thrown.
+
+NOTE: The annotation can alternatively be placed at the class level of a CDI bean, in which case it will apply to all interceptable methods of that bean.
+
+NOTE: Examples of a non-passivation capable CDI bean are beans defined in the Request and Application scope.
+
+[[usage-example]]
+=== Example
+
+Here's an example of defining the roles authorized to call a single method:
+
+[source, java]
+----
+@RequestScoped
+public class TestRolesPermitted {
+
+    @Inject
+    Principal principal;
+
+    @RolesPermitted("payaraAdmin")
+    public String getUserName() {
+        return principal.getName();
+    }
+}
+----
+
+See https://github.com/javaee-samples/vendoree-samples/tree/master/payara/rolesPermitted[this sample project] for a more detailed example.
+
+[[configuration]]
+== Configuration
+
+The `@RolesPermitted` annotation has several configuration options.
+
+They are detailed below.
+
+.Configuration Options
+|===
+| Option | Type | Required | Description
+
+| `value`
+| `String`
+| true
+| A static list of comma-separated roles which are allowed to access this method, or an EL expression used to resolve this list at runtime (_see below_).
+
+| `semantics`
+| `String`
+| no
+| Whether accessing caller must be in any one of the given roles (`OR`) or all given roles (`AND`). Defaults to `OR`.
+|===
+
+[[dynamic-roles]]
+== Dynamic Roles
+
+_Since Payara Server & Payara Micro 5.193_
+
+The `@RolesPermitted` annotation also allows to dynamically specify authorization roles that are allowed to call bean methods at runtime. With this feature, is possible to instruct the container to allow specific roles based on specific contextual information.
+
+Dynamic roles are defined using an _Expression Language (EL) 3.0_ `String` value which should resolve to a valid `String` array or `Collection` that corresponds to the roles permitted to call the corresponding method. This expression value has contextual access to any CDI-scoped bean at the time of the method call. 
+
+NOTE: As a reminder, you can use the `self` bean name in order to refer to the method's bean and access any of its methods and properties at runtime.
+
+IMPORTANT: In order to access the values of any relevant parameters via CDI beans in the method's signature, annotate them with the `javax.inject.Named` CDI annotation, and assign them the name which will be used in the expression value. If no names are provided for these parameters and the method only has one parameter, then it will be available as a bean with the `param` name.
+
+[[usage-examples]]
+=== Examples
+
+[[basic-example]]
+==== Basic Example
+
+The following example illustrates how to dynamically resolve an specific role based on the data received in the parameter. Assume that the application has declared multiple roles for each of one of the registered customers. Let's say that the application has 3 customers named `A`, `B` and `C`, in which case the following roles are defined:
+
+* `Customer_A`
+* `Customer_B`
+* `Customer_C`
+
+With each role granting authorization to each customer respectively. If we have a method for updating a customer's data based on a parameter received you can setup the corresponding authorization constraint like this:
+
+[source, java]
+----
+@RolesPermitted("#{'Customer_'.concat(customer.name)}")
+public void updateCustomer(@Named("customer") Customer customer){
+    ...
+}
+----
+
+As you can observe, the role name is evaluated at runtime by concatenating the `Customer_` prefix with the name of the customer, which is retrieved using the `customer` bean (which is injected in the context using the `@Named` annotation).
+
+[[advanced-expressions-example]]
+==== Advanced Expression Example
+
+Based on the previous example, you can also let the corresponding expression be evaluated by calling a bean's method instead. Imagine that you could use a second variant, namely a product's name; in conjunction with the customer's name to evaluate authorization at runtime like this:
+
+[source, java]
+----
+@RolesPermitted("#{self.findRole(customer, product)}")
+public void updateCustomer(@Named("customer") Customer customer, @Named("product") Product product){
+    ...
+}
+
+public String findRole(Customer customer, Product product) {
+    return customer.getType() + "_" + product.getModel();
+}
+----
+
+By using the `self` bean name, we can call the bean's `findRole` method and pass it the two parameters defined in its signature.
+
+
+[[default-param-example]]
+==== Default Parameter Example
+
+If no parameters are annotated with the `Named` annotation and the method has a single parameter then the `param` bean name can be used as a default reference like this:
+
+[source, java]
+----
+@RolesPermitted("#{'CustomerCare_'.concat(param.name)}")
+public void updateCustomer(Customer customer){
+    ...
+}
+----
+
+
+== Extra Resources
+
+See https://javaee.github.io/javaee-spec/javadocs/javax/annotation/security/RolesAllowed.html[@RolesAllowed] for the original annotation on which this annotation is based.

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Eclipse MicroProfile OpenAPI API :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">docs</a></li>
+    <li><a href="openapi.html">Eclipse MicroProfile OpenAPI API</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/MicroProfile/openapi.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Eclipse MicroProfile OpenAPI API</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Provided version of the API: {mpOpenAPISpecUrl}[MicroProfile OpenAPI {mpOpenAPIVersion}]</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="background"><a class="anchor" href="#background"></a>Background</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The OpenAPI API was designed to provide a standard interface for documenting and exposing RESTful APIs. The MicroProfile OpenAPI API provides a set of interfaces and annotations to allow application developers to produce an OpenAPI document from their JAX-RS applications. The OpenAPI API is somewhat similar to the Swagger API, so many concepts in the API will be familiar.</p>
+</div>
+<div class="paragraph">
+<p>For a full overview of the API, review <a href="https://github.com/eclipse/microprofile-open-api/releases">the documentation for the appropriate release.</a></p>
+</div>
+<div class="paragraph">
+<p>{mpOpenAPISpecUrl}[MicroProfile OpenAPI 1.0] was released in MicroProfile 1.3.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Version {mpOpenAPIVersion} of the OpenAPI specification does not define the behaviour of implementations where multiple applications are deployed to the same container. This limitation will be addressed in a later version of the OpenAPI specification.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="endpoint"><a class="anchor" href="#endpoint"></a>REST Endpoint</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile OpenAPI specifies that an OpenAPI document should be published at the endpoint <code>/openapi</code> documenting a deployed application. For both Payara Server Community and Payara Micro Community, this means that the endpoint can be found on any HTTP port (e.g. <code>8080</code>) after deploying an application. The OpenAPI document displayed will always be for the most recently deployed application, except in the special case of disabling the service (see <a href="#configuration-note">configuration</a>).</p>
+</div>
+<div class="paragraph">
+<p>By default the OpenAPI document is displayed in YAML format, although this can be changed to JSON by changing the <code>Accept</code> header of the request. Alternatively if using a browser, this can also be done by specifying a <code>format</code> query parameter. For example, <code><a href="http://localhost:8080/openapi?format=json" class="bare">http://localhost:8080/openapi?format=json</a></code>. The valid values are <code>json</code> and <code>yaml</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sources"><a class="anchor" href="#sources"></a>OpenAPI Configuration Sources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile OpenAPI specifies several ways of configuring the data in the produced OpenAPI document. These are all provided by the OpenAPI API artifact:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.eclipse.microprofile.openapi&lt;/groupId&gt;
+    &lt;artifactId&gt;microprofile-openapi-api&lt;/artifactId&gt;
+    &lt;version&gt;1.0&lt;/version&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sources-config"><a class="anchor" href="#sources-config"></a>Config Properties</h3>
+<div class="paragraph">
+<p>The OpenAPI can be configured through the <a href="#documentation/microprofile/config/Overview.adoc" class="page unresolved">Config API</a>. For example, these configuration properties can be put in the <code>microprofile-config.properties</code>.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Config key</th>
+<th class="tableblock halign-left valign-top">Value description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.model.reader</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration property to specify the fully qualified name of the <a href="#sources-model-reader">OASModelReader</a> implementation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration property to specify the fully qualified name of the <a href="#sources-filter">OASFilter</a> implementation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.scan.disable</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration property to disable annotation scanning. Default value is <code>false</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.scan.packages</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration property to specify the list of packages to scan. For example,
+<code>mp.openapi.scan.packages=com.xyz.PackageA,com.xyz.PackageB</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.scan.classes</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration property to specify the list of classes to scan. For example,
+<code>mp.openapi.scan.classes=com.xyz.MyClassA,com.xyz.MyClassB</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.scan.exclude.packages</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration property to specify the list of packages to exclude from scans. For example,
+<code>mp.openapi.scan.exclude.packages=com.xyz.PackageC,com.xyz.PackageD</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.scan.exclude.classes</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration property to specify the list of classes to exclude from scans. For example,
+<code>mp.openapi.scan.exclude.classes=com.xyz.MyClassC,com.xyz.MyClassD</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.scan.lib</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration property to scan the packaged jar files inside the WAR (WEB-INF\lib). Default value is <code>false</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.servers</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration property to specify the list of global servers that provide connectivity information. For example,
+<code>mp.openapi.servers=https://xyz.com/v1,https://abc.com/v1</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.servers.path.</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Prefix of the configuration property to specify an alternative list of servers to service all operations in a path. For example,
+<code>mp.openapi.servers.path./airlines/ngs/{id}=https://xyz.io/v1</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.servers.operation.</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Prefix of the configuration property to specify an alternative list of servers to service an operation.
+Operations that want to specify an alternative list of servers must define an <code>operationId</code>, a unique string used to identify the operation. For example,
+<code>mp.openapi.servers.operation.getBooking=https://abc.io/v1</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.openapi.schema.</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Prefix of the configuration property to specify an alternative list of servers to service an operation.
+Prefix of the configuration property to specify a schema for a specific class, in JSON format. The remainder of the property key must be the fully-qualified class name. The value must be a valid OpenAPI schema object, specified in the JSON format. The use of this property is functionally equivalent to the use of the <code>@Schema</code> annotation on a Java class, but may be used in cases where the application developer does not have access to the source code of a class.</p>
+</div>
+<div class="paragraph">
+<p>When a <code>name</code> key is provided with a string value, the schema will be added to the <code>schemas</code> collection in the <code>components</code> object of the resulting OpenAPI document using `name&#8217;s value as the key.</p>
+</div>
+<div class="paragraph">
+<p>For example, in the case where an application wishes to represent a Java <code>Date</code> object in epoch-style milliseconds, the following configuration can be used (line escapes and indentation added for readability):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">mp.openapi.schema.java.util.Date = { \
+  "name": "EpochMillis", \
+  "type": "number", \
+  "format": "int64", \
+  "description": "Milliseconds since January 1, 1970, 00:00:00 GMT" \
+}</code></pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="sources-model-reader"><a class="anchor" href="#sources-model-reader"></a>OASModelReader</h3>
+<div class="paragraph">
+<p><code>org.eclipse.microprofile.openapi.OASModelReader</code></p>
+</div>
+<div class="paragraph">
+<p>The OASModelReader interface can be implemented by an application developer. It must then be declared as an Config API variable in the form:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>mp.openapi.model.reader=fish.payara.examples.OASModelReaderImpl</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This class will be called at the beginning of the OpenAPI document generation, and will create the initial OpenAPI document.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sources-filter"><a class="anchor" href="#sources-filter"></a>OASFilter</h3>
+<div class="paragraph">
+<p><code>org.eclipse.microprofile.openapi.OASFilter</code></p>
+</div>
+<div class="paragraph">
+<p>The OASFilter interface can be implemented by an application developer. It must then be declared as an Config API variable in the form:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>mp.openapi.filter=fish.payara.examples.OASFilterImpl</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each method in the implementation will be called on every appropriate element in the OpenAPI model. For example, the method <code>filterPathItem(PathItem pathItem)</code> will be called for every <code>PathItem</code> in the document.
+This class is called last, before the document is published.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sources-static-document"><a class="anchor" href="#sources-static-document"></a>Static Document</h3>
+<div class="paragraph">
+<p>The MicroProfile OpenAPI supports using a static OpenAPI document to build from. This static file can be placed in either <code>META-INF</code> directory in a WAR file. Most often, this means putting the file in <code>src/main/resources/META-INF</code>.</p>
+</div>
+<div class="paragraph">
+<p>The following file names are allowed for this file. The file given must also be in the specified format.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">File Format</th>
+<th class="tableblock halign-left valign-top">Allowed File Names</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>yaml</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi.yaml</code> <code>openapi.yml</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>json</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi.json</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="sources-annotations"><a class="anchor" href="#sources-annotations"></a>Annotations</h3>
+<div class="paragraph">
+<p>The MicroProfile OpenAPI API provides many annotations to use to augment the OpenAPI document. These are detailed in the <a href="https://github.com/eclipse/microprofile-open-api/blob/master/spec/src/main/asciidoc/microprofile-openapi-spec.adoc#annotations">OpenAPI Specification</a>. These annotations are applied before the OASFilter.</p>
+</div>
+<div class="sect3">
+<h4 id="sources-annotation-example"><a class="anchor" href="#sources-annotation-example"></a>Example</h4>
+<div class="paragraph">
+<p>The following code could be used to give the corresponding operation an ID of "hello world".</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.openapi.annotations.Operation;
+...
+    @GET
+    @Operation(operationId = "hello world")
+    public String helloWorld() {
+        return "Hello World!";
+    }</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="openApi-configuration"><a class="anchor" href="#openApi-configuration"></a>OpenAPI Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenAPI can be configured by using Admin Console or Asadmin commands.</p>
+</div>
+<div class="sect2">
+<h3 id="using-the-admin-console"><a class="anchor" href="#using-the-admin-console"></a>Using the Admin Console</h3>
+<div class="paragraph">
+<p>To configure the OpenAPI in the Admin Console, go to Configuration
+→ [instance-configuration (like server-config)] → MicroProfile → OpenAPI:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../_images/microprofile/openapi.png" alt="Set OpenAPI Configuration"></span></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-asadmin-commands"><a class="anchor" href="#using-asadmin-commands"></a>Using Asadmin Commands</h3>
+<div class="sect3">
+<h4 id="set-openapi-configuration"><a class="anchor" href="#set-openapi-configuration"></a><code>set-openapi-configuration</code></h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>asadmin&gt; set-openapi-configuration
+        [--enabled=true|false]
+        [--corsheaders=true|false]
+        [--securityenabled=true|false]
+        [--roles=&lt;role-list&gt;]
+        [--endpoint=&lt;context-root[default:openapi]&gt;]
+        [--target=&lt;target[default:server]&gt;]
+        [--virtualservers=&lt;virtualserver-list&gt;]</pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Enables or disables the OpenAPI service.</p>
+</dd>
+</dl>
+</div>
+<div id="configuration-note" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+When the OpenAPI service is disabled, the endpoint will always return a 403 error and any applications deployed during this period will <strong>not</strong> have an OpenAPI document built. Enabling the service again will not cause a documents to be built for any currently deployed applications.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_command_options"><a class="anchor" href="#_command_options"></a>Command Options</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 7.1428%;">
+<col style="width: 7.1428%;">
+<col style="width: 71.4285%;">
+<col style="width: 7.1428%;">
+<col style="width: 7.1431%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the service should be enabled/disabled.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>corsheaders</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not CORS headers (e.g. <code>Access-Control-Allow-Origin=*</code>) should be added to OpenAPI endpoint responses.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>securityenabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not secure access to the endpoint is enabled.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roles</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>microprofile</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>endpoint</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The context root used to expose the service endpoint.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">openapi</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The target Payara config to apply the change to.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">server-config</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>virtualservers</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If defined, the '/openapi' endpoint will be assigned to the list of virtual servers specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="get-openapi-configuration"><a class="anchor" href="#get-openapi-configuration"></a><code>get-openapi-configuration</code></h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>asadmin&gt; get-openapi-configuration
+    [--target=&lt;target&gt;]</pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Gets the status of the OpenAPI service.</p>
+</dd>
+</dl>
+</div>
+<div class="sect4">
+<h5 id="_command_options_2"><a class="anchor" href="#_command_options_2"></a>Command Options</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 7.1428%;">
+<col style="width: 7.1428%;">
+<col style="width: 71.4285%;">
+<col style="width: 7.1428%;">
+<col style="width: 7.1431%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The target Payara config to apply the change to.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">server-config</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="security-configuration"><a class="anchor" href="#security-configuration"></a>Security Configuration</h3>
+<div class="paragraph">
+<p>By default, the OpenAPI endpoint binds to the root context application which is the <code><em>default-web-module</code> (also known as <strong>docroot</strong>) system application and the <code></em>default-web-module</code> application, which is secured under the default realm (<code>file</code>) of the server.</p>
+</div>
+<div class="paragraph">
+<p>If a user application is deployed in the empty context-root, then the security configuration of this application will be shared by the OpenAPI endpoint, so exert extreme caution when making these changes.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../_/js/site.js"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

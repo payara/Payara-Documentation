@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>CDI Tools :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../index.html">docs</a></li>
+    <li><a href="CDI.html">CDI Tools</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Development%20Debugging%20And%20Assistance%20Tools/CDI.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">CDI Tools</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section lists existing development tools available from the CDI implementation shipped in Payara Server.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cdi-development-mode"><a class="anchor" href="#cdi-development-mode"></a>CDI Development Mode</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CDI Development Mode enables some CDI related tools and features that help when developing and inspecting applications that contain CDI beans.</p>
+</div>
+<div class="paragraph">
+<p>This mode also provides a <a href="#cdi-probe">CDI Probe</a>, which allows to inspect and monitor CDI beans of deployed applications at runtime.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s possible to enable CDI Development Mode for each application separately or enable it for all applications globally. In both cases, each application is assigned a separate CDI Probe instance.</p>
+</div>
+<div class="paragraph">
+<p>CDI Development Mode can be enabled in the following ways:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The application defines a context parameter in web.xml (always enabled for the application)</p>
+</li>
+<li>
+<p>At deploy time (enabled only for individual application)</p>
+</li>
+<li>
+<p>Via a system property (always enabled for all deployed applications)</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If CDI Development Mode is enabled by one of the options above, it can&#8217;t be disabled by any other option.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+CDI Development Mode will be enabled only if the deployed application contains any valid CDI bean definitions.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Once CDI Development mode is enabled you should be able to see a message similar to this one in the server&#8217;s log output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-log hljs" data-lang="log">Weld Development Mode: ENABLED</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enabling-cdi-development-mode"><a class="anchor" href="#enabling-cdi-development-mode"></a>Enabling CDI Development Mode</h3>
+<div class="paragraph">
+<p>The CDI Development Mode can be enabled using the following mechanisms:</p>
+</div>
+<div class="sect3">
+<h4 id="via-asadmin-cli"><a class="anchor" href="#via-asadmin-cli"></a>Via asadmin CLI</h4>
+<div class="paragraph">
+<p>Using the asadmin CLI it is possible to enable development mode for a single application or for ALL deployed applications.</p>
+</div>
+<div class="sect4">
+<h5 id="asadmin-enabling-single-application"><a class="anchor" href="#asadmin-enabling-single-application"></a>Enabling for a single application</h5>
+<div class="paragraph">
+<p>The CDI Development Mode can be enabled for a single application with the <code>deploy</code> command. Add the <code>cdiDevModeEnabled=true</code> property to the <code>--properties</code> argument&#8217;s value of the <code>deploy</code> command.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s an example of enabling development mode for an application named <code>application.war</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; deploy --properties cdiDevModeEnabled=true myapplication.war</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+It&#8217;s also possible to use the same <code>cdiDevModeEnabled</code> property with the <code>redeploy</code> command to enable/disable development mode when redeploying an application.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="asadmin-enabling-all-applications"><a class="anchor" href="#asadmin-enabling-all-applications"></a>Enabling for all applications</h5>
+<div class="paragraph">
+<p>The CDI Development Mode can be enabled for all applications by setting the <code>org.jboss.weld.development</code> system property to <code>true</code> with the <code>create-system-properties</code> asadmin command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; create-system-properties org.jboss.weld.development=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+All applications deployed AFTER this setting is applied will have CDI Development Mode enabled.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To enable it for already deployed applications, it&#8217;s necessary to redeploy them or disable and then enable them. The latter can be done with the <code>disable</code> and <code>enable</code> asadmin commands:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; disable myapplication
+asadmin&gt; enable myapplication</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-admin-console"><a class="anchor" href="#using-admin-console"></a>Using Admin Console</h4>
+<div class="paragraph">
+<p>Using the admin web console it is possible to enable development mode for a single application or for ALL deployed applications.</p>
+</div>
+<div class="sect4">
+<h5 id="console-enabling-single-application"><a class="anchor" href="#console-enabling-single-application"></a>Enabling for a single application</h5>
+<div class="paragraph">
+<p>The CDI Development Mode can be enabled for a single application during deployment. The <strong>Deploy Application</strong> page provides a checkbox to enable the <strong>CDI Development Mode</strong> for the application. If the checkbox is clicked, the CDI development mode is enabled:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../_images/probe/console-enable-at-deploy.png" alt="Turn On CDI Development Mode">
+</div>
+</div>
+<div class="paragraph">
+<p>In the <strong>Edit Application</strong> page, you can see that the <strong>CDI Development Mode</strong> checkbox is checked:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../_images/probe/console-edit-application.png" alt="CDI Development Mode enabled">
+</div>
+</div>
+<div class="paragraph">
+<p>In this page, it&#8217;s also possible to enable/disable the CDI Development Mode after an application is deployed. Changing the value of the <strong>CDI Development Mode</strong> checkbox will trigger redeployment of the application to take effect immediately.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="console-enabling-all-application"><a class="anchor" href="#console-enabling-all-application"></a>Enabling for all applications</h5>
+<div class="paragraph">
+<p>The CDI Development Mode can be enabled for all applications by setting the <code>org.jboss.weld.development</code> system property to <code>true</code> in the server configuration or by specifying it as a JVM startup option.</p>
+</div>
+<div class="paragraph">
+<p>To set the system property for the server globally, click on <strong>server (Admin Server)</strong> in the sidebar on the left. Then click on the <strong>Properties</strong> tab. In the <strong>System Properties</strong> page, add property with variable name <code>org.jboss.weld.development</code> and <strong>override value</strong> set to <code>true</code>, and press <strong>Save</strong>:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../_images/probe/console-enable-by-property.png" alt="Set CDI Development Mode System Property">
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+All applications deployed AFTER this setting is applied will have CDI Development Mode enabled.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To enable it for already deployed applications, it’s necessary to redeploy each application or disable then enable it.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-web-xml-deployment-descriptor"><a class="anchor" href="#using-web-xml-deployment-descriptor"></a>Using web.xml deployment descriptor</h4>
+<div class="paragraph">
+<p>To enable CDI Development Mode in a WAR application archive, add the following context parameter to the <code>web.xml</code> deployment descriptor:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;web-app&gt;
+    &lt;context-param&gt;
+        &lt;param-name&gt;org.jboss.weld.development&lt;/param-name&gt;
+        &lt;param-value&gt;true&lt;/param-value&gt;
+    &lt;/context-param&gt;
+&lt;/web-app&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This configuration will automatically enable CDI Development Mode for the application once is deployed.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Currently, it&#8217;s not possible to override this option and disable CDI Development Mode in application server configuration without providing an alternative <code>web.xml</code> deployment descriptor during deployment.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cdi-probe"><a class="anchor" href="#cdi-probe"></a>CDI Probe</h3>
+<div class="paragraph">
+<p>Once CDI Development Mode is enabled, the web admin console will provide access to the CDI Probe tool which allows users to inspect and monitor CDI beans of deployed applications at runtime.</p>
+</div>
+<div class="paragraph">
+<p>The CDI Probe supplies the following interfaces for consuming data in real time:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A REST API</p>
+</li>
+<li>
+<p>An HTML-based application accessible via a web browser</p>
+</li>
+<li>
+<p>Multiple JMX beans with monitoring metrics</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="cdi-probe-via-rest-api"><a class="anchor" href="#cdi-probe-via-rest-api"></a>Accessing the CDI Probe via REST API</h4>
+<div class="paragraph">
+<p>The CDI Probe exposes a REST API at the context root of the application suffixed by path <code>/weld-probe</code>, followed by path to the REST resource.</p>
+</div>
+<div class="paragraph">
+<p>The REST interface is documented in the official <a href="https://github.com/weld/core/blob/master/probe/Overview.md">Weld CDI Probe documentation</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cdi-probe-via-webapp"><a class="anchor" href="#cdi-probe-via-webapp"></a>Using CDI Probe Web Application</h4>
+<div class="paragraph">
+<p>An instance of the CDI Probe is attached to each application in CDI Development Mode and is available at the context root of the application suffixed by the path <code>/weld-probe</code>. For example, <a href="http://localhost:8080/cargo-tracker/weld-probe" class="bare">http://localhost:8080/cargo-tracker/weld-probe</a>.</p>
+</div>
+<div class="sect4">
+<h5 id="cdi-probe-via-admin-console"><a class="anchor" href="#cdi-probe-via-admin-console"></a>Access from Admin Console</h5>
+<div class="paragraph">
+<p>Once CDI Development Mode is enabled for an application, the <strong>Edit Application</strong> page in the Admin Console provides a link to open the CDI Probe web application for quick reference.</p>
+</div>
+<div class="paragraph">
+<p>You can find the link called <strong>CDI Probe</strong> in the <strong>Modules and Components</strong> table, in the <strong>Action</strong> column:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../_images/probe/console-edit-application.png" alt="CDI Probe web application in Admin Console">
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The <strong>CDI Probe</strong> link won&#8217;t be visible if the <strong>CDI Development Mode</strong> checkbox on this page isn&#8217;t selected. If the development mode is enabled by other means, the CDI Probe will still be accessible. Either check the <strong>CDI Development Mode</strong> checkbox and press <strong>Save</strong> or access CDI Probe directly by adding <code>/weld-probe</code> to the URL of your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The <strong>CDI Probe</strong> link will open the web application in a new browser window:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../_images/probe/cdi-probe.png" alt="CDI Probe Web Application">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_access_from_an_applications_web_pages"><a class="anchor" href="#_access_from_an_applications_web_pages"></a>Access from an application&#8217;s web pages</h5>
+<div class="paragraph">
+<p>If your application serves web pages, you can also access the CDI Probe web application from the toolbar that is added by the CDI Development Mode at the bottom of every web page. Below is an example on how the toolbar looks like in a sample application named "Cargo Tracker":</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../_images/probe/cdi-probe-in-web-app.png" alt="CDI Probe via Sample Application">
+</div>
+</div>
+<div class="paragraph">
+<p>If the application uses CDI beans to process the HTTP request used to serve the webpage in question, the toolbar will also contain a link to see all bean invocations as a tree of events, which may look like this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../_images/probe/cdi-probe-bean-invocations.png" alt="CDI Invocation Event Tree sample">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="see-also"><a class="anchor" href="#see-also"></a>See Also</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://docs.jboss.org/weld/reference/2.3.5.Final/en-US/html/devmode.html">Weld CDI Development Mode</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../_/js/site.js"></script>
+<script async src="../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

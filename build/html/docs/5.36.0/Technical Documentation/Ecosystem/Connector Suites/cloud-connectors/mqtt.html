@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>MQTT Cloud Connector :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="mqtt.html">MQTT Cloud Connector</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Ecosystem/Connector%20Suites/cloud-connectors/mqtt.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">MQTT Cloud Connector</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>MQTT (Message Queue Telemetry Transport) is a lightweight publish-subscribe
+messaging protocol.</p>
+</div>
+<div class="paragraph">
+<p>In order to connect to a MQTT broker, the <code>MQTTRAR-0.1.0-SNAPSHOT.rar</code> has to
+be deployed as shown in the <a href="#documentation/ecosystem/cloud-connectors/Overview.adoc#Installing-a-connector" class="page unresolved">
+Installing a connector section</a> of the Cloud Connectors overview.</p>
+</div>
+<div class="paragraph">
+<p>In order to make use of this connector in an application, the following maven
+dependency is needed:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-XML hljs" data-lang="XML">&lt;dependency&gt;
+  &lt;groupId&gt;fish.payara.cloud.connectors.mqtt&lt;/groupId&gt;
+  &lt;artifactId&gt;MQTT-JCA-API&lt;/artifactId&gt;
+  &lt;version&gt;0.1.0-SNAPSHOT&lt;/version&gt;
+  &lt;type&gt;jar&lt;/type&gt;
+  &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that this dependency have scope provided since the types within this
+dependency are globally available to every application deployed to Payara Micro Community
+after the <code>MQTTRAR-0.1.0-SNAPSHOT.rar</code> was deployed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sending_messages"><a class="anchor" href="#_sending_messages"></a>Sending messages</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Sending messages to a MQTT broker can be done via the JCA and an MQTT specific
+API. In order to start using this API to send messages, a resource has to be
+defined via the JCA API; a connection factory.</p>
+</div>
+<div class="paragraph">
+<p>The connection factory has to be given a name, which can be any name that is
+valid for JNDI. The <code>java:app</code> namespace is typically recommended to be used.
+The type of the connection factory to be used for MQTT is
+<code>fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory</code>, and we have to
+specify the resource adapter name which is here <code>MQTTRAR-0.1.0-SNAPSHOT.rar</code>.</p>
+</div>
+<div class="paragraph">
+<p>The following gives an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-Java hljs" data-lang="Java">@ConnectionFactoryDefinition (
+ name = "java:app/mqtt/factory",
+ interfaceName = "fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory",
+ resourceAdapter = "MQTTRAR-0.1.0-SNAPSHOT"
+ properties = "cleanSession=true")
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above shown definition in place the following code shows an example of
+sending a message:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-Java hljs" data-lang="Java">@Singleton
+@Startup
+public class SendMQTTMessage {
+
+ @Resource(lookup = "java:app/mqtt/factory")
+ private MQTTConnectionFactory factory;
+
+ @PostConstruct
+ public void init() {
+    try (MQTTConnection connection = factory.createConnection()) {
+        connection.publish("test", "{\"test\": \"Hello World\"}".getBytes(), 0, false);
+    }
+    catch (Exception ex) {
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_receiving_messages"><a class="anchor" href="#_receiving_messages"></a>Receiving messages</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Messages can be received from an MQTT broker by creating an MDB (Message Driven
+Bean) that implements the <code>fish.payara.cloud.connectors.mqtt.api.MQTTListener</code>
+marker interface and has a single method annotated with <code>@OnMQTTMessage</code> and the
+method signature <code>void method(String topic, MqttMessage message)</code>.</p>
+</div>
+<div class="paragraph">
+<p>The following gives an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-Java hljs" data-lang="Java">@MessageDriven(activationConfig = {
+ @ActivationConfigProperty(propertyName = "topicFilter", propertyValue = "test")
+})
+public class ReceiveMQTTMessage implements MQTTListener {
+   @OnMQTTMessage
+   public void receiveMessage(String topic, MqttMessage message) {
+       // Handle message
+   }
+}</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 18.1818%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 63.6364%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Config Property Name</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverURIs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">tcp://localhost:1883</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Server URIs for connection, comma separated</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cleanSession</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets whether the client and server should remember state across reconnects</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">automaticReconnect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets whether the client will automatically reconnect to the server if the
+connection is lost</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">filePersistance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the client should use file persistence for unacked messages</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">persistenceDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Directory to use for file persistence</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">connectionTimeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets the connection timeout value in seconds</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxInflight</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets the maximum messages that can be sent without acknowledgements</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">keepAliveInterval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets the keep alive interval in seconds</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">userName</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The user name for the connection.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password for the connection.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">topicFilter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Topic Filter (For MDBs only)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">qos</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quality of Service for the subscription (For MDBs only)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

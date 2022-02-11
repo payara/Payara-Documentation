@@ -1,0 +1,38 @@
+= Timers in Deployment Groups
+
+Timer facilities provided by EJB APIs `TimerService` and `@Scheduled` need special configuration in order to work intuitively for applications deployed to a deployment group.
+
+There are four types of timers distinguished by their lifecycle (persistent, non-persistent) and the mean of their definition (declarative, programmatic).
+
+Declarative timers are defined in EJB deployment descriptors or with annotation `@Scheduled`.
+Programmatic timers are created via calls to `TimerService.create*Timer`.
+
+== Non-Persistent Timers
+
+Non-Persistent timers exist in memory only for the duration in which the application runs on the instance.
+Declarative non-persistent timers run on every instance, whereas programmatic ones only on the instance that created them.
+When the instance shuts down, the timer stops firing.
+Instances do not see each other's non-persistent timers, so calling `TimerService.getTimers()` only returns local non-persistent timers.
+
+Non-Persistent timers have a simpler lifecycle but are not the default option
+To make a timer non-persistent, the `@Schedule` annotation needs the attribute `persistent=false`, or the `TimerConfig` objects need to have their property `persistent` set to `false` explicitly.
+
+== Persistent Timers
+
+Persistent timers exist in the persistent store for the entire time for which application is deployed to a domain.
+Contrary to non-persistent ones, each persistent timer is only executed on a single instance of a deployment group.
+When the instance shuts down, each persistent timer migrates to another instance in the application's deployment group and continues firing there.
+Since persistent timers are shared, `TimerService.getTimers()` returns all persistent timers in the deployment group, regardless of which instance created them.
+
+Persistent timers are the default kind of timer.
+
+=== Preconditions for using Persistent Timers in Deployment Groups
+
+Because deployment groups do not need to share configurations amongst instances, there are several confiration and operational constraints that are not enforced by the server.
+To ensure correct behaviour of persistent timers within a deployment group, the following conditions need to be met:
+
+* EJB Timer Service needs to use shared storage -- external database or xref:../ejb/persistent-timers.adoc[DataGrid]
+* All instances of deployment groups and the Domain Administration Server share the same configuration of EJB Timer Service
+* Applications with persistent timers are deployed to a deployment group and not managed on instance level afterwards
+* Instances are members of only a single deployment group
+

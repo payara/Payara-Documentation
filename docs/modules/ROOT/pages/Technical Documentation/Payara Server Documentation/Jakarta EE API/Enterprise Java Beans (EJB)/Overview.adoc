@@ -1,0 +1,647 @@
+[[ejb-container-enhancements]]
+= EJB Container Enhancements
+
+This section details several improvements and enhancements done to features provided by the EJB container.
+
+[[concurrent-instance-configuration]]
+== Concurrent Instance Configuration
+
+Payara Server can control the number of maximum *concurrent* instances per EJB that can be served to its clients.
+
+It is possible to limit the number of concurrent Stateless EJB instances that are dispatched, allowing fine-grained control of resources, limiting surface area for DDOS attacks and making applications run more smoothly and efficiently. This is done regardless of the maximum number of instances available in a bean's pool. Using these boundaries, it is possible to instruct the EJB container so that the maximum number of threads is not exceeded at runtime.
+
+These limits can be controlled on a per-EJB basis, using `bean-pool` elements in the `glassfish-ejb-jar.xml` deployment descriptor file with the use of the following proprietary Payara Platform tags and elements:
+
+[cols="4,10a",options="header"]
+.`bean-pool` elements in `glassfish-ejb-jar.xml`
+|===
+|Element |Behaviour
+|`<max-pool-size>`
+|This element controls the maximum concurrent instances that are dispatched for this EJB (number of threads). The default is configured in the domain
+|`<max-wait-time-in-millis>`
+|This element controls what to do when the number of requests exceeds the amount of beans available in the pool.
+Possible values of this element include:
+
+* `-1` (_default_)
++
+When the pooled number is exceeded, a new EJB instance is created, there is no upper bound in place.
+
+* `0`
++
+When the pooled number is exceeded, the request will wait for a bean to free up in the pool. This effectively caps the number of threads that are concurrently created for the bean's client request.
+
+* Between `1` - `MAX_INTEGER`
++
+When the pool number is exceeded, the request will wait for a bean to free up in the pool, up to the number of milliseconds specified here. After this time has expired, a new EJB instance is created and dispatched, thus the configured pool size acts as a soft upper bound, one that can be exceeded once the timer has expired.
+
+|`<steady-pool-size>`
+|This element controls the *minimum* number of beans in the bean pool. This will increase performance at the expense of memory footprint.
+|===
+
+NOTE: The system property `fish.payara.ejb-container.max-wait-time-in-millis` can be set to change the default global value of `<max-wait-time-in-millis>` for *_all_* Stateless EJB bean pools.
+
+IMPORTANT: Unless overridden in the deployment descriptor file, this will become the new default value and can be used to cap the upper bound of all concurrent invocations of any Stateless EJB pools.
+
+[[example]]
+=== Example
+
+The following is a sample `glassfish-ejb-jar.xml` deployment descriptor that configures 2 EJBs with the settings mentioned beforehand.
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glassfish-ejb-jar PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 EJB 3.1//EN" "http://glassfish.org/dtds/glassfish-ejb-jar_3_1-1.dtd">
+<glassfish-ejb-jar>
+  <enterprise-beans>
+    <ejb>
+      <ejb-name>PooledStatelessBean</ejb-name>
+      <bean-pool>
+          <max-pool-size>1</max-pool-size>
+          <max-wait-time-in-millis>0</max-wait-time-in-millis>
+          <steady-pool-size>1</steady-pool-size>
+      </bean-pool>
+    </ejb>
+    <ejb>
+      <ejb-name>PooledMDB</ejb-name>
+      <bean-pool>
+          <max-pool-size>1</max-pool-size>
+          <resize-quantity>1</resize-quantity>
+      </bean-pool>
+    </ejb>
+  </enterprise-beans>
+</glassfish-ejb-jar>
+----
+
+[[custom-ejb-jar-names]]
+== Customized EJB-JAR Archive Names
+
+It is possible to instruct Payara Server to override the name of an EJB-JAR module when it is deployed either as a standalone module or as part of an EAR application. It is also possible to instruct Payara Server to override the module and/or application's name.
+
+[[overwriting-module-name]]
+=== Overwriting the Module Name
+
+When deploying an EJB-JAR module on Payara Server Community, the portable JNDI names for all scanned EJBs will be generated using the name of the module as specified on the _ejb-jar.xml_ deployment descriptor:
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar xmlns = "http://java.sun.com/xml/ns/javaee"
+         version = "3.1"
+         xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation = "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd">
+    <module-name>MODULE_NAME</module-name>
+</ejb-jar>
+----
+
+NOTE: If the name's not specified in the deployment descriptor, the specification states that the module name will be the same as the JAR artifact used to deploy it.
+
+However, When deploying a JAR from an IDE (like **NetBeans** or **IntelliJ**), the IDE deploys to Payara Server using the asadmin `deploy` command, with the `--name` option specified. This will force the module to have the specified name over the name defined in _ejb-jar.xml_. This is undesired because the IDE usually infers the module name from the name of the project or the JAR file and doesn't take the correct name of the module into account.
+
+In Payara Server, the module name defined in the deployment descriptor will be used even if it tries to be overridden using the `--name` option. This behaviour will *always* takes precedence.
+
+IMPORTANT: In the case you need to overwrite the name of the module when deploying the module, use the `--forceName` command option.
+
+[[overwriting--the-application-name]]
+=== Overwriting the Application Name
+
+In the case of EAR artifacts, the portable JNDI names for all scanned EJBs will use the application name defined in the _application.xml_ deployment descriptor:
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_7.xsd" version="7">
+    <display-name>My Application</display-name>
+    <application-name>APPLICATION_NAME</application-name>
+    ...
+</application>
+----
+
+NOTE: You can use the `--name` and `--forcename` deployment options to override the application name in a similar manner with what happens with EJB-JAR modules.
+
+[[lite-remote-ejb]]
+== Lite Remote EJB Communication
+
+For scenarios when communication with remote EJBs is needed across a complex network topology or when a server architecture is deployed on a cloud provider, there's a new feature for the EJB server and client applications: A lite and thin client that can be used to communicate via HTTP(S) instead of IIOP-RMI.
+
+:previewVersion: {currentVersion}
+include::partial$tech-preview.adoc[]
+
+Payara Server has support for classic remote EJB since its inception. Classic remote EJB uses the **IIOP-RMI** (Internet Inter-ORB Protocol Remote Method Invocation) protocol for transport communication and the https://omg.org/spec/SEC[CSIv2] (Common Secure Interoperability Protocol Version 2) protocol for security.
+
+While feature rich, these protocols were not designed with firewalls, NAT, (private) clouds, Docker and generally the Internet in mind. For these environments the requirements of the protocol, such as establishing independent connections back from the server to the client, are too troublesome.
+
+The **IIOP-RMI/CSIv2** also requires the use of multiple heavyweight client libraries. In the case of Payara Server the client library (either referenced by the `gf-client.jar` library or the `payara-embedded-all` dependency) is almost as big as the entire server as it's essentially a special form of the ACC (Application Client Container). For this reason a much needed modernization  of the transport and security protocols was needed, and for the environments described only one protocol really works, and that is the HTTP(S) protocol.
+
+Payara Server features an additional complimentary EJB remoting technology based on the HTTP(S) protocol while favoring the use of a thin client library that make remote applications much lighter while circumventing known challenges for the Internet and other scenarios.
+
+IMPORTANT: HTTP(S) for EJB Remoting in Payara Server is a completely different feature from the classic IIOP-RMI/CSIv2-based feature, and does not intend to replace the transport layer protocol used on it, rather it is implemented as an additional independent feature.
+
+IMPORTANT: TX Propagation and Security Propagation is *not supported* by EJB Remoting in Payara Server.
+
+WARNING: In the current version of this feature, not all remote EJB features are implemented yet.
+
+[[configuring-http-for-remote-ejb]]
+=== Configuring HTTP(S) for Remote EJBs
+
+HTTP(S) for EJB remoting in Payara Server makes use of a special web endpoint on which is located by default on the path `/ejb-invoker`.
+
+IMPORTANT: This endpoint is disabled out of the box and it can be enabled using the `set-ejb-invoker-configuration` asadmin command.
+
+[[set-ejb-invoker-configuration]]
+==== `set-ejb-invoker-configuration`
+
+*Usage*::
+----
+asadmin set-ejb-invoker-configuration
+        [--enabled=true|false]
+        [--securityenabled=true|false]
+        [--roles=<role-list>]
+        [--authmoduleclass=<SAM-class>]
+        [--authmodule=<security-provider-id>]
+        [--realmname=<realm-name>]
+        [--authtype=<auth-type>]
+        [--endpoint=<context-root[default:ejb-invoker]>]
+        [--virtualservers=<virtualserver-list>]
+        [--target=<target[default:server]>]
+----
+
+*Aim*::
+Enables or disables the endpoint that allows HTTP(S) transport based communication for remote EJBs.
+
+[[command-options]]
+===== Command Options
+
+[cols="3,1,10,1,1", options="header"]
+|====
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Enables or disables the `ejb-invoker` application.
+|true
+|No
+
+|`securityenabled`
+|Boolean
+|Whether or not secure access to the `ejb-invoker` endpoint is enabled.
+|false
+|No
+
+|`roles`
+|String
+|If defined, the endpoint will be assigned to a list of the role specified as a comma-separated..
+|invoker
+|No
+
+|`endpoint`
+|String
+|The context root used to expose the `ejb-invoker` application endpoint.
+|`ejb-invoker`
+|No
+
+|`authmoduleclass`
+|String
+|Defines the full qualified class name implementing `javax.security.auth.message.module.ServerAuthModule`. If defined and `securityenabled` is set to true, the HttpServlet Message security provider is created and `ejb-invoker` application secured with the configured SAM.
+|
+|No
+
+|`authmodule`
+|String
+|Defines the existing message security provider id. If defined and `securityenabled` is set to true, the `ejb-invoker application` will be secured with it.
+|
+|No
+
+|`realmname`
+|String
+|Defines the registered realm name. If defined and `securityenabled` it set to true, the `ejb-invoker` application will be secured with the corresponding realm that will be used for authentication.
+|
+|No
+
+|`authtype`
+|String
+|The instance or cluster to enable the endpoint.
+|
+|No
+
+|`virtualservers`
+|String
+|If defined, the endpoint will be assigned to a list of *virtual servers* specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available.
+|
+|No
+
+|`target`
+|String
+|The target configuration where the command should be run.
+|server
+|No
+|====
+
+[[example]]
+===== Example
+
+The following command will enable the endpoint on the DAS:
+
+[source, shell]
+----
+asadmin > set-ejb-invoker-configuration --enabled=true
+----
+
+NOTE: The `set-ejb-invoker-configuration --enabled=true/false` commands actually deploy/undeploy an internal small WAR application that exposes the endpoint. In this version this application is shown in all overviews that show deployed applications once enabled.
+
+
+[[get-ejb-invoker-configuration]]
+==== `get-ejb-invoker-configuration`
+
+*Usage*::
+----
+asadmin get-ejb-invoker-configuration [--target=<target[default:server]>]
+----
+
+*Aim*::
+Returns the current configuration options for the `ejb-invoker` application on the targeted configuration.
+
+[[command-options-2]]
+===== Command Options
+
+[cols="2,1,10,1,1", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`target`
+|String
+|The target configuration where the command should be run.
+|server
+|No
+|===
+
+
+[[example-1]]
+===== Example
+
+The following command returns the current configuration options from the DAS:
+
+[source, shell]
+----
+asadmin > get-ejb-invoker-configuration --target cluster1
+----
+
+[[configuring-thin-client]]
+=== Configuring the Thin Client Dependency
+
+Client applications that wish to use HTTP(S) as the transport protocol when calling remote EJBs will have to use a *special thin-client* dependency. To do this, you can add the following Maven dependency to your client project:
+
+[source, xml]
+----
+<dependency>
+    <groupId>fish.payara.extras</groupId>
+    <artifactId>ejb-http-client</artifactId>
+    <version>{currentVersion}</version>
+</dependency>
+----
+
+This artifact requires a patched version of the Jersey client which is pulled intransitive. This patched version is available within our https://github.com/payara/Payara_PatchedProjects[Payara Patched Project repository].
+The Maven repository definition is present in the pom.xml file of the `ejb-http-client` artifact. However, when your dependencies are managed by a private artifact repository, for example, you might need to update it to refer to the Payara Patched Project repository.
+
+Also, we recommend having a look at the BOM feature so that versions can be defined more consistently.
+
+Finally, the code that executes the call to the remote EJB must be modified in some manner. To obtain a type-safe proxy for any remote EJB bean, the traditional approach via JDNI is still used. An example is given below:
+
+. First, consider the following remote EJB interface:
++
+[source, java]
+----
+@Remote
+public interface BeanRemote {
+    String method();
+}
+----
+
+. Second, consider a (secured) EJB that implements that interface and resides in a EJB application called "test" deployed on a Payara server instance that is listening in `http://localhost:8080`:
++
+[source, java]
+----
+@Stateless
+public class Bean implements BeanRemote, Serializable {
+    private static final long serialVersionUID = 1L;
+    @Override
+    @RolesAllowed("g1")
+    public String method() {
+        return "method";
+    }
+}
+----
+
+. Given the above, the following client code can be used to obtain a proxy to the `BeanRemote` bean and invoke a remote method defined on it:
++
+[source, java]
+----
+import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
+import static javax.naming.Context.PROVIDER_URL;
+import java.util.Properties;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+public class RemoteEJBLiteClient{
+    public static void main(String... args) throws NamingException{
+        Properties environment = new Properties();
+        environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
+        environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
+        InitialContext ejbRemoteContext = new InitialContext(environment);
+        BeanRemote beanRemote = (BeanRemote) ejbRemoteContext.lookup("java:global/test/Bean");
+        beanRemote.method() // returns "method"
+    }
+}
+----
+
+[[calling-secured-bean]]
+==== Calling a Secured Remote EJB
+
+When calling a secured EJB using the `ejb-invoker` endpoint, there are some considerations in place for the client code:
+
+. If the remote EJB is secured with transport confidentiality (and integrity) enabled like this:
++
+[source, xml]
+----
+<ejb>
+    <ejb-name>Bean</ejb-name>
+    <ior-security-config>
+        <transport-config>
+            <integrity>REQUIRED</integrity>
+            <confidentiality>REQUIRED</confidentiality>
+            <establish-trust-in-target>SUPPORTED</establish-trust-in-target>
+            <establish-trust-in-client>SUPPORTED</establish-trust-in-client>
+        </transport-config>
+    </ior-security-config>
+</ejb>
+----
++
+Then, the corresponding HTTP endpoint to use would be `https://localhost:8181/ejb-invoker` instead.
+
+. If the remote EJB also has authentication enabled (via username and password credentials) like this:
++
+[source, xml]
+----
+<ejb>
+    <ejb-name>Bean</ejb-name>
+    <as-context>
+        <auth-method>USERNAME_PASSWORD</auth-method>
+        <realm>default</realm>
+        <required>true</required>
+    </as-context>
+</ejb>
+----
++
+Then the credentials required to correctly authenticate the user for the call have to be specified in the JNDI context with the following properties:
++
+* `javax.naming.Context.SECURITY_PRINCIPAL` for the username
+* `javax.naming.Context.SECURITY_CREDENTIALS` for the password
+
+Here's an example of the complete client code used to call a secured remote EJB:
+
+[source, java]
+----
+import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
+import static javax.naming.Context.PROVIDER_URL;
+import static javax.naming.Context.SECURITY_CREDENTIALS;
+import static javax.naming.Context.SECURITY_PRINCIPAL;
+import java.util.Properties;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+public class RemoteEJBLiteClient{
+    public static void main(String... args) throws NamingException{
+        Properties environment = new Properties();
+        environment.put(INITIAL_CONTEXT_FACTORY,"fish.payara.ejb.rest.client.RemoteEJBContextFactory");
+        environment.put(PROVIDER_URL, "https://localhost:8181/ejb-invoker");
+        environment.put(SECURITY_PRINCIPAL, "u1");
+        environment.put(SECURITY_CREDENTIALS, "p1");
+        InitialContext ejbRemoteContext = new InitialContext(environment);
+        BeanRemote beanRemote = (BeanRemote) ejbRemoteContext.lookup("java:global/test/Bean");
+        beanRemote.method() // returns "method"
+    }
+}
+----
+
+IMPORTANT: When accessing secured EJBs you *should* use only HTTPS (that means, enabling confidential transport requirements to the remote EJB), as the submitted credentials will be transferred in clear text (not encrypted, only base64 encoded), which is a security risk you should avoid in any production environment.
+
+[[jndi-customization-options]]
+==== JNDI Customization Options
+
+Under the covers the remote EJB proxy uses a JAX-RS (Jersey) REST client builder in order to establish communication with the remote server. If you want to customize and modify the parameters for this communication (timeouts, keystores, etc.) the following JNDI context properties can be used to this end:
+
+[cols="6,10,10",options="header"]
+.`JNDI Options for Custom HTTP(S) Communication`
+|===
+|Property |Behaviour| Type
+|`fish.payara.connectTimeout`
+| The connection timeout. A value of *0* represents that the wait is indefinite. Negative values are not allowed. Unit is microseconds.
+| `Number` (from which it's `Long` value is taken) or a `String` that can be converted to a `Long` value.
+|`fish.payara.readTimeout`
+| The timeout to read a response. If the remote Payara doesn't respond within the defined time a ProcessingException is thrown with a `TimeoutException` as its cause. A value of *0* represents that the wait is indefinite. Negative values are not allowed. Unit is microseconds.
+| `Number` (from which it's `Long` value is taken) or a `String` that can be converted to a `Long` value.
+|`fish.payara.keyStore`
+| The key store to be used by the proxy. The key store contains the private key as well as certificates with its associated public keys.
+| Instance of `java.security.KeyStore` or a `String` representing its fully qualified classname.
+|`fish.payara.trustStore`
+| The trust store to be used by the proxy. The trust store must contain the certificates that are needed to communicate with the remote Payara Server.
+| Instance of `java.security.KeyStore` or a `String` representing its fully qualified classname.
+|`fish.payara.sslContext`
+| The SSL context that will be used by the proxy for creating secured connections to the Payara remote server. This context *must* be fully initialized, including the trust and key managers. Should not be used in conjunction with the `fish.payara.keyStore` and/or `fish.payara.trustStore` properties.
+| Instance of `javax.net.ssl.SSLContext` or a `String` representing its fully qualified classname.
+|`fish.payara.hostnameVerifier`
+| The hostname verifier to be used by the proxy to verify the endpoint's hostname against the identification information of it.
+| Instance of a `javax.net.ssl.HostnameVerifier` or a `String` representing its fully qualified classname.
+|`fish.payara.provider.principal`
+| The principal to be used by the proxy to access the secured endpoint.
+| Instance of a `String`.
+|`fish.payara.provider.credentials`
+| The credentials to be used by the proxy to access the secured endpoint.
+| Instance of a `String`.
+|`fish.payara.provider.authType`
+| To specify the authentication type of the secured endpoint. By default `BASIC` is defined.
+| Instance of a `String`.
+|`fish.payara.requestFilter`
+| To register the custom filter for the client request invoked by proxy.
+| Instance of a `javax.ws.rs.client.ClientRequestFilter` or a `Class` implementing `javax.ws.rs.client.ClientRequestFilter`.
+|`fish.payara.responseFilter`
+| To register the custom filter for the client response received by proxy.
+| Instance of a `javax.ws.rs.client.ClientResponseFilter ` or a `Class` implementing `javax.ws.rs.client.ClientResponseFilter`.
+|`fish.payara.executorService`
+| The executor service that will be used for executing asynchronous tasks. _(for future use)_
+| Instance of `java.util.concurrent.ExecutorService` or a `String` representing its fully qualified classname.
+|`fish.payara.scheduledExecutorService`
+| The executor service that will be used for executing scheduled asynchronous tasks. _(For future use)_
+| Instance of `java.util.concurrent.ScheduledExecutorService` or string representing fully qualified classname.
+|`fish.payara.withConfig`
+| The configuration for the internal JAX-RS/Jersey REST client.
+| Instance of `javax.ws.rs.core.Configuration` or a `String` representing its fully qualified classname.
+|`fish.payara.clientAdapter`
+| Implementation of client side adapter to use for intercepting JNDI lookups (see below)
+| Instance of `fish.payara.ejb.http.client.adapter.ClientAdapter`
+|===
+
+The constants are also exposed as static attributes of the `fish.payara.ejb.rest.client.RemoteEJBContextFactory` class.
+
+[[system-properties-fallbacks]]
+==== System Properties Fallbacks
+
+The JNDI customization options listed above as well the environment variables defined in `javax.naming.Context` (except `APPLET`) can be set by setting a system property of the same name that will act as a fallback.
+That means it will not override an environment variable that is already present but would be used in the case that it is not defined when `InitialContextFactory.getInitialContext` is invoked.
+
+[[client-side-adapter]]
+=== Client side adapter
+
+EJB Lite connector is, in its current form, suited for invoking stateless remote EJBs.
+However, if you're using the connector with existing clients, those may depend on stateful interactions, like invoking stateful EJBs or accessing application server data sources and connection factories.
+Client side adapters serve the purpose of emulating stateful behavior at the client and delegate the requests to stateful backend, when all information from the client is collected.
+
+The API of client side adapters is prescribed by interface `fish.payara.ejb.http.client.adapter.ClientAdapter`:
+
+[source,java]
+----
+public interface ClientAdapter {
+    /*
+     * @param jndiName jndi name requested for lookup
+     * @param remoteContext naming context for remote EJB invocation
+     * @return Optional.of(proxy) if adapter provides a proxy for given name, Optional.empty() otherwise
+     * @throws NamingException if downstream lookup fails, or other validation doesn't pass
+     */
+    Optional<Object> makeLocalProxy(String jndiName, Context remoteContext)
+        throws NamingException;
+}
+----
+
+To make use of the adapter, put an instance of `ClientAdapter` into JNDI context property `fish.payara.clientAdapter`. Every JNDI lookup will be  first passed to the adapter instance in such case. If adapter returns a non-empty `Optional` value, tit will be passed back to the client.
+
+[[composing-multiple-adapters]]
+==== Composing multiple adapters
+
+Client side emulation might require stubbing diverse JNDI names and return types, and handling all of that in a single ClientAdapter implementation would result in not very maintainable code. Therefore the client library offers two classes that help with composition of multiple Client adapters into the parent instance to be passed to `RemoteEJBContextFactory`:
+
+* `CompositeClientAdapter` concatenates multiple client adapter instances, calling adapters in a defined order and returning first non-empty proxy provided by the adapters.
+* `ClientAdapterCustomizer` is a decorator, that helps separate JNDI name matching from instantiation of client adapter.
+Most used method of customizer is `matchPrefix`, which will only call downstream adapter when requested JNDI name matches prefix.
+
+NOTE: This prefix is stripped before invoking the downstream adapter.
+
+[[composite-client-adapter-example]]
+===== Composite Client Adapter example
+
+[source,java]
+----
+Properties props = new Properties();
+props.put(Context.INITIAL_CONTEXT_FACTORY, RemoteEJBContextFactory.FACTORY_CLASS);
+props.put(Context.PROVIDER_URL, "http://not.relevant/");
+props.put(RemoteEJBContextFactory.CLIENT_ADAPTER,
+        CompositeClientAdapter.newBuilder()
+            .register(customize(new ConnectionFactoryAdapter()).matchPrefix("jms/")
+                    customize(QueueAdapter.class).matchPrefix("queue/"))
+            .build()
+        );
+Context context = new InitialContext(props);
+----
+
+See https://javadoc.io/doc/fish.payara.extras/ejb-http-client[API documentation] of the client library for detailed description of `ClientAdapterCustomizer` methods and contracts of `CompositeClientAdapter`.
+
+[[known-limitations]]
+=== Known Limitations
+
+[[serialization-limitations]]
+==== Serialization Limitations
+
+The HTTP adapter utilizes http://json-b.net/[JSON-B] for serialization. This places limits on types of objects that can be transmitted as method arguments or return types. The serialization can be customized by means of JSON-B annotations.
+
+. By default, only public properties and fields are transferred
+. Complex object graphs should form a tree and not contain cyclic references
+. Polymorphism is not supported by default
+
+[[programming-model-limitations]]
+==== Programming Model Limitations
+
+The HTTP adapter uses stateless HTTP requests. In its current form, it is unfit for invoking stateful objects like `@Stateful` Enterprise Java Beans, or using server resources like `DataSource` or `ConnectionFactory`.
+
+[[persistent-timers]]
+== Advanced Persistent Timer Configuration
+
+If using an external RDBMS engine for storing persistent timer data is not an option, it is also possible to use the Domain Data Grid to function as a replacement in production environments. The same feature is available in xref:/documentation/payara-micro/persistent-ejb-timers.adoc[Payara Micro].
+
+:previewVersion: {currentVersion}
+include::partial$tech-preview.adoc[]
+
+Persisting an EJB Timer to the Domain Data Grid means that the Data Grid itself will store the timer details, preserving it even if the original instance leaves the grid.
+
+IMPORTANT: All stored timers are lost if the whole domain is stopped.
+
+The Persistence service for EJB Timers can be set in the administration console by navigating to the *EJB Timer Service* tab in the EJB Container node of a configuration.
+
+To use the Data Grid to store EJB Timers set the *Persistence Service* to _DataGrid_
+
+image:ejb/set-ejb-timer-persistence.png[Set EJB Persistence to Data Grid]
+
+EJB Timers will be coordinated across a single deployment group and if an instance of the deployment group is stopped another instance in the same deployment group will take ownership of the timer and ensure it is fired.
+
+CAUTION: Clustered Timer Firing Mode is NOT used in this version of Payara Server and is always "One Per Deployment Group"
+
+It is also possible to set the `ejb-timer-service` from the command line. To get the current state, run the following command:
+
+[source, shell]
+----
+asadmin> get configs.config.${your-config}.ejb-container.ejb-timer-service
+----
+
+This will return the current state taken from the _domain.xml_ configuration file, which by default should be something similar to the following:
+
+[source, shell]
+----
+asadmin> get configs.config.server-config.ejb-container.ejb-timer-service
+configs.config.server-config.ejb-container.ejb-timer-service.ejb-timer-service=Database
+configs.config.server-config.ejb-container.ejb-timer-service.max-redeliveries=1
+configs.config.server-config.ejb-container.ejb-timer-service.minimum-delivery-interval-in-millis=1000
+configs.config.server-config.ejb-container.ejb-timer-service.redelivery-interval-internal-in-millis=5000
+Command get executed successfully.
+----
+
+To persist to the Data Grid you need only change the value for `configs.config.server-config.ejb-container.ejb-timer-service.ejb-timer-service` to `DataGrid`. To do this, run the following `set` command:
+
+[source, bash]
+----
+asadmin> set configs.config.server-config.ejb-container.ejb-timer-service.ejb-timer-service=DataGrid
+----
+
+WARNING: `set` commands are not dynamic. You will need to restart your domain to apply the changes.
+
+[[timer-migration]]
+=== Timer Migration
+
+EJB Timers stored in the Domain Data Grid support timer migration between Instances in the same Deployment Group. You can migrate timers using the Administration console from the *Deployment Group* page. Timers can also be migrated between instances using asadmin commands like this:
+
+[source, shell]
+----
+asadmin> migrate-timers --target server1 server2
+----
+
+Where `server1` is the active instance to migrate timers to and `server2` is the failed instance.
+
+[[migration-live-instance]]
+==== Migration from Live Instances
+
+The `migrate-timers` command can also be used to migrate timers that are scheduled to expire on a live instance. This
+allows a user to pre-emptively move their timers around without having to resort to failover mechanics.
+
+[[mbd-bean-pool-size]]
+== Configuring MDB Bean Pool Size with ActivationConfigProperty
+
+It is now possible to configure the MDB bean pool size with the `ActivationConfigProperty`. Any bean annotated with `@MessageDriven` can use `@ActivationConfigProperty` to set property names and property values. For example:
+
+[source, java]
+----
+@ActivationConfigProperty(propertyName = "MaxPoolSize", propertyValue = "100")
+----
+
+The `MaxPoolSize`, `MaxWaitTimeInMillis`, `PoolResizeQuantity`, `SteadyPoolSize` and `PoolIdleTimeoutInSeconds` are all MDB pool properties that can configured using the `@ActivationConfigProperty` annotation.

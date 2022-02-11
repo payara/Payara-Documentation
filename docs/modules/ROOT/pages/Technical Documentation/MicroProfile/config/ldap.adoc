@@ -1,0 +1,230 @@
+# LDAP Config Source
+
+The LDAP configuration source reads properties from a predefined LDAP directory. 
+
+[[configuration]]
+## Configuration
+
+The LDAP Config Source can be configured by using the Admin Console or `asadmin` commands.
+
+### From the Admin Console
+
+To configure the config source from the admin console, go to `Configs` -> `your-config` -> `MicroProfile` -> `Config` -> `LDAP`.
+
+image:microprofile/config/ldap/admin-console-example.png[Payara Server Administration Console configuration route]
+
+### Using the Asadmin Commands
+
+The following administration commands can be used to configure the MicroProfile LDAP config source:
+
+[[set-ldap-config-source-configuration]]
+==== `set-ldap-config-source-configuration`
+
+*Usage*::
+----
+asadmin set-ldap-config-source-configuration 
+        [--enabled=true|false]
+        [--dynamic=true|false]
+        [--url=<ldap-server-url>]
+        [--authType=simple|none]
+        [--startTLSEnabled=true|false]
+        [--bindDN=<user-distinguished-name>]
+        [--bindDNPassword=<user-credential>]
+        [--searchBase=subtree|onelevel|object]
+        [--searchFilter=<search-filter>]
+        [--searchScope=<search-scope>]
+        [--connectionTimeout=<integer-value-in-milliseconds>]
+        [--readTimeout=<integer-value-in-milliseconds>]
+        [--target=<target[default:server]>]
+----
+
+[[configuration-options]]
+### Configuration Options
+
+[cols="1,1,10,1,1", options="header"]
+|====
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Enables or disables the config source
+|false
+|No
+
+|`dynamic`
+|Boolean
+|If set to `true`, applies the changes instantly without a restart. Otherwise, a restart is required.
+|false
+|No
+
+|`url`
+|String
+|URL where the LDAP server can be reached
+|
+|Yes
+
+|`authType`
+|String
+|Type of the Authentication method used during the connection with the LDAP server. The MicroProfile LDAP config source supports `simple` and `none` auth type.
+If `simple` auth type is selected then Bind DN and Bind DN Password are mandatory. If `none` auth type is selected then Search Base and Search Filter are mandatory otherwise optional.
+If Search Base and Search Filter are not defined then data fetched from direct binding.
+|`none`
+|No
+
+|`startTLSEnabled`
+|Boolean
+|Secure the LDAP server connection using LDAP over TLS (STARTTLS) protocol
+|false
+|No
+
+|`bindDN`
+|String
+|Distinguished name for the application that will be used to access the LDAP server
+|
+|For `simple` auth type
+
+|`bindDNPassword`
+|String
+|Password for the application defined by the Bind DN member. In place of the password, you can enter an alias which corresponds to the password in the form: `${ALIAS=<password-alias-name>}`
+|
+|For `simple` auth type
+
+|`searchBase`
+|String
+|Overrides 'Base DN' and causing the search to be used instead of direct binding
+|
+|For `none` auth type
+
+|`searchFilter`
+|String
+|Search filter to find values starting from the 'Search Base DN' with the scope specified by 'Search Scope'.
+|
+|For `none` auth type
+
+|`searchScope`
+|String
+|Search scope determines the depth of the search in the LDAP tree
+|
+|For `none` auth type
+
+|`connectionTimeout`
+|Integer
+|The timeout for connecting to the LDAP server in milliseconds.  The value should be greater than zero. If this value is not specified or less than one, then wait for the response until it is received.
+|
+|No
+
+|`readTimeout`
+|Integer
+|The timeout for fetching the results from the LDAP server in milliseconds. The value should be greater than zero. If this value is not specified or less than one, then wait for the response until it is received.
+|
+|No
+
+|`target`
+|String
+|The target configuration where the command should be run
+|server
+|No
+|====
+
+
+You may also retrieve the current configuration for the LDAP Config Source using the `get-ldap-config-source-configuration` asadmin command:
+
+[source, shell]
+----
+asadmin> get-ldap-config-source-configuration
+Enabled     Url                             Auth Type       Start TLS Enabled       BindDN                                  BindDN Password     Search Base     Search Filter       Search Scope        Connection Timeout      Read Timeout
+true        ldap://ldap.forumsys.com:389    simple          false                   cn=read-only-admin,dc=example,dc=com    password 
+----
+
+## Usage
+
+Once all of the required options are configured. You should be able to read configuration properties from the LDAP directory.
+
+[source, shell]
+----
+asadmin> get-config-property --source ldap --propertyName sn
+Read Only Admin
+Command get-config-property executed successfully.
+----
+
+NOTE: Currently, the LDAP config source only supports the `get-config-property` command and doesn't support the `set-config-property` and `delete-config-property` commands.
+
+
+## Finding User specific properties
+
+If search filter and search base are not specified then properties fetched from the direct binding of `bindDn`. 
+
+[source, shell]
+----
+set-ldap-config-source-configuration --enabled=true --dynamic=true 
+--url=ldap://ldap.forumsys.com:389 --authType=simple
+--bindDnPassword=password --bindDn=cn=read-only-admin,dc=example,dc=com 
+----
+
+
+[source, shell]
+----
+asadmin get-config-property --source ldap --propertyName sn
+Read Only Admin
+Command get-config-property executed successfully.
+----
+
+Alternatively to fetch the user specific properties, search filter can be specified 
+with attributes unique to specific user.
+For e.g, In the following configuration `uid` is used as user filter in the search query.
+
+image:microprofile/config/ldap/tesla-user.png[Tesla User properties]
+
+[source, shell]
+----
+set-ldap-config-source-configuration --enabled=true --dynamic=true 
+--url=ldap://ldap.forumsys.com:389 --authType=simple
+--binddnPassword=password --binddn=cn=read-only-admin,dc=example,dc=com 
+--searchBase=dc=example,dc=com --searchScope=subtree --searchFilter=(&(uid=tesla))
+----
+
+[source, shell]
+----
+asadmin get-config-property --source ldap --propertyName UIDNUMBER
+88888
+Command get-config-property executed successfully.
+
+asadmin get-config-property --source ldap --propertyName GIDNUMBER
+99999
+Command get-config-property executed successfully.
+
+asadmin get-config-property --source ldap --propertyName MAIL
+tesla@ldap.forumsys.com
+Command get-config-property executed successfully.
+
+asadmin get-config-property --source ldap --propertyName sn
+Tesla
+Command get-config-property executed successfully.
+----
+
+## Finding Group specific properties
+
+To find properties from the group of users search filter is mandatory to specify.
+For e.g, In the following configuration `objectClass` is used as group filter.
+
+image:microprofile/config/ldap/test-user.png[Test User properties]
+
+[source, shell]
+----
+set-ldap-config-source-configuration --enabled=true --dynamic=true 
+--url=ldap://ldap.forumsys.com:389 --authType=simple
+--binddnPassword=password --binddn=cn=read-only-admin,dc=example,dc=com 
+--searchBase=dc=example,dc=com --searchScope=subtree 
+--searchFilter=(&(objectClass=posixAccount)(objectClass=organizationalPerson)) 
+----
+
+[source, shell]
+----
+asadmin get-config-property --source ldap --propertyName sn
+Tesla,Test
+Command get-config-property executed successfully.
+----

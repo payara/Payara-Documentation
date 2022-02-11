@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Eclipse MicroProfile Health Check API :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">docs</a></li>
+    <li><a href="healthcheck.html">Eclipse MicroProfile Health Check API</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/MicroProfile/healthcheck.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Eclipse MicroProfile Health Check API</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Provided version of the API: {mpHealthSpecUrl}[MicroProfile Health Check {mpHealthVersion}]</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="background"><a class="anchor" href="#background"></a>Background</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Health Check API was created to allow easier probing of the state of computing nodes that live in a cloud infrastructure environment.</p>
+</div>
+<div class="paragraph">
+<p>A full overview for the reasoning behind the API can be found in <a href="https://github.com/eclipse/microprofile-health/blob/master/Overview.adoc">the Overview for the source code repository.</a></p>
+</div>
+<div class="paragraph">
+<p>{mpHealthSpecUrl}[The complete specification document] is maintained in the same repository.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rest-endpoints"><a class="anchor" href="#rest-endpoints"></a>REST Endpoints</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The MicroProfile HealthCheck API defines the following list of REST endpoints that are available from the root context at <code>/health/${type}</code> by default:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 8.3333%;">
+<col style="width: 8.3333%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Context</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/health/live</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Liveness</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">On invocation, all registered health checks annotated with <code>@Liveness</code> are performed and the results aggregated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/health/ready</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Readiness</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">On invocation, all registered health checks annotated with <code>@Readiness</code> are performed and the results aggregated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'/health/started'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Startup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">On invocation, all registered health checks annotated with '@Startup' are performed and the results aggregated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/health</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Readiness + Liveness + Startup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">On invocation, all registered health checks annotated with <code>@Liveness</code>, <code>@Readiness</code>, or `@Startup are performed and the results aggregated.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This root endpoint can be altered using the <code>set-microprofile-healthcheck-configuration</code> asadmin command to prevent collisions with other HTTP endpoints that might need to use the <code>health</code> context root.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This endpoint will not be available until at least one application has been deployed.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="health-check-configuration"><a class="anchor" href="#health-check-configuration"></a>Health Check Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Health Check can be configured by using Admin Console or Asadmin commands.</p>
+</div>
+<div class="sect2">
+<h3 id="using-the-admin-console"><a class="anchor" href="#using-the-admin-console"></a>Using the Admin Console</h3>
+<div class="paragraph">
+<p>To configure the Health Check in the Admin Console, go to Configuration
+→ [instance-configuration (like server-config)] → MicroProfile → Health Check:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../_images/microprofile/health-check.png" alt="Set Health Check Configuration"></span></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-asadmin-commands"><a class="anchor" href="#using-asadmin-commands"></a>Using Asadmin Commands</h3>
+<div class="paragraph">
+<p>The following administration commands can be used to configure the MicroProfile Healthcheck service:</p>
+</div>
+<div class="sect3">
+<h4 id="set-microprofile-healthcheck-configuration"><a class="anchor" href="#set-microprofile-healthcheck-configuration"></a><code>set-microprofile-healthcheck-configuration</code></h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>asadmin set-microprofile-healthcheck-configuration
+        [--enabled=true|false]
+        [--securityenabled=true|false]
+        [--roles=&lt;role-list&gt;]
+        [--endpoint=&lt;context-root[default:health]&gt;]
+        [--target=&lt;target[default:server]&gt;]
+        [--virtualservers=&lt;virtualserver-list&gt;]</pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Enables or disables the MicroProfile HealthCheck service and configures the endpoint where all registered health checks are exposed.</p>
+</dd>
+</dl>
+</div>
+<div class="sect4">
+<h5 id="command-options"><a class="anchor" href="#command-options"></a>Command Options</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 7.1428%;">
+<col style="width: 7.1428%;">
+<col style="width: 71.4285%;">
+<col style="width: 7.1428%;">
+<col style="width: 7.1431%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables or disables the service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>securityenabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not secure access to the health-check endpoint is enabled.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>roles</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>microprofile</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>endpoint</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The context root used to expose the health checks endpoint.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">health</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The target configuration where the command should be run</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>virtualservers</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If defined, the '/health' endpoint will be assigned to the list of virtual servers specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Changes made with this command will only be applied when the server or instance is restarted.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="security-configuration"><a class="anchor" href="#security-configuration"></a>Security Configuration</h3>
+<div class="paragraph">
+<p>By default, HealthCheck endpoints bind to the root context application which is the <code><em>default-web-module</code> (also known as <strong>docroot</strong>) system application and the <code></em>default-web-module</code> application, which is secured under the default realm (<code>file</code>) of the server.</p>
+</div>
+<div class="paragraph">
+<p>If a user application is deployed in the empty context-root, then the security configuration of this application will be shared by the HealthCheck endpoints, so exert extreme caution when making these changes.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../_/js/site.js"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

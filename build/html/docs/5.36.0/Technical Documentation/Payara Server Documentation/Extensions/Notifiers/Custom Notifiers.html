@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Create Custom Notifiers :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="Custom%20Notifiers.html">Create Custom Notifiers</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Extensions/Notifiers/Custom%20Notifiers.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Create Custom Notifiers</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The notification service allows customized notifiers to be implemented by users in a modular fashion. New notifiers can be plugin into Payara Server easily. The following are the general steps to follow to implement a custom notifier.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="requirements"><a class="anchor" href="#requirements"></a>Requirements</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>A notifier configuration class</p>
+<div class="paragraph">
+<p><em>Since the data needs to be stored in the <code>domain.xml</code> configuration file</em></p>
+</div>
+</li>
+<li>
+<p>Asadmin CLI subcommand definitions</p>
+<div class="paragraph">
+<p><em>That will be used to read and write the notifier&#8217;s configuration, including the plugin&#8217;s activation</em></p>
+</div>
+</li>
+<li>
+<p>The Notifier&#8217;s implementation class</p>
+<div class="paragraph">
+<p><em>Which takes the Notification event and writes it to the channel of your choice.</em></p>
+</div>
+</li>
+<li>
+<p>Optionally, an additional module plugin for the Admin Console</p>
+<div class="paragraph">
+<p><em>Which allows the notifier to be managed through the Admin Console</em></p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setup"><a class="anchor" href="#setup"></a>Project Setup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A custom notifier us composed of 2 OSGI module bundles:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>One bundle contains the classes for the configuration, the Asadmin CLI subcommands and the notifier implementations.</p>
+</li>
+<li>
+<p>Another (optional) bundle contains the plugin classes for the notifier&#8217;s management in the Admin Console.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Since each module must be an OSGI module, you&#8217;ll have to define the following Maven packaging:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;packaging&gt;glassfish-jar&lt;/packaging&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following plugins are used to generate the correct OSGI module to  be bundled in Payara Server:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;plugins&gt;
+    &lt;plugin&gt;
+        &lt;groupId&gt;org.glassfish.build&lt;/groupId&gt;
+        &lt;artifactId&gt;glassfishbuild-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;3.2.20.payara-p2&lt;/version&gt;
+        &lt;extensions&gt;true&lt;/extensions&gt;
+        &lt;configuration&gt;
+            &lt;dir&gt;${project.build.directory}/classes&lt;/dir&gt;
+        &lt;/configuration&gt;
+    &lt;/plugin&gt;
+    &lt;plugin&gt;
+        &lt;groupId&gt;org.glassfish.hk2&lt;/groupId&gt;
+        &lt;artifactId&gt;hk2-inhabitant-generator&lt;/artifactId&gt;
+        &lt;version&gt;2.6.1.payara-p1&lt;/version&gt;
+        &lt;executions&gt;
+            &lt;execution&gt;
+                &lt;goals&gt;
+                    &lt;goal&gt;generate-inhabitants&lt;/goal&gt;
+                &lt;/goals&gt;
+            &lt;/execution&gt;
+        &lt;/executions&gt;
+        &lt;configuration&gt;
+            &lt;supportedProjectTypes&gt;jar,glassfish-jar&lt;/supportedProjectTypes&gt;
+        &lt;/configuration&gt;
+    &lt;/plugin&gt;
+    &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.felix&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-bundle-plugin&lt;/artifactId&gt;
+        &lt;version&gt;4.1.0&lt;/version&gt;
+        &lt;executions&gt;
+            &lt;execution&gt;
+                &lt;id&gt;default-manifest&lt;/id&gt;
+                &lt;phase&gt;process-classes&lt;/phase&gt;
+                &lt;goals&gt;
+                    &lt;goal&gt;manifest&lt;/goal&gt;
+                &lt;/goals&gt;
+                &lt;configuration&gt;
+                    &lt;Export-Package /&gt;
+                    &lt;instructions&gt;
+                        &lt;_include&gt;-osgi.bundle&lt;/_include&gt;
+                    &lt;/instructions&gt;
+                    &lt;excludeDependencies&gt;tools-jar&lt;/excludeDependencies&gt;
+                    &lt;supportedProjectTypes&gt;
+                        &lt;supportedProjectType&gt;glassfish-jar&lt;/supportedProjectType&gt;
+                        &lt;supportedProjectType&gt;jar&lt;/supportedProjectType&gt;
+                    &lt;/supportedProjectTypes&gt;
+                &lt;/configuration&gt;
+            &lt;/execution&gt;
+        &lt;/executions&gt;
+        &lt;configuration&gt;
+            &lt;Export-Package /&gt;
+            &lt;instructions&gt;
+                &lt;_include&gt;-osgi.bundle&lt;/_include&gt;
+            &lt;/instructions&gt;
+            &lt;excludeDependencies&gt;tools-jar&lt;/excludeDependencies&gt;
+            &lt;supportedProjectTypes&gt;
+                &lt;supportedProjectType&gt;glassfish-jar&lt;/supportedProjectType&gt;
+                &lt;supportedProjectType&gt;jar&lt;/supportedProjectType&gt;
+            &lt;/supportedProjectTypes&gt;
+        &lt;/configuration&gt;
+    &lt;/plugin&gt;
+    &lt;plugin&gt;
+        &lt;groupId&gt;org.glassfish.build&lt;/groupId&gt;
+        &lt;artifactId&gt;command-security-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.0.10.payara-p1&lt;/version&gt;
+        &lt;configuration&gt;
+            &lt;isFailureFatal&gt;false&lt;/isFailureFatal&gt;
+        &lt;/configuration&gt;
+    &lt;/plugin&gt;
+    &lt;plugin&gt;
+        &lt;groupId&gt;org.glassfish.hk2&lt;/groupId&gt;
+        &lt;artifactId&gt;config-generator&lt;/artifactId&gt;
+        &lt;version&gt;2.5.0-b53&lt;/version&gt;
+        &lt;executions&gt;
+            &lt;execution&gt;
+                &lt;goals&gt;
+                    &lt;goal&gt;generate-injectors&lt;/goal&gt;
+                &lt;/goals&gt;
+            &lt;/execution&gt;
+        &lt;/executions&gt;
+        &lt;configuration&gt;
+            &lt;supportedProjectTypes&gt;jar,glassfish-jar&lt;/supportedProjectTypes&gt;
+        &lt;/configuration&gt;
+    &lt;/plugin&gt;
+    &lt;plugin&gt;
+        &lt;groupId&gt;org.glassfish.hk2&lt;/groupId&gt;
+        &lt;artifactId&gt;osgiversion-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;2.6.1.payara-p1&lt;/version&gt;
+        &lt;executions&gt;
+            &lt;execution&gt;
+                &lt;id&gt;default-compute-osgi-version&lt;/id&gt;
+                &lt;phase&gt;process-classes&lt;/phase&gt;
+                &lt;goals&gt;
+                    &lt;goal&gt;compute-osgi-version&lt;/goal&gt;
+                &lt;/goals&gt;
+            &lt;/execution&gt;
+        &lt;/executions&gt;
+        &lt;configuration&gt;
+            &lt;dropVersionComponent&gt;qualifier&lt;/dropVersionComponent&gt;
+            &lt;versionPropertyName&gt;project.osgi.version&lt;/versionPropertyName&gt;
+        &lt;/configuration&gt;
+    &lt;/plugin&gt;
+&lt;/plugins&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The specific versions of these plugins can be found in the Payara Patched Externals repository on GitHub:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;pluginRepositories&gt;
+    &lt;pluginRepository&gt;
+        &lt;releases&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/releases&gt;
+        &lt;snapshots&gt;
+            &lt;enabled&gt;false&lt;/enabled&gt;
+        &lt;/snapshots&gt;
+        &lt;id&gt;payara-patched-externals&lt;/id&gt;
+        &lt;name&gt;Payara Patched Externals&lt;/name&gt;
+        &lt;url&gt;https://raw.github.com/payara/Payara_PatchedProjects/master&lt;/url&gt;
+    &lt;/pluginRepository&gt;
+&lt;/pluginRepositories&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Notifier API itself is available in the <code>internal-api</code> artifact that is located in the Payara Platform&#8217;s Public Nexus repository:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;fish.payara.server.internal.common&lt;/groupId&gt;
+    &lt;artifactId&gt;internal-api&lt;/artifactId&gt;
+    &lt;version&gt;{currentVersion}&lt;/version&gt;
+    &lt;optional&gt;true&lt;/optional&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Any additional dependencies that you custom notifier implementation needs must be specified and included when you install the bundles in Payara Server.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Have a look at <a href="https://github.com/payara/Notifiers">Notifiers Github repository</a> for the setup of the current Notifiers.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="instalation"><a class="anchor" href="#instalation"></a>Installation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>After the OSGI module is built and packaged by Maven, simply drop the JAR file in the <code>&lt;PAYARA-HOME&gt;/glassfish/modules</code> directory and restart the domain.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration"><a class="anchor" href="#configuration"></a>Notifier Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, a notifier implementation has 3 basic configuration parameters</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>enabled</code></dt>
+<dd>
+<p>Is the Notifier active?</p>
+</dd>
+<dt class="hdlist1"><code>dynamic</code></dt>
+<dd>
+<p>Whether to apply the changes immediately (true) or after server restart.</p>
+</dd>
+<dt class="hdlist1"><code>noisy</code></dt>
+<dd>
+<p>When set, the notifier includes verbose information in the output.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Additional configuration options can be provided by defining properties using the <code>org.jvnet.hk2.config.Attribute</code> annotation like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.jvnet.hk2.config.Attribute;
+import org.jvnet.hk2.config.Configured;
+
+import fish.payara.internal.notification.PayaraNotifierConfiguration;
+
+@Configured
+public interface CustomNotifierConfiguration extends PayaraNotifierConfiguration {
+
+    @Attribute(defaultValue = "*", dataType = String.class)
+    String getTestValue();
+    void setTestValue(String value) throws PropertyVetoException;
+
+    @Attribute(required = false, dataType = Integer.class)
+    Integer getThresholdValue();
+    void setThresholdValue(Integer value) throws PropertyVetoException;
+
+    @Attribute(dataType = Boolean.class, defaultValue = "true")
+    Boolean getDuplicateValue();
+    void setDuplicateValue(Boolean value) throws PropertyVetoException;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From the above code the following components are used:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Configured</code>: Defines the interface as part of the configuration, and a suitable proxy holding the actual configuration values will be created at runtime.</p>
+</li>
+<li>
+<p><code>PayaraNotifierConfiguration</code>: Holds the common attributes like <em>enabled</em> and <em>noisy</em>, and is required for storing it in the <code>domain.xml</code> configuration file.</p>
+</li>
+<li>
+<p><code>@Attribute</code>: Defines an additional configuration property. You can specify the type of the value (<code>dataType</code>), if the value is required (<code>required</code>), and a default value if the user doesn&#8217;t specify it explicitly (<code>defaultValue</code>).</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="asadmin-commands"><a class="anchor" href="#asadmin-commands"></a>Notifier Asadmin CLI Subcommands</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Asadmin CLI subcommands are required for your custom notifier to be configured and enabled once it is installed in Payara Server. Although you can choose the name of these commands with whatever suits you best, it is recommended to follow this convention:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">get-&lt;notifierName&gt;-notifier-configuration
+set-&lt;notifierName&gt;-notifier-configuration</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For each subcommand, you must to create its corresponding implementation class. Here&#8217;s the class for the command that retrieves the notifier&#8217;s configuration settings:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.glassfish.api.admin.CommandLock;
+import org.glassfish.api.admin.ExecuteOn;
+import org.glassfish.api.admin.RestEndpoint;
+import org.glassfish.api.admin.RestEndpoints;
+import org.glassfish.api.admin.RuntimeType;
+import org.glassfish.config.support.CommandTarget;
+import org.glassfish.config.support.TargetType;
+import org.glassfish.hk2.api.PerLookup;
+import org.jvnet.hk2.annotations.Service;
+
+import fish.payara.internal.notification.admin.BaseGetNotifierConfigurationCommand;
+import fish.payara.internal.notification.admin.NotificationServiceConfiguration;
+
+@Service(name = "get-custom-notifier-configuration")
+@PerLookup
+@CommandLock(CommandLock.LockType.NONE)
+@ExecuteOn({RuntimeType.DAS, RuntimeType.INSTANCE})
+@TargetType(value = {CommandTarget.DAS, CommandTarget.STANDALONE_INSTANCE, CommandTarget.CLUSTER, CommandTarget.CLUSTERED_INSTANCE, CommandTarget.CONFIG})
+@RestEndpoints({
+   @RestEndpoint(configBean = NotificationServiceConfiguration.class,
+       opType = RestEndpoint.OpType.GET,
+       path = "get-custom-notifier-configuration",
+       description = "Lists Custom Notifier Configuration")
+})
+public class GetCustomNotifierConfigurationCommand extends BaseGetNotifierConfigurationCommand&lt;CustomNotifierConfiguration&gt; {
+
+    @Override
+    protected Map&lt;String, Object&gt; getNotifierConfiguration(CustomNotifierConfiguration configuration) {
+        Map&lt;String, Object&gt; map = super.getNotifierConfiguration(configuration);
+
+        if (configuration != null) {
+            map.put("Test Value", configuration.getTestValue());
+            //...
+        }
+
+        return map;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From the above code notice the following elements:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Service(name = "get-custom-notifier-configuration")</code>: Defines the command&#8217;s name.</p>
+</li>
+<li>
+<p><code>@ExecuteOn</code> and <code>@TargetType</code>: Determines on which environments the command can be used. Make sure it can be run on both the domain and separate server instances.</p>
+</li>
+<li>
+<p><code>@RestEndpoint</code>: All Asadmin CLI commands are handled via REST calls to the DAS. This annotation defines the endpoint (name, type, etc) and is required to make the command work.</p>
+</li>
+<li>
+<p><code>BaseGetNotifierConfigurationCommand&lt;CustomNotifierConfiguration&gt;</code>: Base implementation of the asadmin command to retrieve the configuration for a notifier.</p>
+</li>
+<li>
+<p><code>protected Map&lt;String, Object&gt; getNotifierConfiguration()</code>: Method that needs to be implemented to retrieve the specific values of the notifier. The result is a Map that contains the configuration that will be printed as the result of the Asadmin command.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The following class implements the specifics of a sample command that modifies the notifier&#8217;s configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.beans.PropertyVetoException;
+
+import org.glassfish.api.Param;
+import org.glassfish.api.admin.CommandLock;
+import org.glassfish.api.admin.ExecuteOn;
+import org.glassfish.api.admin.RestEndpoint;
+import org.glassfish.api.admin.RestEndpoints;
+import org.glassfish.api.admin.RuntimeType;
+import org.glassfish.config.support.CommandTarget;
+import org.glassfish.config.support.TargetType;
+import org.glassfish.hk2.api.PerLookup;
+import org.jvnet.hk2.annotations.Service;
+
+import fish.payara.internal.notification.admin.BaseSetNotifierConfigurationCommand;
+import fish.payara.internal.notification.admin.NotificationServiceConfiguration;
+
+
+@Service(name = "set-custom-notifier-configuration")
+@PerLookup
+@CommandLock(CommandLock.LockType.NONE)
+@ExecuteOn({RuntimeType.DAS, RuntimeType.INSTANCE})
+@TargetType(value = {CommandTarget.DAS, CommandTarget.STANDALONE_INSTANCE, CommandTarget.CLUSTER, CommandTarget.CLUSTERED_INSTANCE, CommandTarget.CONFIG})
+@RestEndpoints({
+        @RestEndpoint(configBean = NotificationServiceConfiguration.class,
+                opType = RestEndpoint.OpType.POST,
+                path = "set-custom-notifier-configuration",
+                description = "Configures Custom Notification Service")
+})
+public class SetCustomNotifierConfigurationCommand extends BaseSetNotifierConfigurationCommand&lt;CustomNotifierConfiguration&gt; {
+
+    @Param(name = "testValue")
+    private String testValue;
+
+    @Param(name = "thresholdValue", optional = true)
+    private Integer thresholdValue;
+
+    @Param(name = "duplicateValue")
+    private Boolean duplicateValue;
+
+    @Override
+    protected void applyValues(CustomNotifierConfiguration configuration) throws PropertyVetoException {
+        super.applyValues(configuration);
+        if (this.testValue != null) {
+            configuration.setTestValue(this.testValue);
+        }
+        // ...
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice the following elements which are not present in the previous example:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Param</code>: Parameters used for the REST operation that hold the new configuration settings. The name is the name of the variable defined in the Notifier Configuration class.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="notifier-implementation"><a class="anchor" href="#notifier-implementation"></a>Notifier Implementation Code</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that we have the implemented the classes for configuration management, we&#8217;ll proceed to implement the class that handles the notification events.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.jvnet.hk2.annotations.Service;
+
+import fish.payara.internal.notification.PayaraConfiguredNotifier;
+import fish.payara.internal.notification.PayaraNotification;
+
+@Service(name = "custom-notifier")
+public class CustomNotifier extends PayaraConfiguredNotifier&lt;CustomNotifierConfiguration&gt; {
+
+    @Override
+    public void handleNotification(PayaraNotification event) {
+        // Handle the event.
+    }
+
+    @Override
+    public void bootstrap() {
+        System.out.println("Bootstrapping custom notifier");
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("Destroying custom notifier");
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From the above code notice the following elements:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Service(name = "custom-notifier")</code>: Name of the notifier, which must be unique amongst all notifiers registered within the server.</p>
+</li>
+<li>
+<p><code>PayaraConfiguredNotifier</code>: The base class that allows the notifier&#8217;s code to access the server&#8217;s facilities. You only need to implement the method <code>handleNotification</code> to handle the notification event.</p>
+</li>
+<li>
+<p><code>bootstrap()</code>: Override this method if you want to perform specific actions after the notifier is instantiated.</p>
+</li>
+<li>
+<p><code>destroy()</code>: Override this method if you want to perform specific actions before the notifier&#8217;s instance is destroyed.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="payara-notification-event"><a class="anchor" href="#payara-notification-event"></a>Payara Notification Event</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is the main class that abstracts event data. Events can be raised for the following scenarios:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>JMX Monitoring</p>
+</li>
+<li>
+<p>Health Check Monitoring</p>
+</li>
+<li>
+<p>Asadmin CLI auditing feature</p>
+</li>
+<li>
+<p>Request Tracing traces</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>And the attributes of this class are the following:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>eventType</code></dt>
+<dd>
+<p>Log.Level value of the event, like INFO, WARN, &#8230;&#8203;</p>
+</dd>
+<dt class="hdlist1"><code>hostName</code></dt>
+<dd>
+<p>Hostname on which the Notification was generated.</p>
+</dd>
+<dt class="hdlist1"><code>domainName</code></dt>
+<dd>
+<p>The name of the domain where the notification was triggered.</p>
+</dd>
+<dt class="hdlist1"><code>instanceName</code></dt>
+<dd>
+<p>The name of the server instance where the notification was triggered.</p>
+</dd>
+<dt class="hdlist1"><code>serverName</code></dt>
+<dd>
+<p>The name of the current server instance.</p>
+</dd>
+<dt class="hdlist1"><code>subject</code></dt>
+<dd>
+<p>A short subject title of the notification.</p>
+</dd>
+<dt class="hdlist1"><code>message</code></dt>
+<dd>
+<p>The full message of the notification.</p>
+</dd>
+<dt class="hdlist1"><code>data</code></dt>
+<dd>
+<p>Detailed data of the notification event, supplied by the subsystem that triggered it, like:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>HealthCheckNotificationData</code>: Data for the HealthCheck notification event like Status (<em>GOOD</em>, <em>CRITICAL</em>, &#8230;&#8203; )</p>
+</li>
+<li>
+<p><code>RequestTracingNotificationData</code>: Data for the Request Tracing notification event like tracing span information details.</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="notifier-plugin"><a class="anchor" href="#notifier-plugin"></a>Notifier Admin Console Plugin</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With the Notifier&#8217;s Admin Console plugin, you can prepare a dedicated view of the notifier&#8217;s configuration in the Web Admin console. Preparing this plugin is an optional task and thus not required.</p>
+</div>
+<div class="paragraph">
+<p>In this section, the basic requirements and conventions are described in order to create such a plugin. You can also have a look at the plugins of the existing notifiers to see several examples of how to implement your own console plugin.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The console plugin is based on Payara Server&#8217;s console provider which allows users to extend Admin Console functionality.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The configuration view of the notifier will be structured as a tab view under the notifier&#8217;s section in the <strong>Notification Service</strong> option in the console&#8217;s side menu.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="console-plugin"><a class="anchor" href="#console-plugin"></a>Console Plugin</h3>
+<div class="paragraph">
+<p>Define the plugin by creating the <code>META-INF/admingui/console-plugin.xml</code> file and filling it with the following content:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;console-config id="customNotifier"&gt;
+   &lt;integration-point
+      id="customNotifier"
+      type="fish.payara.admingui:notifierTab"
+      priority="40"
+      parentId="notificationConfigTabs"
+      content="custom/customNotifierTabs.jsf"
+   /&gt;
+&lt;/console-config&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a description of the attributes of the <code>integration-point</code> tag:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>id</code></dt>
+<dd>
+<p>Defines the unique ID of the integration point and is also used as part of the identifier of the plugin.</p>
+</dd>
+<dt class="hdlist1"><code>priority</code></dt>
+<dd>
+<p>Location of the notifier&#8217;s tab view on the screen. A higher priority (lower value) will locate the tab to the left of the screen.</p>
+</dd>
+<dt class="hdlist1"><code>content</code></dt>
+<dd>
+<p>Location of the code snippet that defines the tab view of the notifier</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tab-snippet"><a class="anchor" href="#tab-snippet"></a>Tab Snippet</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The code of the tab view is implemented using the specific JSF templating framework for Payara Server.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a sample of the code snippet that defines the tab view of a custom notifier:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;sun:tab id="customNotifierTab" immediate="true" text="$resource{i18nexn.notifier.custom.tabs.tabText}"
+         toolTip="$resource{i18nexn.notifier.custom.tabs.tabToolTip}"&gt;
+    &lt;!beforeCreate
+        setResourceBundle(key="i18nexn" bundle="fish.payara.admingui.notifier.custom.Strings");
+    /&gt;
+    &lt;!command
+        setSessionAttribute(key="notificationConfigTab" value="customNotifierTab");
+        gf.redirect(page="#{request.contextPath}/customNotifier/custom/customNotifierConfiguration.jsf?configName=#{pageSession.configName}");
+    /&gt;
+&lt;/sun:tab&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From the above code notice the following elements:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>id</code>: The ID of the component. It should correspond to the ID defined in the <em>console-plugin.xml</em> file followed by the <code>Tab</code> suffix.</p>
+</li>
+<li>
+<p><code>Resource bundle</code>: Make sure the Resource bundle is defined containing all the labels that needs to be shown on the screen.</p>
+</li>
+<li>
+<p><code>Command</code>: Use this section to link the location of the snippet defining the body of the notifier&#8217;s configuration page.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="plugin-configuration-page"><a class="anchor" href="#plugin-configuration-page"></a>Configuration Page</h3>
+<div class="paragraph">
+<p>This is the page that the Admin console will use to expose the configuration settings of the custom notifier. The easiest way to create this page template is to start from an existing example and modify the configuration fields to match the ones in your notifiers implementation.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a sample template:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;sun:property id="testValueProp" labelAlign="left" noWrap="#{true}" overlapLabel="#{false}"
+              label="$resource{i18nexn.notifier.jfr.configuration.categoryLabel}"
+              helpText="$resource{i18nexn.notifier.jfr.configuration.categoryLabelHelpText}"&gt;
+    &lt;sun:textField id="namesField"  maxLength="255"
+                   text="#{pageSession.valueMap['testvalue']}" styleClass="string"
+                   required="#{true}"/&gt;
+&lt;/sun:property&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From the above code notice the following elements:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>sun:textField</code>: A simple input text field that corresponds to a configuration attribute of the notifier. Use <code>sun:checkbox</code> if you want a checkbox for a true/false value.</p>
+</li>
+<li>
+<p><code>text="#{pageSession.valueMap['testvalue']}"</code>: This binding defines the property that needs to be displayed and the value that is assigned to this property when the save button is clicked. This must be an all lowercase value of the property you have defined in the configuration and its corresponding REST method parameter.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

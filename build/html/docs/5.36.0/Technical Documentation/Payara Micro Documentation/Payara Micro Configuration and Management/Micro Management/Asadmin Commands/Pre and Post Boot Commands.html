@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Running asadmin commands using Pre-boot and Post-boot Scripts :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../../index.html">docs</a></li>
+    <li><a href="Pre%20and%20Post%20Boot%20Commands.html">Running asadmin commands using Pre-boot and Post-boot Scripts</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Micro%20Documentation/Payara%20Micro%20Configuration%20and%20Management/Micro%20Management/Asadmin%20Commands/Pre%20and%20Post%20Boot%20Commands.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Running asadmin commands using Pre-boot and Post-boot Scripts</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Administration commands can also be run against a Payara Micro instance at specific moments in its lifecycle. To do this, you must provide the commands you wish to execute in special scripts via a command line option.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="structure-of-a-boot-script"><a class="anchor" href="#structure-of-a-boot-script"></a>Structure of a Boot Script</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Boot scripts are simple text files that contain the <em>asadmin</em> subcommands used to configure the instance. These scripts will follow these set of rules:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Each <em>asadmin</em> command must be represented in one line of text in the script. No line breaks are allowed.</p>
+</li>
+<li>
+<p>Each <em>asadmin</em> command must be formatted on the syntax <code>subcommand [options] [operands]</code>,
+as if you were running the commands in a multimode session from the command line.</p>
+</li>
+<li>
+<p>Empty lines and comment lines (starting with the <code>#</code> character) are ignored.</p>
+</li>
+<li>
+<p>Each <em>asadmin</em> command may contain variable references (e.g. to environment variables or system properties) as described in <a href="#/documentation/payara-server/server-configuration/var-substitution/usage-of-variables.adoc" class="page unresolved">Using variables</a></p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<em>asadmin</em> commands that contain spaces in the value should be surrounded with quotations marks.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a sample of a post boot script used to configure an instance for production uses:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">#Disable dynamic reloading of applications
+set configs.config.server-config.admin-service.das-config.dynamic-reload-enabled=false
+
+# Set a system property which contains spaces
+create-system-properties "property.name=This is a property value"
+#Disable auto deployment
+set configs.config.server-config.admin-service.das-config.autodeploy-enabled=false
+
+#Optimizing Heap size
+delete-jvm-options -client:-Xmx1024:-Xms512
+create-jvm-options -server:-Xmx2048:-Xms2048
+
+#Configuring Hazelcast cluster
+set-hazelcast-configuration --clusterName=my-production-cluster --target=server-config
+
+#Using a reference to a system property payara.deployed-app-name
+set configs.config.server-config.http-service.virtual-server.server.default-web-module=${payara.deployed-app-name}
+
+#Using a reference to an environment variable security-enabled
+set configs.config.server-config.network-config.protocols.protocol.http-listener-1.security-enabled=${ENV=security-enabled}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-boot-scripts"><a class="anchor" href="#configuring-boot-scripts"></a>Configuring Boot Scripts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When running Payara Micro from the command line, use appropriate command file options to specify the script file locations and the moment in the boot lifecycle when they should be executed:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>--prebootcommandfile</code></dt>
+<dd>
+<p>provides a file of asadmin commands to run before booting the server (only some commands work at this point)</p>
+</dd>
+<dt class="hdlist1"><code>--postbootcommandfile</code></dt>
+<dd>
+<p>provides a file of asadmin commands to run after booting the server</p>
+</dd>
+<dt class="hdlist1"><code>--postdeploycommandfile</code></dt>
+<dd>
+<p>provides a file of asadmin commands to run after all deployments have completed</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --prebootcommandfile prepare-resources.txt --postbootcommandfile ready-production-use.txt --postdeploycommandfile post-process-apps.txt</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When creating an Uber JAR using the <code>--outputUberJAR</code> option, the scripts are transferred into the <code>MICRO-INF/</code> directory of the resulting JAR artifact as the <code>pre-boot-commands.txt</code>, <code>post-boot-commands.txt</code> and <code>post-deploy-commands.txt</code> files.</p>
+</div>
+<div class="paragraph">
+<p>For example, when generating the Uber JAR like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --prebootcommandfile prepare-resources.txt --postbootcommandfile ready-production-use.txt --outputUberJar custom-micro.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Examining the JAR structure will confirm that the scripts have been transferred correctly:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../../_images/payara-micro/uber-jar-command-scripts-structure.png" alt="Uber JAR Command scripts structure"></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="boot-scripts-with-persistent-rootdir"><a class="anchor" href="#boot-scripts-with-persistent-rootdir"></a>Boot Scripts with Persistent Root Directory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A command in a boot script usually results in change of configuration in <code>config/domain.xml</code>.
+When persistent root directory is reused between restarts, it may cause some commands to fail, particularly those that create new resources, like for example <code>create-jdbc-connection-pool</code>. However, failure of a script command is not critical for server startup, just a warning is logged in such case.</p>
+</div>
+<div class="paragraph">
+<p>By utilizing <a href="#../configuring/config-cmd-line.adoc#warmup" class="page unresolved">warmup run</a>, these commands can be run as part of preparation of root directory rather than run on every startup. That also spares startup time for productive instance.</p>
+</div>
+<div class="paragraph">
+<p>When a command uses <a href="#/documentation/payara-server/server-configuration/var-substitution/usage-of-variables.adoc" class="page unresolved">variable references</a>, the values for variables are determined during execution of the script, before executing the command and changing the configuration. If a variable value should be evaluated each time Payara Micro starts, then executing a script in <code>--warmup</code> mode will not suffice and the script needs to be passed as argument also for productive runs.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="restrictions-on-preboot-scripts"><a class="anchor" href="#restrictions-on-preboot-scripts"></a>Restrictions on Pre-boot Scripts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Keep in mind when writing a <strong>pre-boot</strong> command script, that the commands prepared will be running before the server has booted, which means not all available asadmin subcommands will yield results (for example deploying or listing applications).</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+It&#8217;s recommended to create <em>preboot</em> scripts that use simple set commands to change the configuration of existing resources (adding new resources might not work in all cases) like network listeners, standard domain configuration and such.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

@@ -1,0 +1,143 @@
+= Payara Micro Managed Arquillian Container
+
+The Payara Micro Managed Arquillian container provides a managed Payara Micro
+instance for integration testing.
+
+[[usage]]
+== Usage
+
+The Payara Micro Managed Arquillian container can be found on Maven Central,
+and can be included in your project using the following Maven coordinates:
+
+[source,XML]
+----
+<dependency>
+  <groupId>fish.payara.arquillian</groupId>
+  <artifactId>arquillian-payara-micro-managed</artifactId>
+  <version>${version}</version>
+</dependency>
+----
+
+You can find the latest artifact version https://mvnrepository.com/artifact/fish.payara.arquillian/arquillian-payara-micro-managed[from here].
+
+[[configure]]
+== Configuring the Container
+
+The container can be configured via the arquillian.xml using the standard http://arquillian.org/arquillian-core/#container-configuration[Arquillian Container Configuration] mechanism, via system properties, or via environment variables.
+
+The following configuration options are available:
+
+[cols="1,3,2,2,1"]
+.Configuration Options
+|===
+| Container Option | Description | System Property | Environment Variable | Default
+
+| `microJar`
+| Provides the location of the Payara Micro Community Jar.
+| `payara.microJar`
+| `MICRO_JAR`
+| 
+
+| `startupTimeoutInSeconds`
+| Specifies the amount of time in seconds that the
+container will wait for Payara Micro Community to start.
+| `payara.startupTimeoutInSeconds`
+| `MICRO_STARTUP_TIMEOUT_IN_SECONDS`
+| `180`
+
+| `randomHttpPort`
+| Randomises the initial HTTP port of Payara Micro Community.
+This saves time by avoiding collisions with the default port.
+| `payara.randomHttpPort`
+| `MICRO_RANDOM_HTTP_PORT`
+| `true`
+
+| `autoBindHttp`
+| Enables the `--autoBindHttp` option for the Micro instance.
+| `payara.autoBindHttp`
+| `MICRO_AUTOBIND_HTTP`
+| `true`
+
+| `clusterEnabled`
+| Enables clustering on the Micro instance.
+| `payara.clusterEnabled`
+| `MICRO_CLUSTER_ENABLED`
+| `false`
+
+| `consoleOutput`
+| Enables/disables console output on the Micro instance.
+| `payara.consoleOutput`
+| `MICRO_CONSOLE_OUTPUT`
+| `true`
+
+| `debug`
+| Enables debugging on the Micro instance. By default Payara Micro Community will
+wait for the debugger on port `5005` before starting.
+Disables the startup timeout.
+To change this, provide java debug options to `cmdOptions`.
+| `payara.debug`
+| `MICRO_DEBUG`
+| `false`
+
+| `cmdOptions`
+| Provides additional options to the Java process running the Micro instance (I.e. between `java` and `-jar`.).
+| `payara.cmdOptions`
+| `MICRO_CMD_OPTIONS`
+| 
+
+| `extraMicroOptions`
+| Provides additional options to the Micro instance (I.e. at the end of the command.).
+| `payara.extraMicroOptions`
+| `EXTRA_MICRO_OPTIONS`
+| 
+|===
+
+[[examples]]
+== Examples
+
+To configure Container options using Arquillian container properties, you need to use an `arquillian.xml` file placed on the test classpath. Here's an example `arquillian.xml` file. It configures `randomHttpPort` and `autoBindHttp` options.
+
+[source,XML]
+.Example `arquillian.xml` file
+----
+<?xml version="1.0"?>
+<arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://jboss.org/schema/arquillian"
+            xsi:schemaLocation="http://jboss.org/schema/arquillian
+                http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+
+    <container qualifier="payara-micro-managed" default="true">
+        <configuration>
+            <property name="randomHttpPort">false</property>
+            <property name="autoBindHttp">false</property>
+        </configuration>
+    </container>
+</arquillian>
+----
+
+You can configure the options also using system properties. Here's an example configuration if you run your tests using the maven `surefire` plugin:
+
+[source,XML]
+.Example Surefire plugin configuration in a `pom.xml` file
+----
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <configuration>
+        <systemPropertyVariables>
+            <arquillian.launch>payara-micro-managed</arquillian.launch>
+            <payara.randomHttpPort>false</payara.randomHttpPort>
+            <payara.autoBindHttp>false</payara.autoBindHttp>
+        </systemPropertyVariables>
+    </configuration>
+</plugin>
+----
+
+You can also configure the options using environment variables, for example when running the maven `mvn test` command:
+
+[source,shell]
+----
+export MICRO_RANDOM_HTTP_PORT=false
+export MICRO_AUTOBIND_HTTP=false
+mvn test
+----

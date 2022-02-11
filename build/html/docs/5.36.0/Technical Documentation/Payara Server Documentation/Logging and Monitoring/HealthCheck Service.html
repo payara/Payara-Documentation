@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>HealthCheck Service :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../index.html">docs</a></li>
+    <li><a href="HealthCheck%20Service.html">HealthCheck Service</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Logging%20and%20Monitoring/HealthCheck%20Service.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">HealthCheck Service</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Payara Server includes a HealthCheck Service that is disabled by default. When enabled it can periodically check the following performance metrics:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Host CPU Usage</p>
+</li>
+<li>
+<p>Host Memory Usage</p>
+</li>
+<li>
+<p>Payara Server’s JVM Garbage Collections</p>
+</li>
+<li>
+<p>Payara Server’s JVM Heap Usage</p>
+</li>
+<li>
+<p>CPU Usage of individual threads</p>
+</li>
+<li>
+<p>Detects stuck threads</p>
+</li>
+<li>
+<p>Monitors metrics exposed by MicroProfile Metrics</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If there is a problem with any of these metrics and they exceed a configurable threshold then a <code>GOOD</code>, <code>WARNING</code> or <code>CRITICAL</code> event notification is sent to the Notification Service. Notifications can be then sent to one or more notifiers, e.g. a log file.</p>
+</div>
+<div class="paragraph">
+<p>This allows operations teams to rapidly detect problems or work out what happened after these problems have occurred.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+It is possible to display metrics produced by HealthCheck service on MicroProfile Health <a href="../../MicroProfile/healthcheck.html#rest-endpoints" class="page">REST endpoints</a>. You can find more information on <a href="#set-healthcheck-service-configuration"><code>set-healthcheck-service-configuration</code></a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The Host Memory Usage currently only works on Linux and BSD derivatives.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If the <a href="#/Technical Documentation/Payara Server Documentation/Logging and Monitoring/Notification Service/Notifier Configuration/log-notifier.adoc" class="page unresolved">Log Notifier</a> is enabled, such events will be presented in the server&#8217;s log file like in the following sample:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-log hljs" data-lang="log">[2016-05-24T03:52:28.690+0000] [Payara 4.1] [INFO] [fish.payara.nucleus.healthcheck.HealthCheckService] [tid: _ThreadID=72 _ThreadName=healthcheck-service-3 [timeMillis: 1464061948690] [levelValue: 800] [[ CPUC:Health Check Result:[[status=WARNING, message='CPU%: 75.6, Time CPU used: 267 milliseconds'']']]]  [2016-05-24T21:11:36.579+0000] [Payara 4.1] [SEVERE] [fish.payara.nucleus.healthcheck.HealthCheckService] [tid: _ThreadID=71 _ThreadName=healthcheck-service-3] [timeMillis: 1464124296579] [levelValue: 1000] [[ HOGT:Health Check Result:[[status=CRITICAL, message='Thread with &lt;id-name&gt;: 145-testing-thread-1 is a hogging thread for the last 59 seconds 999 milliseconds'']']]]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="health-check-service"><a class="anchor" href="#health-check-service"></a>HealthCheck Service Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As with any other services available in Payara Server, the HealthCheck service can be configured by using the web console, administration commands or editing the <em>domain.xml</em> configuration file directly.</p>
+</div>
+<div class="sect2">
+<h3 id="using-the-web-console"><a class="anchor" href="#using-the-web-console"></a>Using the Web Administration Console</h3>
+<div class="paragraph">
+<p>To configure the HealthCheck Service in the Administration Console, go to <em>Configuration &#8594; [instance-configuration (like server-config)] &#8594; Healthcheck</em>:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../_images/healthcheck/admin-console-configuration.png" alt="HealthCheck Configuration in the Admin Console"></span></p>
+</div>
+<div class="paragraph">
+<p>Check the <strong>Enabled</strong> box (and the <strong>Dynamic</strong> box too if you don&#8217;t want to restart the domain) to switch the HealthCheck service on.</p>
+</div>
+<div class="paragraph">
+<p>The general settings of the service are:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Threshold Unit</strong></dt>
+<dd>
+<p>This defines the time duration per unit. The accepted options are any valid <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/TimeUnit.html">java.util.concurrent.TimeUnit</a> values. The default value is <em>SECONDS</em>.</p>
+</dd>
+<dt class="hdlist1"><strong>Threshold Value</strong></dt>
+<dd>
+<p>This defines the number of units beyond which a request will be traced.</p>
+</dd>
+<dt class="hdlist1"><strong>Store Historic Traces</strong></dt>
+<dd>
+<p>When present, enables the storage of the slowest historical request trace events.</p>
+</dd>
+<dt class="hdlist1"><strong>Historic Trace Store Size</strong></dt>
+<dd>
+<p>Determines the number of historical trace events that can be stored in memory when historical storing is enabled. The default value is <strong>20</strong> records</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Aside from this configuration settings, you can also define which notifiers will be used to relay the HealthCheck events by moving them to the <strong>Active Notifiers</strong> box.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Keep in mind that for HealthCheck events to be relayed to the
+active notifiers, both the <a href="#/Technical Documentation/Payara Server Documentation/Logging and Monitoring/Notification Service/Notifier Configuration/notification-service.adoc" class="page unresolved">Notification Service</a> and each respective notifier must be enabled first.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You don&#8217;t need to manually add each notifier on this screen. When enabling a notifier on its configuration screen, the server will <strong>automatically</strong> add it to the list of active notifiers for the HealthCheck service. This same result occurs when
+enabling the notifier using the appropriate <em>asadmin</em> command.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="configuring-the-available-checkers"><a class="anchor" href="#configuring-the-available-checkers"></a>Configuring the Available Checkers</h4>
+<div class="paragraph">
+<p>Each of the available checkers that are used to determine the server&#8217;s health can also be configured separately from each other on the admin console. The list of the available checkers is as follows:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>CPU Usage</strong></dt>
+<dd>
+<p>Calculates the CPU usage and prints out the percentage along with the usage time.</p>
+</dd>
+<dt class="hdlist1"><strong>Connection Pool</strong></dt>
+<dd>
+<p>Calculates the ratio of free/used connections available for all JDBC connections pool an prints the percentage of used connections for each active pool.</p>
+</dd>
+<dt class="hdlist1"><strong>Heap Memory Usage</strong></dt>
+<dd>
+<p>Calculates the heap memory usage and prints out the percentage along with initial and committed heap sizes.</p>
+</dd>
+<dt class="hdlist1"><strong>Machine Memory Usage</strong></dt>
+<dd>
+<p>Calculates the machine memory usage and prints out the percentage along with the total and used physical memory size.</p>
+</dd>
+<dt class="hdlist1"><strong>Hogging Threads</strong></dt>
+<dd>
+<p>Identifies the threads that are hogging the CPU.</p>
+</dd>
+<dt class="hdlist1"><strong>Stuck Threads</strong></dt>
+<dd>
+<p>Identifies the threads that are stuck for a specified period of time.</p>
+</dd>
+<dt class="hdlist1"><strong>Garbage Collector</strong></dt>
+<dd>
+<p>Calculates and prints out how many times GC is executed with its elapsed time.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>You can configure the settings for each checker on the respective tab in the web console. Here&#8217;s a sample image with the current configuration for the <strong>CPU Usage</strong> checker:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../_images/healthcheck/cpu-usage-checker-configuration.png" alt="CPU Usage Checker Configuration in the Admin Console"></span></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="from-the-command-line"><a class="anchor" href="#from-the-command-line"></a>From the Command Line</h3>
+<div class="paragraph">
+<p>You can configure the HealthCheck Service by using the asadmin commands. The following is a detailed list of the administration commands that can be used to correctly configure the HealthCheck Service.</p>
+</div>
+<div class="sect3">
+<h4 id="set-healthcheck-configuration"><a class="anchor" href="#set-healthcheck-configuration"></a><code>set-healthcheck-configuration</code></h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">set-healthcheck-configuration
+ --enabled=true|false
+ --dynamic=true|false
+ --historic-trace-enabled=true|false
+ --historic-trace-store-size=20
+ --historic-trace-store-timeout=&lt;integer.value&gt;s|m|h|d
+ --set-notifiers=&lt;notifier.name&gt;
+ --enable-notifiers=&lt;notifier.name&gt;
+ --disable-notifiers=&lt;notifier.name&gt;</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Enables and disables the HealthCheck service. This includes configuration for tracing historic health check events for later inspection.</p>
+</dd>
+</dl>
+</div>
+<div class="sect4">
+<h5 id="command-options-8"><a class="anchor" href="#command-options-8"></a>Command Options</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 23.0769%;">
+<col style="width: 7.6923%;">
+<col style="width: 38.4615%;">
+<col style="width: 23.0769%;">
+<col style="width: 7.6924%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The instance or cluster that will enable or disable its service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--dynamic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to apply the changes directly to the server without a restart</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">N/A</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--historic-trace-enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables storing traces in a rolling store for later inspection</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--historic-trace-store-size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets the maximum number of health checks to store</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--historic-trace-store-timeout</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets the time period after which a historic health check event entry is removed from history. The time expression should consist of a number followed by a time unit; <code>s</code> for seconds, <code>m</code> for minutes, <code>h</code> for hours or <code>d</code> for days. If no time unit is given the number specifies seconds. If the parameter is zero or unspecified there is no timeout for entries.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--set-notifiers</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use the option to set the notifiers to the HealthCheck Service. It will replace all the notifiers that have already been set to the HealthCheck Service.  A comma-separated list can be used to represent multiple notifiers.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>The notifiers available by default are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>log-notifier</code></p>
+</li>
+<li>
+<p><code>jms-notifier</code></p>
+</li>
+<li>
+<p><code>cdieventbus-notifier</code></p>
+</li>
+<li>
+<p><code>eventbus-notifier</code></p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--enable-notifiers</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use the option to enable a notifier. A comma-separated list can be used to represent multiple notifiers.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--disable-notifiers</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use the option to disable a notifier. A comma-separated list can be used to represent multiple notifiers.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Enabling or disabling the health check service implicitly also enables or disables the log notifier which is the default notifier.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can find the list of available notifiers using the <a href="#/Technical Documentation/Payara Server Documentation/Logging and Monitoring/Notification Service/Notifier Configuration/asadmin-commands.adoc#list-notifiers" class="page unresolved"><code>list-notifiers</code></a> command.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="example-8"><a class="anchor" href="#example-8"></a>Example</h5>
+<div class="paragraph">
+<p>The following example will enable the Healthcheck service such that it will only activate from the next time the server is restarted. It sets the log notifier and JMS notifiers and the historical trace store to retain 20 health checks.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-healthcheck-configuration
+    --enabled=true
+    --dynamic=false
+    --historic-trace-enabled=true
+    --historic-trace-store-size=20
+    --set-notifiers=log-notifier,jms-notifiers</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="list-healthcheck-services"><a class="anchor" href="#list-healthcheck-services"></a><code>list-healthcheck-services</code></h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; list-healthcheck-services</code></p>
+</dd>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Lists the names of all available metric checker services.</p>
+</dd>
+</dl>
+</div>
+<div class="sect4">
+<h5 id="command-options-9"><a class="anchor" href="#command-options-9"></a>Command Options</h5>
+<div class="paragraph">
+<p>There are no options available.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="example-9"><a class="anchor" href="#example-9"></a>Example</h5>
+<div class="paragraph">
+<p>Running the command will show output similar to the example below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Available Health Check Services:
+        Name                    Description
+        healthcheck-cpool       Provides ratio on connection usage for a given pool name with severity according to defined threshold values
+        healthcheck-mp          Checks that all instances are responding to Microprofile Healthcheck requests with an UP response
+        healthcheck-stuck       Provides thread name, id and stack trace for requests which reach over defined threshold values
+        healthcheck-cpu         Provides ratio on cpu usage time with severity according to defined threshold values
+        healthcheck-gc          Provides ratio on garbage collection count with severity according to defined threshold values
+        healthcheck-heap        Provides ratio on used heap memory with severity according to defined threshold values
+        healthcheck-threads     Lists hogging threads with their id when given thresholds exceed
+        healthcheck-machinemem  Provides ratio on used machine memory with severity according to defined threshold values
+        healthcheck-mpmetrics   Provides a way to monitor and log the values of metrics exposed by MicroProfile Metrics
+
+Command list-healthcheck-services executed successfully.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="set-healthcheck-service-configuration"><a class="anchor" href="#set-healthcheck-service-configuration"></a><code>set-healthcheck-service-configuration</code></h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">set-healthcheck-service-configuration
+ --enabled=true|false
+ --dynamic=true|false
+ --service=&lt;service.name&gt;
+ --checker-name=&lt;string.value&gt;
+ --add-to-microprofile-health=true|false
+ --time=&lt;integer.value&gt;
+ --time-unit=DAYS|HOURS|MINUTES|SECONDS|MILLISECONDS
+ --threshold-critical=80
+ --threshold-warning=50
+ --threshold-good=0
+ --hogging-threads-threshold=&lt;integer.value&gt;
+ --hogging-threads-retry-count=&lt;integer.value&gt;
+ --stuck-threads-threshold=&lt;integer.value&gt;
+ --stuck-threads-threshold-unit=DAYS|HOURS|MINUTES|SECONDS|MILLISECONDS
+ --add-metric=&lt;metric.name&gt;
+ --delete-metric=&lt;metric.name&gt;</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Enables or disables the monitoring of an specific metric. The command also configures the frequency of monitoring for that metric. Furthermore it configures metric specific properties.</p>
+</dd>
+</dl>
+</div>
+<div class="sect4">
+<h5 id="command-options-10"><a class="anchor" href="#command-options-10"></a>Command Options</h5>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 23.0769%;">
+<col style="width: 7.6923%;">
+<col style="width: 38.4615%;">
+<col style="width: 23.0769%;">
+<col style="width: 7.6924%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The instance or cluster that will enable or disable its metric configuration</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>server</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--dynamic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to apply the changes directly to the server/instance without a restart</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>false</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the metric monitoring</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>N/A</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--service</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>The service metric name. One of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>connection-pool</code> or <code>cp</code></p>
+</li>
+<li>
+<p><code>cpu-usage</code> or  <code>cu</code></p>
+</li>
+<li>
+<p><code>garbage-collector</code> or <code>gc</code></p>
+</li>
+<li>
+<p><code>heap-memory-usage</code> or <code>hmu</code></p>
+</li>
+<li>
+<p><code>hogging-threads</code> or <code>ht</code></p>
+</li>
+<li>
+<p><code>machine-memory-usage</code> or <code>mmu</code></p>
+</li>
+<li>
+<p><code>stuck-thread</code> or <code>st</code></p>
+</li>
+<li>
+<p><code>mp-health</code> or <code>mh</code></p>
+</li>
+<li>
+<p><code>mp-metrics</code> or <code>mm</code></p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>-</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--checker-name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A user determined name for easy identification of the checker. This should be unique among the services you have configured, to avoid confusion on the notification messages.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Depends on the service checker. One of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>CONP</code></p>
+</li>
+<li>
+<p><code>CPUC</code></p>
+</li>
+<li>
+<p><code>GBGC</code></p>
+</li>
+<li>
+<p><code>HEAP</code></p>
+</li>
+<li>
+<p><code>HOGT</code></p>
+</li>
+<li>
+<p><code>MEMM</code></p>
+</li>
+<li>
+<p><code>MP</code></p>
+</li>
+<li>
+<p><code>MPM</code></p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--add-to-microprofile-health</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When enabled the checker is add to MicroProfile Health and all health check result for the checker is displayed on MicroProfile Health <a href="../../MicroProfile/healthcheck.html#rest-endpoints" class="page">REST endpoints</a>.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>false</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time units that the service will use to periodically monitor the metric</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>5</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--time-unit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TimeUnit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The time unit to set the frequency of the metric monitoring. Must correspond to a valid
+<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/TimeUnit.html"><code>java.util.concurrent.TimeUnit</code></a>
+value</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>MINUTES</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--threshold-critical</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The threshold value that this metric must surpass to generate a <strong><code>CRITICAL</code></strong> event. A value between <em>WARNING VALUE</em> and <em>100</em> must be used. Available for services <code>cp</code>, <code>cu</code>, <code>gc</code>, <code>hmu</code> and <code>mmu</code>.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>90</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--threshold-warning</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The threshold value that this metric must surpass to generate a <strong><code>WARNING</code></strong> event. A value between <em>GOOD VALUE</em> and <em>CRITICAL VALUE</em> must be used. Available for services <code>cp</code>, <code>cu</code>, <code>gc</code>, <code>hmu</code> and <code>mmu</code>.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>50</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--threshold-good</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The threshold value that this metric must surpass to generate a <strong><code>GOOD</code></strong> event. A value between <em>0</em> and <em>WARNING VALUE</em> must be used. Available for services <code>cp</code>, <code>cu</code>, <code>gc</code>, <code>hmu</code> and <code>mmu</code>.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>0</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--hogging-threads-threshold</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The threshold value that this metric will be compared to mark threads as hogging the CPU. Only available for <code>ht</code> service.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>95</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--hogging-threads-retry-count</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of retries that the checker service will execute in order to identify a hogging thread. Only available for <code>ht</code> service.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>3</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--stuck-threads-threshold</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The threshold above which a thread is considered stuck. Must be 1 or greater. Only available for <code>st</code> service.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>-</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--stuck-threads-threshold-unit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TimeUnit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The unit for the threshold for when a thread should be considered stuck. Only available for <code>st</code> service.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>-</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--add-metric</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Adds a metric exposed by MicroProfile Metrics to monitor. Takes a string of the format <code>'metricName=MetricName description=Description'</code>, where <code>metricName</code> is required.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>-</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--delete-metric</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Removes a metric exposed by MicroProfile Metrics that has been added to monitor. Takes a string of the format <code>'metricName=MetricName'</code>, where <code>metricName</code> is required.</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>-</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If this command gets executed before running the <a href="#set-healthcheck-configuration"><code>set-healthcheck-configuration</code></a> command, it will succeed and the configuration will be saved, but the HealthCheck service will not be enabled.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="example-10"><a class="anchor" href="#example-10"></a>Examples</h5>
+<div class="paragraph">
+<p>A very basic example command to simply enable the GC checker and activate it without
+needing a restart would be as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-healthcheck-service-configuration
+ --enabled=true
+ --service=gc
+ --dynamic=true</code></pre>
+</div>
+</div>
+<div id="example-11" class="paragraph">
+<p>Monitoring the health of JDBC connection pools is a common need. In that scenario, it is very unlikely that on-the-fly configuration changes would be made, so a very high <code>CRITICAL</code> threshold can be set. Likewise, a nonzero <code>GOOD</code> threshold is needed because an empty or unused connection pool may not be healthy either.</p>
+</div>
+<div class="paragraph">
+<p>The following command would apply these settings to the connection pool checker:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-healthcheck-service-configuration
+ --service=cp
+ --dynamic=true
+ --threshold-critical=95
+ --threshold-warning=70
+ --threshold-good=30</code></pre>
+</div>
+</div>
+<div id="example-12" class="paragraph">
+<p>Monitoring which threads hog the CPU is extremely important since this can lead to performance degradation, deadlocks and extreme bottlenecks issues that web applications can incur. In some cases the defaults are all that is needed, but imagine that in a critical system you want to set the threshold percentage to <strong>90%</strong>, and you want to make sure that the health check service guarantees the state of such threads with a retry count of <strong>5</strong>. Additionally, you want to set the frequency of this check for every <em>20 seconds</em>.</p>
+</div>
+<div class="paragraph">
+<p>The following command would apply these settings to the connection pool checker:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-healthcheck-service-configuration
+ --service=cp
+ --dynamic=true
+ --hogging-threads-threshold=90
+ --hogging-threads-retry-count=5
+ --time=20
+ --time-unit=SECONDS</code></pre>
+</div>
+</div>
+<div id="example-13" class="paragraph">
+<p>The following example configures the stuck threads checker to check every 30 seconds for any threads which have been stuck for more than 5 minutes and applies the configuration change without needing a restart:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-healthcheck-service-configuration
+ --service=stuck-thread
+ --enabled=true
+ --dynamic=true
+ --time=30
+ --time-unit=SECONDS
+ --stuck-threads-threshold=5
+ --stuck-threads-threshold-unit=MINUTES</code></pre>
+</div>
+</div>
+<div id="example-15" class="paragraph">
+<p>The following example configures the Microprofile Metrics Checker to add  <code>base_thread_max_count</code> metrics for monitoring, adds the checker to MicroProfile Health to
+display its result on MicroProfile Health <a href="../../MicroProfile/healthcheck.html#rest-endpoints" class="page">REST endpoints</a> and applies the configuration change without needing a restart:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-healthcheck-service-configuration
+ --service=mp-metrics
+ --enabled=true
+ --dynamic=true
+ --add-to-microprofile-health=true
+ --add-metric='metricName=base_thread_max_count'</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="get-healthcheck-configuration"><a class="anchor" href="#get-healthcheck-configuration"></a><code>get-healthcheck-configuration</code></h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; get-healthcheck-configuration</code></p>
+</dd>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Lists the current configuration for the health check service, configured checkers and enabled notifiers.</p>
+</dd>
+</dl>
+</div>
+<div class="sect4">
+<h5 id="command-options-7"><a class="anchor" href="#command-options-7"></a>Command Options</h5>
+<div class="paragraph">
+<p>There are no options available.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="example-7"><a class="anchor" href="#example-7"></a>Example</h5>
+<div class="paragraph">
+<p>A sample output is as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Health Check Service Configuration is enabled?: true
+Historical Tracing Enabled?: true
+Historical Tracing Store Size: 20
+Name                  Notifier Enabled
+log-notifier          true
+jms-notifier          false
+cdieventbus-notifier  false
+eventbus-notifier     false
+Below are the list of configuration details of each checker listed by its name.
+
+Name  Enabled  Time  Unit     Add to MicroProfile Health  Critical Threshold  Warning Threshold  Good Threshold
+CPUC  true     5     MINUTES  true                        80                  50                 0
+HEAP  true     5     MINUTES  false                       80                  50                 0
+
+Name   Enabled  Time  Unit     Add to MicroProfile Health  Threshold Time  Threshold Unit
+STUCK  true     5     MINUTES  false                       5               MINUTES
+
+Name  Enabled  Time  Unit     Add to MicroProfile Health
+MPM   true     5     MINUTES  false
+
+Monitored Metric Name  Description
+base_thread_max_count Displays the peak live thread count since the Java virtual machine started or peak was reset. This includes daemon and non-daemon threads.
+base_gc_total_total    Displays the total number of collections that have occurred. This attribute lists -1 if the collection count is undefined for this collector.
+
+Command get-healthcheck-configuration executed successfully.</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="common-checker-configuration"><a class="anchor" href="#common-checker-configuration"></a>Common HealthCheck Service Checker Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following are the configurable attributes available to <strong>ALL</strong> the HealthCheck Service checkers:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><em>Enabled</em></dt>
+<dd>
+<p>Determines whether or not the checker is enabled.</p>
+</dd>
+<dt class="hdlist1"><em>Dynamic</em></dt>
+<dd>
+<p>Determine whether the changes done to the checker&#8217;s configuration are applied immediately or after the server/instance&#8217;s restart.</p>
+</dd>
+<dt class="hdlist1"><em>Name</em></dt>
+<dd>
+<p>The name or label that the checker will use to identify itself on the notification events. The default names for all checkers are the following:</p>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Checker</th>
+<th class="tableblock halign-left valign-top">Default name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>CPU Usage</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CPUC</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Connection Pool</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CONP</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Heap Memory Usage</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HEAP</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Machine Memory Usage</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MEMM</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Hogging Threads</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HOGT</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Stuck Threads</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>STUCK</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Garbage Collector</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>GBGC</code></p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt class="hdlist1"><em>Time</em></dt>
+<dd>
+<p>The time interval value (as an <code>Integer</code>) specified in given unit to execute the checker for the metric. The default value is <strong>5</strong>.</p>
+</dd>
+<dt class="hdlist1"><em>Unit</em></dt>
+<dd>
+<p>This defines the time duration per unit. The accepted options are any valid <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/TimeUnit.html">java.util.concurrent.TimeUnit</a> values. The default value is <strong>MINUTES</strong>.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="threshold-range-configuration"><a class="anchor" href="#threshold-range-configuration"></a>Threshold Range Configuration for HealthCheck Service Checkers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following attributes are available to the <strong>CPU Usage</strong>, <strong>Connection Pool</strong>, <strong>Heap Memory Usage</strong>, <strong>Machine Memory Usage</strong> and <strong>Garbage Collector</strong> checkers:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><em>Threshold Good</em></dt>
+<dd>
+<p>The upper numeric boundary (valid <code>Integer</code>) of the metric used by the checker for the notification event to be classified as <strong>GOOD</strong>. It has <strong>0</strong> as default value.</p>
+</dd>
+<dt class="hdlist1"><em>Threshold Warning</em></dt>
+<dd>
+<p>The upper numeric boundary (valid <code>Integer</code>) of the metric used by the checker for the notification event to be classified as <strong>WARNING</strong>. It has <strong>50</strong> as default value.</p>
+</dd>
+<dt class="hdlist1"><em>Threshold Critical</em></dt>
+<dd>
+<p>The upper numeric boundary (valid <code>Integer</code>) of the metric used by the checker for the notification event to be classified as <strong>CRITICAL</strong>. It has <strong>80</strong> as default value.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The threshold values range (GOOD - WARNING - CRITICAL) are used to correctly warn users of the health of an specific metric depending on their value when they are measured based on the checking frequency. For example, if the <strong>CPU Usage</strong> checker is configured with the default threshold values, and at measuring time, the CPU is performing at 76,8%. Then this notification event would be generated:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-log hljs" data-lang="log">Health Check notification with severity level: WARNING - CPUC:Health Check Result:[[status=WARNING, message='CPU%: 76.8, Time CPU used: 171 milliseconds'']']</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="special-checkers-configuration"><a class="anchor" href="#special-checkers-configuration"></a>Special HealthCheck Service Checkers Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <strong>Hogging Threads</strong> and the <strong>Stuck Threads</strong> checkers are special on their configuration. They do not have a threshold range configuration, instead opting for different attributes.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a configuration sample of the <strong>Hogging Threads</strong> checker:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../_images/healthcheck/hogging-threads-checker-configuration.png" alt="Hogging Threads Checker Configuration in the Admin Console"></span></p>
+</div>
+<div class="paragraph">
+<p>The following are the attributes used to configure this checker:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><em>Threshold Percentage</em></dt>
+<dd>
+<p>Defines the minimum percentage needed to decide if the thread is hogged CPU-wise. The percentage is calculated with the ratio of elapsed CPU time to checker execution interval. Its default value is <strong>95</strong>.</p>
+</dd>
+<dt class="hdlist1"><em>Retry Count</em></dt>
+<dd>
+<p>Represents the count value that should be reached by the hogged thread in order for the service to send notifications. Its default value is <strong>3</strong></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>And here&#8217;s a configuration sample for the <strong>Stuck Threads</strong> checker:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../_images/healthcheck/stuck-threads-checker-configuration.png" alt="Stuck Threads Checker Configuration in the Admin Console"></span></p>
+</div>
+<div class="paragraph">
+<p>The following are the attributes used to configure this checker:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><em>Threshold Time</em></dt>
+<dd>
+<p>Defines the time value for which a thread can be non-responsive before it is considered stuck. It&#8217;s default value is <strong>5</strong>.</p>
+</dd>
+<dt class="hdlist1"><em>Threshold Unit</em></dt>
+<dd>
+<p>Defines the time unit for the value of the <strong>Threshold Time</strong> field. It&#8217;s default value is <strong>Minutes</strong>.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../_/js/site.js"></script>
+<script async src="../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

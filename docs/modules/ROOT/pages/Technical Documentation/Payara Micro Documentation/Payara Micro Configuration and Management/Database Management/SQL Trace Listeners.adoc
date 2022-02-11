@@ -1,0 +1,58 @@
+[[sql-trace-listeners]]
+= SQL Trace Listeners in Payara Micro
+
+Payara Micro also supports SQL Trace Listeners which brings powerful
+operational diagnostics to your micro-services platform. 
+
+[[adding-a-sql-trace-listener]]
+== Adding a SQL Trace Listener
+
+To add a SQL Trace Listener to your data source used by applications deployed on Payara Micro,
+you can use the annotation or deployment descriptor methods described below.
+
+[[deployment]]
+=== Application Deployment
+
+In Java EE 7+ applications, a JDBC data source can be deployed by adding the
+`@DataSourceDefinition` annotation to  a managed component (like and `@Stateless`
+EJB bean for example). SQL Trace Listener classes can be configured using this
+annotation, like in the following example:
+
+[source, java]
+----
+@DataSourceDefinition(
+    name = "java:app/MyApp/MyDS",
+    className = "org.h2.jdbcx.JdbcDataSource",
+    url = "jdbc:h2:mem:test",
+    properties = {"fish.payara.sql-trace-listeners=fish.payara.examples.payaramicro.datasource.example.CustomSQLTracer"})
+----
+
+The Data source definition can also be added to a deployment descriptor of
+an application, for example in the _web.xml_ standard deployment descriptor:
+
+[source, xml]
+----
+<data-source>
+    <name>java:global/ExampleDataSource</name>
+    <class-name>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</class-name>
+    <server-name>localhost</server-name>
+    <port-number>3306</port-number>
+    <database-name>mysql</database-name>
+    <user>test</user>
+    <password>test</password>
+    <!-- Example of how to use a Payara specific custom connection pool setting -->
+    <property>
+       <name>fish.payara.sql-trace-listeners</name>
+       <value>fish.payara.examples.payaramicro.datasource.example.CustomSQLTracer</value>
+    </property>
+</data-source>
+----
+
+[[see-also]]
+== See Also
+
+* xref:Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Database Management/Slow SQL Logger.adoc[Slow SQL Logging in Payara Micro]
+* xref:Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Database Management/Log JDBC Calls.adoc[JDBC Call Logging in Payara Micro]
+* xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/JDBC Resource Management/SQL.adoc[SQL in Payara Server]
+
+

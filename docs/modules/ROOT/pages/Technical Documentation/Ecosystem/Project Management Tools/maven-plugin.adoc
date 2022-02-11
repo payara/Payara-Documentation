@@ -1,0 +1,379 @@
+= Payara Micro Maven Plugin
+
+Payara Micro has a Maven plugin which can start and stop Payara Micro and create an Uber JAR bundle of the application and Payara Micro.
+
+The plugin requires JDK 8 or higher and the latest version is currently `1.4.0`
+
+[[goals]]
+== Configurable Goals
+
+=== `bundle`
+*Aim*: This goal bundles the attached project's artifact into an Uber JAR with the specified configurations. By default this goal is attached to the install phase.
+*Usage*: `mvn payara-micro:bundle`
+
+Example:
+
+[source, xml, subs=attributes+]
+----
+    <plugin>
+        <groupId>fish.payara.maven.plugins</groupId>
+        <artifactId>payara-micro-maven-plugin</artifactId>
+        <version>${payaramicro.maven.plugin.version}</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>bundle</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <startClass>my.custom.start.class.Main</startClass>
+            <deployArtifacts>
+                <artifactItem>
+                    <groupId>org.mycompany</groupId>
+                    <artifactId>my-project</artifactId>
+                    <version>1.0</version>
+                    <type>ear</type>
+                </artifactItem>
+            </deployArtifacts>            
+            <customJars>
+                <artifactItem>
+                    <groupId>org.primefaces</groupId>
+                    <artifactId>primefaces</artifactId>
+                    <version>6.0</version>
+                </artifactItem>
+            </customJars>
+        </configuration>
+    </plugin>
+----
+
+.Configuration tags
+[cols="2,1,7",options="header"]
+|===
+|Element
+|Default
+|Notes
+
+|`autoDeployArtifact`
+|true
+|If the extension of the produced artifact is `WAR`, it will be copied automatically to the `MICRO-INF/deploy` directory when this property is set to `true`.
+
+|`autoDeployContextRoot`
+|_none_
+|Sets context root of the deployed artifact if `autoDeployArtifact` is `true`. `autoDeployContextRoot` has the higher precedence compared to the `autoDeployEmptyContextRoot`.
+
+|`autoDeployEmptyContextRoot`
+|true
+|Sets context root of the deployed artifact to `/`  if `autoDeployArtifact` is `true`. If set to false, context root is derived from `project.build.finalName`. If `autoDeployContextRoot` is specified, `autoDeployEmptyContextRoot` will be ignored.
+
+|`startClass`
+|(optional):
+|Replaces the `Start-Class` definition that resides in the `MANIFEST.MF` file with the provided class.
+
+|`appendSystemProperties`
+|true
+|Appends all system properties defined into the `payara-boot.properties` file.
+
+|`payaraVersion`
+|{currentVersion}
+|By default bundle mojo fetches Payara Micro with version {currentVersion}.
+
+|`deployArtifacts`
+|_None_
+|Can contain a list of artifactItems, which defines the dependencies with their GAVs to be copied under MICRO-INF/deploy folder.
+
+|`customJars`
+|_None_
+|Can contain a list of artifactItems, which defines the dependencies with their GAVs to be copied under MICRO-INF/lib folder.
+
+|`uberJarClassifier`
+|microbundle
+|Specifies the maven artifact classifier to use for the generated uber-jar.
+|=== 
+
+The `bundle` goal always searches for domain configuration files in `src/main/resources` to copy in to the `MICRO-INF/domain` directory of the  Uber jar. The files which are currently included are:
+
+- `domain.xml`
+- `hazelcast-config.xml`
+- `keystore.jks`
+- `login.conf`
+- `logging.properties`
+- `metrics.xml`
+
+Additionally boot command scripts will be included if they exist in `src/main/resources` and transferred to the `MICRO-INF` directory of the Uber jar artifact.
+
+`pre-boot-commands.txt`:: Provides a file of asadmin commands to run before booting the server.
+`post-boot-commands.txt`:: Provides a file of asadmin commands to run after booting the server.
+`post-deploy-commands.txt`:: Provides a file of asadmin commands to run after all deployments have completed.
+
+=== `start`
+*Aim*: This goal starts Payara Micro with the specified configuration.
+*Usage*: `mvn payara-micro:start`
+
+Example:
+
+[source,XML]
+----
+<plugin>
+    <groupId>fish.payara.maven.plugins</groupId>
+    <artifactId>payara-micro-maven-plugin</artifactId>
+    <version>${payaramicro.maven.plugin.version}</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>start</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <useUberJar>true</useUberJar>
+        <payaraMicroAbsolutePath>/path/to/payara-micro.jar</payaraMicroAbsolutePath>
+        <payaraVersion>{currentVersion}</payaraVersion>
+        <artifactItem>
+            <groupId>fish.payara.extras</groupId>
+            <artifactId>payara-micro</artifactId>
+            <version>{currentVersion}</version>
+        </artifactItem>
+        <daemon>true</daemon>
+        <javaPath>/path/to/Java/Executable</javaPath>
+        <deployWar>true</deployWar>
+        <contextRoot>myApp</contextRoot>
+        <javaCommandLineOptions>
+            <option>
+                <value>-Xdebug</value>
+            </option>
+            <option>
+                <key>-Xrunjdwp:transport</key>
+                <value>dt_socket,server=y,suspend=y,address=5005</value>
+            </option>
+        </javaCommandLineOptions>
+        <commandLineOptions>
+            <option>
+                <key>--domainconfig</key>
+                <value>/path/to/domain.xml</value>
+            </option>
+            <option>
+                <key>--autoBindHttp</key>
+                <value>true</value>
+            </option>
+        </commandLineOptions>
+    </configuration>
+</plugin>
+----
+
+NOTE: If you want to execute the payara-micro plugin along with maven-toolchains-plugin, you need to execute the plugin as: `mvn toolchains:toolchain payara-micro:start`. See <<using-toolchains>> for more information.
+
+.Configuration tags
+[cols="2,1,7",options="header"]
+|===
+|Element
+|Default
+|Notes
+
+|`useUberJar`
+|false
+|Use the created uber-jar that resides in the target folder. The name of the JAR artifact will be resolved automatically by evaluating its final name, artifact ID and version. This configuration element has the higher precedence compared to `payaraMicroAbsolutePath`, `payaraVersion` and `artifactItem`.
+
+|`uberJarClassifier`
+|microbundle
+|Specifies the maven artifact classifier to use for the Uber JAR.
+
+|`payaraMicroAbsolutePath`
+|_none_
+|Absolute path to the Payara Micro executable.
+
+|`payaraVersion`
+|{currentVersion}
+|By default start mojo fetches payara-micro with version {currentVersion}.
+
+|`artifactItem`
+|_none_
+|Defines payara-micro artifact with its coordinates. Specified artifact should be available in local maven repository.
+
+|`daemon`
+|false
+|Starts Payara Micro in separate JVM process and continues with the maven build.
+
+|`immediateExit`
+|false
+|If Payara Micro is executed in daemon mode, the executor thread will wait for the ready message before shutting down its process. By setting `immediateExit` to `true` you can skip this and instantly interrupt the executor thread.
+
+|`javaPath`
+|`java`
+|Absolute path to the java executable. This has higher priority to the java executable identified via the Maven toolchain.
+
+|`deployWar`
+|false
+|If the attached project is of type WAR, it will automatically be deployed if `deployWar` is set to `true`.
+
+|`contextRoot`
+|_none_
+|Defines the context root of an application.
+
+|`javaCommandLineOptions`
+|_none_
+|Defines a list of command line options that will be passed to `java` executable. Command line options can either be defined as key-value pairs or just as list of values. key-value pairs will be formatted as `key=value`.
+
+|`commandLineOptions`
+|_none_
+|Defines a list of command line options that will be passed onto payara-micro.
+
+|`hotDeploy`
+|false
+|Enables the Hot Deploy mode.
+
+|===
+
+=== `stop`
+*Aim*: This goal stops Payara Micro with the specified configuration. By default this goal tries to find the currently executing Payara Micro instance by checking the running JAR. If an `artifactItem` is defined, it will take precedence for identifying currently running instances. If `processId` is defined, this takes the highest precedence and the given `processId` will immediately kill the executing Payara Micro instance.
+*Usage*: `mvn payara-micro:stop`
+
+Example:
+
+[source,XML]
+----
+<plugin>
+    <groupId>fish.payara.maven.plugins</groupId>
+    <artifactId>payara-micro-maven-plugin</artifactId>
+    <version>${payaramicro.maven.plugin.version}</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>stop</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <processId>32333</processId>
+        <artifactItem>
+            <groupId>fish.payara.extras</groupId>
+            <artifactId>payara-micro</artifactId>
+            <version>{currentVersion}</version>
+        </artifactItem>
+    </configuration>        
+</plugin>
+----
+
+NOTE: If you want to execute the payara-micro plugin along with maven-toolchains-plugin, you need to execute the plugin as: `mvn toolchains:toolchain payara-micro:start`. See <<using-toolchains>> for more information.
+
+.Configuration tags
+[cols="2,1,7",options="header"]
+|===
+|Element
+|Default
+|Notes
+
+|`processId`
+|_none_
+|Process id of the running Payara Micro instance.
+
+|`artifactItem`
+|_none_
+|Defines payara-micro artifact with its coordinates. This information is used to identify the process id of the running Payara Micro instance.
+
+|`useUberJar`
+|false
+|Use the name of the created uber-jar that resides in target folder to identify the process id of the running Payara Micro instance.
+
+|`uberJarClassifier`
+|microbundle
+|Specifies the maven artifact classifier of the generated uber-jar to identify the process id of the running Payara Micro instance.
+
+|`maxStopTimeoutMillis`
+|5000
+|Defines the maximum timeout in milliseconds to wait for the process of Payara Micro Community instance to stop.
+|===
+
+=== `reload`
+
+*Aim*: This goal reloads the Payara Micro application with the specified configuration. By default, this goal performs the vanilla deployment of the application without restarting the Payara Micro instance. If `hotDeploy` is set to true then the Hot Deploy functionality will be enabled. 
+*Usage*: `mvn payara-micro:reload`
+
+NOTE: This goal is specifically designed for integration with the IDEs and Editors. Payara Micro instance allows IDEs to deploy the application in Hot Deploy mode by reusing the existing application instance and updating its classloader and internal components relative to the modified source. This can lead to significant savings of time when an application is redeployed and boost developer productivity even more.
+
+.Configuration tags
+[cols="2,1,7",options="header"]
+|===
+|Element
+|Default
+|Notes
+
+|`hotDeploy`
+|false
+|Enables the Hot Deploy mode.
+
+|`sourcesChanged`
+|_none_
+|Defines a list (comma separated) of the absolute paths to the source file which need to be reloaded via the Hot Deploy feature.
+
+|`metadataChanged`
+|false
+|If set to true, reloads deployment descriptors metadata in Hot Deploy mode
+|===
+
+[[using-toolchains]]
+=== Using Toolchains
+
+The Maven Toolchains provide a way for plugins to discover what JDK (or other tools) are to be used during the build and Payara Micro Maven Plugin also supports using toolchains with its configuration.
+
+In order to use the toolchains with either `payara-micro:start` or `payara-micro:stop`, first toolchains plugin should be defined as:
+[source,XML]
+----
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-toolchains-plugin</artifactId>
+    <version>1.1</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>toolchain</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <toolchains>
+            <jdk>
+                <version>1.8</version>
+                <vendor>oracle</vendor>
+            </jdk>
+        </toolchains>
+    </configuration>
+</plugin>
+----
+
+toolchains.xml is the file for configuring each toolchain and it should reside under the .m2 folder. A sample would be as:
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF8"?>
+<toolchains>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>1.7</version>
+            <vendor>oracle</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>1.8</version>
+            <vendor>oracle</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home</jdkHome>
+        </configuration>
+    </toolchain>
+</toolchains>
+----
+
+The version and the vendor defined in the plugins section should match one of the entries defined in the toolchains.xml file. After configuring the toolchain, the plugin can be executed with `start` and `stop` goals as:
+
+[source, shell]
+----
+mvn toolchains:toolchain payara-micro:start
+mvn toolchains:toolchain payara-micro:stop
+----

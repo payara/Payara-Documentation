@@ -1,0 +1,281 @@
+[[deploy-programatically]]
+= Deploying Applications on Micro Programmatically
+
+You can deploy applications onto Payara Micro programmatically via its API.
+
+[[deploying-applications-using-an-asadmin-command]]
+== Deploying Applications Using an asadmin Command
+
+Applications can be deployed using the equivalent administration (`asadmin`) commands present on Payara Server.
+
+[[deploying-on-a-local-instance]]
+=== Deploying on a Local Instance
+
+It's possible to use the `run(Collection<InstanceDescriptor> members, String command, String... args )`
+method to run the `deploy` asadmin command. To deploy to a single instance, you must create a `members` `Collection` object only containing a single instance like in the following example:
+
+[source, java]
+----
+import fish.payara.micro.PayaraMicro;
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicroRuntime;
+import fish.payara.micro.services.data.InstanceDescriptor;
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class EmbeddedPayara {
+    public static void main(String[] args) throws BootstrapException {
+        PayaraMicroRuntime runtime = PayaraMicro.getInstance().setHttpAutoBind(true).bootstrap();
+
+        // Get a Collection with all running instances in the local runtime's cluster
+        Collection<InstanceDescriptor> allInstances = runtime.getClusteredPayaras();
+
+        // Create a Collection to use as a subset
+        Collection<InstanceDescriptor> subset = new ArrayList<>();
+
+        // Loop through all instances
+        for (InstanceDescriptor instance : allInstances){
+            // Only add the local instance
+            if (instance == runtime.getLocalDescriptor()){
+                subset.add(instance);
+                break;
+            }
+        }
+
+        // Run the deploy asadmin command on the subset Collection
+        runtime.run(subset, "deploy", "/home/user/test.war");
+    }
+}
+----
+
+[[deploying-on-multiple-instances]]
+== Deploying on Multiple Running Instances
+
+You can use the `run` method to run the `deploy` asadmin command on multiple Payara Micro instances that belong to the same cluster. There are two `run` method variants available for running administration commands: One which runs an `asadmin` command on a subset of instances in a cluster, and another than runs an `asadmin` command on ALL instances in a cluster.
+
+Here is an example of deploying an application to ALL instances in a cluster:
+
+[source, java]
+----
+import fish.payara.micro.PayaraMicro;
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicroRuntime;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+        PayaraMicroRuntime runtime = PayaraMicro.getInstance().setHttpAutoBind(true).bootstrap();
+
+        // Run the deploy asadmin command on all instances in the runtime's cluster
+        runtime.run("deploy", "/home/user/test.war");
+    }
+}
+----
+
+See the example for <<deploying-on-a-local-instance, deploying on local instance>> on how to use the `run` method on a subset of instances in a cluster.
+
+[[deploying-an-application-programmatically-during-bootstrap]]
+== Deploying an Application Programmatically during Bootstrap
+
+There are two methods you can use to deploy an application during Payara Micro's bootstrap process:
+
+* `addDeployment(String pathToWar)`
+* `addDeploymentFile(File file)`
+
+The first, `addDeployment(String pathToWar)`, accepts a String that points to the path of the artefact to be deployed. For example:
+
+[source, java]
+----
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicro;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+        PayaraMicro.getInstance().addDeployment("/home/user/example.war").bootStrap();
+    }
+}
+----
+
+The second method, `addDeploymentFile(File file)`, functions in the same way, but takes a `File` object instead:
+
+[source, java]
+----
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicro;
+import java.io.File;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+        File file = new File("/home/user/example.war");
+        PayaraMicro.getInstance().addDeploymentFile(file).bootStrap();
+    }
+}
+----
+
+Unlike when controlling Payara Micro from the command line, you can split the instance initialization and configuration across multiple method invocations. For example, to deploy an application and start the instance on separate method calls, you can run the following code:
+
+[source, java]
+----
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicro;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+        PayaraMicro micro = PayaraMicro.getInstance();
+        micro.addDeployment("/home/user/example.war");
+        micro.bootStrap();
+    }
+}
+----
+
+TIP: You can use this strategy to deploy multiple deployments by calling `addDeployment` multiple times, or use `setDeploymentDir` to point to a deployment directory that contains the applications to deploy.
+
+[[deploying-an-application-programmatically-after-bootstrap]]
+== Deploying an Application Programmatically After Bootstrap
+
+There are three methods available for deploying an application to a running instance:
+
+* `deploy(File war)`
+* `deploy(String name, InputStream is)`
+* `deploy(String name, String contextRoot, InputStream is)`
+
+[[deployfile-war]]
+=== `deploy(File war)`
+
+The first method works in the exact same way as the `addDeploymentFile` method described in the  <<deploying-an-application-programmatically-during-bootstrap, Deploying Programmatically during Bootstrap>> section.
+
+[[deploystring-name-inputstream-is]]
+=== `deploy(String name, InputStream is)`
+
+This method allows you to deploy WAR files using an `InputStream`:
+
+[source, java]
+----
+import fish.payara.micro.PayaraMicro;
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicroRuntime;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class EmbeddedPayara {
+    public static void main(String[] args) throws BootstrapException{
+        PayaraMicroRuntime instance = PayaraMicro.bootstrap();
+
+        try (InputStream is = new FileInputStream("/home/user/test.war")){
+            instance.deploy("test", is);
+        }
+        catch (IOException ex){
+            Logger.getLogger(EmbeddedPayara.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}
+----
+
+[[deploystring-name-string-contextroot-inputstream-is]]
+=== `deploy(String name, String contextRoot, InputStream is)`
+
+This method works in the same way as the previous one, but allows you to specify the context root of the application at the same time. The following example would deploy the `test` application to a context root of `/app`:
+
+[source, java]
+----
+import fish.payara.micro.PayaraMicro;
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicroRuntime;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+        PayaraMicroRuntime instance = PayaraMicro.bootstrap();
+
+        try (InputStream is = new FileInputStream("/home/user/test.war")){
+            instance.deploy("test", "app", is);
+        }
+        catch (IOException ex){
+            Logger.getLogger(EmbeddedPayara.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}
+----
+
+[[deploying-an-application-programmatically-from-a-maven-repository]]
+== Deploying an Application Programmatically from a Maven Repository
+
+Payara Micro supports the deployment of an application's artefact that is hosted in a Maven repository.
+
+[[deploying-an-artefact-using-maven-coordinates]]
+=== Deploying an Artefact Using Maven Coordinates
+
+To deploy an application directly from a Maven repository, you will need to add a Maven GAV coordinate. This can be done using `addDeployFromGAV()` method. This method accepts a comma separated string denoting a maven artefact's `groupId`, `artifactId`, and `version` attributes.
+
+[source, java]
+----
+import fish.payara.micro.PayaraMicro;
+import fish.payara.micro.BootstrapException;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+       PayaraMicro.getInstance().addDeployFromGAV("fish.payara.testing,clusterjsp, 1.1").bootStrap();
+    }
+}
+----
+
+[[specifying-additional-maven-repositories]]
+== Specifying Additional Maven Repositories
+
+By default, Payara Micro will only search for artefacts in the Maven Central repository. If you wish to search additional repositories, you can add them to the list of repositories to search with the `addRepoUrl()` method:
+
+[source, java]
+----
+import fish.payara.micro.PayaraMicro;
+import fish.payara.micro.BootstrapException;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+       PayaraMicro.getInstance().addRepoUrl("https://raw.github.com/Pandrex247/Payara_PatchedProjects/Payara-Maven-Deployer");
+       PayaraMicro.getInstance().addDeployFromGAV("fish.payara.testing,clusterjsp,1.1").bootStrap();
+    }
+}
+----
+
+To search through multiple additional repositories, you can simply call the `addRepoUrl` method, and specify a comma-separated list of the URLs of each repository:
+
+[source, java]
+----
+import fish.payara.micro.PayaraMicro;
+import fish.payara.micro.BootstrapException;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+       PayaraMicro micro = PayaraMicro.getInstance();
+       micro.addRepoUrl("https://raw.github.com/Pandrex247/Payara_PatchedProjects/Payara-Maven-Deployer", "https://maven.java.net/content/repositories/promoted/");
+       micro.addDeployFromGAV("fish.payara.testing,clusterjsp,1.1");
+       micro.bootStrap();
+    }
+}
+----
+
+[[deploying-multiple-applications-from-a-maven-repository]]
+=== Deploying Multiple Applications from a Maven Repository
+
+To deploy multiple applications hosted in a Maven repository, you must call the `addDeployFromGAV` method for each application.For example, to deploy two applications:
+
+[source, java]
+----
+import fish.payara.micro.PayaraMicro;
+import fish.payara.micro.BootstrapException;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+       PayaraMicro micro = PayaraMicro.getInstance();
+       micro.addDeployFromGAV("fish.payara.testing,clusterjsp,1.1");
+       micro.addDeployFromGAV("fish.payara.testing,demo,1.0");
+       micro.bootStrap();
+    }
+}
+----

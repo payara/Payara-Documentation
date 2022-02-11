@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Adding Third-Party JARs to a Micro Instance :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../../index.html">docs</a></li>
+    <li><a href="adding-jars.html">Adding Third-Party JARs to a Micro Instance</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Micro%20Documentation/Payara%20Micro%20Configuration%20and%20Management/Micro%20Management/Jar%20Structure%20&amp;%20Configuration/adding-jars.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Adding Third-Party JARs to a Micro Instance</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>Since Payara Micro 4.1.2.173</em></p>
+</div>
+<div class="paragraph">
+<p>There are multiple scenarios when it&#8217;s needed to add a third-party library to the
+class path of a Payara Micro Community instance:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Deploying applications that use JDBC resources, which have a need to access the
+respective JDBC driver JAR.</p>
+</li>
+<li>
+<p>Shared libraries used by multiple applications deployed on the same instance.</p>
+</li>
+<li>
+<p>Avoiding the creation of fat application WARs with lots of bundled libraries
+to simplify a build-integration pipeline.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Such scenarios are easily solved on Payara Server Community by adding these JAR files at
+the domain or modules of the application server library directories. On Payara Micro Community,
+this can be done on multiple ways.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="from-the-command-line"><a class="anchor" href="#from-the-command-line"></a>From the command line</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to add a third-party jar to a new Payara Micro Community instance, use the <code>--addLibs</code> argument when starting the instance like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --addLibs third-party.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can specify a directory instead of a simple JAR to add all of the JARs that
+are located in that directory:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --addLibs /home/payara-libs/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally, in order to add third-party libraries from multiple sources, specify
+each source (either a file or directory path) separating them using the colon
+character (<code>:</code>). Here&#8217;s a simple example to add 3 sources for libraries:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --addLibs third-party.jar:/opt/application/jars:~/v/mysql-jdbc-driver.jar</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You may notice that this syntax is similar to the syntax used to specify
+the classpath using the <code>-cp</code> argument when running the JVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t like using the previous syntax and prefer a simpler option, you can
+repeat the <code>--addLibs</code> argument as many times as you want per each JAR source, like
+in the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro.jar --addLibs third-party.jar --addLibs /opt/application/jars --addLibs ~/v/mysql-jdbc-driver.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This argument cannot be used when instance is started via <a href="#documentation/payara-micro/starting-instance.adoc" class="page unresolved">root directory launcher</a>.
+It is however accepted when creating a launcher via <code>--outputlauncher</code> and provided libraries will be added to launcher&#8217;s classpath.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="programmatically-using-api"><a class="anchor" href="#programmatically-using-api"></a>Programmatically using the API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to add third-party libraries to a new Payara Micro Community instance programmatically,
+use the <code>PayaraMicro.addLibrary</code> method to properly add either JAR files or a directory
+of JAR files. You can call the method multiple times to each multiple sources.</p>
+</div>
+<div class="paragraph">
+<p>For example, to add both a JAR file and a new directory of JAR files to a new instance
+use the following code:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public static void main(String[] args) throws BootstrapException {
+    PayaraMicro instance = PayaraMicro.getInstance();
+    instance.addLibrary(new File("~/my-library"));
+    instance.addLibrary(new File("~/my-libs/"));
+    instance.bootStrap();
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Unlike other configuration methods of the <code>PayaraMicro</code> class, the
+<code>addLibrary</code> method <strong>DOES NOT RETURN</strong> a reference to the <code>PayaraMicro</code> object,
+which means that this method cannot be used for method-chaining style configuration.
+This is an issue which will be solved on a future release.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="packaging-libraries-uber-jar"><a class="anchor" href="#packaging-libraries-uber-jar"></a>Packaging Libraries in an Uber JAR</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When creating an Uber JAR using the <code>--outputUberJar</code> argument from the commmand
+line, all specified third-party libraries will be packaged on the resulting JAR.
+All added JARS will be located on the <em>MICRO-INF/lib</em> directory.</p>
+</div>
+<div class="paragraph">
+<p>Here is an example to package 2 JDBC drivers (for MySQL and PostgreSQL) into an
+Uber JAR called <code>my-micro.jar</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">java -jar payara-micro-4.1.2.173.jar --addLibs postgresql-9.4.1208.jre7.jar:mysql-connector-java-5.1.44-bin.jar --outputUberJar my-micro.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can inspect this Uber JAR to verify that the third-party JAR files were packaged
+successfully:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">&gt; jar -tf my-micro.jar | grep "MICRO-INF/lib"
+
+MICRO-INF/lib/
+MICRO-INF/lib/postgresql-9.4.1208.jre7.jar
+MICRO-INF/lib/mysql-connector-java-5.1.44-bin.jar</code></pre>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

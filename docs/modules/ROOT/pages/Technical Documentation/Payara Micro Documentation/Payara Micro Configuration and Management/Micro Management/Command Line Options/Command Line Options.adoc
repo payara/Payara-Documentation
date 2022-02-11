@@ -1,0 +1,151 @@
+[[payara-micro-command-line-options]]
+= Payara Micro Command Line Options
+
+All of the options listed below are case-insensitive from version `4.1.1.171`;
+prior versions need the option to be set with
+https://en.wikipedia.org/wiki/Camel_case[camelCase notation]
+
+[cols=",,",options="header",]
+|=======================================================================
+|Configuration Option| Description| Default Value
+|`--accesslog <directory-path>`
+|Sets user defined directory path for the access log.|
+|`--accesslogformat`
+|Sets user defined log format for the access log.|"%client.name% %auth-user-name% %datetime% %request% %status% %response.length%"
+|`--accessloginterval`
+|Sets user defined access log write interval.|300
+|`--accesslogsuffix`
+|Sets user defined simple date time suffix for access log filenames.|yyyy-MM-dd
+|`--accesslogprefix`
+|Sets user defined prefix for access log filenames.|
+|`--additionalrepository <repo-url>`
+|Specifies an additional repository to search for deployable artefacts in. Since 4.1.2.184 and 5.184 it is possible to use basic authentication. For example https://USER:PASSWORD@example.payara.fish/repositories/repo/ . You may also use aliases https://USER:{ALIAS=ALIAS_NAME}@example.payara.fish/repositories/repo/|
+|`--addjars <jar-path>`
+|__Deprecated__. Use `--addlibs` instead|
+|`--addlibs <file or directory path>`|<file-or-directory-path> add specified jar files into classloader, or packaged into an uberjar. Multiple files can be specified as colon separated values.|
+|`--autobindhttp`
+|Enables auto-binding for the HTTP port.|_false_
+|`--autobindrange <number-of-ports>`
+|Sets the range for HTTP and HTTPS port auto-binding.|5
+|`--autobindssl`
+|Enables auto-binding for the HTTPS port.|_false_
+|`--clustermode`
+|Modifies the cluster discovery mode of  Payara Micro Community when finding members of the cluster. Options are multicast:group:port, tcpip:host:port, domain:dashost:port|multicast
+|`--clustername <cluster-name>`
+|Sets the cluster group name.|
+|`--clusterpassword <cluster-password>`|Sets the cluster group password.|
+|`--contextroot <context-path>`|Sets the context root of the application originating from the `--deploy` option given first that does not specify a context root itself. See
+xref:/documentation/payara-micro/deploying/deploy-cmd-line.adoc#define-context-root[Define context root] for more details.
+|
+|`--copytouberjar <directory-path`
+|<directory-path> copy a directory into the root of an uberjar|
+|`--deploy <file-path>[:<context-path]`
+|Specifies a WAR file to deploy and optionally the context path to use for that application.| If not set, has no value and is not used.
+|`--deploydir <directory-path>`
+|Sets a directory which will be scanned for EAR, WAR, and RAR files for auto-deployment.
+|If not set, has no value and is not used.
+|`--deployfromgav <list-of-artefacts>`
+|Specifies a comma separated `groupId, artifactId, versionNumber` of an artefact
+to deploy from a repository.|
+|`--deploymentdir <directory-path>`
+|See `--deploydir`.|
+|`--disablephonehome`
+|Disables the _Phone Home_ service for this instance. |If not set, the _Phone Home_
+service is active.
+|`--domainconfig <file-path>`
+|Overrides the server configuration with an alternative _domain.xml_ file.
+|If not set, the domain.xml contained in the Payara Micro JAR is used.
+|`--enableDynamicLogging`
+|Watch the logging properties file for changes, and apply them dynamically |
+|`--enablehealthcheck <boolean>`
+|enables/disables the HealthCheck Service.|_false_
+|`--enablerequesttracing`
+|Enables the Request Tracing Service and optionally sets the threshold unit
+and/or value.|
+|`--enablerequesttracingadaptivesampling <boolean>`|<boolean> Enables the adaptive sampling. Can also be enabled by configuring any one of the adaptive sampling configuration options|
+|`--group <group-name>`
+|Sets the instance's group.|
+|`--help`
+|Displays the configuration options and then exits. |If not set, this option is
+not used.
+|`--hostaware`
+|Enable Host Aware Partitioning. When enabled cluster backups will not be stored
+on members with the same IP Address.| _false_
+|`--hzconfigfile <file-path>`
+|Sets the Hazelcast configuration file to use for overriding the built-in Hazelcast
+cluster configuration.| If not set, the built-in Hazelcast configuration file
+is used.
+|`--hzinitialjoinwait <time in seconds>`|Sets the time in seconds for Payara Micro to wait before attempting to join the
+data grid.|1
+|`--hzPublicAddress <host-name or ip>`|The Public Address to use for this Data Grid Node. Used when the node is behind a NAT|
+|`--instancegroup <group-name>`|See `--group`|
+|`--interfaces`|Specifies the Interfaces that the data grid discovery mode should use to listen. Can be comma separated, e.g. 127.0.0.1,192.168.0.*|
+|`--lite`
+|Sets the micro container to lite mode, which means it clusters with other Payara
+Micro instances but does not store clustered data.| _false_
+|`--logo`
+|Reveals either the **#BadAssFish** or a custom logo on boot.|
+|`--logproperties <file-path>`
+|Allows user to set their own logging properties file.|
+|`--logtofile <file-path>`
+|Outputs all the Log entries to a user defined file.|
+|`--maxhttpthreads <max-thread-count>`
+|Sets the maximum number of threads in the HTTP thread pool.|10
+|`--mcaddress <multicast-address>`
+|Sets the cluster multicast group if multicast cluster mode is selected. See `--clustermode`.|
+|`--mcport <multicast-port>`
+|Sets the cluster multicast port if mulitcast cluster mode is selected.  See `--clustermode`.|2904
+|`--minhttpthreads <min-thread-count>`
+|Sets the minimum number of threads in the HTTP thread pool.|10
+|`--name <instance-name>`
+|Sets the instance name. |Generated Universally Unique Identifier
+_(Adjective-Fish)_.
+|`--nested`
+|Do not unpack the Nested Jars when booting the server. This is generally slower
+than unpacking the runtime.| _false_
+|`--nocluster`
+|Disables Hazelcast and clustering for this instance.| _false_
+|`--nohostaware`|Disables Host Aware Paritioning. See `--hostaware`|
+|`--outputuberjar <file-path>`
+|Packages up an Uber JAR at the specified path based on the provided command
+line arguments and exit.|
+|`--outputlauncher`
+|Create launcher `launch-micro.jar` into the root directory that is specified by `--rootdir` and exit.|
+|`--port <http-port-number>`
+|Sets the HTTP port that the instance will bind to.| 8080
+|`--postbootcommandfile <file-path>`
+|Provides a file of asadmin commands to run *after booting the server*.|
+|`--postdeploycommandfile <file-path>`
+|Provides a file of asadmin commands to run *after all deployments have completed*.|
+|`--prebootcommandfile <file-path>`
+|Provides a file of asadmin commands to run *before booting the server*.|
+|`--requesttracingadaptivesamplingtargetcount`|The target number of traces to sample per the configured time window | 6
+|`--requesttracingadaptivesamplingtimeunit`| The time unit for the adaptive sample time; a `java.util.concurrent.TimeUnit` value (also in singular) or one of the short forms: `ns`, `us`/`µs`, `ms`, `s`, `m`/`min`/`mins`, `h` or `d`.  | MINUTES
+|`--requesttracingadaptivesamplingtimevalue`| The period of time to attempt to hit the adaptive sample target count in | 1
+|`--requesttracingthresholdunit <threshold-unit-notation>`
+|Sets the time unit for the requestTracingThresholdValue option, i.e. `SECONDS`,
+`ms`, `days` etc.|
+|`--requesttracingthresholdvalue <threshold-unit-value>`
+|Sets the threshold time before a request is traced.|
+|`--rootdir <directory-path>`
+|Sets the root configuration directory and saves the configuration across restarts.
+|Defaults to `java.io.tmpdir`.
+|`--secretsdir`|Directory to read configuration from key-value files using the Microprofile config api.|
+|`--shutdowngrace <duration-ms>`|  After server shutdown is initiated the server waits this period of time to finish ongoing requests before terminating. Currently, new requests are still accepted during this grace period. | 0
+|`--sslport <ssl-port-number>`
+|Sets the HTTPs port that the instance will bind to.| If not set, has no value
+and HTTPS is disabled.
+|`--sslcert <certificate-name>`
+|Sets the SSL certificate name to be used from the keystore for SSL| `s1as`
+|`--startport <cluster-start-port-number>`
+|Sets the cluster start port number.|5900
+|`--systemproperties <file-path>`
+|Reads system properties from a file.|
+|`--unpackdir <directory-path>`
+|Unpack the Nested Jar runtime jars to the specified directory.| Unpack to
+`java.io.tmpdir`.
+|`--version`
+|Displays the version information|
+|`--warmup`
+|Exit the server immediately after configuration is done, applications are deployed and it's ready to serve requests. |
+|=======================================================================

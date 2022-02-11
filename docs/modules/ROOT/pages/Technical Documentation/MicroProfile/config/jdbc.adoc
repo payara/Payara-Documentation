@@ -1,0 +1,53 @@
+# JDBC Config Source
+
+The JDBC config source reads configuration properties from a database table. 
+
+[[configuration]]
+## Configuration
+
+You can configure JDBC Config Source either via the admin console or the _asadmin_ utility. You'll need JNDI name of the database JDBC resources, name of a database table, name of the key column containing the key and name of the column containing the value. The values from the key column will be used as the config property names and the values from the value column will be used as the config property value. 
+
+IMPORTANT: The type of the database columns for the _key_ and _value_ columns needs to be of type _`String`_ or compatible.
+
+### From the Admin Console
+
+To configure the config source from the admin console, go to `Configs` -> `your-config` -> `MicroProfile` -> `Config` -> `JDBC`.
+
+image:microprofile/config/jdbc/admin-console-example.png[Payara Server Administration Console configuration route]
+
+From here you configure the JNDI name of the database JDBC resources, name of the database table, name of the key column containing the key and name of the column containing the value.
+
+### From the Command Line
+
+To configure the JDBC config source from the command line, use the `set-jdbc-config-source-configuration` asadmin command, specifying the required parameters like this:
+
+[source, shell]
+----
+asadmin> set-jdbc-config-source-configuration --jndiName jndi-name --tableName Books --keyColumnName ISBN --valueColumnName Title
+----
+
+Also, you can retrieve the current configuration for the JDBC Config Source using the `get-jdbc-config-source-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin> get-jdbc-config-source-configuration
+JNDI Name  Table Name  Key-Column Name  Value-Column Name
+jndi-name  Books       ISBN             Title
+----
+
+## Usage
+
+Once all of the required options are configured. You should be able to read configuration properties from a database table. For example, let's look at the following diagram. It shows a table named Books with columns ISBN, Author and Title.
+
+image:microprofile/config/jdbc/database-example.png[Database Example]
+
+If the key column name is set to ISBN and the value column name to Title. You can get the value of the Title column in relation to the ISBN column using the following command along with the ISBN value: 
+
+[source, shell]
+----
+asadmin> get-config-property --source jdbc --propertyName 9780030779008
+Great Expectations
+Command get-config-property executed successfully.
+----
+
+NOTE: Currently JDBC config source only supports the `get-config-property` command and doesn't support the `set-config-property` and `delete-config-property` commands.

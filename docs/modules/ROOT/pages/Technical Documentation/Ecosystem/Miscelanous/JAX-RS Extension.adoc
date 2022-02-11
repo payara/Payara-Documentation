@@ -1,0 +1,50 @@
+= JAX-RS Extension
+
+The JAX-RS Extension is an application specific extension that can assist you in improving the coding of certain aspects of any application that uses the standard JAX-RS Client API. At the moment the following features are supported:
+
+* Define the `alias` of SSL certificate entry that will be used to establish secure communication in a mutual TLS transport setting. 
+
+[[installation]]
+== Installation
+
+To install this extension, simply include its JAR file in the application's WAR file. Using Maven, it is as simple as declaring the dependency through its GAV coordinates:
+
+[source, xml]
+----
+<dependency>
+  <groupId>fish.payara.ecosystem.jaxrs</groupId>
+  <artifactId>rest-ssl-configuration</artifactId>
+  <version>1.0</version>
+</dependency>
+----
+
+[[usage]]
+== Usage
+
+[[ssl-certificate-alias-configuration]]
+=== SSL Certificate Alias Configuration
+
+To configure the alias of the SSL certificate to be used in secure communications established by the client, the following system property must be defined when establishing a new REST client call through the use of the `javax.ws.rs.client.ClientBuilder` class:
+
+[cols="1,1", options="header"]
+|===
+|Property |Description
+|`fish.payara.jaxrs.client.certificate.alias` | The alias name of the certificate
+|===
+
+IMPORTANT: The certificate that corresponds to the given alias must exist in the domain's configured keystore.
+
+[[alias-configuration-example]]
+==== Example
+
+Here's an example of how to set up the property when executing a new JAX-RS client call:
+
+[source, java]
+----
+ClientBuilder.newBuilder()
+              .property("fish.payara.jaxrs.client.certificate.alias", "someAliasName")
+              .build()
+              .target(new URI("https://localhost:8080/service"))
+              .request()
+              .get(Service.class)
+----

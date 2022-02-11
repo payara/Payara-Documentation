@@ -1,0 +1,74 @@
+[[logging-jdbc-calls]]
+= Logging JDBC Calls in Payara Micro
+
+Payara Micro supports SQL Tracing which brings powerful operational
+diagnostics to your micro-services platform.
+
+[[enabling]]
+== Enabling Logging JDBC Calls
+
+To enable SQL Tracing of JDBC on applications deployed on Payara Micro, use can use the annotation or deployment descriptor methods described below.
+
+[[deployment]]
+=== Application Deployment
+
+In Java EE 7+ applications, a JDBC data source can be deployed by adding the
+`@DataSourceDefinition` annotation to  a managed component (like and `@Stateless`
+EJB bean for example). The *Log JDBC Calls* setting can be configured using
+this annotation as well:
+
+[source, java]
+----
+@DataSourceDefinition(
+    name = "java:app/MyApp/MyDS",
+    className = "org.h2.jdbcx.JdbcDataSource",
+    url = "jdbc:h2:mem:test",
+    properties = {"fish.payara.log-jdbc-calls=true"})
+----
+
+The Data source definition can also be added to a deployment descriptor of
+an application, for example in the _web.xml_ standard deployment descriptor:
+
+[source, xml]
+----
+<data-source>
+   <name>java:global/ExampleDataSource</name>
+   <class-name>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</class-name>
+   <server-name>localhost</server-name>
+   <port-number>3306</port-number>
+   <database-name>mysql</database-name>
+   <user>test</user>
+   <password>test</password>
+   <!-- Example of how to use a Payara specific custom connection pool setting -->
+   <property>
+       <name>fish.payara.log-jdbc-calls</name>
+       <value>true</value>
+   </property>
+</data-source>
+----
+
+or in the definition of a `jdbc-connection-pool` in a __payara-resources.xml__ file:
+[source, xml]
+----
+<jdbc-connection-pool name="examplePool"
+        res-type="javax.sql.DataSource"
+        datasource-classname="org.h2.jdbcx.JdbcDataSource" log-jdbc-calls="true">
+    <property name="user" value="test"/>
+    <property name="password" value="test"/>
+    <property name="url" value="java:global/ExampleDataSource"/>
+</jdbc-connection-pool>
+
+----
+
+This can also be done in the creation of a JDBC Connection Pool with the `--logjdbccalls` option.
+[source, shell]
+----
+asadmin create jdbc-connection-pool --datasourceclassname org.h2.jdbcx.JdbcDataSource --restype javax.sql.XADataSource --logjdbccalls=true examplePool
+----
+
+== See Also
+
+* xref:Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Database Management/Slow SQL Logger.adoc[Slow SQL Logging in Payara Micro]
+* xref:Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Database Management/SQL Trace Listeners.adoc[SQL Trace Listeners in Payara Micro]
+* xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/JDBC Resource Management/SQL.adoc[SQL in Payara Server]
+

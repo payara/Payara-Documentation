@@ -1,0 +1,844 @@
+= Protocols
+:page-toclevels: 3
+
+A protocol is used by a network listener to determine the nature of the communication expected by the listener. For example, a protocol determines the timeout of a request, as well as whether HTTPS should be used. The reason the protocol is separate to the listener is so that the same protocol configuration can be used to listen on multiple ports.
+
+Existing protocols can be configured from the admin console or with asadmin commands. The protocol configurations can be found in the Admin Console under *Configurations* -> *your-config* -> *Network Config* -> *Protocols*.
+
+image::http/protocol-config.png[Protocol Configuration View Location]
+
+[[standard-configuration-settings]]
+== Standard Configuration Settings
+
+The following are the main configuration settings for network listener protocols:
+
+[[configuration-security]]
+=== Security
+
+Whether security is enabled for the protocol. When disabled, all the SSL/TLS options are ignored.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.security-enabled=[true|false]
+----
+
+[[http-settings]]
+=== HTTP Settings
+
+The following HTTP settings can be configured:
+
+[[configuration-http-server-name]]
+==== Server Name
+
+The name of the server. This will be sent as the `Server` header in responses.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.server-name-enabled=value
+----
+
+[[configuration-http-default-virtual-server]]
+==== Default Virtual Server
+
+The default virtual server used for the protocol. Establishes the request priority when multiple virtual servers are configured.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.default-virtual-server=value
+----
+
+[[configuration-http-redirect-port]]
+==== Redirect Port
+
+The port used for SSL transport redirection.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.redirect-port=value
+----
+
+[[configuration-http-max-connections]]
+==== Max Connections
+
+The maximum number of requests per connection to keep in keep-alive mode.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.max-connections=value
+----
+
+[[configuration-http-timeout]]
+==== Timeout
+
+The amount of time in seconds before a connection is deemed as idle. After this, the connection will no longer be in keep-alive state.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.timeout-seconds=value
+----
+
+[[configuration-http-upload-timeout]]
+==== Upload Timeout Enabled
+
+Enables closing a connection that is reading bytes slowly after the `configuration-http-upload-timeout-millis` setting is reached.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.upload-timeout-enabled=value
+----
+
+[[configuration-http-upload-timeout-millis]]
+==== Connection Upload Timeout 
+
+The timeout, in milliseconds, for uploads. 
+
+TIP: To disable this timeout, set the value to `-1`
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.connection-upload-timeout-millis=value
+----
+
+[[configuration-http-request-timeout]]
+==== Request Timeout
+
+The timeout, in seconds, for requests.
+
+TIP: To disable this timeout, set the value to `-1`
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.request-timeout-seconds=value
+----
+
+[[configuration-http-send-buffer-size]]
+==== Send Buffer Size
+
+The size, in bytes, of the send buffer.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.send-buffer-size-bytes=value
+----
+
+[[configuration-http-header-buffer-length]]
+==== Header Buffer Length
+
+The size, in bytes, of the buffer used to read the request data.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.header-buffer-length-bytes=value
+----
+
+[[configuration-http-max-post-size]]
+==== Max Post Size
+
+The maximum size, in bytes, of POST actions.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.max-post-size-bytes=value
+----
+
+[[configuration-http-max-form-post-size]]
+==== Max Form Post Size
+
+The maximum size, in bytes, of a POST form.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.max-form-post-size-bytes=value
+----
+
+[[configuration-http-max-save-post-size]]
+==== Max Save Post Size
+
+The maximum size, in bytes, of a POST request that will be saved during authentication.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.max-save-post-size-bytes=value
+----
+
+[[configuration-http-uri-encoding]]
+==== URI Encoding
+
+The character set used to decode the request URIs received.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.uri-encoding=value
+----
+
+[[configuration-http-compression]]
+==== Compression
+
+Whether to enable HTTP/1.1 GZIP compression to save server bandwidth. Will be ignored when HTTP/2 is used.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.compression=[off/on/force]
+----
+
+[[configuration-http-compression-level]]
+==== Compression Level
+
+The level of compression to be used:
+
+*  `-1` corresponds to the default level
+* `0` is no compression
+* `1` is the best speed 
+* `9` is the best compression
+
+*Asadmin Command:*
+
+`set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.compression-level=[-1-9]`
+
+[[configuration-http-compression-strategy]]
+===== Compression Strategy
+
+Sets the strategy to be used during HTTP compression.
+
+*Asadmin Command:*
+
+`set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.compression-strategy=[Default/Filtered/Huffman Only]`
+
+[[configuration-http-compressable-mime-type]]
+===== Compressible Mime Types
+
+Comma separated list of MIME types for which HTTP compression is used.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.compressable-mime-type=value
+----
+
+[[configuration-http-compression-min-size]]
+===== Compression Minimum Size
+
+The minimum size of a file that determines whether compression is applied.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.compression-min-size-bytes=value
+----
+
+[[configuration-http-no-compression-user-agents]]
+===== No-Compression User Agents
+
+Comma separated list of regular expressions matching user agents for which compression should not be used.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.no-compression-user-agents=value
+----
+
+[[configuration-http-restricted-user-agents]]
+===== Restricted User Agents
+
+List of restricted user agents for which HTTP compression is applied.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.restricted-user-agents=value
+----
+
+[[configuration-http-default-response-type]]
+==== Default Response Type
+
+The default response type if none are matched. Specified as a semi-colon delimited string consisting of content type, encoding, language, charset.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.default-response-type=value
+----
+
+[[configuration-http-adapter]]
+==== Adapter
+
+The class name of the static resources adapter.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.adapter=value
+----
+
+[[configuration-http-comet-support]]
+==== Comet Support
+
+Whether comet support is enabled or not.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.comet-support-enabled=[true|false]
+----
+
+[[configuration-http-dns-lookup]]
+==== DNS Lookup
+
+Enables Domain Name System lookups.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.dns-lookup-enabled=[true|false]
+----
+
+[[configuration-http-trace-operation]]
+==== Trace Enabled
+
+Enables the TRACE operation.
+
+TIP: Setting this to false helps prevent cross-site scripting attacks.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.trace-enabled=[true|false]
+----
+
+[[configuration-http-auth-pass-through]]
+==== Auth Pass Through
+
+Enable this if the network listener receives traffic from an SSL terminating proxy server.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.auth-pass-through-enabled=[true|false]
+----
+
+[[configuration-http-chunking-enabled]]
+==== Chunking Enabled
+
+Enables HTTP response chunking.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.chunking-enabled=[true|false]
+----
+
+[[configuration-http-xpowered-by]]
+==== XPoweredBy
+
+Used to overwrite the default X-Powered-By header string.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.xpowered-by=value
+----
+
+[[configuration-http-xframe-options]]
+==== XFrame Options
+
+When enabled, the X-Frame-Options header will be set to SAMEORIGIN. This can still be overriden by a deployed application.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.xframe-options=[true|false]
+----
+
+[[configuration-http-encoded-slash]]
+==== Encoded Slash
+
+Allow encoded slashes (e.g. `%2F`) in URIs.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.encoded-slash-enabled=[true|false]
+----
+
+[[configuration-http-websockets-support]]
+==== Websockets Support Enabled
+
+Allows Websockets to be used.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.websockets-support-enabled=[true|false]
+----
+
+[[configuration-http-scheme-mapping]]
+==== Scheme Mapping
+
+HTTP header name used for identifying the originating protocol of a HTTP request.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.scheme-mapping=value
+----
+
+[[configuration-http-remote-user-mapping]]
+==== Remote User Mapping
+
+HTTP header name used for identifying the originating user of a HTTP request.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.remote-user-mapping=value
+----
+
+[[http2-settings]]
+=== HTTP/2 Settings
+
+The following HTTPv2 specific settings can be configured:
+
+[[configuration-http-http2]]
+==== HTTP/2 Enabled
+
+Whether to enable HTTP/2 support.
+
+IMPORTANT: HTTP/2 support can only be enabled on a secure network listener
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-enabled=[true|false]
+----
+
+[[configuration-http-http2-disable-cipher-check]]
+==== Disable HTTP/2 Cipher Check
+
+Whether TLS connections can be established using insecure cipher suites.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-disable-cipher-check=[true|false]
+----
+
+[[configuration-http-http2-max-concurrent-streams]]
+==== HTTP/2 Max Concurrent Streams
+
+The number of maximum concurrent streams allowed per HTTP/2 connection.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-max-concurrent-streams=value
+----
+
+[[configuration-http-http2-initial-window-size]]
+==== HTTP/2 Initial Window Size
+
+The initial window size in bytes.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-initial-window-size-in-bytes=value
+----
+
+[[configuration-http-http2-max-frame-payload-size]]
+==== HTTP/2 Max Frame Payload Size
+
+The maximum size of the HTTP/2 frame payload to be accepted.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-max-frame-payload-size-in-bytes=value
+----
+
+[[configuration-http-http2-max-header-list-size]]
+==== HTTP/2 Max Header List Size
+
+The maximum size, in bytes, of the header list.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-max-header-list-size-in-bytes=value
+----
+
+[[steams-high-water]]
+==== Streams High Water Mark
+
+The maximum number of streams that are allowed. Excess streams will be cleaned out periodically in proportion to the maximum number of streams
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-streams-high-water-mark=value
+----
+
+[[steams-clean-percent]]
+==== Streams Clean Percentage
+
+The number of streams to process when the high water mark is exceeded. 
+
+NOTE: Only closed streams will be removed.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-clean-percentage=value
+----
+
+[[streams-clean-frequency]]
+==== Streams Clean Frequency Check
+
+The number of streams that must be closed before checking if the number of streams exceeds the high water mark.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-clean-frequency-check=value
+----
+
+[[http2-push]]
+==== HTTP/2 Push
+
+Enables server push. This is enabled by default.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.http2-push-enabled=[true|false]
+----
+
+[[ssl-tls-settings]]
+=== SSL/TLS Settings
+
+The following SSL/TLS settings can be configured:
+
+[[configuration-ssl-ssl3]]
+==== SSLv3 Enabled
+
+Whether to enable SSLv3 or not.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.ssl3-enabled=[true | false]
+----
+
+[[configuration-ssl-tls]]
+==== TLS Enabled
+
+Whether to enable TLS or not.
+
+*Asadmin Command:*
+
+`set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.tls-enabled=[true|false]`
+
+[[configuration-ssl-tls11]]
+==== TLS V1.1 Enabled
+
+Whether to enable TLS V1.1 or not. Will be ignored if TLS is disabled.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.tls11-enabled=[true|false]
+----
+
+[[configuration-ssl-tls12]]
+==== TLS V1.2 Enabled
+
+Whether to enable TLS V1.2 or not. Will be ignored if TLS is disabled.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.tls12-enabled=[true|false]
+----
+
+[[configuration-ssl-tls13]]
+==== TLS V1.3 Enabled
+
+Whether to enable TLS V1.3 or not. Will be ignored if TLS is disabled.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.tls13-enabled=[true|false]
+----
+
+NOTE: Support for TLS 1.3 is available with JDK 8 versions after **JDK 1.8.0u261**, unless you're using **Zulu JDK 1.8.0u222 - 1.8.0u252**, in which case you'll also need to use the Java option **-XX:+UseOpenJSSE**. This option makes OpenJSSE default TLS provider. OpenJSEE is a JSEE provider created by Azul to support TLS 1.3 on JDK 8. See https://docs.azul.com/openjsse/index.htm[TLS 1.3 Support in Zulu 8 with OpenJSSE] for more information. Also note that this flag can cause problems with the HTTP/2 support. If you using a lower version than 1.8.0u222, checkbox to enable TLS 1.3 will not be visible on the web administration console. 
+
+IMPORTANT: You will need to add the following Java Option:  **-Dfish.payara.clientHttpsProtocol=TLSv1.3** to the asadmin script for  TLS 1.3 to work with asadmin CLI. This sets the TLS version to 1.3 which will be used by the asadmin client.
+
+[[configuration-ssl-client-auth]]
+==== Client Authentication
+
+When enabled, clients will be required to authenticate themselves to the server.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.client-auth-enabled=[true|false]
+----
+
+[[configuration-ssl-cert-nickname]]
+==== Certificate Nickname
+
+The alias of the certificate to be supplied on secure requests. The certificate should be present in the server keystore.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.cert-nickname=value
+----
+
+[[configuration-ssl-keystore]]
+==== Key Store
+
+The name of the keystore file used to secure communication handled by this network listener.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.key-store=value
+----
+
+[[configuration-ssl-truststore]]
+==== Trust Store
+
+The name of the trust store file where trusted certificates are stored.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.trust-store=value
+----
+
+[[configuration-ssl-trust-algorithm]]
+==== Trust Algorithm
+
+The name of the trust management algorithm (e.g. `PKIX`) to use for certification path validation.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.trust-algorithm=value
+----
+
+[[configuration-ssl-max-cert-length]]
+==== Max Certificate Length
+
+Maximum number of non self-issued intermediate certificates that can exist in a certification path. Only used if the trust algorithm is set to `PKIX`.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.trust-max-cert-length=value
+----
+
+[[configuration-ssl-enabled-ciphers]]
+==== Enabled Ciphers
+
+A list of the server enabled ciphers. This string is stores as a comma separated list of the enabled ciphers with a `+` or a `-` at the start of each, depending on whether the cipher is enabled or disabled. E.g. `+TLS_RSA_WITH_AES_256_CBC_SHA,+SSL_RSA_WITH_3DES_EDE_CBC_SHA`.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.ssl3-tls-ciphers=value
+----
+
+[[configuration-ssl-handshake-timeout]]
+==== Handshake Timeout
+
+The timeout, in milliseconds, for a handshake. After this timeout the handshake will be aborted.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.handshake-timeout-millis=value
+----
+
+[[configuration-ssl-tls-rollback]]
+==== TLS Rollback
+
+Whether TLS rollback is enabled or not.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.tls-rollback-enabled=[true|false]
+----
+
+[[configuration-hsts-enabled]]
+==== HSTS Enabled
+
+Whether HSTS is enabled. When enabled, the server will respond to requests with the `Strict-Transport-Security` header. While these requests often return a 301 directing the client to the secure site, this header instructs the requester to make all connections to this site secure for the next year. The header takes the following form:
+
+----
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+----
+
+The last 2 attributes are added based on the other HSTS configuration options.
+
+NOTE: HSTS can be enabled on any HTTP listener. However, it's meant to be enabled on a secure HTTP listener if an insecure HTTP listener redirects to the secure listener. When browsers receive the `Strict-Transport-Security` header over HTTPS, they will use HTTPS immediately for all future connections requested over plain HTTP. If the header is retrieved over HTTP, it is ignored by browsers due to security reasons. More information in https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security[MDN Docs].
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.hsts-enabled=[true|false]
+----
+
+When the configuration value is set to `true`, the HSTS header is added with a `max-age` property value of `31536000`. The `max-age` property is not configurable.
+
+[[configuration-hsts-subdomains]]
+==== HSTS Subdomains
+
+When enabled in combination with HSTS, `Strict-Transport-Security` headers will include the `includeSubDomains` attribute. When this is configured, the client will also assume subdomains of the targeted resource require secure connections. The `subdomains` property is not enabled by default and has to be enabled with the following command:
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.hsts-sub-domains=[true|false]
+----
+
+[[configuration-hsts-preload]]
+==== HSTS Preload
+
+When enabled in combination with HSTS, `Strict-Transport-Security` headers will include the `preload` attribute. When this is configured, the domain of the target resource will be added to the browser preload list, meaning that initial requests to this resource in future won't be insecure. The `preload` property is not enabled by default and has to be enabled with the following command:
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.hsts-preload=[true|false]
+----
+
+[[main-asadmin-commands]]
+== Main Asadmin Commands
+
+The following asadmin commands can be used to manage protocol records.
+
+=== `create-protocol`
+
+The `create-protocol` command creates a bare protocol to be configured with `create-http` and `create-ssl`.
+
+[source, shell]
+----
+asadmin create-protocol [--help]
+           [--securityenabled={false|true}]
+           [--target target]
+           protocol-name
+----
+
+=== `create-http`
+
+The `create-http` command creates a set of HTTP parameters for a created protocol.
+
+[source, shell]
+----
+asadmin  create-http [--help]
+           --default-virtual-server virtual-server
+           [--request-timeout-seconds timeout]
+           [--timeout-seconds timeout]
+           [--max-connection max-keepalive]
+           [--dns-lookup-enabled={false|true}]
+           [--servername server-name]
+           [--target target]
+           protocol-name
+----
+
+=== `create-ssl`
+
+The `create-ssl` command creates a set of SSL parameters for a created protocol.
+
+[source, shell]
+----
+asadmin create-ssl [--help]
+        --certname certname
+        --type protocol
+        [--ssl3enabled={false|true}]
+        [--ssl3tlsciphers ssl3tlsciphers]
+        [--tlsenabled={false|true}]
+        [--tlsrollbackenabled={false|true}]
+        [--clientauthenabled={false|true}]
+        [--target target]
+        listener-id
+----

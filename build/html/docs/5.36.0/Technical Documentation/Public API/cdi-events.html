@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Firing and Listening for remote CDI Events :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../index.html">docs</a></li>
+    <li><a href="cdi-events.html">Firing and Listening for remote CDI Events</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Public%20API/cdi-events.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Firing and Listening for remote CDI Events</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>Since Payara Server 4.1.1.171 (Full Edition), 4.1.2.172 (Web Edition) &amp; Payara Micro 4.1.153</em></p>
+</div>
+<div class="paragraph">
+<p>Payara Server Community is able to listen to and fire CDI events across the
+Hazelcast cluster. The CDI events can be fired and listened to by
+applications on Payara Server instances as well as Payara Micro
+instances provided that they are connected to the same cluster.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="requirements"><a class="anchor" href="#requirements"></a>Requirements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hazelcast must be enabled for all Payara Server instances and they must be able to connect to the same Hazelcast cluster. See the <a href="#documentation/payara-server/hazelcast/Overview.adoc" class="page unresolved">Data Grid</a> section for more details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="initializing-the-event-bus"><a class="anchor" href="#initializing-the-event-bus"></a>Initializing the event bus</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The event bus is initialized automatically after an application is
+started. No additional configuration is necessary to fire and listen to
+remote events.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="firing-remote-cdi-events"><a class="anchor" href="#firing-remote-cdi-events"></a>Firing remote CDI events</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to fire a CDI event remotely, mark it with the <code>@Outbound</code>
+annotation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+@fish.payara.micro.cdi.Outbound
+Event&lt;String&gt; event;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above will create an event with a String payload, which will be
+observable on remote instances in the cluster.</p>
+</div>
+<div class="paragraph">
+<p>An outbound event can be fired as any other CDI event:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">event.fire("This is an event");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The payload passed as an argument to the <code>fire()</code> method has to
+implement the <code>Serializable</code> interface.</p>
+</div>
+<div class="paragraph">
+<p>An outbound event will be fired asynchronously on a remote instance. If
+<a href="#loopback">loopback</a> is allowed, it will be fired also on the same
+instance, but in a different thread. Therefore the call doesn&#8217;t block
+the current thread.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Since Payara Version 4.1.2.172, it&#8217;s possible to use additional qualifiers to match
+event with observers. Any additional qualifier used with <code>@Outbound</code>
+will mean that the event will be matched with an <code>@Inbound</code> listener that accepts the qualifiers.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="observing-remote-cdi-events"><a class="anchor" href="#observing-remote-cdi-events"></a>Observing remote CDI events</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Outbound events are observed by every CDI bean with a listener method
+that is marked with the <code>@Inbound</code> qualifier:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public void receiveEvent(@Observes @Inbound String message) {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The observers may reside in any application running on one or more
+instances in a Hazelcast cluster, and they will listen to events fired
+in an application running on any instance within the same cluster. By
+default, events will be fired on all remote cluster instances (all
+instances except the one in which the event was fired).</p>
+</div>
+<div class="paragraph">
+<p>An event will be matched with observers by the payload class, using the
+same rules as usual CDI events. Observers will receive events that are
+assignable to the observed class.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="additional-options"><a class="anchor" href="#additional-options"></a>Additional options</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="qualifiers"><a class="anchor" href="#qualifiers"></a>Using CDI Qualifiers</h3>
+<div class="paragraph">
+<p><em>Since Payara Version 4.1.2.172</em></p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s possible to tag a remote event in a type-safe way using any
+CDI qualifier. Only observers that match the qualifiers would receive
+such event.</p>
+</div>
+<div class="paragraph">
+<p>A remote event with a qualifier <code>@MyQualifier</code> can be triggered like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+@fish.payara.micro.cdi.Outbound
+@MyQualifier
+Event&lt;String&gt; event;
+...
+event.fire("This is a qualified event");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This event can be observed only by an observer that contains the qualifier:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public void receiveEvent(@Observes @Inbound @MyQualifier String message) {
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="event-name"><a class="anchor" href="#event-name"></a>Event name</h3>
+<div class="paragraph">
+<p>It is possible to tag a remote event with a name. In that case, only
+observers that listen to events of the same name will receive such
+events.</p>
+</div>
+<div class="paragraph">
+<p>To fire an event with a name:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+@Outbound(eventName = "MyEvent")
+Event&lt;String&gt; event;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To receive the above named event:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public void receiveEvent(@Observes @Inbound("MyEvent") String message) {
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="instance-name"><a class="anchor" href="#instance-name"></a>Instance name</h3>
+<div class="paragraph">
+<p>By default, all remote instances in the same cluster will receive an
+outbound event, which matches the observed class and event name. If you
+want to target specific instances in the cluster, it is possible to
+define one or more target instances for an outbound event:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+@Outbound(instanceName = "Instance-1")
+Event&lt;String&gt; event;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Several instance names can be configured with an array:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+@Outbound(instanceName = {"Instance-1", "Instance-2"})
+Event&lt;String&gt; event;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you are using Payara Server, the name of the DAS instance is <code>server</code>
+by default. In the case of a separate standalone instance, use the
+instance&#8217;s name in the configuration. If you are using Payara Micro, the
+instance&#8217;s name is configured using the <code>--name</code> option, or is generated
+by if not configured (see the section <a href="#/documentation/payara-micro/configuring/instance-names.adoc" class="page unresolved">Payara Micro Instance
+Names</a>).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="loopback"><a class="anchor" href="#loopback"></a>Loopback</h3>
+<div class="paragraph">
+<p>When an outbound event is fired, by default, it is treated as a remote
+message and will be delivered only to remote instances in the cluster.
+It will not be delivered to listeners on the same server instance.</p>
+</div>
+<div class="paragraph">
+<p>If an event should be delivered to observers in the local instance as
+well, it can be done by setting the <code>loopBack</code> attribute to true:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+@Outbound(loopBack = true)
+Event&lt;String&gt; event;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dynamic-configuration"><a class="anchor" href="#dynamic-configuration"></a>Dynamic configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If required, events can also be fired programmatically, not only
+using the static <code>@Outbound</code> annotation next to the injection point.
+Although there is no special API to support it, CDI already supports
+programmatic configuration of events.</p>
+</div>
+<div class="paragraph">
+<p>The following is an example of how to configure and fire an outbound
+event programmatically without using any injection points:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">CDI.current().getBeanManager().fireEvent("This is an event", new Outbound() {
+    @Override
+    public String eventName() {
+        return System.getProperty("eventname");
+    }
+
+    @Override
+    public boolean loopBack() {
+        return Boolean.getBoolean(System.getProperty("loopback"));
+    }
+
+    @Override
+    public String instanceName() {
+        return System.getProperty("instanceName");
+    }
+
+    @Override
+    public Class&lt;? extends Annotation&gt; annotationType() {
+        return this.getClass();
+    }
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above code creates a dynamic instance of the
+<code>@Outbound</code> annotation and fires the event <code>"This is an event"</code>
+using a bean manager retrieve via a static <code>CDI.current</code>()` method.</p>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../_/js/site.js"></script>
+<script async src="../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

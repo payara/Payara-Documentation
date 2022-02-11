@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Data Grid Configuration :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="configuration.html">Data Grid Configuration</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/ondro-poc/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Server%20Configuration%20And%20Management/Domain%20Data%20Grid%20And%20Hazelcast/configuration.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Data Grid Configuration</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section details the multiple configuration settings available for both the Data Grid</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enabling-hazelcast"><a class="anchor" href="#enabling-hazelcast"></a>Enabling and Disabling the Data Grid</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The data grid is enabled by default in Payara Server. It can be disabled and re-enabled either through the Admin Console, or by using a command line <em>asadmin</em> command.</p>
+</div>
+<div class="sect2">
+<h3 id="enabling-hazelcast-admin-console"><a class="anchor" href="#enabling-hazelcast-admin-console"></a>Disabling the Data Grid via the Admin Console</h3>
+<div class="paragraph">
+<p>From the Admin Console homepage:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Select Data Grid under the instance&#8217;s configuration from the page tree:</p>
+<div class="imageblock">
+<div class="content">
+<img src="../../../../_images/hazelcast/hazelcast-admin-console-select-instance-config.png" alt="Admin Console Data Grid Config">
+</div>
+</div>
+</li>
+<li>
+<p>Un-check the <strong>Enabled</strong> option (and optionally check the <strong>Dynamic</strong> option to apply the configuration without the need for a restart) and save.</p>
+<div class="imageblock">
+<div class="content">
+<img src="../../../../_images/hazelcast/hazelcast-admin-console-enable-hazelcast.png" alt="Admin Console Data Grid Enabling">
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+Disabling the Data Grid in a configuration object will disable the Data Grid for all instances using that same configuration. If this change is applied dynamically and multiple instances are restarted, there is big risk in incurring on data loss. If this is a problem, ensure not to select the dynamic option and restart each affected instance manually in turn.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enabling-hazelcast-asadmin"><a class="anchor" href="#enabling-hazelcast-asadmin"></a>Disabling DataGrid using Asadmin</h3>
+<div class="paragraph">
+<p>The <code>set-hazelcast-configuration</code> asadmin command can be used to enable or disable Hazelcast and therefore the Data Grid. This command is also used to configure other aspects of Hazelcast, which is covered in this same section. The command requires the Admin Server to be running, and will expect it to be listening on port <strong>4848</strong> unless specified differently with the asadmin utility <code>--port</code> option.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-hazelcast-configuration --enabled=false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If no target is specified, the command will disable Hazelcast on the domain configuration <code>(server-config)</code> which equates to the DAS. To disable Hazelcast on another instance, configuration or cluster, use the <code>--target</code> option like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-hazelcast-configuration --enabled=false --target=${Target}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>dynamic</code> option of the asadmin command defaults to true, so to enable Hazelcast and require a restart of the target instance/cluster, use <code>--dynamic=false</code>:</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+Same as above, dynamic restarting of multiple instances can incur in data loss, so keep this in mind.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-hazelcast-configuration --enabled=false --dynamic=false</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hazelcast-settings"><a class="anchor" href="#hazelcast-settings"></a>Domain Data Grid&#8217;s Hazelcast settings</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Payara Server supports configuring Hazelcast through the Admin Console and asadmin commands. The Hazelcast configuration file can also be directly edited, but will not be covered in depth in this section.</p>
+</div>
+<div class="paragraph">
+<p>Configuration of Hazelcast is divided into four sections. The first section  applies to the whole domain, the second section applies to specific configurations and therefore to Payara Server instances that use that configuration, the third section covers how certain settings can be specified when a domain is created and the final section covers how to configure config specific Data Grid Start Port during or after the creation of an instance.</p>
+</div>
+<div class="paragraph">
+<p>Using a Hazelcast configuration file will cause the settings set via the Admin Console and <em>asadmin</em> commands to be ignored. Any parameters not specified in the configuration file reverting to the Hazelcast defaults, even if they are specified in the Admin Console or <em>domain.xml</em></p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The <a href="https://github.com/hazelcast/hazelcast/blob/master/hazelcast/src/main/resources/hazelcast-default.xml">Hazelcast defaults settings</a> are not necessarily the same as the Payara Server&#8217;s Hazelcast default settings).
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Payara Server uses its <a href="https://github.com/payara/Payara/blob/master/nucleus/payara-modules/hazelcast-bootstrap/src/main/java/fish/payara/nucleus/hazelcast/PayaraHazelcastSerializer.java">own serializer</a> instead of the default Hazelcast one. Setting a global serializer will not override it. This is by design, implemented to avoid a <a href="https://github.com/payara/Payara/issues/759">bug</a> that causes <code>ClassNotFoundException</code> issues.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="setting-hazelcast-configuration-file"><a class="anchor" href="#setting-hazelcast-configuration-file"></a>Setting a custom Hazelcast Configuration File</h3>
+<div class="paragraph">
+<p>A custom Hazelcast configuration file can be either set using Admin Console or asadmin CLI.</p>
+</div>
+<div class="sect3">
+<h4 id="setting-hazelcast-configuration-file-admin-console"><a class="anchor" href="#setting-hazelcast-configuration-file-admin-console"></a>Setting a Hazelcast Configuration File with the Admin Console</h4>
+<div class="paragraph">
+<p>To set the Hazelcast configuration from a Hazelcast Configuration file:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Select the domain Data Grid configuration from the page tree and click the <strong>Configuration</strong> tab to view the <em>"Hazelcast Configuration"</em> page:</p>
+</li>
+<li>
+<p>On the <em>Hazelcast Configuration</em> page, add the path to your Hazelcast configuration file and click "Save". This path is relative to your domain configuration directory:</p>
+<div class="imageblock">
+<div class="content">
+<img src="../../../../_images/hazelcast/hazelcast-admin-console-set-configuration-file.png" alt="Hazelcast Set Configuration File">
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="setting-hazelcast-configuration-file-asadmin"><a class="anchor" href="#setting-hazelcast-configuration-file-asadmin"></a>Setting a Hazelcast Configuration File using asadmin</h4>
+<div class="paragraph">
+<p>The <code>set-hazelcast-configuration</code> command can be used to set the configuration file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-hazelcast-configuration --hazelcastconfigurationfile /path/to/file</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As with the admin console, this path is relative to your domain configuration directory.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuring-domain-wide-hazelcast-with-the-admin-console"><a class="anchor" href="#configuring-domain-wide-hazelcast-with-the-admin-console"></a>Configuring Domain Wide Hazelcast Settings with the Admin Console</h4>
+<div class="paragraph">
+<p>Some Hazelcast configuration settings apply to the whole domain. Navigate to the <em>Data Grid</em> page for the domain wide settings:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../../_images/hazelcast/hazelcast-admin-console-domain-hazelcast-options.png" alt="Data Grid Domain Wide Options">
+</div>
+</div>
+<div class="paragraph">
+<p>The following configuration options are available here:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Restart Data Grid</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Determines if the Hazelcast member embedded in Payara will be restarted to apply any changes made</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DAS Bind Address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Explicitly specifies the IP Address the DAS should bind the Hazelcast instance to.
+By default, Hazelcast will try to choose the correct bind address from the IP addresses available on the host. If you find the DAS is binding to an incorrect IP Address the correct address can be specified here.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DAS Public Address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This is the public IP Address that the DAS should use if the DAS is behind a NAT firewall and other Payara Server Instances need to connect via the public NAT address rather than the internal IP Address</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Auto Increment Port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">By default the cluster uses the next unoccupied port that is available starting with the start port. When auto-increment is turned off an occupied start port results in a startup failure instead.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DAS Start Port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port the DAS uses to run Hazelcast on. If this port is busy, the port specified will be incremented until a valid port is found.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Network Interfaces</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Similar to DAS Bind address by default Hazelcast will choose the correct IP Address to bind to. If you find Hazelcast is binding to the incorrect address a comma separated list of IP Addresses can be specified here.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override Configuration File</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the Hazelcast configuration file to use. The path specified is relative to the domain <em>config</em> directory.
+If you are using a custom configuration for a cluster or standalone instance (e.g. <em>cluster-config</em>), then the Hazelcast configuration file should be placed in the directory with the same name (e.g. <code>&lt;domain-root&gt;/config/cluster-config</code>). This will ensure it is replicated to the node during startup.
+Using this option to point to a valid Hazelcast configuration file will cause all other options set to be ignored. Any options unset within the Hazelcast configuration file will be set to the Hazelcast defaults.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data Grid Group Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the Hazelcast group name, to be optionally used to help divide clusters into logical, segregated groups (i.e. <em>dev-group</em>, <em>prod-group</em>).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Start Port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port the other Payara Server instances use to run Hazelcast on. If this port is busy, the port specified will be incremented until a valid port is found.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">License Key</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables <a href="https://hazelcast.com/products/enterprise/">Hazelcast Enterprise</a> features.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Host Aware Partitioning</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to enable <a href="http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#grouping-types">host-aware partitioning</a> for the cluster. Host aware partitioning <strong>must be</strong> enabled on all members of the cluster (including Payara Micro instances) for this feature to work correctly. This is default in Payara Server 5.181 onwards for both Payara Server domains and Payara Micro instances.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data Grid Discovery Mode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">See <a href="#/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Domain Data Grid And Hazelcast/Hazelcast/discovery.adoc" class="page unresolved">Discovery Modes</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuring-config-specifc-hazelcast-with-the-admin-console"><a class="anchor" href="#configuring-config-specifc-hazelcast-with-the-admin-console"></a>Configuring Server Config Specific Hazelcast Settings with the Admin Console</h3>
+<div class="paragraph">
+<p>Navigate to the <em>Data Grid</em> page for the specific configuration.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../../_images/hazelcast/hazelcast-admin-console-config-hazelcast-options.png" alt="Data Grid Domain Wide Options">
+</div>
+</div>
+<div class="paragraph">
+<p>The following configuration options are available here:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">See <a href="#/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Domain Data Grid And Hazelcast/Hazelcast/enable-hazelcast.adoc" class="page unresolved">Disabling Data Grid</a> for detailed information</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Restart Data Grid</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Determines if the Hazelcast member embedded in Payara will be restarted to apply any changes made</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lite Data Grid Instance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to true, cluster members with this configuration will be Hazelcast "lite" nodes, meaning they will not store any cache data locally and rely on other cluster members to store data.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config Specific Data Grid Start Port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets Data Grid Start Port to the instance. If set to 0 (default) the Domain wide start port will be used instead.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Public Address for this Data Grid Node</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Public Address to use for this Data Grid Node. Used when the node is behind a NAT</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance Group</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance group name for all Server Instances using the configuration. Future functionality may use this name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hazelcast Instance JNDI Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The JNDI name to bind the Hazelcast instance to.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JCache Manager JNDI Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The JNDI name to bind the JCache Cache Manager to.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JCache Caching Provider JNDI Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The JNDI name to bind the JCache Caching Provider to.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Executor Pool Size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The thread pool&#8217;s size for the Hazelcast Executor service</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Executor Queue Capacity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Queue Capacity of the Data Grid Executor Service. Executions are queued until a thread is available</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scheduled Executor Pool Size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The thread pool&#8217;s size for the Hazelcast Scheduled Executor service</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scheduled Executor Queue Capacity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Queue Capacity of the Data Grid Scheduled Executor Service. Executions are queued until a thread is available</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Enter your required values, and click <em>Save</em>. Restarting the domain or instance/cluster is not necessary for any changes made to take effect, provided that <em>"Dynamic"</em> remains set to "<em>true</em>"</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuring-hazelcast-on-domain-creation"><a class="anchor" href="#configuring-hazelcast-on-domain-creation"></a>Configuring Hazelcast on Domain Creation</h3>
+<div class="paragraph">
+<p>The following options can be used with the <code>create-domain</code> command to specify certain Hazelcast settings when a domain is created:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 30%;">
+<col style="width: 10%;">
+<col style="width: 40%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--hazelcastdasport</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port to run Hazelcast on for the DAS. If this port is busy and auto-increment option is enabled, the port specified will be incremented until a valid port is found. The <code>--hazelcastdasport</code> option cannot be used with the <code>--portbase</code> option. The <code>--hazelcastdasport</code> option overrides the <code>hazelcast.das.port</code> property of the <code>--domainproperties</code> option.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4900</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--hazelcaststartport</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port the other Payara Server instances use to run Hazelcast on. If this port is busy and auto-increment  option is enabled, the port specified will be incremented until a valid port is found. The <code>--hazelcaststartport</code> option cannot be used with the <code>--portbase</code>  option. The <code>--hazelcaststartport</code> option overrides the <code>hazelcast.start.port</code> property of the <code>--domainproperties</code> option.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5900</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--hazelcastautoincrement</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">By default the Data Grid uses the next unoccupied port that is available starting with the start port. When
+auto-increment is turned off an occupied start port results in a startup failure instead. The <code>--hazelcastautoincrement</code> option overrides the <code>hazelcast.auto.inrement</code> property of the <code>--domainproperties</code> option.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5900</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The following domain properties have been added  to the 'create-domain' command to make it possible to configure certain Hazelcast setting when a domain is created:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hazelcast.das.port</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This property specifies the port number of the port the DAS use to run Hazelcast on. The <code>hazelcast.das.port</code> property is overridden by the <code>--hazelcastdasport</code> option.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hazelcast.start.port</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This property specifies the port number of the port the other Payara Server instances use to run Hazelcast on. The <code>hazelcast.start.port</code> property is overridden by the <code>--hazelcaststartport</code> option.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hazelcast.auto.increment</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This property specifies whether or not to use the next unoccupied port that is available starting with the start port. When auto-increment is turned off an occupied start port results in a startup failure instead. The <code>hazelcast.auto.increment</code> property is overridden by the <code>--hazelcastautoincrement</code> option.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If the <code>portbase</code> options are used, the values for the ports of the Hazelcast DAS start port and the Hazelcast start Port are calculated as follows: Hazelcast DAS start port: <em>portbase</em> + 49 and Hazelcast start port: <em>portbase</em> + 59.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The following examples demonstrate creating a domain with all of the Hazelcast related options:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>An example of <code>create-domain</code> command with Hazelcast specific options:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; asadmin create-domain --hazelcastdasport 7900 --hazelcaststartport 8900 --hazelcastautoincrement true testDomain
+
+Using default port 4848 for Admin.
+Using default port 8080 for HTTP Instance.
+Using default port 7676 for JMS.
+Using default port 3700 for IIOP.
+Using default port 8181 for HTTP_SSL.
+Using default port 3820 for IIOP_SSL.
+Using default port 3920 for IIOP_MUTUALAUTH.
+Using default port 8686 for JMX_ADMIN.
+Using default port 6666 for OSGI_SHELL.
+Using default port 9009 for JAVA_DEBUGGER.
+Using port 7900 for Hazelcast DAS.
+Using port 8900 for Hazelcast Start.
+Distinguished Name of the self-signed X.509 Server Certificate is:
+[CN=dev,OU=Payara,O=Payara Foundation,L=Great Malvern,ST=Worcestershire,C=UK]
+Distinguished Name of the self-signed X.509 Server Certificate is:
+[CN=dev-instance,OU=Payara,O=Payara Foundation,L=Great Malvern,ST=Worcestershire,C=UK]
+Domain testDomain created.
+Domain testDomain admin port is 4848.
+Domain testDomain allows admin login as user "admin" with no password.
+Command create-domain executed successfully.</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>An example of <code>create-domain</code> command with Hazelcast specific domain properties:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; create-domain --domainproperties hazelcast.das.port=7900:hazelcast.auto.increment=false:hazelcast.start.port=8900 testDomain
+
+Using default port 8080 for HTTP Instance.
+Using default port 7676 for JMS.
+Using default port 3700 for IIOP.
+Using default port 8181 for HTTP_SSL.
+Using default port 3820 for IIOP_SSL.
+Using default port 3920 for IIOP_MUTUALAUTH.
+Using default port 8686 for JMX_ADMIN.
+Using default port 6666 for OSGI_SHELL.
+Using default port 9009 for JAVA_DEBUGGER.
+Using port 7900 for Hazelcast DAS.
+Using port 8900 for Hazelcast Start.
+Distinguished Name of the self-signed X.509 Server Certificate is:
+[CN=dev,OU=Payara,O=Payara Foundation,L=Great Malvern,ST=Worcestershire,C=UK]
+Distinguished Name of the self-signed X.509 Server Certificate is:
+[CN=dev-instance,OU=Payara,O=Payara Foundation,L=Great Malvern,ST=Worcestershire,C=UK]
+Domain testDomain created.
+Domain testDomain admin port is 4848.
+Domain testDomain allows admin login as user "admin" with no password.
+Command create-domain executed successfully.</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuring-config-specific-data-grid-start-port"><a class="anchor" href="#configuring-config-specific-data-grid-start-port"></a>Configuring Config Specific Data Grid Start Port</h3>
+<div class="paragraph">
+<p>It is possible to configure the port used by Hazelcast to bind the corresponding instance to the Data Grid by letting users set its value during or after the creation of an instance.</p>
+</div>
+<div class="sect3">
+<h4 id="configuring-config-specific-data-grid-start-port-on-instance-creation"><a class="anchor" href="#configuring-config-specific-data-grid-start-port-on-instance-creation"></a>Configuring Config Specific Data Grid Start Port on Instance Creation</h4>
+<div class="paragraph">
+<p>The following option can be used with the <code>create-instance</code> or the <code>create-local-instance</code> commands to specify config Specific Data Grid Start Port when an instance is created:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--dataGridStartPort</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets Data Grid Start Port to the instance. If set to 0 the Domain wide start port will be used instead</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The following examples demonstrate creating an instance with <code>--dataGridStartPort</code> options:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>An example of <code>create-instance</code> command:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; asadmin create-instance --dataGridStartPort 2900 --node localhost-domain1 instance1
+
+Command _create-instance-filesystem executed successfully.
+Port Assignments for server instance instance1:
+OSGI_SHELL_TELNET_PORT=26666
+JAVA_DEBUGGER_PORT=29009
+JMS_PROVIDER_PORT=27676
+HTTP_LISTENER_PORT=28080
+IIOP_SSL_LISTENER_PORT=23820
+ASADMIN_LISTENER_PORT=24848
+IIOP_SSL_MUTUALAUTH_PORT=23920
+JMX_SYSTEM_CONNECTOR_PORT=28686
+HTTP_SSL_LISTENER_PORT=28181
+IIOP_LISTENER_PORT=23700
+The instance, instance1, was created on host localhost
+Command create-instance executed successfully.</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>An example of <code>create-local-instance</code> command:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; asadmin create-local-instance --dataGridStartPort 2900 --node localhost-domain1 instance2
+
+Rendezvoused with DAS on localhost:4848.
+Using DAS host localhost and port 4848 from existing das.properties for node
+localhost-domain1. To use a different DAS, create a new node using create-node-ssh or
+create-node-config. Create the instance with the new node and correct
+host and port:
+asadmin --host das_host --port das_port create-local-instance --node node_name instance_name.
+Port Assignments for server instance instance2:
+OSGI_SHELL_TELNET_PORT=26667
+JAVA_DEBUGGER_PORT=29010
+JMS_PROVIDER_PORT=27677
+HTTP_LISTENER_PORT=28081
+IIOP_SSL_LISTENER_PORT=23821
+ASADMIN_LISTENER_PORT=24849
+IIOP_SSL_MUTUALAUTH_PORT=23921
+JMX_SYSTEM_CONNECTOR_PORT=28687
+HTTP_SSL_LISTENER_PORT=28182
+IIOP_LISTENER_PORT=23701
+Command create-local-instance executed successfully.</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuring-data-grid-start-port-After-instance-creation"><a class="anchor" href="#configuring-data-grid-start-port-After-instance-creation"></a>Configuring Data Grid Start Port After Instance Creation</h4>
+<div class="paragraph">
+<p>You can configure the start port used by an instance after its creation by either using the Admin Console or the asadmin CLI.</p>
+</div>
+<div class="sect4">
+<h5 id="setting-data-grid-start-port-with-the-admin-console"><a class="anchor" href="#setting-data-grid-start-port-with-the-admin-console"></a>Setting Data Grid Start Port with the Admin Console</h5>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Select the Configuration from the page tree, click on the relevant instance and finally click on the Data Grid.</p>
+</li>
+<li>
+<p>On the Configuration Specific Data Grid Configuration, set the <strong>Data Grid Start Port</strong> and click <strong>Save</strong>.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../../_images/hazelcast/hazelcast-admin-console-config-data-grid-start-port.png" alt="Data Grid Start Port Option">
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="setting-data-grid-start-port-with-the-asadmin-cli"><a class="anchor" href="#setting-data-grid-start-port-with-the-asadmin-cli"></a>Setting Data Grid Start Port using asadmin CLI</h5>
+<div class="paragraph">
+<p>The <code>set-hazelcast-configuration</code> command can be used to set the Data Grid start port:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-hazelcast-configuration --dynamic=true --configSpecificDataGridStartPort=2900 --target=instance1-config</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuring-hazelcast-using-asadmin"><a class="anchor" href="#configuring-hazelcast-using-asadmin"></a>Configuring Hazelcast using Asadmin</h4>
+<div class="paragraph">
+<p>As noted above, the <code>set-hazelcast-configuration</code> asadmin command is used to both enable/disable Hazelcast, and to configure it. The <code>set-hazelcast-configuration</code> command is used to set both domain wide and config specific settings. You can pass the <code>--help</code> option to the command to see usage instructions and available arguments in your terminal, both of which are listed below:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 30%;">
+<col style="width: 10%;">
+<col style="width: 40%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables Hazelcast. If no <code>target</code> is specified, this will enable Hazelcast on the domain configuration <em>(server-config)</em>. If no arguments are specified, defaults to <em>true</em>. If other options are specified, asadmin will interactively prompt for <code>--enabled</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>true</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the instance or cluster to configure.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>domain</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--dynamic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable or disable dynamic stopping and starting of the embedded Hazelcast member.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>-f</code> <code>--hazelcastconfigurationfile</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">File Path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Hazelcast configuration file to use. This path is relative to the domain config directory, <code>&lt;Payara Installation Directory&gt;/glassfish/domains/&lt;Domain Name&gt;/config/</code>.
+Using this option to point to a valid Hazelcast configuration file will cause all other options set to be ignored. Any options unset within the Hazelcast configuration file will be set to the Hazelcast defaults.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hazelcast-config.xml</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--startport</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port to run Hazelcast on for Payara Server Instances. If this port is busy, the port specified will be incremented until a valid port is found.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5900</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--daspublicaddress</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IP Address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This is the public IP Address that the DAS should use if the DAS is behind a NAT firewall and other Payara Server Instances need to connect via the public NAT address rather than the internal IP Address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--dasbindaddress</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IP Address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Explicitly specifies the IP Address the DAS should bind the Hazelcast instance to. By default, Hazelcast will try to choose the correct bind address from the IP addresses available on the host. If you find the DAS is binding to an incorrect IP Address the correct address can be specified here.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--dasport</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port to run Hazelcast on for the DAS. If this port is busy, the port specified will be incremented until a valid port is found.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4900</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--publicaddress</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IP Address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Public Address to use for this Data Grid Node. Used when the node is behind a NAT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--interfaces</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IP Addresses</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Similar to DAS Bind address by default Hazelcast will choose the correct IP Address to bind to. If you find Hazelcast is binding to the incorrect address a comma separated list of IP Addresses can be specified here.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--clustername</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Group Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the Hazelcast group name, to be optionally used to help divide clusters into logical, segregated groups (i.e. <em>dev-group</em>, <em>prod_group</em>).</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--hostawarepartitioning</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to enable <a href="http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#grouping-types">host-aware partitioning</a> for the cluster. Host aware partitioning <strong>must be</strong> enabled on all members of the cluster (including Payara Micro instances) for this feature to work correctly.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--licensekey</code> <code>-lk</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hazelcast License</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables <a href="https://hazelcast.com/products/enterprise/">Hazelcast Enterprise</a> features.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--clustermode</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cluster Mode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Can be one of <code>domain</code>, <code>tcpip</code> or <code>multicast</code>. See <a href="#/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Domain Data Grid And Hazelcast/Hazelcast/discovery.adoc" class="page unresolved">Discovery Modes</a> for a detailed description of each mode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--multicastgroup</code> <code>-g</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multicast Address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The multicast group for communications in the Hazelcast instance if <code>multicast</code> is selected as cluster mode.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">224.2.2.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--multicastport</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The multicast port for communications in the Hazelcast instance if <code>multicast</code> is selected as cluster mode.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">54327</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--tcpipmembers</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IP Addresses</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma separated list of <code>IP-Address:port</code> used to discover cluster members if <code>tcpip</code> is selected as the cluster mode.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--lite</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets the cluster to lite mode, where it will cluster but <strong>not</strong> store any cluster data.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--configSpecificDataGridStartPort</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets Data Grid Start Port to the instance. If set to 0 the Domain wide start port will be used instead.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--jndiname</code> <code>-j</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JNDI Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the JNDI name to bind the Hazelcast instance to.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--cachemanagerjndiname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JNDI Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specified the JNDI name to bind the JCache Caching provider</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--cachingproviderjndiname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JNDI Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The JNDI name to bind the JCache Caching Provider to.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--executorpoolsize</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The thread pool&#8217;s size for the Hazelcast Executor service</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--executorqueuecapacity</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Queue Capacity of the Data Grid Executor Service. Executions are queued until a thread is available</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--scheduledexecutorpoolsize</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The thread pool&#8217;s size for the Hazelcast Scheduled Executor service</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--scheduledexecutorqueuecapacity</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Queue Capacity of the Data Grid Scheduled Executor Service. Executions are queued until a thread is available</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--membername</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">instance name</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--membergroup</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance group name for all Server Instances using the configuration. Future functionality may use this name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">config name</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--encryptdatagrid</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables or disables encryption of data stored in the data grid store using a key created using the <code>generate-encryption-key</code> command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--help</code> <code>-?</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Displays the help menu.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>false</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The following example demonstrates setting all of the options on a cluster called <em>cluster1</em>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-hazelcast-configuration --enabled=true --target=cluster1 --dynamic=true -f hazelcast-config.xml --startport=5902 -g 224.2.2.3 --multicastport=6666 --clustermode multicast --hostAwareParitioning=true -j payara/Hazelcast</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="asadmin-commands"><a class="anchor" href="#asadmin-commands"></a>Asadmin Commands</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following is a list of the administration commands available to configure the Data Grid/Hazelcast settings.</p>
+</div>
+<div class="sect2">
+<h3 id="set-hazelcast-configuration"><a class="anchor" href="#set-hazelcast-configuration"></a><code>set-hazelcast-configuration</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; set-hazelcast-configuration --disabled=true</code></p>
+</dd>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Configures the underlying Hazelcast instance.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="get-hazelcast-configuration"><a class="anchor" href="#get-hazelcast-configuration"></a><code>get-hazelcast-configuration</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Return the current Hazelcast configuration.</p>
+</dd>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; get-hazelcast-configuration</code></p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options-2"><a class="anchor" href="#command-options-2"></a>Command Options</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance or Cluster Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies a particular config</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>server</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--help</code> <code>-?</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Displays the help menu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="example-2"><a class="anchor" href="#example-2"></a>Example</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-hazelcast-configuration
+Configuration File    Enabled  Start Port  MulticastGroup  MulticastPort  JNDIName            Lite Member  Cluster Name  License Key          Host Aware Partitioning
+hazelcast-config.xml  true     5900        224.2.2.3       54327          payara/Hazelcast    false        clustername   XXXX-XXXX-XXXX-XXXX  false</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="list-hazelcast-cluster-members"><a class="anchor" href="#list-hazelcast-cluster-members"></a><code>list-hazelcast-cluster-members</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>List the current members of the DAS' Hazelcast cluster in a formatted table, with extra properties.</p>
+</dd>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; list-hazelcast-cluster-members</code></p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options-3"><a class="anchor" href="#command-options-3"></a>Command Options</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>server</code> or <code>micro</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the type of cluster to locate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Both</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--help</code> <code>-?</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Displays the help menu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="example-3"><a class="anchor" href="#example-3"></a>Example</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; list-hazelcast-cluster-members --type server
+Instance Name  Instance Group  Instance Type  Host Name  HTTP Ports  HTTPS Ports  Admin Port  Hazelcast Port  Lite Member  Deployed Applications
+server         server-config   DAS            127.0.1.1  8080        8181         4848        5901            false        __admingui</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="list-hazelcast-members"><a class="anchor" href="#list-hazelcast-members"></a><code>list-hazelcast-members</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>List the hazelcast members as a targetable array.</p>
+</dd>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; list-hazelcast-members</code></p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options-4"><a class="anchor" href="#command-options-4"></a>Command Options</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance or cluster name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the targeted instance or cluster.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>server</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--help</code> <code>-?</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Displays the help menu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="example-4"><a class="anchor" href="#example-4"></a>Example</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; list-hazelcast-members
+
+\{ server-MicroShoal-/192.168.1.148:4900-this \}
+Command list-hazelcast-members executed successfully.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="restart-hazelcast"><a class="anchor" href="#restart-hazelcast"></a><code>restart-hazelcast</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Restarts the Data Grid/Hazelcast in the specified target.</p>
+</dd>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; restart-hazelcast --target &lt;instance-name&gt;</code></p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options-5"><a class="anchor" href="#command-options-5"></a>Command Options</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance or cluster name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the targeted instance or cluster.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>server</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--help</code> <code>-?</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Displays the help menu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="example-5"><a class="anchor" href="#example-5"></a>Example</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; restart-hazelcast --target instance-name
+instance-name:
+Hazelcast Restarted</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+There&#8217;s a risk of data loss if multiple Payara Server instances are targeted for restart.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="list-cache-keys"><a class="anchor" href="#list-cache-keys"></a><code>list-cache-keys</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Lists all keys in a cache.</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+If no cache is specified, keys from all caches will be returned.
+</td>
+</tr>
+</table>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; list-cache-keys</code></p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options-6"><a class="anchor" href="#command-options-6"></a>Command Options</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the cache to query</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="list-caches"><a class="anchor" href="#list-caches"></a><code>list-caches</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Lists the Hazelcast distributed caches in the cluster</p>
+</dd>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin list-caches</code></p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="clear-cache"><a class="anchor" href="#clear-cache"></a><code>clear-cache</code></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Clears a Hazelcast or JCache IMap</p>
+</dd>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; clear-cache &lt;cacheName&gt;</code></p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Use of this command removes all data from a cache and therefore can result in unexpected behaviour if a system cache is cleared. Clearing a cache
+containing web session data will result in all users losing their sessions, for example.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-hazelcast-instance"><a class="anchor" href="#create-hazelcast-instance"></a><code>create-hazelcast-instance</code></h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All instances are created as part of the Domain Data Grid by default.
+</td>
+</tr>
+</table>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>Usage</strong></dt>
+<dd>
+<p><code>asadmin&gt; create-hazelcast-instance new-instance</code></p>
+</dd>
+<dt class="hdlist1"><strong>Aim</strong></dt>
+<dd>
+<p>Creates a new Payara Server instance with Hazelcast and the persistence types.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="command-options-1"><a class="anchor" href="#command-options-1"></a>Command Options</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Node Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the node to create the instance on.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--config</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the config to use for the instance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>server-config</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--lbenabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies whether the instance is enabled for load balancing, meaning that the load balancer directs requests to the instance.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--checkports</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies whether the check that the administration, HTTP, JMS, JMX, and IIOP ports are free.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--terse</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies whether output data should be returned in a concise format, suited for scripts, with descriptive text omitted.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--portbase</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the port to start assigning ports from. This will always output the assigned ports, even when omitted.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--systemproperties</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Options</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies additional system properties which will override other settings, such as the assigned port. Examples include
+<code>ASADMIN_LISTENER_PORT</code> and <code>OSGI_SHELL_TELNET_PORT</code>.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the instance or cluster to configure.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>server-config</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables Hazelcast. If no target is specified, this will enable Hazelcast on the domain configuration (<code>server-config</code>). If no arguments are specified, defaults to true.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--dynamic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable or disable dynamic stopping and starting of the embedded Hazelcast member.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--hazelcastconfigurationfile</code> <code>-f</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">File Path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Hazelcast configuration file to use. This path is relative to the domain config directory,
+<code>&lt;Payara Installation Directory&gt;/glassfish/domains/&lt;Domain Name&gt;/config/`</code>
+Using this option to point to a valid Hazelcast configuration file will cause all other options set to be ignored. Any options unset within the Hazelcast configuration file will be set to the Hazelcast defaults</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hazelcast-config.xml</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--startport</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port to run Hazelcast on. If this port is busy, the port specified will be incremented until a valid port is found.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>5900</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--multicastgroup</code> <code>-g</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multicast Address</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The multicast group for communications in the Hazelcast instance.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>224.2.2.3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--multicastport</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port Number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The multicast port for communications in the instance.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--clustername</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Group Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the Hazelcast&#8217;s group name, to be optionally used to help divide clusters into logical, segregated groups (i.e. <em>dev-group</em>, <em>prod_grop</em>).</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--jndiname</code> <code>-j</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JNDI Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the JNDI name to bind the Hazelcast instance to.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--licensekey</code> <code>-lk</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hazelcast License</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables <a href="https://hazelcast.com/products/enterprise/">Hazelcast Enterprise</a> features.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--lite</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets the cluster to lite mode, where it will cluster but <strong>not</strong> store any data.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--hostawarepartitioning</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to enable <a href="http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#grouping-types">host-aware partitioning</a> for the cluster. Host aware partitioning <strong>must be</strong> enabled on all members of the cluster (including Payara Micro instances) for this feature to work correctly.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--webpersistence</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies whether Hazelcast will be used for web persistence.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--ejbpersistence</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies whether Hazelcast will be used for web persistence.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>--help</code> <code>-?</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Displays the help menu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="example-1"><a class="anchor" href="#example-1"></a>Example</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; create-hazelcast-instance --webpersistence=false --lite instance2</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

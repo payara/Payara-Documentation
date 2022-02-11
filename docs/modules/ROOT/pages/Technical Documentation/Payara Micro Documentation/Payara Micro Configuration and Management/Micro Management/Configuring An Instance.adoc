@@ -1,0 +1,374 @@
+[[configuring-an-instance]]
+= Configuring an Instance
+
+This section details how to configure a Payara Micro instance.
+
+[[configuring-an-instance-from-the-command-line]]
+== Configuring an Instance from the Command Line
+
+As described in
+xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Deploying Applications/deploy-cmd-line.adoc[Deploying From the Command Line],
+the starting and configuration of an instance can be done in its entirety on
+one line.
+
+The options available can be seen by running the JAR with the `--help` option,
+or by consulting the
+xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Command Line Options/Command Line Options.adoc[Payara Micro Command Line Options]
+section.
+
+The general structure of starting, configuring, and deploying an application to
+an instance is as follows:
+
+[source, java]
+----
+java -jar payara-micro.jar _--option1_ _--option2_ ...
+----
+
+As an example, see below for starting an instance with a non-default HTTP port:
+
+[source, java]
+----
+java -jar payara-micro.jar --port 2468
+----
+
+[[warmup]]
+=== Separating Configuration from Production Run
+
+An instance can be configured separately, but only when xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Jar Structure & Configuration/rootdir.adoc[persistent root configuration directory] is specified by means of command line argument `--rootDir`.
+
+When switch `--warmup` is supplied all configuration and deployment command line parameters are applied to configuration directory and the instance immediately shuts down:
+
+[source,java]
+----
+java -jar payara-micro.jar --option1 --option2 deployment.war --warmup
+----
+
+Another use case for --warmup is to collect profiling information for e. g. Class Data Sharing feature of JDK:
+
+[source,shell]
+----
+# Open JDK 11; launcher needs to be used because of simpler classpath
+java -XX:DumpLoadedClassList=classes.lst -jar rootidr/launch-micro.jar  --warmup
+
+# OpenJ9
+java -Xshareclasses:name=payara-micro -jar payara-micro.jar --warmup
+----
+
+[[read-configuration-from-a-file]]
+=== Read configuration from a file
+
+With `--domainConfig` option, it is possible to define multiple options in a
+configuration file. This option would override the default Payara Micro configuration
+completely. The provided file must conform to the same structure as the `domain.xml`
+file in a Payara Server domain.
+
+The `--rootDir` option sets the root configuration directory and saves the
+configuration across restarts. If empty, this directory will be filled by the
+default configuration, including the `domain.xml` file.
+
+[[precedence]]
+=== Precedence
+
+If specifying multiple options at once, the following precedence is followed:
+
+----
+rootDir < domainConfig < autoBindHttp | autoBindSsl < port | sslPort
+----
+
+In human language:
+
+* The _domain.xml_ in the directory specified by the _rootDir_ option (if one exists)
+is overridden by the _domain.xml_ specified with the `domainConfig` option
+* The HTTP and HTTPS port numbers specified in either of these _domain.xml_ files
+are overridden to be the default values of *8080* and *8081* when the `autoBindHttp`
+or `autoBindSsl` options are enabled respectively.
+* These default port values are then overridden in turn by the port numbers
+specified with the `port` or `sslPort` options.
+
+[[configuring-an-instance-programmatically]]
+== Configuring an Instance Programmatically
+
+There are various methods available for configuring a Payara Micro instance
+programmatically. You can only configure an instance before it is bootstrapped
+however.
+
+The configuration methods available to you should be detected by your IDE, allowing
+you to view them using the auto-complete feature common to most popular IDEs.
+Alternatively, you can consult the
+xref:/Technical Documentation/Payara Micro Documentation/API/Payara Micro API/micro-api.adoc[Payara Micro Configuration Methods]
+section.
+
+As noted in the
+xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Deploying Applications/deploy-program-bootstrap.adoc[Deploying an Application Programmatically]
+section, you can either call the desired configuration commands on one line during
+instance initialization, or on separate lines after creating a `PayaraMicro` variable.
+
+As an example of configuring an instance to use a different HTTP and Cluster
+start port on one line, see here:
+
+[source, java]
+----
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicro;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+        PayaraMicro.getInstance().setHttpPort(2468).setClusterStartPort(5902).bootStrap();
+    }
+}
+----
+
+For the example of the same, but done across multiple lines, see here:
+
+[source, java]
+----
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicro;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+        PayaraMicro micro = PayaraMicro.getInstance();
+        micro.setHttpPort(2468);
+        micro.setClusterStartPort(5902);
+        micro.bootStrap();
+    }
+}
+----
+
+It is also possible to configure an instance programmatically by specifying a
+`domain.xml` file that is packaged within your application by passing a resource
+string to the `setApplicationDomainXML` method. The path in the string will be
+resolved using the `getResource` method of the thread context class loader:
+
+[source, java]
+----
+import fish.payara.micro.BootstrapException;
+import fish.payara.micro.PayaraMicro;
+
+public class EmbeddedPayara{
+    public static void main(String[] args) throws BootstrapException{
+        PayaraMicro.getInstance().setApplicationDomainXML("config/domain.xml").bootStrap();
+    }
+}
+----
+
+[[packaging-a-configured-instance-as-an-uber-jar]]
+== Packaging a Configured Instance as an Uber Jar
+
+Sometimes it is preferable to package the application (or applications),
+configuration and dependencies into a single executable jar. To do this with
+Payara Micro use the `--outputUberJar` command line option as in this example:
+
+[source, shell]
+----
+java -jar payara-micro.jar --deploy test.war --outputUberJar test.jar
+----
+
+This will package up the `payara-micro.jar` and the WAR application into a
+single JAR. The resulting file can be execute like this:
+
+[source, shell]
+----
+java -jar test.jar
+----
+
+Any additional command line options you specify when creating an Uber JAR are
+recorded, so the Payara Micro instance is configured later when executing the
+packaged JAR:
+
+[source, shell]
+----
+java -jar payara-micro.jar --deploy test.war --port 9080 --lite --clusterName test-cluster --clusterPassword test-password --outputUberJar test2.jar
+----
+
+IMPORTANT: All specified command line option will be retained when the Uber JAR
+is executed.
+
+[[uber-jar-context-root]]
+=== Uber JAR Context Root
+
+When creating an Uber JAR, the context root of the packaged application will
+*always* be the name of the application WAR that is deployed. For example,
+ the `test.war` that was packaged into the `test2.jar` on port *9080* would be
+ accessible on the following path:
+
+--------------------------
+http://localhost:9080/test
+--------------------------
+
+Currently, this is *always* the case; including when a context root is specified
+in a `glassfish-web.xml` deployment descriptor.
+
+If the WAR file is renamed to `ROOT.war` and packaged as an Uber JAR, it will
+be deployed to the root context:
+
+[source, shell]
+----
+java -jar payara-micro.jar --deploy ROOT.war --port 9080 --outputUberJar test3.jar
+java -jar test3.jar
+----
+
+The application will now be accessible on:
+
+----------------------
+http://localhost:9080/
+----------------------
+
+[[package-additional-files]]
+=== Package Additional Files
+
+It's also possible to package additional files into an Uber JAR, by using a custom
+root directory. You can run a Payara Micro instance first by generating the domain
+directory first using the `--rootDir` option first:
+
+[source, shell]
+----
+java -jar payara-micro.jar --rootDir /tmp/micro-dir/
+----
+
+You can then add files to the root directory like this:
+
+[source, shell]
+----
+> cd /tmp/micro-dir/
+> ls -lsarth
+
+total 784K
+   0 drwxr-xr-x 1 root 197609    0 Mar 24 18:16 docroot
+160K -rw-r--r-- 1 root 197609 158K Mar 24 18:16 __ds_jdbc_ra.rar
+   0 drwxr-xr-x 1 root 197609    0 Mar 24 18:16 META-INF
+160K -rw-r--r-- 1 root 197609 159K Mar 24 18:16 __cp_jdbc_ra.rar
+160K -rw-r--r-- 1 root 197609 159K Mar 24 18:16 __xa_jdbc_ra.rar
+160K -rw-r--r-- 1 root 197609 160K Mar 24 18:16 __dm_jdbc_ra.rar
+   0 drwxr-xr-x 1 root 197609    0 Mar 24 18:17 autodeploy
+   0 drwxr-xr-x 1 root 197609    0 Mar 24 18:20 lib
+4.0K drwxr-xr-x 1 root 197609    0 Mar 30 19:22 config
+128K drwxr-xr-x 1 root 197609    0 Mar 30 19:23 runtime
+
+> cp ~/test-properties /tmp/micro-dir/config/.
+----
+
+And then, generate the Uber JAR using the modified root directory:
+
+----
+java -jar payara-micro.jar --rootDir /tmp/micro-dir/ --outputUberJar custom-micro.jar
+----
+
+You can verify that the files are located in the MICRO-INF/ directory:
+
+[source, shell]
+----
+> unzip -d custom-micro custom-micro.jar
+> ls -lsarth custom-micro/** | grep
+
+MICRO-INF/domain:
+total 304K
+1.0K -rw-r--r-- 1 fabio 197609   24 Apr  3 20:26 test.properties
+----
+
+IMPORTANT: Additional JAR files that are placed in the `$\{PAYARA_INSTALL_DIR}/lib`
+directory will be ignored when being packaged to the Uber JAR. To package additional
+JAR files into an Uber JAR, check the
+xref:Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Jar Structure & Configuration/adding-jars.adoc[Adding Third Party JARs section]
+
+[[configuring-payara-micro-via-system-properties]]
+== Configuring Payara Micro via System Properties and Environment Variables
+
+Payara Micro can also be configured via system properties. These can either be
+set on the command line or passed into Payara Micro using the `--systemProperties`
+command line option which will load the properties from the specified file.
+
+NOTE: Payara Micro can also be configured using Environment variables. The environment
+variables supported are the same as the system properties below just replace the `.` with `_`
+ for example `payaramicro.port` should be `payaramicro_port` when used as a system property.
+
+Payara Micro supports the following system properties:
+
+[cols=",",options="header",]
+|==================================================
+|System Property|Equivalent Command Line Flag
+|*payaramicro.domainConfig*|`--domainConfig`
+|*payaramicro.hzConfigFile*|`--hzConfigFile`
+|*payaramicro.publicaddress*|`--hzPublicAddress`
+|*payaramicro.autoBindHttp*|`--autoBindHttp`
+|*payaramicro.autoBindRange*|`--autoBindrange`
+|*payaramicro.autoBindSsl*|`--autoBindSsl`
+|*payaramicro.logo*|`--logo`
+|*payaramicro.logToFile*|`--logToFile`
+|*payaramicro.enableAccessLog*|`--accessLog`
+|*payaramicro.logPropertiesFile*|`--logProperties`
+|*payaramicro.enableDynamicLogging*|`--enableDynamicLogging`
+|*payaramicro.enableHealthCheck*|`--enableHealthCheck`
+|*payaramicro.port*|`--port`
+|*payaramicro.sslPort*|`--sslport`
+|*payaramicro.sslCert*|`--sslcert`
+|*payaramicro.mcAddress*|`--mcAddress`
+|*payaramicro.mcPort*|`--mcPort`
+|*payaramicro.hostAware*|`--hostaware`
+|*payaramicro.startPort*|`--startport`
+|*payaramicro.clusterName*|`--clusterName`
+|*payaramicro.clusterPassword*|`--clusterPassword`
+|*payaramicro.lite*|`--lite`
+|*payaramicro.maxHttpThreads*|`--maxHttpThreads`
+|*payaramicro.minHttpThreads*|`--minHttpThreads`
+|*payaramicro.noCluster*|`--noCluster`
+|*payaramicro.disablePhoneHome*|`--disablePhoneHome`
+|*payaramicro.enableRequestTracing*|`--enableRequestTracing`
+|*payaramicro.requestTracingThresholdUnit*|`--requesttracingthresholdunit`
+|*payaramicro.requestTracingThresholdValue*|`--requesttracingthresholdvalue`
+|*payaramicro.rootDir*|`--rootDir`
+|*payaramicro.name*|`--name`
+|*payaramicro.instanceGroup*|`--instancegroup`
+|*payaramicro.initialJoinWait*|`--hzinitialjoinwait`
+|==================================================
+
+[[configuring-alternate-keystores-for-ssl]]
+== Configuring Alternate KeyStores for SSL
+
+Payara Micro comes with Keystore files directly embedded within the JAR file.
+
+These can be overridden using the following standard Java SSL system properties:
+
+* `javax.net.ssl.trustStore`
+* `javax.net.ssl.keyStore`
+* `javax.net.ssl.trustStorePassword` 
+* `javax.net.ssl.keyStorePassword`
+
+IMPORTANT: When packaging applications into an Uber Jar any keystores specified via system properties will be copied into 
+the uberjar to replace the default internal keystores. However the uber jar will not contain the passwords 
+and these must still be specified via the system properties.
+
+IMPORTANT: _asadmin_ commands like `add-pkcs8` and `add-to-keystore` are NOT supported in pre-boot and post-boot commands with Payara Micro and Java SSL system properties need to be used to point to the correct stores.
+
+[[setting-key-pair-at-runtime]]
+=== Setting the Key-Pair at Runtime
+
+The key-pair to use as Payara Micro's SSL certificate can also be specified using the `--sslCert` command line option like
+this:
+
+[source, shell]
+----
+java -jar payara-micro.jar -sslCert my-custom-alias
+----
+
+NOTE: The default key-pair name is `s1as` if not overriden via the command line switch.
+
+[[micro-instance-names]]
+== Payara Micro Instance Names
+
+Payara Micro instances are automatically assigned a name on boot. These names
+are generated from a dictionary of adjectives and fish names as `adjective-fish`.
+For example: `Magnanimous-Payara`, `Disgruntled-Goldfish`, and `Bamboozled-Tetra`.
+
+[[setting-a-custom-instance-name]]
+=== Setting a Custom Instance Name
+
+Instance names can be overridden with the `--name` command-line argument on start-up.
+Manually entered instances names are non-unique.
+
+As an example, see below:
+
+[source, shell]
+----
+java -jar payara-micro.jar --name MicroInstance1
+----

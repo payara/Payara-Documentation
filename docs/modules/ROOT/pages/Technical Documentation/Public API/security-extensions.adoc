@@ -1,0 +1,324 @@
+[[jakarta-ee-security-extensions]]
+= Jakarta EE Security Extensions
+
+This section documents available extensions for custom authentication mechanisms and identity store configurations that can be used in any Jakarta EE application.
+
+[[custom-authentication-mechanisms]]
+== Custom Authentication Mechanisms
+
+The Payara Platform Public API offers the following custom authentication mechanisms for use cases that aren't covered in the Jakarta EE Security API.
+
+[[certificate-authentication-mechanism]]
+=== Client Certificate Authentication Mechanism
+
+The Jakarta EE Security API doesn't include any specific authentication mechanisms for support client certificate validation, so the `@CertificateAuthenticationMechanismDefinition` can be used to instruct any application to initiate client certificate validation when any HTTP request is to be authenticated.
+
+TIP: This authentication mechanism will mostly be used in conjunction with the `@CertificateIdentityStoreDefinition` (see below for more information), since certificates are probably stored in a client certificate security realm.
+
+[[configuration]]
+==== Configuration
+
+No specific configuration is needed for this annotation.
+
+[[usage-example]]
+==== Example
+
+The following code sample illustrates how to configure a client certificate authentication mechanism:
+
+[source, java]
+----
+@ApplicationScoped
+@ApplicationPath("/rest")
+@DeclareRoles({ "a", "b" })
+@CertificateAuthenticationMechanismDefinition
+@CertificateIdentityStoreDefinition("certificate-realm")
+public class MyRestApp extends Application {
+}
+----
+
+[[two-identity-stores-authentication-mechanism]]
+=== Two Identity Stores Authentication Mechanism
+
+By default, when multiple identity stores are available to the Servlet container, user credentials will get validated against all of them and the authentication of a user will be considered successful if **at least one** identity store returns a `VALID` result. In some cases this might not be the desired solution, so the the `@TwoIdentityStoreAuthenticationMechanismDefinition` allows users to configure an special authentication mechanism that validates user credentials against 2 identity stores and is successful if **both of them** return a `VALID` result.
+
+WARNING: This authentication mechanism is based on the form-based authentication mechanism and requires a call to the `SecurityContext.authenticate()` method for each identity store validation. In case of further calls to this method an `IllegalStateException` will be thrown.
+
+[[configuration]]
+==== Configuration
+
+The `@TwoIdentityStoreAuthenticationMechanismDefinition` annotation can be configured with the following settings.
+
+|===
+| Option | Required | Description
+| `loginToContinue`| true| A `@LoginToContinue` annotation defines the login page
+|===
+
+[[usage-example]]
+==== Example
+
+The following code sample authenticates a user by using both single username/password credentials and a Yubikey code. Observe the 2 calls made to the `SecurityContext.authenticate()` method: 
+
+[source, java]
+----
+TwoIdentityStoreAuthenticationMechanismDefinition(loginToContinue
+        = @LoginToContinue(loginPage = "/login", errorPage = "failure")
+)
+@WebServlet("/Login")
+public class LoginServlet extends HttpServlet {
+    
+    @Inject 
+    private SecurityContext securityContext;
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        PrintWriter out = resp.getWriter();
+        printHeaders(out);
+        out.println("<form action=\"Login\" method=\"post\">");
+        out.println("Username: ");
+        out.println("<input type=\"text\" name=\"username\"></br>");
+        out.println("Password: ");
+        out.println("<input type=\"password\" name=\"password\"></br>");
+        out.println("Yubikey Code: ");
+        out.println("<input type=\"password\" name=\"yubikey\"></br>");
+        out.println("<input type=\"submit\" value=\"submit\"></input>");
+        out.println("</form");
+        out.println("</body></html>");
+        out.flush();
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        
+        Credential firstCredential = new UsernamePasswordCredential(req.getParameter("username"), req.getParameter("password"));
+        Credential secondCredential = new YubikeyCredential(req.getParameter("yubikey"));
+        // First call to securityContext.authenticate()
+        securityContext.authenticate(req, resp, new AuthenticationParameters().credential(firstCredential));
+        // Second call to securityContext.authenticate()
+        AuthenticationStatus status = securityContext.authenticate(req, resp, new AuthenticationParameters().credential(secondCredential));
+        PrintWriter out = resp.getWriter();
+        printHeaders(out);
+        if (status.equals(AuthenticationStatus.SUCCESS)){
+            out.println("Successfully logged in");
+        }
+        else {
+            PrintWriter out = resp.getWriter();
+            printHeaders(out);
+            out.println("Failed to log in");    
+        }
+        out.flush();
+    }
+    
+    private void printHeaders(PrintWriter out){
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<title>Two Identity Stores Authentication</title>");
+        out.println("</head>");
+        out.println("<body>");
+    }   
+}
+----
+
+[[custom-identity-stores]]
+== Custom Identity Stores
+
+By default, the Jakarta EE Security API only instructs containers to implement identity stores for the following types: 
+
+* LDAP directories through the `@LdapIdentityStoreDefinition` annotation.
+* Relational databases through the `@DatabaseIdentityStoreDefinition` annotation.
+
+The following annotations serve to provide additional identity store configurations, by allowing the mapping an existing Payara Platform security realm
+
+[[realm-identity-stores]]
+=== Basic Realm Identity Store
+
+The `@RealmIdentityStoreDefinition` annotation allows users to plug-in any existing security realm as a valid identity store definition.
+
+NOTE: No additional configuration settings or properties are available, so in case of needing further control over the store definition, see the more specific annotations defined below.
+
+[[configuration]]
+==== Configuration
+
+The `@RealmIdentityStoreDefinition` annotation is configured with the options as shown below.
+
+|===
+| Option | Description | Default | Required
+| `value`| The name of an existing security realm.| <Default Realm>| `true`
+|===
+
+[[usage-example]]
+==== Example
+
+The following code sample illustrates how to configure the default `file` security realm as an identity store:
+
+[source, java]
+----
+@ApplicationScoped
+@ApplicationPath("/rest")
+@DeclareRoles({ "a", "b"})
+@BasicAuthenticationMechanismDefinition(realmName = "file")
+@RealmIdentityStoreDefinition("file")
+public class MyRestApp extends Application {
+}
+----
+
+TIP: The `RealmIdentityStoreDefinition` is a **repeatable** annotation, hence multiple security realms can be used in sequence to define more than one identity store
+
+[source, java]
+----
+@ApplicationScoped
+@ApplicationPath("/rest")
+@DeclareRoles({ "a", "b"})
+@BasicAuthenticationMechanismDefinition
+@RealmIdentityStoreDefinition("realm1")
+@RealmIdentityStoreDefinition("realm2")
+public class MyRestApp extends Application {
+}
+----
+
+[[file-identity-store]]
+=== File Identity Store
+
+The `@FileIdentityStoreDefinition` annotation allows users to plug-in an existing file security realm (`com.sun.enterprise.security.auth.realm.file.FileRealm`) as a valid identity store definition.
+
+IMPORTANT: If no realm is found with the defined name then a new realm will registered on the server's configuration using the `create-auth-realm` asadmin command.
+
+[[configuration]]
+==== Configuration
+
+The file realm identity store can be configured via both `@FileIdentityStoreDefinition` annotation attributes and MicroProfile Configuration properties. Here's a list of all available and equivalent settings:
+
+|===
+| Option | MP Config Property | Description | Default | Required
+| `value` | | The name of the realm. | `file` | `true`
+| `file`| `payara.security.file`| The location of the file to store user credentials locally. If no file name is defined then the realm name is used as the file name. | <Realm Name> |`false`
+| `assignGroups`| `payara.security.file.assignGroups`| Users will get assigned membership to these groups automatically on successful authentication | | `false`
+| `jaasContext` | `payara.security.file.jaasContext` | The JAAS Context of the file realm. | `fileRealm` | `false`
+|===
+
+CAUTION: If both an annotation attribute and a MicroProfile Configuration property are defined for the same option then the configuration property always takes precedence.
+
+[[usage-example]]
+==== Example
+
+The following code sample illustrates how to configure a file realm identity store:
+
+[source, java]
+----
+@ApplicationScoped
+@ApplicationPath("/rest")
+@DeclareRoles({ "a", "b"})
+@BasicAuthenticationMechanismDefinition(realmName = "file-realm")
+@FileIdentityStoreDefinition("file-realm")
+public class MyRestApp extends Application {
+}
+----
+
+[[certificate-identity-store]]
+=== Client Certificate Identity Store
+
+The `@CertificateIdentityStoreDefinition` annotation allows users to plug-in an existing client `certificate` security realm (`com.sun.enterprise.security.auth.realm.certificate.CertificateRealm`) as a valid identity store definition.
+
+IMPORTANT: If no realm is found with the defined name then a new realm will registered on the server's configuration using the `create-auth-realm` asadmin command.
+
+[[configuration]]
+==== Configuration
+
+The certificate realm identity store can be configured via both `@CertificateIdentityStoreDefinition` annotation attributes and MicroProfile Configuration properties. Here's a list of all available and equivalent settings:
+
+|===
+| Option | MP Config property | Description | Default | Required
+| `value`| | The name of the certificate realm. | `certificate` | `true`
+| `assignGroups` | `payara.security.certificate.assignGroups` | Users will get assigned membership to these groups automatically on successful authentication.| |`false` 
+|===
+
+CAUTION: If both an annotation attribute and a MicroProfile Configuration property are defined for the same option then the configuration property always takes precedence.
+
+[[usage-example]]
+==== Example
+
+The following code sample illustrates how to configure a certificate realm identity store:
+
+[source, java]
+----
+@ApplicationScoped
+@ApplicationPath("/rest")
+@DeclareRoles({ "a", "b" })
+@CertificateAuthenticationMechanismDefinition
+@CertificateIdentityStoreDefinition("certificate-realm")
+public class MyRestApp extends Application {
+}
+----
+
+[[pam-identity-store]]
+=== PAM Identity Store
+
+The `@PamIdentityStoreDefinition` annotation allows users to plug-in an existing PAM (Privileged Access Management) security realm (`com.sun.enterprise.security.auth.realm.pam.PamRealm`) as a valid identity store definition.
+
+IMPORTANT: If no realm is found with the defined name then a new realm will registered on the server's configuration using the `create-auth-realm` asadmin command.
+
+[[configuration]]
+==== Configuration
+
+The pam realm identity store can be configured via both `@PamIdentityStoreDefinition` annotation attributes and MicroProfile Configuration properties. Here's a list of all available and equivalent settings:
+
+|===
+| Option | MP Config property | Description | Default | Required
+| `value`| | The name of PAM realm.| | `true`
+| `assignGroups`| `payara.security.pam.assignGroups`| Users will get assigned membership to these groups automatically on successful authentication.| | `false`
+| `jaasContext`| `payara.security.pam.jaasContext` | The JAAS Context of the PAM realm. | `pamRealm`| `false`
+|===
+
+[[usage-example]]
+==== Example
+
+The following code sample illustrates how to configure a PAM realm identity store:
+
+[source, java]
+----
+@ApplicationScoped
+@ApplicationPath("/rest")
+@DeclareRoles({ "a", "b"})
+@BasicAuthenticationMechanismDefinition(realmName = "pam-realm")
+@PamIdentityStoreDefinition("pam-realm")
+public class MyRestApp extends Application {
+}
+----
+
+CAUTION: If both an annotation attribute and a MicroProfile Configuration property are defined for the same option then the configuration property always takes precedence.
+
+[[solaris-identity-store]]
+=== Solaris Identity Store
+
+The `@SolarisIdentityStoreDefinition` annotation allows users to plug-in an existing Solaris security realm (`com.sun.enterprise.security.auth.realm.solaris.SolarisRealm`) as a valid identity store definition.
+
+IMPORTANT: If no realm is found with the defined name then a new realm will registered on the server's configuration using the `create-auth-realm` asadmin command.
+
+[[usage-example]]
+==== Example
+
+The following code sample illustrates how to configure a Solaris realm identity store:
+
+[source, java]
+----
+@ApplicationScoped
+@ApplicationPath("/rest")
+@DeclareRoles({ "a", "b"})
+@BasicAuthenticationMechanismDefinition(realmName = "solaris-realm")
+@SolarisIdentityStoreDefinition("solaris-realm")
+public class MyRestApp extends Application {
+}
+----
+
+[[configuration]]
+==== Configuration
+
+The Solaris realm identity store can be configured via both `@SolarisIdentityStoreDefinition` annotation attributes and MicroProfile Configuration properties. Here's a list of all available and equivalent settings:
+
+|===
+| Option | MP Config property | Description | Default | Required
+| `value`|| The name of the Solaris realm.|| `true`
+| `assignGroups`| `payara.security.solaris.assignGroups`| Users will get assigned membership to these groups automatically on successful authentication.|| `false`
+| `jaasContext`| `payara.security.solaris.jaasContext`| The JAAS Context of the Solaris realm.| `solarisRealm`|`false`
+|===
+
+CAUTION: If both an annotation attribute and a MicroProfile Configuration property are defined for the same option then the configuration property always takes precedence.

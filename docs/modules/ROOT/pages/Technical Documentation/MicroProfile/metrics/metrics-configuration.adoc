@@ -1,0 +1,140 @@
+[[metrics-configuration]]
+= Metrics Configuration
+
+Metrics can be configured by using Admin Console or Asadmin commands. 
+
+_Since Payara Platform 5.183_
+
+[[using-the-admin-console]]
+== Using the Admin Console
+
+To configure the Metrics in the Admin Console, go to Configuration 
+→ [instance-configuration (like server-config)] → MicroProfile → Metrics:
+
+image:microprofile/metrics.png[Set Metrics Configuration]
+
+[[using-asadmin-commands]]
+== Using Asadmin Commands
+
+=== `set-metrics-configuration`
+
+*Usage*::
+----
+asadmin> set-metrics-configuration
+        [--enabled=true|false]
+        [--securityenabled=true|false]
+        [--roles=<role-list>] 
+        [--dynamic=true|false]
+        [--endpoint=<context-root[default:metrics]>]
+        [--target=<instance-name[default:server]>]
+        [--virtualservers=<virtualserver-list>]
+----
+*Aim*::
+Provides a way to set the configuration of the metrics service of the targeted config.
+
+==== Command Options
+
+[cols=",,,,", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Enables or disables the metrics service.
+|true
+|No
+
+|`securityenabled`
+|Boolean
+|Whether or not secure access to the metrics endpoint is enabled.
+
+_Since Payara Server 5.193_
+|false
+|No
+
+|`roles`
+|String
+|If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.
+
+_Since Payara Server 5.193_
+|`microprofile`
+|No
+
+|`endpoint`
+|String
+|The context root used to expose the metrics endpoint.
+|`metrics`
+|No
+
+|`dynamic`
+|Boolean
+|If set to `true`, applies the changes instantly without a restart. Otherwise a restart is required.
+|true
+|No
+
+|`target`
+|String
+|The target server/instance configuration.
+|`server-config`
+|No
+
+|`virtualservers`
+|String
+|If defined, the endpoint will be assigned to a list of *virtual servers* specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available. 
+
+_Since Payara Server 4.1.2.184 and 5.184_
+|-
+|No
+|===
+
+==== Example
+
+[source,Shell]
+----
+asadmin> set-metrics-configuration --enabled=true --securityenabled=true --dynamic=true --target instance1
+----
+
+=== `get-metrics-configuration`
+
+*Usage*::
+----
+asadmin> get-metrics-configuration [--target <instance-name>]
+----
+*Aim*::
+Returns the current configuration options for the metrics service on the targeted configuration.
+
+==== Command Options
+
+[cols=",,,,", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`target`
+|String
+|The target server/instance configuration.
+|`server-config`
+|No
+|===
+
+==== Example
+
+[source,Shell]
+----
+asadmin> get-metrics-configuration --target cluster1
+----
+
+[[security-configuration]]
+== Security Configuration
+By default, Metrics endpoints binds to root context application which is 
+`__default-web-module` (docroot) system application and `__default-web-module` 
+application uses default realm (`file`) of server. If user application deployed 
+with the empty context-root then the security configuration of the deployed 
+application will be shared by Metrics endpoints.
