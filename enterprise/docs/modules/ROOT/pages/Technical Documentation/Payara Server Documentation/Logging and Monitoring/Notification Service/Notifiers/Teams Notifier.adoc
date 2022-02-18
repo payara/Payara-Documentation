@@ -1,0 +1,53 @@
+[[teams-notifier]]
+= Teams Notifier
+
+A notifier extension for publishing to Microsoft Teams.
+
+[[downloads]]
+== Downloads
+
+- link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/teams-notifier-core/1.0/teams-notifier-core-1.0.jar[Teams Notifier Core 1.0]
+- link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/teams-notifier-console-plugin/1.0/teams-notifier-console-plugin-1.0.jar[Teams Notifier Console Plugin 1.0]
+
+[[payara-server-configuration]]
+== Payara Server Configuration
+
+[[using-the-administration-web-console]]
+=== Using the Administration Web Console
+
+To configure the Notification Service in the Administration Console, go
+to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_
+and click on the *Teams* tab:
+
+image:notification-service/teams/admin-console-configuration.png[Notification Service in Admin Console]
+
+[[from-the-command-line]]
+=== From the Command Line
+
+To configure the Notification Service from the command line, use the
+`set-teams-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin> set-teams-notifier-configuration --enabled=true --dynamic=true https://outlook.office.com/webhook/xyz
+----
+
+You can use the `--enabled` and `--dynamic` options to enable or disable
+the Teams notifier on demand.
+
+You can retrieve the current configuration for the Teams notifier
+using the `get-teams-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin > get-teams-notifier-configuration
+----
+
+This will return the details of the current Teams configuration; see
+below for an example:
+
+[source, shell]
+----
+Enabled  Noisy  Webhook URL
+true     false  https://outlook.office.com/webhook/xyz
+----

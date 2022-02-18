@@ -7,18 +7,21 @@
 # Files will have the same name, including punctuation as the file name.
 
 # To use this script, place it in the same folder as the 'pages' directory
-# For example: payara-community-documentation/docs/modules/ROOT/
+# For example: payara-community-Technical Documentation/docs/modules/ROOT/
 
 #--- CONSTANTS ---
 
 # You do not need to change this unless the script is in a different directory
 readonly WORKING_DIR="$(pwd)/pages"
 
+
 # The output name of the nav file, this should be the same as configured in antora.yml
-readonly NEW_NAV_FILE_NAME="nav.adoc"
+readonly NEW_NAV_FILE_NAME="base-nav.adoc"
 
 # The output location of the nav file, by default it will be in the same directory as the script.
-readonly OUTPUT_NAV_LOCATION="$(pwd)/$NEW_NAV_FILE_NAME"
+readonly OUTPUT_NAV_LOCATION="$(pwd)/partials/$NEW_NAV_FILE_NAME"
+
+readarray -t EXCLUDED_DIRECTORIES < $(pwd)/excluded.directories
 
 #--- SETUP ---
 
@@ -129,6 +132,7 @@ get_ordinal() {
 #Loops through directories in the WORKING_DIR and constructs a nav from them.
 for dir in */ ; do
     dir=${dir%?}
+    [[ "${EXCLUDED_DIRECTORIES[*]}" =~ "${dir}" ]] && continue;
     cd "${dir}"
     echo >> $OUTPUT_NAV_LOCATION
     echo ".$dir" >> $OUTPUT_NAV_LOCATION

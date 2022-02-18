@@ -1,0 +1,96 @@
+[[overview]]
+= Payara Server Deployment Descriptor Files
+By default, the Payara Platform allows the use of standard GlassFish Server deployment descriptor files to configure application behaviour.
+
+[[payara-web-info]]
+== Payara Platform Deployment Descriptors
+
+The `payara-web.xml` deployment descriptor can be used instead of `glassfish-web.xml`. The top level element for the `payara-web.xml` file must be `_payara-web-app_` and the schema is referenced by the following declaration:
+
+[source,xml,subs=attributes+]
+----
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}">
+----
+
+The `payara-resources.xml` can be used instead of `glassfish-resources.xml`. Its structure is exactly the same, and the schema is referenced by the following declaration:
+
+[source,xml,subs=attributes+]
+----
+<!DOCTYPE resources PUBLIC "-//Payara.fish//DTD Payara Server 4 Resource Definitions//EN" "{payaraResourcesDtd}">
+----
+
+See the xref:/Appendix/Schemas/Overview.adoc[schema reference] for the list of deployment descriptor DTD files.
+
+== Allowed configuration elements
+
+The following elements are supported in Payara Server on top of elements supported by GlassFish:
+
+[[glassfish-application.xml]]
+== _glassfish-application.xml_
+
+* `classloading-delegate`
+* `enable-implicit-cdi`
+* `default-role-mapping` (_property_)
+* `whitelist-package`
+* `scanning-exclude`
+* `scanning-include`
+
+[[glassfish-web.xml]]
+== _glassfish-web.xml_ and _payara-web.xml_
+
+* `container-initialized-enabled`
+* `default-role-mapping` (_property_)
+* `jaxrs-roles-allowed-enabled`
+* `scanning-exclude`
+* `scanning-include`
+* `jsp-config`
+* `whitelist-package`
+
+[[glassfish-ejb-jar.xml]]
+== _glassfish-ejb-jar.xml_
+
+* `webservice-default-login-config`
+* `default-role-mapping` (_property_)
+* `enterprise-beans`
+** `ejb`
+*** `ejb-name`
+*** `clustered-bean`
+*** `clustered-key-name`
+*** `clustered-lock-type`
+*** `clustered-attach-postconstruct`
+*** `clustered-detach-predestroy`
+
+[[payara-resources.xml]]
+== _payara-resources.xml_
+
+* `snapshot` (_property of transaction isolation, this isolation level is only supported by Microsoft SQL Server_)
+* `log-jdbc-calls` (_attribute of jdbc-connection-pool_)
+
+[[deployment-descriptor-precedence-order]]
+== Deployment Descriptor Precedence Order
+
+When multiple vendor deployment descriptors are present in the same module (including deployment descriptors of the old *Sun Application Server*), the descriptors are processed with the following precedence order in default mode:
+
+----
+WebLogic Server > Payara Platform > GlassFish Server > Sun Application Server
+----
+
+The default precedence order can be customized and configured via the system properties documented in the following sections.
+
+[[gfdd-over-wlsdd]]
+=== `gfdd.over.wlsdd`
+
+This system property controls the precedence between GlassFish Server and WebLogic Server deployment descriptors when they are both present. When the `gfdd.over.wlsdd` property is set to true, the descriptors are processed in this order:
+
+----
+Payara Platform > GlassFish Server > WebLogic Server > Sun Application Server
+----
+
+[[ignore-wlsdd]]
+=== `ignore.wlsdd`
+
+When the `ignore.wlsdd` property is set to true, the WebLogic Server deployment descriptors will be completely ignored and other descriptors will be processed in the following order:
+
+----
+GlassFish Server > Payara Platform > Sun Application Server
+----

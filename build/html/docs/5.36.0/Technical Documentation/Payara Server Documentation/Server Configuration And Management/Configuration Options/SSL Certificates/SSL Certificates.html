@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Configure SSL Certificates :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../../index.html">docs</a></li>
+    <li><a href="SSL%20Certificates.html">Configure SSL Certificates</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/Payara-Documentation/docs/modules/ROOT/pages/Technical%20Documentation/Payara%20Server%20Documentation/Server%20Configuration%20And%20Management/Configuration%20Options/SSL%20Certificates/SSL%20Certificates.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Configure SSL Certificates</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Payara Server Community uses a dedicated key and certificate store when using SSL/TLS connections. The files are located in the configuration directory of the domain <code>&lt;payara-home&gt;/glassfish/domains/&lt;domain-name&gt;/config</code> and referenced through JVM options so that they are used for the entire JVM.</p>
+</div>
+<div class="paragraph">
+<p><em>cacerts.jks</em>: Java Keystore formatted file used as Trust Store file holding the X.509 certificates.
+<em>keystore.jks</em>: Java Keystore formatted file containing the Cryptographic keys, like the private keys associated with the certificates.</p>
+</div>
+<div class="paragraph">
+<p>These keystores are protected with the Master Password of your domain.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Payara Platform Enterprise provides the link:{enterpriseDocsPageRootUrl}/Technical Documentation/Payara Server Documentation/Server Configuration And Management/certificate-management.html[Integrated Certificate Management]  feature. This allows creating, installing and managing SSL/TLS certificates without external tools like keytool or OpenSSL, just using <strong>asadmin</strong> commands or <strong>Admin Console</strong>. This simplifies the processes documented below and makes it much less risky to perform tasks like renewing certificates, deleting expired certificates, etc.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="add-certificate"><a class="anchor" href="#add-certificate"></a>Adding SSL Certificate</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To add your SSL Certificate to the Payara Server configuration files, you need:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The private key associated with your certificate.</p>
+</li>
+<li>
+<p>The Certificate you received from the Certificate Authority based on your Certificate Signing Request (CSR).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You can find the detailed steps of adding a self-signed certificate into Payara for testing purposes in the blog <a href="https://blog.payara.fish/securing-payara-server-with-custom-ssl-certificate">Securing Payara Server with Custom SSL Certificate</a>.</p>
+</div>
+<div class="paragraph">
+<p>The private key can be stored in various formats. We assume that the key is in a format which can be read by the Java key tool program, such as PKCS#8 (file starts with <code>BEGIN ENCRYPTED PRIVATE KEY</code>)</p>
+</div>
+<div class="sect2">
+<h3 id="combine-private-key-and-certificate"><a class="anchor" href="#combine-private-key-and-certificate"></a>Combine the Private Key with the Certificate.</h3>
+<div class="paragraph">
+<p>In a first step, we combine the Private key and the Certificate we received into a file.  This file can then be used to merge our data into the files used by the Payara installation. In this step, we also specify an alias name for our key/certificate. This alias name is important as we will use it later to refer to our specific SSL Certificate.</p>
+</div>
+<div class="paragraph">
+<p>The command to perform this combination is the following with OpenSSL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">openssl pkcs12 -export -in mycert.crt -inkey mycert.key -out mycert.p12 -name mydomain_certificate</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>mycert.key</em> contains the private key</p>
+</li>
+<li>
+<p><em>mycert.crt</em> contains the X.509 certificate</p>
+</li>
+<li>
+<p><em>-name</em> indicate the alias we assign to our certificate</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The resulting file, <em>mycert.p12</em> is also encrypted with a password that is requested during the execution of the command.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="importing-into-keystore"><a class="anchor" href="#importing-into-keystore"></a>Import into keystore.jks</h3>
+<div class="paragraph">
+<p>The information needs to be imported into the <em>keystore.jks</em> file of your Payara Domain which will use it.</p>
+</div>
+<div class="paragraph">
+<p>This is performed using the <em>keytool</em> command of the JDK:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">keytool -importkeystore -destkeystore keystore.jks -srckeystore mycert.p12 -srcstoretype PKCS12 -alias mydomain_certificate</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The parameters of the above command are self-explanatory. Important here is the correct alias value.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="importing-into-cacerts"><a class="anchor" href="#importing-into-cacerts"></a>Import into cacerts.jks</h3>
+<div class="paragraph">
+<p>A similar command is used to import the information into the Trust Store file so that our certificate is trusted by the JVM.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">keytool -importcert -trustcacerts -destkeystore cacerts.jks -file mycert.crt -alias mydomain_certificate</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="update-http-listener"><a class="anchor" href="#update-http-listener"></a>Update HTTP Listener</h3>
+<div class="paragraph">
+<p>The last step we need to perform is the indication which 'certificate' needs to be used when Payara receives an SSL/TLS request. This can be done by specifying the alias name we have used when we integrated the required information into the key store files of the domain.</p>
+</div>
+<div class="paragraph">
+<p>This information can be set either via the asadmin CLI like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin set configs.config.server-config.network-config.protocols.protocol.http-listener-2.ssl.cert-nickname=mydomain_certificate</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In a default installation, the <em>http-listener-2</em> is responsible for handling the secure connections on port <strong>8181</strong>. The above command sets the alias name so that the system knows which certificate needs to be used.</p>
+</div>
+<div class="paragraph">
+<p>The information can also be entered in the Web Administration console, by navigating to the page Configurations &#8594; server-config &#8594; HTTP Service &#8594; HTTP Listeners &#8594; <code>http-listener-2</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="loading-certificates-from-multiple-keystores"><a class="anchor" href="#loading-certificates-from-multiple-keystores"></a>Loading Certificates From Multiple Keystores</h2>
+<div class="sectionbody">
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+All additional keystores must have the same password as your domain master password.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To add additional keystores to Payara Server you will need to have your keystore and truststore files in a local directory. You can then configure this using the admin console or asadmin commands. If you want to load more than one additional keystore, you will need to use a delimiter between the paths to the additional keystores. This is different depending on your OS, Windows uses ';' and Linux uses ':'.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+When specifying the key or trust store for a specific listener, this is deemed as an absolute and any additional key or trust stores are not considered.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The new JVM properties used to add additional keystores are:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>-Dfish.payara.ssl.additionalKeyStores
+-Dfish.payara.ssl.additionalTrustStores</pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="multiple-keystores-via-admin-console"><a class="anchor" href="#multiple-keystores-via-admin-console"></a>Using the Admin Console</h3>
+<div class="paragraph">
+<p>To configure the additional keystore locations in the admin console, head to the <strong>Configurations &#8594; &lt;instance configuration&gt; &#8594; JVM Settings</strong> and on the <strong>JVM Options</strong> tab click <strong>Add JVM Option</strong>.</p>
+</div>
+<div class="paragraph">
+<p>You can add the new JVM property and the relative paths to your keystores or truststores here.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../../../../../_images/ssl/add-additional-keystores-admin-console.png" alt="Configure additional keystores and truststores in Admin Console">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="multiple-keystores-via-asadmin-cli"><a class="anchor" href="#multiple-keystores-via-asadmin-cli"></a>Using the Asadmin CLI</h3>
+<div class="paragraph">
+<p>JVM options can be configured using the 'create-jvm-options' asadmin command, you can configure your additional keystore and truststore files using this command. If you are loading in multiple additional keystores via asadmin commands, you will need to prefix the appropriate delimiter for your OS with '\' to avoid creating multiple JVM options.</p>
+</div>
+<div class="paragraph">
+<p><strong>Additional Keystores</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin create-jvm-options "-Dfish.payara.ssl.additionalKeyStores=/path/to/keystore.jks\:/path2/to/keystore2.jks"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Additional Truststores</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin create-jvm-options "-Dfish.payara.ssl.additionalTrustStores=/path/to/truststore.jks\:/path2/to/truststore2.jks"</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you load multiple keystores with the same alias, the server will use the first keystore with that alias, starting with the default and then the additional keystores in the order they are listed in the JVM option.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_certificate_expiration"><a class="anchor" href="#_certificate_expiration"></a>Certificate expiration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>All the X.509 certificates have a validity period when they can be used. Once this validity period is passed, the users will see a warning or error message depending on the browser that the certificate is no longer valid.</p>
+</div>
+<div class="paragraph">
+<p>Within the server log file, the expired certificates are listed when the system encounters one. Besides your custom certificates which are added as described in a previous chapter, the Trust Store also contains certificates from the Certificate Authorities. Also, they can expire and thus can be listed in the log.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The log level of the expired certificates is of type <strong>WARNING</strong>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

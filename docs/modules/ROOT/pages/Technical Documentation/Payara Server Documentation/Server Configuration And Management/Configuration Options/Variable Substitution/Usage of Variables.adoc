@@ -1,0 +1,109 @@
+
+[[using-variable-references]]
+= Using variable references
+
+A variable can be referenced anywhere inside a string value of a property which supports variable references. Multiple references to system properties and environment variables can be used within the same configuration value, concatenating any number of variable references and plain text chunks. When a reference to a password alias is used, it has to expand to the whole property value and cannot be combined with any other text or variable references.
+
+== Variable references in the domain configuration
+
+Variable references can be used inside text values in the following configuration files within the domain directory:
+
+*   domain.xml (inside attribute values or inside text nodes that contain a configuration value)
+*   logging.properties (inside property values)
+
+== Variable references in deployed applications
+
+_Since Payara Server 4.1.2.172_
+
+Variable references can be used inside text values also in the following places within deployed applications and modules:
+
+* Package descriptors:
+**   web.xml / glassfish-web.xml
+**   ejb-jar.xml / glassfish-ejb-jar.xml
+**   application.xml / glassfish-application.xml
+**   glassfish-resources.xml
+* Framework descriptors:
+**   persistence.xml
+**   faces-config.xml
+* In the annotations:
+** `@EJB`, `@WebService`, `@Stateless`, `@Stateful`, `@Singleton`, `@ActivationConfigProperty`, `@DataSource`, `@WebServlet`
+*   In JNDI lookups inside an application
+* In pre and post boot command files. _[Since Payara Server 4.1.2.174]_
+* In JVM Options. _[Since Payara Server 4.1.2.182 and 5.182]_
+* In `payara-expression-config.properties` file _[Since Payara Server 5.2020.2]_.
+
+[[examples]]
+== Examples
+
+Here are several examples of where you can use variable references:
+
+[[examples-annotation]]
+=== Within an annotation
+
+[source,java]
+----
+@DataSourceDefinition(name="java:global/ExampleDataSource",
+      className="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource",
+      user="${mysql.user}",
+      password="${ALIAS=mysql-db-password}",
+      databaseName="${ENV=MYSQL_DBNAME}",
+      serverName="localhost"
+   )
+----
+
+[[examples-web-xml]]
+=== Within a `web.xml` descriptor
+
+[source,xml]
+----
+<data-source>
+     <name>java:global/ExampleDataSource</name>
+     <class-name>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</class-name>
+     <server-name>localhost</server-name>
+     <port-number>3306</port-number>
+     <database-name>${ENV=MYSQL_DBNAME}</database-name>
+     <user>${mysql.user}</user>
+     <password>${ALIAS=mysql-db-password}</password>
+</data-source>
+----
+
+[[examples-multi]]
+=== Multiple variable references combined in a single value withing the `domain.xml`
+
+[source,xml]
+----
+<domain log-root="${com.sun.aas.instanceRoot}/${ENV=STAGE_NAME}/logs">
+----
+
+[[examples-boot]]
+=== Within a pre or post boot command file
+
+[source,bash]
+----
+set configs.config.server-config.http-service.virtual-server.server.default-web-module=${ENV=deployed-app-name}
+set configs.config.server-config.network-config.protocols.protocol.http-listener-1.security-enabled=${ENV=security-enabled}
+----
+
+[[examples-logging]]
+=== Within a `logging.properties` file
+
+NOTE: Environment variable substitution in the logging properties file is available since Payara Server _5.184_
+
+[source,properties]
+----
+handlers=${ENV=CONSOLE-HANDLER}
+handlerServices=${ENV=SYS-LOG-HANDLER}
+----
+
+[[examples-ver-ref]]
+=== Within a `payara-expression-config.properties` file
+
+NOTE: The `payara-expression-config.properties` config source is only available in Payara Server since _5.2020.2_
+
+[source,properties]
+----
+fish.payara.example.system=${java.home}
+fish.payara.example.env=${ENV=PATH}
+fish.payara.example.password=${ALIAS=secret}
+fish.payara.example.multiple=property containing both an ${ENV=envProperty} and a ${sysProp}
+----

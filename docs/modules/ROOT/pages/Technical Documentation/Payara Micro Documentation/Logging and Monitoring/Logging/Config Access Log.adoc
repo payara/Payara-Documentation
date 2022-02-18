@@ -1,0 +1,41 @@
+[[configuring-the-access-log]]
+= Configuring The Access Log
+
+Payara Micro Community supports a number of commands to help you configure access logging. It is easiest to configure access logging before it is bootstrapped, however you can edit `domain.xml` also, as Payara Micro can reload that dynamically.
+
+[cols=",,",options="header",]
+|============================
+|Configuration Option| Description| Default Value
+|`--accesslog <directory-path>`
+|Sets user defined directory path for the access log|
+|`--accesslogformat`
+|Sets user defined log format for the access log|%client.name% %auth-user-name% %datetime% %request% %status% %response.length%
+|`--accessloginterval`
+|Sets user defined access log write interval|300
+|`--accesslogsuffix`
+|Sets user defined simple date time suffix for access log filenames|yyyy-MM-dd
+|`--accesslogprefix`
+|Sets user defined prefix for access log filenames|
+|============================
+
+All options available for configuring Payara Micro Community can be seen by running the JAR with the `--help` option,
+or by consulting
+xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Command Line Options/Command Line Options.adoc[Payara Micro Command Line Options]
+
+[[usage-examples]]
+== Usage Examples
+
+[cols=",,",options="header",]
+|============================
+|Configuration Option| Usage| Result
+|`--accesslog`
+|`java -jar payara-micro --accesslog ~/logs/accesslogs`| Access logging is enabled
+|`--accesslogformat`
+|`java -jar payara-micro --accesslog ~/logs/accesslogs` --accesslogformat %u %t %s %b`| Payara [22/11/2019:09:24:36 00] 200 532
+|`--accessloginterval`
+|`java -jar payara-micro --accesslog ~/logs/accesslogs` --accessloginterval 0`| Access log write interval is set to write its buffer to file immediately
+|`--accesslogsuffix`
+|`java -jar payara-micro --accesslog ~/logs/accesslogs` --accesslogsuffix %hh%mm%a`| server_access_log.%09%30%AM.txt
+|`--accesslogprefix`
+|`java -jar payara-micro --accesslog ~/logs/accesslogs` --accesslogprefix Production`| Production.2019-11-22.txt
+|============================

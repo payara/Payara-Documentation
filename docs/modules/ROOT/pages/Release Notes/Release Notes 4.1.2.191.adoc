@@ -1,0 +1,125 @@
+[[Release Notes]]
+= Payara Server 4.1.2.191 Release Notes
+
+NOTE: This version is distributed only to Payara Enterprise customers
+
+[[supported-apis-and-applications]]
+== Supported APIs and Applications
+
+* Java EE 7 Applications
+* MicroProfile 1.3
+
+== Notes
+Due to some changes in the following areas, you might encounter some small functionality changes:
+
+- Executor Service
+- Async CDI events
+- EJB Timers
+- Security
+- Access log
+
+If you are uncertain if this might impact your application, please feel free to ask more information.
+
+There are new asadmin commands for the configuration of the health check feature, the old ones are still valid but are deprecated.
+
+
+
+== New Features
+
+-   https://github.com/payara/Payara/pull/3729[PAYARA-3344] - Allow a configurable graceful behaviour for Payara Server's (and Micro) shutdown hook
+-   https://github.com/payara/Payara/pull/3683[PAYARA-3381] - Daily rotation for Access Log
+
+== Improvements
+
+-   https://github.com/payara/Payara/pull/3479[PAYARA-455] - PY should clean up temp files
+-   https://github.com/payara/Payara/pull/3727[PAYARA-546] - Allow setting SO_KEEPALIVE on the DAS or specific configs
+-   https://github.com/payara/Payara/pull/3730[PAYARA-1896] - Refactor HealthCheck service commands to bring in to line with other asadmin commands
+-   https://github.com/payara/Payara/pull/3789[PAYARA-2206] - Remove registration and installer modules
+-   https://github.com/payara/Payara/pull/3496[PAYARA-3262] - Don't create a new response in the JaxrsContainerExceptionMapper
+-   https://github.com/payara/Payara/pull/3454[PAYARA-3316] - Improve @AroundInvoke/@AroundTimeout interceptor handling
+-   https://github.com/payara/Payara/pull/3752[PAYARA-3318] - Allow enabling or disabling HTTP methods for the j_security_check action
+-   https://github.com/payara/Payara/pull/3523[PAYARA-3360] - asadmin list-commands only works when domain is running
+-   https://github.com/payara/Payara/pull/3655[PAYARA-3382] - Make `addDateStampToFirstAccessLogFile` configurable
+-   https://github.com/payara/Payara/pull/3796[PAYARA-3434] - Optimise FileArchive to reduce deployment times
+-   https://github.com/payara/Payara/pull/3792[PAYARA-3438] - Improve usability of MP Health endpoint as readinessProbe for k8s
+-   https://github.com/payara/Payara/pull/3784[PAYARA-3499] - Optimise ASClassLoaderUtil
+-   https://github.com/payara/Payara/pull/3794[PAYARA-3505] - Prevent JLine Logging in Asadmin Multimode
+-   https://github.com/payara/Payara/pull/3783[PAYARA-3507] - Improve the Executor Pool and Queue Sizes in Payara Micro
+-   https://github.com/payara/Payara/pull/3785[PAYARA-3508] - Improve logging in ConnectionPool
+
+== Security Fixes
+
+-   https://github.com/payara/Payara/pull/3461[PAYARA-3331] - Upgrade jackson to 2.9.7 to fix:
+    -   CVE-2018-14718
+    -   CVE-2018-14719
+    -   CVE-2018-14720
+    -   CVE-2018-14721
+
+== Bug Fixes
+
+-   https://github.com/payara/Payara/pull/3629[PAYARA-3160] - Minimum log file size error is ignored when set using logging.properties file
+-   https://github.com/payara/Payara/pull/3665[PAYARA-3163] - WebAppClassLoader fails to find JAX-WS Handler class
+-   https://github.com/payara/Payara/pull/3647[PAYARA-3164] - Variable substitution in post boot command file doesn't work in Payara Micro
+-   https://github.com/payara/Payara/pull/3517[PAYARA-3257] - CDI Bean created (but fails) when interface has @Path annotation
+-   https://github.com/payara/Payara/pull/3511[PAYARA-3258] - Open API takes into account annotated interfaces without implementation
+-   https://github.com/payara/Payara/pull/3660[PAYARA-3260] - Metrics API produces invalid metric names for Prometheus
+-   https://github.com/payara/Payara/pull/3503[PAYARA-3356] - EJB Timer fails when using non-persistent flag
+-   https://github.com/payara/Payara/pull/3636[PAYARA-3357] - asadmin shell issues when ask for additional data
+-   https://github.com/payara/Payara/pull/3521[PAYARA-3358] - asadmin command stop-domains no longer works
+-   https://github.com/payara/Payara/pull/3515[PAYARA-3362] - get-http-listener throws NPE
+-   https://github.com/payara/Payara/pull/3529[PAYARA-3366] - Payara MP Config getConverters() is not thread-safe
+-   https://github.com/payara/Payara/pull/3766[PAYARA-3373] - Certificate realms with a custom JCE provider still raise exceptions
+-   https://github.com/payara/Payara/pull/3539[PAYARA-3376] - Some JVM parameters are not correctly stored through the Web Admin Console
+-   https://github.com/payara/Payara/pull/3685[PAYARA-3425] - asadmin recorder generates wrong command for create-network-listener
+-   https://github.com/payara/Payara/pull/3696[PAYARA-3432] - Setting core-pool-size of ExecutorService result in NPE
+-   https://github.com/payara/Payara/pull/3662[PAYARA-3449] - list-protocol-filters command fails with NPE
+-   https://github.com/payara/Payara/pull/3694[PAYARA-3451] - Managed Scheduled Executor Service doesn't execute tasks from versioned applications
+-   https://github.com/payara/Payara/pull/3772[PAYARA-3478] - SO_KEEPALIVE checks for wrong port, and Enable Logic is Wrong
+-   https://github.com/payara/Payara/pull/3718[PAYARA-3479] - NPE when logging JMX monitoring data to server.log
+-   https://github.com/payara/Payara/pull/3773[PAYARA-3511] - ClassCastException when using CircuitBreaker.delayUnit Config Property
+-   https://github.com/payara/Payara/pull/3774[PAYARA-3512] - CircuitBreaker Interceptor Checks for Config Override on Wrong Annotation
+-   https://github.com/payara/Payara/pull/3806[PAYARA-3565] - asadmin create-node-ssh install=true fails to create the ZIP
+
+== Component Upgrades
+
+-   https://github.com/payara/Payara/pull/3589[PAYARA-3292] - Upgrade Tyrus to 1.14
+-   https://github.com/payara/Payara/pull/3476[PAYARA-3294] - Upgrade javax.mail to 1.6.2
+-   https://github.com/payara/Payara/pull/3480[PAYARA-3297] - Upgrade MIME Streaming Extension (mimepull) to 1.9.10
+-   https://github.com/payara/Payara/pull/3591[PAYARA-3299] - Upgrade GlassFish MBean Annotation Library (gmbal) to 4.0.0
+-   https://github.com/payara/Payara/pull/3593[PAYARA-3300] - Upgrade commons-io to 2.6
+-   https://github.com/payara/Payara/pull/3595[PAYARA-3301] - Upgrade wsdl4j to 1.6.3
+-   https://github.com/payara/Payara/pull/3594[PAYARA-3302] - Upgrade metainf-services to 1.8
+-   https://github.com/payara/Payara/pull/3668[PAYARA-3303] - Upgrade javax.servlet.jsp.jstl-api to 1.2.2, javax.servlet.jsp.jstl (impl) to 1.2.5
+-   https://github.com/payara/Payara/pull/3628[PAYARA-3308] - Upgrade PrototypeJS version used in the Admin Console
+-   https://github.com/payara/Payara/pull/3596[PAYARA-3388] - Upgrade maven-compiler-plugin to 3.8.0
+-   https://github.com/payara/Payara/pull/3597[PAYARA-3389] - Upgrade maven-clean-plugin to 3.1.0
+-   https://github.com/payara/Payara/pull/3598[PAYARA-3390] - Upgrade maven-resources-plugin to 3.1.0
+-   https://github.com/payara/Payara/pull/3599[PAYARA-3391] - Upgrade maven-jar-plugin to 3.1.1
+-   https://github.com/payara/Payara/pull/3601[PAYARA-3392] - Upgrade maven-war-plugin to 3.2.2
+-   https://github.com/payara/Payara/pull/3558[PAYARA-3394] - Upgrade maven-dependency-plugin to 3.1.1
+-   https://github.com/payara/Payara/pull/3604[PAYARA-3395] - Upgrade maven-site-plugin to 3.7.1
+-   https://github.com/payara/Payara/pull/3605[PAYARA-3396] - Upgrade maven-remote-resources-plugin to 1.6.0
+-   https://github.com/payara/Payara/pull/3606[PAYARA-3397] - Upgrade maven-invoker-plugin to 3.1.0
+-   https://github.com/payara/Payara/pull/3607[PAYARA-3398] - Upgrade maven-jaxb2-plugin to 0.14.0
+-   https://github.com/payara/Payara/pull/3608[PAYARA-3399] - Upgrade antlr-maven-plugin to 2.2
+-   https://github.com/payara/Payara/pull/3609[PAYARA-3400] - Upgrade maven-enforcer-plugin to 3.0.0-M2
+-   https://github.com/payara/Payara/pull/3610[PAYARA-3401] - Upgrade maven-install-plugin to 3.0.0-M1
+-   https://github.com/payara/Payara/pull/3612[PAYARA-3403] - Upgrade build-helper-maven-plugin to 3.0.0
+-   https://github.com/payara/Payara/pull/3613[PAYARA-3404] - Upgrade jaxws-maven-plugin to 2.5
+-   https://github.com/payara/Payara/pull/3614[PAYARA-3405] - Upgrade maven-deploy-plugin to 3.0.0-M1
+-   https://github.com/payara/Payara/pull/3618[PAYARA-3407] - Upgrade findbugs components to 1.7
+-   https://github.com/payara/Payara/pull/3619[PAYARA-3408] - Upgrade glassfish ha-api to 3.1.11
+-   https://github.com/payara/Payara/pull/3620[PAYARA-3409] - Upgrade jackson to 2.9.8
+-   https://github.com/payara/Payara/pull/3621[PAYARA-3410] - Upgrade javassist to 3.24.1-GA
+-   https://github.com/payara/Payara/pull/3622[PAYARA-3411] - Upgrade glassfish pfl components to 4.0.1
+-   https://github.com/payara/Payara/pull/3624[PAYARA-3412] - Upgrade ant version to 1.9.13
+-   https://github.com/payara/Payara/pull/3626[PAYARA-3413] - Upgrade org.glassfish.annotations:logging-annotation-processor to 1.8
+-   https://github.com/payara/Payara/pull/3667[PAYARA-3414] - Upgrade javax.el to 3.0.1-b11
+-   https://github.com/payara/Payara/pull/3648[PAYARA-3416] - Upgrade hazelcast to 3.11.1
+-   https://github.com/payara/Payara/pull/3649[PAYARA-3418] - Upgrade maven-plugin-api to 3.6.0
+-   https://github.com/payara/Payara/pull/3652[PAYARA-3420] - Upgrade jsftemplating to 2.1.3
+-   https://github.com/payara/Payara/pull/3666[PAYARA-3421] - Upgrade jsp components to 2.3.3
+-   https://github.com/payara/Payara/pull/3782[PAYARA-3472] - Update Weld to 2.4.8.Final
+
+Known issues can be seen on our GitHub issues page here: https://github.com/payara/Payara/issues
+

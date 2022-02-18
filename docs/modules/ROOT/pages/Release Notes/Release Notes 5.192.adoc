@@ -1,0 +1,137 @@
+[[Release Notes]]
+= Payara Server 5.192 Release Notes
+
+[[supported-apis-and-applications]]
+== Supported APIs and Applications
+
+* Java EE 8 Applications
+* MicroProfile 2.2
+
+== Notes
+
+=== Domain.xml Changes
+
+At long last, Payara Platform is shipping with support for JDK 11. It should be
+stressed that firstly: this support is in tech preview and secondly: if
+upgrading from an older version of Payara, you’ll need to add some extra JVM
+options to your domain.xml configuration files. These are documented in the
+https://docs.payara.fish/Technical Documentation/user-guides/upgrade-payara.html#jdk-11-upgrade-considerations[release
+documentation].
+
+=== MicroProfile Changes
+
+This release also brings our support of MicroProfile up to 2.2, providing
+updates to OpenAPI, Rest Client, and Fault Tolerance.
+
+=== Docker Integration Changes
+
+Finally, this release introduces the concept of a Docker node (also tech
+preview) as our first iteration of better native Docker integration. These
+function similarly to existing nodes, except the instances created for a Docker
+node are run within Docker containers.
+
+=== Removal of System Property
+
+The system property `java.ext.dirs` is no longer supported. This also means that
+JAR files within the `<payara-home>/glassfish/domains/<domain>/lib/ext` directory are no longer placed on the classpath.
+The `<payara-home>/glassfish/domains/<domain>/lib` directory is the preferred place to put these additional JAR files or
+the `asadmin add-library` command can be used to place it there for you.
+
+Also the System property `java.endorsed.dirs` is no longer supported.
+
+== Known Issues
+
+- [PAYARA-3865] - Output of asadmin osgi commands is not displayed. The issue was discovered later in release cycle. Workaround is to use OSGi shell over
+telnet. The server can be started by issuing command asadmin osgi telnetd start.
+
+== Bug Fixes
+
+- [https://github.com/payara/Payara/pull/3827[PAYARA-3162]] - Endpoints defined within interface aren’t picked up by MP openAPI
+- [https://github.com/payara/Payara/pull/3827[PAYARA-3259]] - Fix OpenAPI Context Creation
+- [https://github.com/payara/Payara/pull/3897[PAYARA-3288]] - Grizzly Memory Leak caused by HeapMemory and PooledMemory managers
+- [https://github.com/payara/Payara/pull/3825[PAYARA-3444]] - Warn when asadmin set targeting instances changes shared configuration
+- [https://github.com/payara/Payara/pull/3950[PAYARA-3464]] - Description does not save from MP config property in admin console
+- [https://github.com/payara/Payara/pull/3924[PAYARA-3487]] - Race condition in ConnectionPool
+- [https://github.com/payara/Payara/pull/3859[PAYARA-3493]] - Unable to Inject into EntityListener when using AttributeConverter
+- [https://github.com/payara/Payara/pull/3827[PAYARA-3509]] - additionalProperties of OpenAPI schema is not `rendered'
+- [https://github.com/payara/Payara/pull/3875[PAYARA-3515]] - Fix setting authentication realm on Virtual Server with a property for default-web-module
+- [https://github.com/payara/Payara/pull/3961[PAYARA-3521]] - JAX-RS client with payara-embedded-all raises IllegalStateException for RequestTracingService run level
+- [https://github.com/payara/Payara/pull/3864[PAYARA-3540]] - Compile Error when Generating JavaDoc
+- [https://github.com/payara/Payara/pull/3956[PAYARA-3541]] - Error while deploying exploded war with payara micro
+- [https://github.com/payara/Payara/pull/3814[PAYARA-3576]] - embedded-all leaks upstream dependencies
+- [https://github.com/payara/Payara/pull/3866[PAYARA-3660]] - Payara Micro unable to inject MP RestClient instance in REST endpoint class
+- [https://github.com/payara/Payara/pull/3831[PAYARA-3662]] - context-root setting of glassfish-web.xml is ignored
+- [https://github.com/payara/Payara/pull/3870[PAYARA-3665]] - Asadmin Shell Only Reads a Single Input
+- [https://github.com/payara/Payara/pull/3798[PAYARA-3666]] - Fixes for issues found by tests for new health check as-admin commands
+- [https://github.com/payara/Payara/pull/3869[PAYARA-3670]] - `Rotation on Date Change' for Notification Logging is not applied on Admin Console
+- [https://github.com/payara/Payara/pull/3880[PAYARA-3674]] - CDI Async events not working on Payara Micro
+- [https://github.com/payara/Payara/pull/3846[PAYARA-3682]] - Error in gf-client manifest
+- [https://github.com/payara/Payara/pull/3848[PAYARA-3686]] - Default Principal can’t be set from the Admin Console
+- [https://github.com/payara/Payara/pull/3874[PAYARA-3692]] - Class name is wrong or classpath is not set for :
+com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+- [https://github.com/payara/Payara/pull/3936[PAYARA-3696]] - Payara Executor Service Error Printed when Application Client Container starts
+- [https://github.com/payara/Payara/pull/3824[PAYARA-3702]] - Community Fix (https://github.com/svendiedrichsen[*svendiedrichsen*]): NPE when Deploying an
+Application containing EJB Singletons
+- [https://github.com/payara/Payara/pull/3867[PAYARA-3708]] - Some INFO messages still printed by JLine in asadmin even with jline.log.disable=true
+- [https://github.com/payara/Payara/pull/3887[PAYARA-3709]] - Equals sign is added to system properties with empty value even if it’s already in the key
+- [https://github.com/payara/Payara/pull/3868[PAYARA-3723]] - Community Fix (https://github.com/svendiedrichsen[*svendiedrichsen*]): Fix unclosed resources
+and potential NPE
+- [https://github.com/payara/Payara/pull/3926[PAYARA-3729]] - Jersey-media-json-jackson & jersey-hk2 Dependencies are not included with
+Ejb-Http-Client
+- [https://github.com/payara/Payara/pull/3888[PAYARA-3738]] - Community Fix (https://github.com/svendiedrichsen[*svendiedrichsen*]): Properly implement
+equals and hashcode method for OpenID state
+- [https://github.com/payara/Payara/pull/3911[PAYARA-3753]] - ClassCastException when using delayUnit Config Property
+- [https://github.com/payara/Payara/pull/3901[PAYARA-3754]] - @Clustered Annotation Doesn’t Use Bean Name
+- [https://github.com/payara/Payara/pull/3916[PAYARA-3780]] - Community Fix (https://github.com/aubi[*aubi*]): Fix Http & Https ports in generated OpenAPI
+- [https://github.com/payara/Payara/pull/3906[PAYARA-3783]] - Community Fix (https://github.com/svendiedrichsen[*svendiedrichsen*]): Avoid using
+non-threadsafe XPath as static property
+- [https://github.com/payara/Payara/pull/3909[PAYARA-3784]] - OpenIdState equals method fixed
+- [https://github.com/payara/Payara/pull/3940[PAYARA-3820]] - Community Contribution (https://github.com/svendiedrichsen[*svendiedrichsen*]): Fixing
+sporadic NPE when archive has no JPA beans
+
+== New Features
+
+- [https://github.com/payara/Payara/pull/3908[PAYARA-3111]] - Security Audit Logging of Admin Console
+- [https://github.com/payara/Payara/pull/3952[PAYARA-3314]] - Introduce the concept of a Docker Node
+- [https://github.com/payara/Payara/pull/3827[PAYARA-3466]] - Implement Open API 1.1
+- [https://github.com/payara/Payara/pull/3951[PAYARA-3482]] - Implement MicroProfile Rest Client 1.2.1
+- [https://github.com/payara/Payara/pull/3911[PAYARA-3468]] - Implement MP FT 2.0
+- [https://github.com/payara/Payara/pull/3793[PAYARA-3537]] – Community Contribution (https://github.com/lreimer[*lreimer*]): Added CORS headers support to Microprofile OpenAPI module
+- [https://github.com/payara/Payara/pull/3929[PAYARA-3580]] – JDK 11 support
+- [https://github.com/payara/Payara/pull/3931[PAYARA-3654]] - Add support for client side adapters in EJB HTTP Client
+
+== Improvements
+
+- [https://github.com/payara/Payara/pull/3954[PAYARA-3385]] - Allow OpenTracing @Traced to work with JAX-WS Web Services
+- [https://github.com/payara/Payara/pull/3837[PAYARA-3386]] - Complete login.conf configuration after creating custom security realm with default
+LoginModule configuration
+- [https://github.com/payara/Payara/pull/3900[PAYARA-3417]] - CertificateRealm should optionally return CN part a the certificate subject instead of the whole
+subject
+- [https://github.com/payara/Payara/pull/3853[PAYARA-3419]] - Persistent EJB Timer service forced too eagerly in cluster/Deployment group.
+- [https://github.com/payara/patched-src-eclipselink/pull/3[PAYARA-3474]] - Disable stacktrace logging when JPA schema generation tries to read from non
+existing sequence
+- [https://github.com/payara/Payara/pull/3934[PAYARA-3688]] - Make the timeout parameter configurable in the start-local-instance command
+- [https://github.com/payara/Payara/pull/3930[PAYARA-3718]] - Support System Properties with EJB over Rest
+- [https://github.com/payara/Payara/pull/3945[PAYARA-3755]] - Implement Full Support for JSON-B Serialization when using EJB Remote over HTTP
+- [https://github.com/payara/Payara/pull/3904[PAYARA-3758]] - Cleanup of sonar warnings for rest-service
+- [https://github.com/payara/Payara/pull/3915[PAYARA-3781]] - Community Contribution (https://github.com/edthorne[*edthorne*]): Allow wildcards when
+specifying interfaces for the data grid discovery mode
+- [https://github.com/payara/Payara/pull/3920[PAYARA-3785]] - Security small cleanup sweep 6
+- [https://github.com/payara/Payara/pull/3911[PAYARA-3790]] - CircuitBreaker with configuration file does not override the requestVolumeThreshold
+
+== Component Upgrades
+
+- [https://github.com/payara/Payara/pull/3855[PAYARA-2965]] - Update hk2 to 2.5.0
+- [https://github.com/payara/Payara/pull/3566[PAYARA-3402]] - Upgrade maven-javadoc-plugin to 3.0.1
+- [https://github.com/payara/Payara/pull/3892[PAYARA-3668]] - Update libpam4j to version 1.11
+- [https://github.com/payara/Payara/pull/3863[PAYARA-3706]] - Upgrade hibernate-validator to 6.0.16.Final
+- [https://github.com/payara/Payara/pull/3917[PAYARA-3742]] - Upgrade to Jersey 2.29
+- [https://github.com/payara/Payara/pull/3890[PAYARA-3743]] - Upgrade snakeyaml to 1.24
+- [https://github.com/payara/Payara/pull/3891[PAYARA-3744]] - Upgrade-MIME-Streaming-Extension-mimepull-to-1.9.11
+- [https://github.com/payara/Payara/pull/3893[PAYARA-3745]] - Upgrade classmate to 1.5.0
+- [https://github.com/payara/Payara/pull/3894[PAYARA-3746]] - Upgrade hazelcast version to 3.12
+- [https://github.com/payara/Payara/pull/3895[PAYARA-3747]] - Upgrade ha-api to version 3.1.12
+
+And of course, we’d like to give a huge thank you to community contributors
+*svendiedrichsen* , *aubi* , *edthorne* and *lreimer* for their contributions to
+this release.

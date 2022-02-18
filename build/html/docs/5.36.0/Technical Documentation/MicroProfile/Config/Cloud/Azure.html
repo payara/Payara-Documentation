@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Azure Cloud Config Source :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="Azure.html">Azure Cloud Config Source</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/Payara-Documentation/docs/modules/ROOT/pages/Technical%20Documentation/MicroProfile/Config/Cloud/Azure.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Azure Cloud Config Source</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Azure cloud config source takes configuration properties from Azure Key Vault Secrets.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_register_azure_ad_application_and_create_service_principle"><a class="anchor" href="#_register_azure_ad_application_and_create_service_principle"></a>Register Azure AD Application and Create Service Principle</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you haven&#8217;t already, you will need to register an Azure Active Directory (Azure AD) application and create a service principal, so that the Microsoft identity platform can provide authentication and authorisation services. You can use the Azure portal to register your application and create a service principle.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Once you have signed in to your Azure portal, search and select Azure Active Directory</p>
+</li>
+<li>
+<p>Select App registrations under the Manage section</p>
+</li>
+<li>
+<p>Click New registration</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have access to multiple tenants and want to select a specific tenant to register with your application, use the Directory + subscription filter in the top menu.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/azure/application-registration.png" alt="Application Registration"></span></p>
+</div>
+<div class="paragraph">
+<p>Then on the Register an application page:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Specify a name for your application</p>
+</li>
+<li>
+<p>Select the appropriate account types</p>
+</li>
+<li>
+<p>Click Register to complete your application registration</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Once the application registration is completed, the service principal is automatically created in your home tenant.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/azure/application-registration-configuration.png" alt="Application Registration Configuration"></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_application_api_permissions"><a class="anchor" href="#_application_api_permissions"></a>Application API Permissions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You will need to allow your application full access to the Azure Key Vault service to enable it to retrieve secrets from the vault. To do this, you will need to configure your application&#8217;s API permissions. You can learn more about permissions and consent <a href="https://docs.microsoft.com/en-gb/azure/active-directory/develop/v2-permissions-and-consent">here</a>.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Select your application</p>
+</li>
+<li>
+<p>Select API permissions under the Manage section</p>
+</li>
+<li>
+<p>Click Add a permission</p>
+</li>
+<li>
+<p>Select Azure Key Vault for the list of Microsoft APIs</p>
+</li>
+<li>
+<p>Under the types of permissions, select Delegated permissions</p>
+</li>
+<li>
+<p>Tick the <em>user_impersonation</em> checkbox</p>
+</li>
+<li>
+<p>Click Add permissions</p>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/azure/API-permissions.png" alt="API Permissions"></span></p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_add_credentials"><a class="anchor" href="#_add_credentials"></a>Add Credentials</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Credentials allow your application to authenticate as itself. Azure supports two options as credentials: client secret (a string) and certificate (public key). Currently, Payara Platform only supports certificate as they provide a higher level of assurance than client secrets. You can upload your certificate for authentication using the following steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Select your application</p>
+</li>
+<li>
+<p>Select Certificates &amp; Secrets under the Manage section</p>
+</li>
+<li>
+<p>Click Upload certificate</p>
+</li>
+<li>
+<p>Choose a certificate</p>
+</li>
+<li>
+<p>Click Add</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Once the certificate is successfully uploaded, it should generate a <em>Thumbprint</em>, which will be required when we configure the Azure Config Source.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/azure/certificate-upload.png" alt="Certificate Upload"></span></p>
+</div>
+<div class="sect2">
+<h3 id="_supported_private_key_formats"><a class="anchor" href="#_supported_private_key_formats"></a>Supported Private Key formats</h3>
+<div class="paragraph">
+<p>In this step, only an X.509 certificate is needed but the corresponding private key is needed when we configure the Payara MicroProfile Configuration Source. Currently, only an RSA private key in the PKCS8 unencrypted PEM format is supported.  We have an issue open to also support an encrypted key and other formats.  The <code>OpenSSL</code> commands to generate this private key and certificate are:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>openssl req -x509 -newkey rsa:4096 -keyout demo-application.pem -out cert-demo-application.pem -days 365
+openssl pkcs8 -in demo-application.pem -out demo-application.key</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The first command will ask for the Subject DN parts of the certificate and the passphrase to encrypt the private key (written into the file <em>demo-application.pem</em>)</p>
+</div>
+<div class="paragraph">
+<p>The second command will convert this encrypted private key file to the unencrypted equivalent which we require for the Payara configuration later on.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_create_a_key_vault"><a class="anchor" href="#_create_a_key_vault"></a>Create a Key Vault</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To store your secrets securely, you will need to create a key vault.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Search for key vaults and select it</p>
+</li>
+<li>
+<p>Click Add</p>
+</li>
+<li>
+<p>Provide relevant information on the Create key vault page</p>
+</li>
+<li>
+<p>Click Review + create</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Although key vault allows storing of keys, secrets, and certificates, the Payara Azure Config Source currently only supports secrets.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/azure/key-vault-creation.png" alt="Key Vault Creation"></span></p>
+</div>
+<div class="paragraph">
+<p>In the above diagram, the Basic section has been configured and the remaining sections have been left to their default settings. You can configure other sections, such as Access policy and Networking, to fit your requirements.</p>
+</div>
+<div class="sect2">
+<h3 id="_configure_access_policies_on_key_vault"><a class="anchor" href="#_configure_access_policies_on_key_vault"></a>Configure access policies on Key Vault</h3>
+<div class="paragraph">
+<p>To give your application access to the secrets in a key vault, you will need to add the application to the key vault&#8217;s access policies.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Navigate to your key vault</p>
+</li>
+<li>
+<p>Select Access policies under the Settings section</p>
+</li>
+<li>
+<p>Click Add Access Policy</p>
+</li>
+<li>
+<p>Under Configure from template, select Secret Management, as we don&#8217;t require the other options</p>
+</li>
+<li>
+<p>Select the service principal that you created previously</p>
+</li>
+<li>
+<p>Click Add</p>
+</li>
+<li>
+<p>Click Save to commit your changes</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/azure/access-policy-configuration.png" alt="Access Policy Configuration"></span></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_add_a_secret_to_key_vault"><a class="anchor" href="#_add_a_secret_to_key_vault"></a>Add a Secret to Key Vault</h3>
+<div class="paragraph">
+<p>To add a secret to the key vault:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Select the key vault you want to add your secret to</p>
+</li>
+<li>
+<p>Click on Secrets under the Settings section</p>
+</li>
+<li>
+<p>Click Generate/Import</p>
+</li>
+<li>
+<p>Provide relevant information on the Create a secret page</p>
+</li>
+<li>
+<p>Click Create</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/azure/secret-creation.png" alt="Secret Creation"></span></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuration_in_payara_server"><a class="anchor" href="#_configuration_in_payara_server"></a>Configuration in Payara Server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can configure Azure Secrets either via the admin console or the asadmin utility. You will need the name of your key vault, tenant ID and client ID of your application, your private key file and thumbprint generated by your application after you uploaded your certificate.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Your private key file will be copied into ${PAYARA_DOMAIN}/config.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_from_the_admin_console"><a class="anchor" href="#_from_the_admin_console"></a>From the Admin Console</h3>
+<div class="paragraph">
+<p>To configure the config source from the admin console, go to <code>Configs</code> &#8594; <code>your-config</code> &#8594; <code>MicroProfile</code> &#8594; <code>Config</code> &#8594; <code>Azure Secrets</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/azure/admin-console-config.png" alt="Payara Server Administration Console configuration route"></span></p>
+</div>
+<div class="paragraph">
+<p>From here, you can pass the name of the key vault, tenant ID and client ID of the application, absolute path to the private key file and thumbprint of the certificate. You can also decide whether to apply these changes dynamically or on the next server restart. If the config source is enabled or disabled dynamically, it will take effect across the server immediately.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_from_the_command_line"><a class="anchor" href="#_from_the_command_line"></a>From the Command Line</h3>
+<div class="paragraph">
+<p>To configure the Azure Config Source from the command line, use the <code>set-azure-config-source-configuration</code> asadmin command, specifying the required parameters like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-azure-config-source-configuration --dynamic true --enabled true --keyVaultName demo-secret-key-vault --tenantID 22b3bb26-e046-42df-9c96-65dbd72c1c81 --clientID 22b3bb26-e046-42df-9c96-65dbd72c1c81 --thumbprint 84E05C1D98BCE3A5421D225B140B36E86A3D5534 --privateKeyPath path/to/privatekey.pem</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can use the <code>--enabled</code> and <code>--dynamic</code> options to enable or disable the Azure Config Source on demand.</p>
+</div>
+<div class="paragraph">
+<p>Also, you can retrieve the current configuration for the Azure Config Source using the <code>get-azure-config-source-configuration</code> asadmin command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-azure-config-source-configuration
+
+Enabled Tenant ID Client ID Key VaultName Private Key Path Thumbprint
+true 22b3bb26-e046-42df-9c96-65dbd72c1c81 22b3bb26-e046-42df-9c96-65dbd72c1c81 demo-secret-key-vault path/to/privatekey.pem 84E05C1D98BCE3A5421D225B140B36E86A3D5534</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_usage"><a class="anchor" href="#_usage"></a>Usage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Provided that all of the above sections are configured correctly, the secrets can be injected into any applicable MicroProfile Config injection point as with any other Config Source. The secrets can also be fetched, created and deleted from the <code>asadmin</code> utility.</p>
+</div>
+<div class="paragraph">
+<p>To fetch a secret from a Key Vault:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-config-property --source cloud --sourceName azure --propertyName demo-secret
+demo-secret-value</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To create or change a secret in a Key Vault:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-config-property --source cloud --sourceName azure --propertyName mysecret --propertyValue secretvalue</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To delete a secret from a Key Vault:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; delete-config-property --source cloud --sourceName azure --propertyName mysecret</code></pre>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>

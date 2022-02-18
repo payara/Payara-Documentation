@@ -1,0 +1,147 @@
+= Azure Service Bus Cloud Connector
+
+The Microsoft Azure Service Bus allows code that runs both outside and inside
+Azure to communicate with Azure.
+
+In order to connect to Azure, the `AzureSBRAR-0.1.0-SNAPSHOT.rar` has to
+be deployed as shown in the xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Overview.adoc#Installing-a-connector[
+Installing a connector section] of the Cloud Connectors overview.
+
+In order to make use of this connector in an application, the following maven dependency is needed:
+
+[source,XML]
+----
+<dependency>
+  <groupId>fish.payara.cloud.connectors</groupId>
+  <artifactId>AzureSBJCAAPI</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <type>jar</type>
+  <scope>provided</scope>
+</dependency>
+----
+
+Note that this dependency have scope provided since the types within this
+dependency are globally available to every application deployed to Payara Micro
+after the `AzureSBRAR-0.1.0-SNAPSHOT.rar` was deployed.
+
+== Sending messages
+
+Sending messages to Azure can be done via the JCA and an Azure specific API. In
+order to start using this API to send messages, a resource has to be defined via
+the JCA API; a connection factory.
+
+The connection factory has to be given a name, which can be any name that is
+valid for JNDI. The `java:app` namespace is typically recommended to be used.
+The type of the connection factory to be used for the Azure Service Bus is 
+`fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory`, and we have
+to specify the resource adapter name which is here `AzureSBRAR-0.1.0-SNAPSHOT`.
+
+Finally the Azure credentials have to be specified. 
+
+The following gives an example:
+
+[source,Java]
+----
+@ConnectionFactoryDefinition ( 
+  name = "java:app/azuresb/factory",
+  interfaceName = "fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory",
+  resourceAdapter = "AzureSBRAR-0.1.0-SNAPSHOT"
+  properties = {"nameSpace=payara", "sasKeyName=RootManageSharedAccessKey", "sasKey=someKey"}
+)
+----
+
+With the above shown definition in place the following code shows an example of sending a message:
+
+[source,Java]
+----
+@Singleton
+@Startup
+public class SendAzureMessage {
+ 
+  @Resource(lookup = "java:app/azuresb/factory")
+  private AzureSBConnectionFactory factory;
+ 
+  @PostConstruct
+  public void init() {
+    try (AzureSBConnection connection = factory.createConnection()) {
+        connection.sendMessage("testq", new BrokeredMessage("Hello World"));
+    }
+    catch (Exception ex) {
+    }
+  }
+}
+----
+
+== Receiving messages
+Messages can be received from Azure by creating an MDB (Message Driven Bean)
+that implements the `fish.payara.cloud.connectors.azuresb.api.AzureSBListener`
+marker interface and has a single method annotated with `@OnAzureSBMessage`
+and the method signature `void method(BrokeredMessage message)`.
+
+The following gives an example:
+
+[source,Java]
+----
+@MessageDriven(activationConfig = {
+ @ActivationConfigProperty(propertyName = "nameSpace", propertyValue = "payara"), 
+ @ActivationConfigProperty(propertyName = "sasKeyName", propertyValue = "RootManageSharedAccessKey"), 
+ @ActivationConfigProperty(propertyName = "sasKey", propertyValue = "someKey"), 
+ @ActivationConfigProperty(propertyName = "queueName", propertyValue = "testq") 
+})
+public class ReceiveAzureMessage implements AzureSBListener {
+    @OnAzureSBMessage
+    public void receiveMessage(BrokeredMessage message) {
+        // Handle message
+    }
+}
+----
+
+The full list of config properties is given below:
+
+[cols="2,1,1,7",options="header"]
+|===
+|Config Property Name
+|Type
+|Default
+|Notes
+
+|sasKeyName
+|String
+|none
+|The SAS Key Name defined in your Service Bus namespace
+
+|sasKey
+|String
+|none
+|The SAS Key. Environment variable replacement can be used so that this is not
+exposed in the code
+
+|nameSpace
+|String
+|none
+|The Azure namespace of your Service Bus
+
+|queueName
+|String
+|none
+|The Queue Name (MDB property only)
+
+|initialPollDelay
+|Integer
+|1
+|The Initial Poll Delay (in seconds) before the Adapter starts polling for
+messages after deployment (MDB Property Only)
+
+|pollInterval
+|Integer
+|1
+|The Poll interval (in seconds). This is how often the MDB polls for new
+messages (MDB Property Only)
+
+|pollTimeout
+|Integer
+|1
+|The Poll Timeout (in seconds). This is how long the MDB should wait for
+messages in a single poll (MDB Property Only)
+
+|===

@@ -1,0 +1,32 @@
+[[concurrent-cdi-bean-loading]]
+= Concurrent CDI Bean Loading
+
+_Since Payara Server 5.184_
+
+It is possible to concurrently load CDI beans and potentially speed up an application's load time by enabling Weld's Multi-Threaded Bean Loading feature. 
+
+IMPORTANT: By default this feature is disabled for all applications on Payara Server, and enabled for all applications on Payara Micro.
+
+[[enable-concurrent-cdi-bean-loading]]
+== Enable Concurrent CDI Bean Loading
+
+Concurrent CDI bean loading is configured on a per-configuration basis using the `set` on the `cdi-service.enable-concurrent-deployment` property like this:
+
+[source, bash]
+----
+asadmin set configs.config.server-config.cdi-service.enable-concurrent-deployment=true
+----
+
+It is possible to configure the number of pre-loader threads like this:
+
+[source, bash]
+----
+asadmin set configs.config.server-config.cdi-service.pre-loader-thread-pool-size=4
+----
+
+When configuring the number of the pre-loader threads, use a sensible value that is consistent with the number of CPU cores available for the server instance, otherwise this setting may introduce performance degradation on the deployment times.
+
+NOTE: Concurrent deployment of CDI Beans is enabled by default with 2 preloader
+threads in Payara Micro.
+
+WARNING: There are no equivalent configuration views for these commands in the Web admin console. They'll be reserved for a future release

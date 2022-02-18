@@ -1,0 +1,317 @@
+[[Release Notes]]
+= Payara Server 5.184 Release Notes
+
+[[release-highlights]]
+== Release Highlights
+
+
+[[important-information]]
+=== *Important Information*
+
+* JDK version 8u162 or newer is no longer required
+* When upgrading Payara Server from an older version, make sure to use JVM options appropriate for your JDK version. See the Notes section below for more details
+* Some IDE plugins have problems with the default JVM options in Payara Server 5.184. In Netbeans, you should update the xref:/Technical Documentation/Ecosystem/IDE Integration/NetBeans Plugin/Overview.adoc[Payara plugin] to version 1.5. For Eclipse IDE there's a workaround. IntelliJ works out of the box. See the xref:#known-issues[Known issues] section in case you run into problems
+
+[[supported-apis-and-applications]]
+== Supported APIs and Applications
+
+* Java EE 8 Applications
+* MicroProfile 2.0 (in v5.184) / 1.4 (in v4.1.2.184)
+
+== Notes
+
+=== Upgrading from older versions
+
+When upgrading from a domain used by an older version of Payara Server you may run into issues due to changes in ALPN.
+
+We recommend modifying domain.xml by removing `grizzly-npn-bootstrap.jar` JVM option and adding appropriate JVM option for your JDK version. Or you can just copy all the `grizzly-npn-bootstrap` JVM options from a https://github.com/payara/Payara/pull/3414/files#diff-106a22dc9db673bf7b67c76cf69914aaR256[default domain.xml] in Payara Server 5.184.
+
+If you apply the JVM options in the default domain.xml in version 5.184, you'll avoid problems if you update the JDK in the future. The default configuration takes advantage of JDK version selectors supported in JVM options and will instruct Payara Server to choose the appropriate `grizzly-npn-bootstrap` JAR.
+
+Beware that future versions of JDK (beyond u192) may break the ALPN contract again and subsequent version of Payara Server will need to provide another version of `grizzly-npn-bootstrap` JAR to fix it.
+
+TIP: Users with a support account can follow the https://support.payara.fish/hc/en-gb/articles/360012350494-Upgrade-to-Payara-Server-5-184[Guide to Upgrading to Payara Server 5.184].
+
+=== PasswordLoginModule Changes
+
+In Payara 5.182 login modules often extended from a base login module
+called com.sun.enterprise.security.auth.login.PasswordLoginModule. This
+base class however was redundant and only provided for backwards
+compatibility as per the following comment on it:
+
+_________________________________________________________________________________________
+This class is provided for backward compatibility and is a candidate
+for deprecation.
+_________________________________________________________________________________________
+
+In order to simplify the security system somewhat by reducing the amount
+of redundant classes, this class has been removed since Payara 5.183.
+Its direct preferred replacement for a long time has been
+`com.sun.enterprise.security.BasePasswordLoginModule`. This class is now
+the only (and therefore mandatory) replacement.
+
+=== Principal String Representation Changes
+
+String representations of principals that are based on X500Principals
+have changed since Payara 5.184. The sequence of RDNs (Relative
+Distinguished Names) used to be rendered with a comma (,) and a space
+( ) as separator, but due to an internal class change are now rendered
+with only a comma character (’,’ ASCII 44) as separator. For instance
+a distinguished name that used to be represented in string form as
+`"C=UK, ST=lak, L=zak, O=kaz, OU=bar, CN=lfoo"` is now represented as
+`"C=UK,ST=lak,L=zak,O=kaz,OU=bar,CN=lfoo"`
+
+
+== New Features
+
+* https://github.com/payara/Payara/pull/3096[PAYARA-635] - Autocomplete
+Asadmin Commands
+* https://github.com/payara/Payara/pull/3125[PAYARA-2479] - New Health
+Check checker to report status from MP Health Check endpoints
+* https://github.com/payara/Payara/pull/3187[PAYARA-2627] - Allow using
+different security providers via JCE API
+* https://github.com/payara/Payara/pull/3424[PAYARA-2872] - Create
+Native Kubernetes Cluster Mode for Domain Data Grid
+* https://github.com/payara/Payara/pull/3221[PAYARA-2901] - Improve
+template placeholder replacements for custom MP metrics
+* https://github.com/payara/Payara/pull/3137[PAYARA-3004] - Configure
+virtual servers for MP endpoints
+* https://github.com/payara/Payara/pull/3210[PAYARA-3025] - Add a DNS
+Cluster Mode to Payara Micro
+* https://github.com/payara/Payara/pull/3136[PAYARA-3087] - Support
+replacement of config values from Server Defined MP Config Sources
+* https://github.com/payara/Payara/pull/3162[PAYARA-3106] - Create
+payara-resources.xml functionality
+* https://github.com/payara/Payara/pull/3288[PAYARA-3184] - Make
+SecuritySupport resettable
+
+== Improvements
+
+* https://github.com/payara/Payara/pull/3418[PAYARA-455] - Updated
+fileinstall to no longer create a directory eagerly
+* https://github.com/payara/Payara/pull/3223[PAYARA-2417] - Allow the
+DAS to control the lifecycle of Payara Micro
+* https://github.com/payara/Payara/pull/3100[PAYARA-2539] - Metrics
+Service init takes significant boot time
+* https://github.com/payara/Payara/pull/3268[PAYARA-2692] - Rename
+secrets-dir asadmin commands for the directory config source
+* https://github.com/payara/Payara/pull/3259[PAYARA-2764] - Translate
+Payara only feature to Japanese
+* https://github.com/payara/Payara/pull/3132[PAYARA-2844] - Move Payara
+Notification Logger Settings to its own page
+* https://github.com/payara/Payara/pull/3293[PAYARA-2905] - Prevent
+creation of databases used for Timer Service when only non-persistent
+timers are present
+* https://github.com/payara/Payara/pull/3263[PAYARA-3040] - Allow the
+user to configure custom isolation levels in JDBC connection pools
+* https://github.com/payara/Payara/pull/3135[PAYARA-3058] - Phone Home
+should use Executor Service
+* https://github.com/payara/Payara/pull/3115[PAYARA-3061] - Cleanup of
+nucleus/admin/server-mgmt
+* https://github.com/payara/Payara/pull/3358[PAYARA-3062] - Support
+Mysql/ConnectorJ 8
+* https://github.com/payara/Payara/pull/3376[PAYARA-3090] - Supply Basic
+authentication for additionalrepository CLI option of Payara Micro
+* https://github.com/payara/Payara/pull/3168[PAYARA-3105] - Make
+MinIdleSwap and MaxIdleSwap configurable
+* https://github.com/payara/Payara/pull/3188[PAYARA-3115] - OpenID
+Connect custom `groups' and callerName claims mapping in EE
+IdentityStore
+* https://github.com/payara/Payara/pull/3191[PAYARA-3117] - Warning
+message ``Tried to deregister non-existent thread'' incorrectly shown
+when using Proxied Runnables
+* https://github.com/payara/Payara/pull/3185[PAYARA-3123] - Log rootdir
+value and warn when using temporary directory
+* https://github.com/payara/Payara/pull/3172[PAYARA-3133] - Sonar
+cleanup of Batch connector
+* https://github.com/payara/Payara/pull/3202[PAYARA-3134] - Add help
+text on MicroProfile Config property
+* https://github.com/payara/Payara/pull/3214[PAYARA-3141] - Improve
+message when no Request Trace Store is not enabled.
+* https://github.com/payara/Payara/pull/3230[PAYARA-3156] - Feedback on
+asadmin command from preboot and postboot scripts
+* https://github.com/payara/Payara/pull/3423[PAYARA-3159] - Creation of
+config parameters on MicroProfile page of WebConsole is wrong
+* https://github.com/payara/Payara/pull/3430[PAYARA-3209] - Vendor
+support for namespaced claims in MP-JWT access tokens
+* https://github.com/payara/Payara/pull/3370[PAYARA-3215] - Implement
+Weld Deployment getClasses
+* https://github.com/payara/Payara/pull/3371[PAYARA-3216] - Add option
+for multi-threaded bean loading in Weld
+* https://github.com/payara/Payara/pull/3329[PAYARA-3221] - Fixing sonar
+bugs in module container common
+* https://github.com/payara/Payara/pull/3387[PAYARA-3242] - Add
+MicroProfile Healthcheck Checker to Server Tab
+* https://github.com/payara/Payara/pull/3414[PAYARA-3247] - Add JVM
+Switch For NPN Versions
+* https://github.com/payara/Payara/pull/3406[PAYARA-3249] - Move
+DynamicReloader polling to the Payara Executor Service
+* https://github.com/payara/Payara/pull/3407[PAYARA-3250] - Move
+AutoDeployer Thread onto Payara Scheduled Executor Service
+* https://github.com/payara/Payara/pull/3408[PAYARA-3251] - Reduce
+Payara Micro thread usage on boot
+* https://github.com/payara/Payara/pull/3409[PAYARA-3252] - Refactor
+Healthcheck Service to use Payara Executor Service
+* https://github.com/payara/Payara/pull/3410[PAYARA-3253] - Refactor JMX
+Monitoring Service to use Payara Executor Service
+* https://github.com/payara/Payara/pull/3310[PAYARA-3266] - Use
+Environment Variable Substitution in logging.properties
+* https://github.com/payara/Payara/pull/3398[PAYARA-3267] - Optimise
+Memory Usage of JavaEETransactionImpl
+
+== Bug Fixes
+
+* https://github.com/payara/Payara/pull/3104[PAYARA-2791] - Mojarra
+@ViewScope Incorrect Handling
+* https://github.com/payara/Payara/pull/3143[PAYARA-2837] - OpenAPI
+Incorrect Collection Merging
+* https://github.com/payara/Payara/pull/3141[PAYARA-2912] - Jbatch
+broken with PostgreSQL
+* https://github.com/payara/Payara/pull/3282[PAYARA-2938] - MP Metrics
+returns 0 for a custom CPU load metric
+* https://github.com/payara/Payara/pull/3390[PAYARA-2940] - Browser
+request administrator credentials again when accessing the support
+portal on the admin console
+* https://github.com/payara/Payara/pull/3142[PAYARA-2975] -
+`metrics.xml' parsed and metadata re-registered on every call to
+`/metrics' endpoint
+* https://github.com/payara/Payara/pull/3420[PAYARA-3046] - Listing
+Cache Keys not working
+* https://github.com/payara/Payara/pull/3114[PAYARA-3059] -
+SQLTraceDelegator should use Concurrent HashMap
+* https://github.com/payara/Payara/pull/3330[PAYARA-3068] - MP
+Healthcheck fails if no name is supplied
+* https://github.com/payara/Payara/pull/3134[PAYARA-3069] - Payara Micro
+outputUberJar throws NullPointerException and fails in v5.183
+* https://github.com/payara/Payara/pull/3126[PAYARA-3075] - Rework Fault
+Tolerance so that Bulkhead and CircuitBreaker are tied to instances
+instead of applications
+* https://github.com/payara/Payara/pull/3140[PAYARA-3076] - Runtime
+Exception when Enabling Request Tracing from Admin Console
+* https://github.com/payara/Payara/pull/3127[PAYARA-3079] - Admin
+Console Log File Viewer Doesn’t Show Complete Message
+* https://github.com/payara/Payara/pull/3163[PAYARA-3085] - OpenAPI
+Doesn’t Support @…Param Annotated Fields
+* https://github.com/payara/Payara/pull/3312[PAYARA-3091] - Post Boot
+Commands Incorrect Quotation Mark Processing
+* https://github.com/payara/Payara/pull/3157[PAYARA-3093] - Non Standard
+Admin Name Causes 403 in Admin Console
+* https://github.com/payara/Payara/pull/3144[PAYARA-3094] - There is no
+help text for MaxSessions in the admin console
+* https://github.com/payara/Payara/pull/3171[PAYARA-3098] -
+delete-domain can run even when domain is currently running
+* https://github.com/payara/Payara/pull/3346[PAYARA-3102] - Asadmin does
+not work correctly with multiple admin users
+* https://github.com/payara/Payara/pull/3177[PAYARA-3109] - OpenAPI
+doesn’t support if schema type is array
+* https://github.com/payara/Payara/pull/3169[PAYARA-3110] - CDI Session
+beans throw errors when stored
+* https://github.com/payara/Payara/pull/3174[PAYARA-3114] - Concurrent
+Modification Exception when trying to access an active span
+programmatically.
+* https://github.com/payara/Payara/pull/3180[PAYARA-3116] - OpenAPI
+Fails When Jersey Providers Are Registered
+* https://github.com/payara/Payara/pull/3209[PAYARA-3119] -
+NullPointerException when starting Jersey/EJB Containers in Order
+* https://github.com/payara/Payara/pull/3309[PAYARA-3121] - Jersey
+Crashes for EJB Classes of Same Name
+* https://github.com/payara/Payara/pull/3213[PAYARA-3122] - Managed
+Scheduled Executor Service still executes tasks after undeployment
+* https://github.com/payara/Payara/pull/3309[PAYARA-3125] - OpenTracing
+ExceptionMapper prevents usage of app provided one
+* https://github.com/payara/Payara/pull/3224[PAYARA-3126] - OpenAPI
+Fails When Custom Operation Annotation is Used
+* https://github.com/payara/Payara/pull/3200[PAYARA-3128] - Secure
+Protocols not being disabled correctly for ORB listeners
+* https://github.com/payara/Payara/pull/3199[PAYARA-3131] - Clicking
+Cancel button on Configuration Properties page causes an error
+* https://github.com/payara/Payara/pull/3215[PAYARA-3143] - Clustered
+Event Bus is broken in 5.182 onwards for POJO events
+* https://github.com/payara/Payara/pull/3219[PAYARA-3145] - NPE in
+isSlowQueryLoggingEnabled
+* https://github.com/payara/Payara/pull/3243[PAYARA-3146] -
+OpenIdIdentityStore/OAuthIdentityStore ambiguous dependencies
+* https://github.com/payara/Payara/pull/3228[PAYARA-3153] - OpenAPI
+doesn’t support child schema on @…Param annotations
+* https://github.com/payara/Payara/pull/3252[PAYARA-3155] - @…Param
+annotations doesn’t support @DefaultValue annotations on OpenAPI
+* https://github.com/payara/Payara/pull/3300[PAYARA-3158] - NPE when
+starting asadmin multimode tool when DAS isn’t accessible
+* https://github.com/payara/Payara/pull/3267[PAYARA-3166] - Create file
+user operation fails when replicating commands to instances in
+deployment group
+* https://github.com/payara/Payara/pull/3344[PAYARA-3186] - NPE in
+ConnectorXAResource.getResourceHandle method
+* https://github.com/payara/Payara/pull/3290[PAYARA-3189] - Fixing
+blocker bugs in Payara micro boot module [community
+* https://github.com/payara/Payara/pull/3302[PAYARA-3190] - Web Console
+403 LDAPRealm.getGroupNames Exception [community
+* https://github.com/payara/Payara/pull/3297[PAYARA-3192] - Fixing
+blocker bugs in Deployment related classes module [community
+* https://github.com/payara/Payara/pull/3299[PAYARA-3193] - Fixing
+Sonar blocker bugs in module nucleus logging [community
+* https://github.com/payara/Payara/pull/3357[PAYARA-3196] - Grizzly NPN
+Fails for JDK 8.192
+* https://github.com/payara/Payara/pull/3313[PAYARA-3197] - Fixing
+sonar bugs blocker and major in web glue module [community
+* https://github.com/payara/Payara/pull/3373[PAYARA-3199] - NPE in
+MicroProfile Metrics on Payara Micro
+* https://github.com/payara/Payara/pull/3318[PAYARA-3203] - MP OpenAPI
+@Operation deprecated member ignored
+* https://github.com/payara/Payara/pull/3369[PAYARA-3212] - CDI
+Extensions are registered many times in large EAR deployments
+* https://github.com/payara/Payara/pull/3375[PAYARA-3222] - When adding
+@Priority to an Interceptor, the deployment fails
+* https://github.com/payara/Payara/pull/3351[PAYARA-3224] - Don’t depend
+on NPE to skip JAX-RS features for admin console
+* https://github.com/payara/Payara/pull/3397[PAYARA-3225] - Location
+Header Not Present with WebApplicationException
+* https://github.com/payara/Payara/pull/3372[PAYARA-3231] - It appears
+that with Firefox 63, that the Payara admin web screens no longer work
+correctly.
+* https://github.com/payara/Payara/pull/3368[PAYARA-3232] -
+LocalTxConnectionEventListener Not Thread Safe
+* https://github.com/payara/Payara/pull/3384[PAYARA-3233] - When
+deploying an application in the admin console all further deployment
+options are no longer shown
+* https://github.com/payara/Payara/pull/3385[PAYARA-3241] - Only display
+the MicroProfile HealthChecker on Server Config
+* https://github.com/payara/Payara/pull/3419[PAYARA-3264] - Fix Linkage
+errors Concurrently Loading EJBs
+* https://github.com/payara/Payara/pull/3422[PAYARA-3265] - Fix Linkage
+Error in Generated Classes
+
+== Fixes for upstream bugs
+
+These defects are most probably present also in the upstream GlassFish
+Server version.
+
+* https://github.com/payara/Payara/pull/3190[PAYARA-3157] - The resource
+type of a JDBC connection pool can’t be changed in the second step of
+creation
+
+== Component Upgrades
+
+* https://github.com/payara/Payara/pull/3111[PAYARA-3055] - Upgrade
+javax.annotation-api to 1.3.2
+* https://github.com/payara/Payara/pull/3112[PAYARA-3056] - Upgrade
+javax.el-api to 3.0.1-b06
+* https://github.com/payara/Payara/pull/3113[PAYARA-3057] - Upgrade
+javassist to 3.23.1-GA
+* https://github.com/payara/Payara/pull/3294[PAYARA-3137] - Upgrade
+Jersey 2.27.payara-p12
+* https://github.com/payara/Payara/pull/3280[PAYARA-3177] - Upgrade
+Yasson to 1.0.2
+* https://github.com/payara/Payara/pull/3321[PAYARA-3205] - Upgrade
+jackson to 2.9.6
+* https://github.com/payara/Payara/pull/3322[PAYARA-3206] - Upgrade
+apache httpclient to 4.5.6
+* https://github.com/payara/Payara/pull/3402[PAYARA-3248] - Upgrade
+hazelcast to 3.11
+
+[[known-issues]]
+== Known issues
+
+* Fresh Payara Server 5.184 doesn't start in Netbeans with a Payara plugin older than version 1.5 and with the current GlassFish plugin. This is because the Netbeans plugin modifies the standard start procedure but doesn't understand Java version selectors in JVM options, which leads to an error in the plugin. This is fixed in the  Payara NetBeans Plugin version 1.5 which is already available in our xref:/Technical Documentation/Ecosystem/IDE Integration/NetBeans Plugin/Overview.adoc[Netbeans repositories]. For older versions or for a GlassFish plugin, you can fix this if you replace multiple JVM options for `grizzly-npn-bootstrap` in the https://github.com/payara/Payara/pull/3414/files#diff-106a22dc9db673bf7b67c76cf69914aaR256[default domain.xml] with a single option that matches your Java version and remove the Java version selector. 
+* Fresh Payara Server 5.184 doesn't start in Eclipse IDE with any current plugin. You should apply the same  workaround as for an older Netbeans plugin: replace multiple JVM options for `grizzly-npn-bootstrap` in the https://github.com/payara/Payara/pull/3414/files#diff-106a22dc9db673bf7b67c76cf69914aaR256[default domain.xml] with a single option that matches your Java version and remove the Java version selector
+* There are no issues in IntelliJ as it starts Payara Server in a standard way

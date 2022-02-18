@@ -1,0 +1,136 @@
+[[tracing-remote-ejbs]]
+= Tracing Remote EJBs
+
+Remote calls to an EJB from a Java SE client will have their active OpenTracing span context automatically propagated to the server, with the server-side span being created as a child of this client call. This will allow users to trace EJB calls that are originated externally from the server, and the span context will be propagated internally to any traceable components.
+
+[[java-se-client-tracing]]
+== Java SE Client Tracing
+
+No additional setup is required on the client side over what is to be expected for making regular un-traced remote EJB calls - the requirements are the same: usage of `payara-embedded-all` or the application client facilities of a Payara Server instance.
+
+No additional properties need to be specified when performing the initial context lookup either:
+
+[source, java]
+----
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.util.Properties;
+
+...
+
+Properties contextProperties = new Properties();
+contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
+
+try {
+    Context context = new InitialContext(contextProperties);
+    EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
+} catch (NamingException ne) {
+    logger.warning("Failed performing lookup:\n" + ne.getMessage());
+}
+----
+
+[[getting-a-tracer]]
+=== Getting a Tracer Instance
+
+Injection of an OpenTracing tracer is not supported on Java SE clients, so you must create an instance yourself and register it to a `GlobalTracer` instance. 
+
+WARNING: Manual registration of a tracer instance is only required if using a third-party tracer such as ZipKin or Jaeger - if using the built-in Payara Request Tracing service the registration will automatically happen during creation of the initial context.
+
+NOTE: The built-in Payara Request Tracing service does not support tracing of Java SE clients (though will still propagate the active span context to the server) - if you wish to trace the client itself you must set up and use a third-party tracer such as ZipKin or Jaeger. Details on setting these up can be found xref:/Technical Documentation/MicroProfile/Opentracing.adoc#alternative-implementation[here].
+
+[source, java]
+----
+import io.opentracing.Tracer;
+import io.opentracing.util.GlobalTracer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.util.Properties;
+
+...
+
+Properties contextProperties = new Properties();
+contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
+
+try {
+    Context context = new InitialContext(contextProperties);
+    EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
+
+    Tracer tracer = GlobalTracer.get();
+} catch (NamingException ne) {
+    logger.warning("Failed performing lookup:\n" + ne.getMessage());
+}
+----
+
+Extra information on creating a Tracer instance and registering it to the `GlobalTracer` can be found link:https://opentracing.io/guides/java/tracers/[here], but in short it can be done like so (replacing `CustomTracer` with your desired implementation):
+
+[source, java]
+----
+Tracer tracerImpl = new CustomTracer(...);
+GlobalTracer.register(tracerImpl);
+----
+
+[[starting-a-span]]
+=== Starting a Span
+
+The `@Traced` annotation is not supported on Java SE client methods, so spans must be started and finished manually. Note that the Span Context of the *active* span will be propagated to the server, so it is recommended that you use a try-with-resources clause to help ensure your span scope is the one you expect.
+
+[source, java]
+----
+import io.opentracing.Scope;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+import io.opentracing.util.GlobalTracer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.util.Properties;
+
+...
+
+Properties contextProperties = new Properties();
+contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
+
+try {
+    Context context = new InitialContext(contextProperties);
+    EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
+
+    Tracer tracer = GlobalTracer.get();
+
+    try (Scope scope = tracer.buildSpan("ExecuteEjb").startActive(true)) {
+        ejb.doTheThing();
+    }
+} catch (NamingException ne) {
+    logger.warning("Failed performing lookup:\n" + ne.getMessage());
+}
+----
+
+Once your span has been started, you can attach any desired baggage items (link:https://opentracing.io/docs/overview/tags-logs-baggage/[String key:value pairs]), and these will be propagated to the server along with the span context. These can then be retrieved within the EJB implementation hosted on Payara Server like so:
+
+[source, java]
+----
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
+@Stateless
+public class Ejb implements EjbRemote {
+
+    @Inject
+    Tracer tracer;
+
+    public void businessMethod(){
+        Span activeSpan = tracer.activeSpan();
+        if (activeSpan != null) {
+            String myBaggageItem = activeSpan.getBaggageItem("myBaggageItem");
+        }
+    }
+}
+----
+
+NOTE: Baggage items are attached to the Span you invoke `setBaggageItem` on, as well as any child spans, so you are not prevented from starting additional child spans on your EJB methods manually or via the `@Traced` annotation.

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>AWS Cloud Config Source :: Payara Documentation Preview</title>
+    <meta name="generator" content="Antora 2.2.0">
+    <link rel="stylesheet" href="../../../../../../_/css/site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@alpha" />
+    <meta name="docsearch:version" content="5.36.0" />
+  </head>
+  <body class="article">
+  <header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../../../../..">Payara Documentation Preview</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-item hide-for-print">
+        Version: <div class="page-versions">
+  <button class="version-menu-toggle single-version" title="Current version">5.36.0</button>
+</div>
+
+      </div>
+      <div class="navbar-item hide-for-print">
+            <div id="search-input-container">
+    </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="https://www.payara.fish/products/downloads/">Download</a>
+          </span>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary enterprise" href="../../../../../../../enterprise">Documentation for Payara Enterprise</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="docs" data-version="5.36.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-explore is-active" data-panel="explore">
+  <div class="context">
+    <span class="title">docs</span>
+    <span class="version">5.36.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">docs</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../../../../index.html">5.36.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../../../Overview.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../../../../index.html">docs</a></li>
+    <li><a href="AWS.html">AWS Cloud Config Source</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///home/alanroth/Workspace/Payara-Documentation/docs/modules/ROOT/pages/Technical%20Documentation/MicroProfile/Config/Cloud/AWS.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">AWS Cloud Config Source</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The AWS cloud config source takes configuration properties from AWS Secrets Manager.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_aws_secret_creation"><a class="anchor" href="#_aws_secret_creation"></a>AWS Secret Creation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The AWS cloud config source takes configuration from a single named secret in a JSON format, with each object key being a config property name. To create a secret of this format, you must first go to the AWS secret manager home: <a href="https://console.aws.amazon.com/secretsmanager/home" class="bare">https://console.aws.amazon.com/secretsmanager/home</a>.</p>
+</div>
+<div class="paragraph">
+<p>Once you&#8217;ve logged in, click the button to create a new secret. From here, you should specify the type as <em>Other type of secrets</em>. You&#8217;ll be able to enter your config properties in a key/value format below, or leave blank for configuring through Payara Server.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/new-secret.png" alt="AWS Secret Creation"></span></p>
+</div>
+<div class="paragraph">
+<p>On the next screen, you&#8217;ll be able to enter your secret name. This will need giving to Payara Server in order to fetch the config properties from it.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/secret-name.png" alt="AWS Secret Name"></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_aws_iam_user"><a class="anchor" href="#_aws_iam_user"></a>AWS IAM User</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to connect to AWS Secrets Manager you need to know your project name as well as have an access key. Assuming you already have a AWS project and a secret created in AWS Secrets Manager, you need to create an IAM user which Payara Server will use to access your AWS Secrets.</p>
+</div>
+<div class="paragraph">
+<p>From the AWS console, visit the <em>IAM Users</em> dashboard by searching 'IAM' in the top search bar. From here, head to <em>Users</em> in the left menu. You&#8217;ll see all your IAM users associated with this region.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/iam-users.png" alt="AWS IAM users"></span></p>
+</div>
+<div class="paragraph">
+<p>From here you can create a new IAM user. Skip this step if you already have an IAM user you want to use.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/new-iam-user.png" alt="AWS new IAM user"></span></p>
+</div>
+<div class="paragraph">
+<p>Set the IAM user name. This isn&#8217;t used by Payara, but will be helpful for your own reference. Make sure you enable <em>Programmatic access</em>, as this will be used by Payara Server to access your AWS Secrets.</p>
+</div>
+<div class="paragraph">
+<p>Next, select your IAM user permissions.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/iam-user-permissions.png" alt="AWS IAM user permissions"></span></p>
+</div>
+<div class="paragraph">
+<p>Whether you assign a group or select individual permissions, make sure the IAM user contains the <em>SecretsManagerReadWrite</em> permission, which will allow the user access to your secrets.</p>
+</div>
+<div class="paragraph">
+<p>When you finish creating the IAM user, you&#8217;ll be given an access key id and secret access key. These will need to be recorded, and passed to Payara Server as <a href="../../../Payara%20Server%20Documentation/Server%20Configuration%20And%20Management/Configuration%20Options/Password%20Aliases.html" class="page">Password Aliases</a> <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code> respectively.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration"><a class="anchor" href="#configuration"></a>Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can configure AWS Secrets either via the admin console or the <em>asadmin</em> utility. You&#8217;ll need the access key id, secret access key and secret name created from the AWS console in the previous sections, as well as the name of the AWS region. Make sure that the AWS Secrets Manager has been enabled in the specified region.</p>
+</div>
+<div class="paragraph">
+<p>To find the region in the AWS console, check the top right dropdown:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/region.png" alt="AWS region selection"></span></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The region name is the snake-case notation, not the full words. E.g. <code>eu-west-2</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_from_the_admin_console"><a class="anchor" href="#_from_the_admin_console"></a>From the Admin Console</h3>
+<div class="paragraph">
+<p>To configure the <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code> password aliases from the admin console, refer to the <a href="../../../Payara%20Server%20Documentation/Server%20Configuration%20And%20Management/Configuration%20Options/Password%20Aliases.html" class="page">Password Aliases Admin Console configuration</a> guide.</p>
+</div>
+<div class="paragraph">
+<p>To configure the config source from the admin console, go to <code>Configs</code> &#8594; <code>your-config</code> &#8594; <code>MicroProfile</code> &#8594; <code>Config</code> &#8594; <code>AWS Secrets</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="../../../../_images/microprofile/config/cloud/aws/admin-console-config.png" alt="Payara Server Administration Console configuration route"></span></p>
+</div>
+<div class="paragraph">
+<p>From here you can pass the name of the secret to access in AWS Secrets Manager, as well as the region name. You can also decide whether to apply these changes dynamically or on the next server restart. If the config source is enabled or disabled dynamically it will take effect across the server immediately.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_from_the_command_line"><a class="anchor" href="#_from_the_command_line"></a>From the Command Line</h3>
+<div class="paragraph">
+<p>To configure the <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code> password aliases from the command line, refer to the <a href="../../../Payara%20Server%20Documentation/Server%20Configuration%20And%20Management/Configuration%20Options/Password%20Aliases.html" class="page">Password Aliases Asadmin configuration</a> guide.</p>
+</div>
+<div class="paragraph">
+<p>To configure the AWS Secrets Cloud Config Source from the command line, use the <code>set-aws-config-source-configuration</code> asadmin command, specifying the required parameters like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-aws-config-source-configuration --dynamic true --enabled true --secretName payara/test/key --regionName eu-west-2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can use the <code>--enabled</code> and <code>--dynamic</code> options to enable or disable the AWS Config Source on demand.</p>
+</div>
+<div class="paragraph">
+<p>Also, you can retrieve the current configuration for the AWS Config Source using the <code>get-aws-config-source-configuration</code> asadmin command like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-aws-config-source-configuration
+
+Enabled  Region Name  Secret Name
+true     eu-west-2    payara/test/key</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_usage"><a class="anchor" href="#_usage"></a>Usage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Provided the required roles have been assigned to the IAM user in the AWS console, the secrets can be injected into any applicable MicroProfile Config injection point as with any other Config Source. The secrets can also be fetched, created and deleted from the <code>asadmin</code> utility.</p>
+</div>
+<div class="paragraph">
+<p>To fetch a secret from AWS Secrets Manager:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; get-config-property --source cloud --sourceName aws --propertyName mysecret
+
+secretvalue</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To create or change a secret from AWS Secrets Manager:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; set-config-property --source cloud --sourceName aws --propertyName mysecret --propertyValue secretvalue</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To delete a secret from AWS Secrets Manager:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">asadmin&gt; delete-config-property --source cloud --sourceName aws --propertyName mysecret</code></pre>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../../../../_/js/site.js"></script>
+<script async src="../../../../../../_/js/vendor/highlight.js"></script>
+<script async src="../../../../../../_/js/vendor/docSearch.js"></script>
+  </body>
+</html>
