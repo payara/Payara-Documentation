@@ -1,0 +1,170 @@
+[[Request Tracing Service-in-payara-micro]]
+= Request Tracing in Payara Micro
+
+_Since Payara Micro 4.1.1.164_
+
+The Request Tracing service works the same on Payara Micro Community and will trace the
+same events described in its xref:/Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/Overview.adoc[documentation].
+
+[[usage]]
+== Usage
+
+Payara Micro Community exposes a number of command line options to configure request tracing. These options cover the most frequent
+use cases for Payara Micro Community, but you can also configure the Request Tracing Service using a *post*-boot command file,
+giving you access to the asadmin commands and the full range of options they provide.
+
+[[configuration-options]]
+=== Configuration Options
+
+[cols="<,a", options="header"]
+|===
+| Parameter | Summary
+| `enableRequestTracing`
+| Enables the service when present.
+
+A supplementary parameter can be provided with this option to encapsulate the value
+and unit options, for example, the following will enable the service with a threshold
+of 4ms:
+
+[source, shell]
+----
+java -jar payara-micro.jar --enableRequestTracing 4ms
+----
+
+| `requestTracingThresholdUnit`
+| Accepts a String value determining the time unit, defaulting to seconds if no
+value is given. The accepted strings are (case insensitive):
+
+* `NANOSECONDS`
+* `MICROSECONDS`
+* `MILLISECONDS`
+* `SECONDS`
+* `MINUTES`
+* `HOURS`
+* `DAYS`
+
+This is combined with the `requestTracingThresholdValue` setting to determine the threshold time period.
+
+| `requestTracingThresholdValue`
+| Accepts an integer value to determine the threshold value before a request is traced,
+defaulting to 30 if no value is entered. This is combined with the `requestTracingThresholdUnit` setting to determine
+the threshold time period.
+
+| `enablerequesttracingadaptivesampling`
+| Enables the _Adaptive Sampling_ option when present. When enabled, this allows the sample rate to change to attempt to
+meet a target count of traces over a specified period of time.
+
+| `requesttracingadaptivesamplingtargetcount`
+| Accepts an integer value to determine the threshold value before a request is traced,
+defaulting to 6 if no value is entered. Only used if adaptive sampling is enabled.
+
+| `requesttracingadaptivesamplingtimevalue`
+| Accepts an integer value to determine the threshold value before a request is traced,
+defaulting to 1 if no value is entered. Only used if adaptive sampling is enabled.
+This is combined with the `requesttracingadaptivesamplingtimeunit` setting to determine
+the adaptive sampling time period.
+
+| `requesttracingadaptivesamplingtimeunit`
+| Accepts a String value determining the time unit, defaulting to minutes if no
+value is given. The accepted strings are (case insensitive):
+
+* `NANOSECONDS`
+* `MICROSECONDS`
+* `MILLISECONDS`
+* `SECONDS`
+* `MINUTES`
+* `HOURS`
+* `DAYS`
+
+This is combined with the `requesttracingadaptivesamplingtimevalue` setting to determine
+the adaptive sampling time period.
+Only used if adaptive sampling is enabled.
+|===
+
+[[shorthand-notation]]
+=== Shorthand Notation
+
+To enable and configure request tracing with a single command, the
+`--enableRequestTracing` option allows you to provide *one* string following it
+to set the threshold unit and/or value.
+
+In other words, the value and unit need to be a single string with no spaces,
+so `500ms` would be allowed, but `500 ms` would not. In the second case,
+the unit is ignored and the default `SECONDS` is kept.
+
+Notation for units is as follows:
+
+[cols=",a", options="header"]
+|===
+| Unit | Acceptable notation
+| `NANOSECONDS`
+|
+* `Nanoseconds` (case-insensitive)
+* `Nanosecond` (case-insensitive)
+* `ns`
+|`MICROSECONDS`
+|
+* `Microseconds` (case-insensitive)
+* `Microsecond` (case-insensitive)
+* `us`
+* `μs`
+| `MILLISECONDS`
+|
+* `Milliseconds` (case-insensitive)
+* `Millisecond` (case-insensitive)
+* `ms`
+| `SECONDS`
+|
+* `Seconds` (case-insensitive)
+* `Second` (case-insensitive)
+* `s`
+| `MINUTES`
+|
+* `Minutes` (case-insensitive)
+* `Minute` (case-insensitive)
+* `Mins` (case-insensitive)
+* `Min` (case-insensitive)
+* `m`
+| `HOURS`
+|
+* `Hours` (case-insensitive)
+* `Hour` (case-insensitive)
+* `h`
+| `DAYS`
+|
+* `Days` (case-insensitive)
+* `Day` (case-insensitive)
+* `d`
+|===
+
+== Example usages
+
+`*java -jar payara-micro.jar --enableRequestTracing*`::
+Enable request tracing
+`*java -jar payara-micro.jar --enableRequestTracing ns*`::
+Enable request tracing and set threshold unit to nanoseconds (`_value_`
+_defaults to_ `_30_`)
+`*java -jar payara-micro.jar --enableRequestTracing 2*`::
+Enable request tracing and set threshold value to 2 (`_unit_` _defaults to_
+  `_SECONDS_`)
+`*java -jar payara-micro.jar --enableRequestTracing 4ms*`::
+Enable request tracing and set threshold to 4 microseconds
+
+[WARNING]
+====
+Exercise caution when using the shorthand notation together with other parameters. Due to the way the parser works, the last parameter entered will override the previous. For example:
+
+[source, shell]
+----
+java -jar payara-micro.jar --requestTracingThresholdUnit DAYS --enableRequestTracing 1ns
+----
+
+Will enable request tracing, and set the threshold to `1 NANOSECOND`, while
+
+[source, shell]
+----
+java -jar payara-micro.jar --enableRequestTracing 1ns --requestTracingThresholdUnit DAYS
+----
+
+Will enable request tracing, and set the threshold to `1 Day`
+====

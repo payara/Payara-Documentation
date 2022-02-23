@@ -1,0 +1,167 @@
+[[custom-vendor-metrics]]
+= Custom Vendor Metrics
+
+xref:/Technical Documentation/Payara Server Documentation/Logging and Monitoring/Monitoring Service/MBeans.adoc[JMX MBeans] can be exposed as ***Custom Vendor Metrics*** by the user by supplying a custom https://github.com/payara/Payara/blob/master/appserver/payara-appserver-modules/microprofile/metrics/src/main/resources/metrics.xml[metrics.xml] file in the `${PAYARA_HOME}/glassfish/domains/${DOMAIN_NAME}/config/` folder with the following format:
+
+[source, xml]
+----
+<config>
+    <base>
+        ...
+    </base>
+    <vendor>
+        <!--sample metadata-->
+        <metadata>
+            <!--tags are since 5.193 -->
+            <tags>
+                <tag>
+                    <name>operatingSystem</name>
+                    <value>Linux</value>
+                </tag>
+            </tags>
+            <name>system.cpu.load</name>
+            <mbean>java.lang:type=OperatingSystem/SystemCpuLoad</mbean>
+            <type>gauge</type>
+            <unit>none</unit>
+            <displayName>System CPU Load</displayName>
+            <description>Recent CPU usage for the whole system.</description>
+        </metadata>
+    </vendor>
+</config>
+----
+
+IMPORTANT: Payara Server has a more extensive range of MBeans available than Payara Micro, but these _AMX_ MBeans need to be enabled through the _Monitoring_ section of the admin console before they will be usable. Each of these AMX MBeans are also lazily loaded so, for example, JDBC connection pool MBeans will not be visible until an application that uses the connection pool is deployed.
+
+[[templating-metrics-amx-mbeans]]
+== Templating Metrics for AMX MBeans
+
+It is possible to create a template for a metric based on AMX MBeans properties for multiple resource configurations or similar objects (like JDBC connection pools for example).
+
+[[simple-templating]]
+=== Simple Templating
+
+You can use the `%s` placeholder to define a template in the metadata definition of the metric using the `mbean` element. The server will look for all MBeans that match the expression defined and will generate metrics for each one of them.
+
+IMPORTANT: You will need to use the `%s` placeholder in the name element as well to allow each metric to have a different name and avoid collisions.
+
+[[example]]
+==== Example
+
+Here's a simple example of defining a custom metric definition template that will generate metrics for the number of free connections available to all JDBC connections pools:
+
+[source, xml]
+----
+<metadata>
+     <tags>
+        <tag>
+            <name>name</name>
+            <value>%s</value>
+        </tag>
+     </tags>
+     <name>jdbc.connection.pool.numconnfree</name>
+     <mbean>amx:pp=/mon/server-mon[server],type=jdbc-connection-pool-mon,name=resources/%sPool/numconnfree#current</mbean>
+     <type>counter</type>
+     <unit>none</unit>
+     <displayName>numconnfreePool</displayName>
+     <description>The total number of free connections in the pool as of the last sampling.</description>
+</metadata>
+----
+
+Which will yield the following results:
+
+[source, text]
+----
+# TYPE vendor_jdbc_connection_pool_numconnfree_total counter
+# HELP vendor_jdbc_connection_pool_numconnfree_total The total number of free connections in the pool as of the last sampling.
+vendor_jdbc_connection_pool_numconnfree_total{name="resources/DerbyPool"} 0
+vendor_jdbc_connection_pool_numconnfree_total{name="resources/H2Pool"} 0
+vendor_jdbc_connection_pool_numconnfree_total{name="resources/__TimerPool"} 0 0
+----
+
+[[instance-names]]
+==== Instance Names
+
+Payara provides the placeholder `${instance}`. It is replaced with the name of the Payara instance, where the metrics is running:
+
+[source, xml]
+----
+<metadata>
+    <name>requestcount.${instance}</name>
+    <mbean>amx:type=web-request-mon,pp=/mon/server-mon[${instance}],name=clusterjsp/server/requestcount#count</mbean>
+    <type>gauge</type>
+    <unit>none</unit>
+    <displayName>Request count for application</displayName>
+</metadata>
+----
+
+Here's the sample output of this metric being queried on a server instance named `i1`:
+
+[source, text]
+----
+vendor_requestcount_i1 1
+----
+
+[[advanced-templating]]
+=== Advanced Templating
+
+If you need more control on the attributes of specific MBeans used in a metric definition, you can use the `${key}`, `${attribute}` and `${subattribute}` placeholders to define more fine-grained metrics.
+
+These placeholders are used as follows:
+
+`key`:: Used as a placeholder of the name (or part of the name) of an AMX MBean.
+
+`attribute`:: Used as a placeholder for the name of an *attribute* of an AMX MBean.
+
+`subattribute`:: Used as a placeholder for the name of a *sub-attribute* (or second-level attribute), which corresponds to the attribute of a `CompositeData` object.
+
+IMPORTANT: You will need to use the `${key}`, `${attribute}` and `${subattribute}` placeholders in the `name` element as well to prevent name collisions between different templated metrics.
+
+[[example-1]]
+==== Example
+
+Here's an example of defining a custom metric definition template with these placeholders that will generate a counter metric for each specific connection metric that is available to all JDBC connection pools:
+
+[source, xml]
+----
+<metadata>
+     <name>jdbc.connection.pool.${key}Pool.${attribute}#${subattribute}</name>
+     <mbean>amx:pp=/mon/server-mon[server],type=jdbc-connection-pool-mon,name=resources/${key}Pool/${attribute}#${subattribute}</mbean>
+     <type>counter</type>
+     <unit>none</unit>
+</metadata>
+----
+
+Which will yield the following results:
+
+[source, text]
+----
+# TYPE vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnsuccessfullymatched#start_time counter
+vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnsuccessfullymatched#start_time 1540463722554
+# TYPE vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconncreated#count counter
+vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconncreated#count 0
+# TYPE vendor:jdbc_connection_pool_resources/_derby_pool_pool_connrequestwaittime#last_sample_time counter
+vendor:jdbc_connection_pool_resources/_derby_pool_pool_connrequestwaittime#last_sample_time -1
+# TYPE vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnused#start_time counter
+vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnused#start_time 1540463106138
+# TYPE vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnused#last_sample_time counter
+vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnused#last_sample_time 1540463722554
+# TYPE vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconntimedout#start_time counter
+vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconntimedout#start_time 1540463722554
+# TYPE vendor:jdbc_connection_pool_resources/_derby_pool_pool_connrequestwaittime#start_time counter
+vendor:jdbc_connection_pool_resources/_derby_pool_pool_connrequestwaittime#start_time 1540463722554
+# TYPE vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnfree#start_time counter
+vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnfree#start_time 1540463106138
+# TYPE vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnfailedvalidation#count counter
+vendor:jdbc_connection_pool_resources/_derby_pool_pool_numconnfailedvalidation#count 0
+......
+# TYPE vendor:jdbc_connection_pool_resources/_h2_pool_pool_numconnsuccessfullymatched#start_time counter
+vendor:jdbc_connection_pool_resources/_h2_pool_pool_numconnsuccessfullymatched#start_time 1540463722554
+# TYPE vendor:jdbc_connection_pool_resources/_h2_pool_pool_numconncreated#count counter
+vendor:jdbc_connection_pool_resources/_h2_pool_pool_numconncreated#count 0
+......
+......
+----
+
+== See Also
+
+* xref:/Technical Documentation/Payara Server Documentation/Logging and Monitoring/Monitoring Service/MBeans.adoc[JMX MBeans Reference]

@@ -1,0 +1,288 @@
+:ordinal: 900
+[[payara-micro-api]]
+= Payara Micro API
+
+This section details documentation on the Payara Micro API. The Javadoc for the most recent version of the Payara Micro API can be
+found https://javadoc.io/doc/fish.payara.extras/payara-micro[here].
+
+`PayaraMicro.class` methods are used during the bootstrap
+process, whereas `PayaraMicroRuntime.class` methods are used on running instances.
+
+[[configuration-methods]]
+== Configuration Methods
+
+Configuration Methods of `PayaraMicro.class` are detailed here. 
+
+[cols=",,,,,",options="header",]
+|=======================================================================
+|Configuration Operand |Description |Get Method |Set Method |Default Value
+|Command Line Equivalent
+|Alternate Domain XML
+|Gets or sets the domain.xml used to override the default server configuration.
+|`File getAlternateDomainXML()`
+|`PayaraMicro setAlternateDomainXML(File alternateDomainXML)`
+|`null`
+|`--domainConfig`
+
+|Cluster Multicast Group
+|Gets or sets the cluster multicast group for the instance.
+|`String getClusterMulticastGroup()`
+|`PayaraMicro setClusterMulticastGroup(String hzMulticastGroup)`
+|`null` (Default value of 224.2.2.4 set in default domain.xml is not read into instance variable)
+|`--mcAddress`
+
+|Cluster Port
+|Gets or sets the multicast cluster port.
+|`int getClusterPort()`
+|`PayaraMicro setClusterPort(int hzPort)`
+|-2147483648 (MIN_VALUE) (Default value of 2904 set in default domain.xml is not read into instance variable)
+|`--mcPort`
+
+|Cluster Start Port
+|Gets or sets the start port number for the Payara Micro instance to listen on for cluster communications.
+|`int getClusterStartPort()`
+|`PayaraMicro setClusterStartPort(int hzStartPort)`
+|-2147483648 (MIN_VALUE) (Default value of 5900 set in default configuration files is not read into instance variable)
+|`--startPort`
+
+|Deployment Directory
+|Gets or sets the directory to be scanned for archives to deploy.
+|`File getDeploymentDir()`
+|`PayaraMicro setDeploymentDir(File deploymentRoot)`
+|`null`
+|`--deploymentDir`
+
+|HTTP Port
+|Gets or sets the HTTP port for the instance to bind to.
+|`int getHttpPort()`
+|`PayaraMicro setHttpPort(int httpPort)`
+|-2147483648 (MIN_VALUE) (Default value of 8080 set in default domain.xml is not read into instance variable)
+|`--port`
+
+|Instance Name
+|Gets or sets the name of the instance.
+|`String getInstanceName()`
+|`PayaraMicro setInstanceName(String instanceName)`
+|Generated Universally Unique Identifier.
+|`--name`
+
+|Maximum HTTP Threads
+|Gets or sets the maximum number of threads in the HTTP thread pool.
+|`int getMaxHttpThreads()`
+|`PayaraMicro setMaxHttpThreads(int maxHttpThreads)`
+|-2147483648 (MIN_VALUE) (Default value of 10 set in default domain.xml is not read into instance variable)
+|`--maxHttpThreads`
+
+|Minimum HTTP Threads
+|Gets or sets the minimum number of threads in the HTTP thread pool.
+|`int getMinHttpThreads()`
+|`PayaraMicro setMinHttpThreads(int minHttpThreads)`
+|-2147483648 (MIN_VALUE) (Default value of 10 set in default domain.xml is not read into instance variable)
+|`--minHttpThreads`
+
+|Root Directory
+|Gets or sets the root configuartion directory.
+|`File getRootDir()`
+|`PayaraMicro setRootDir(File rootDir)`
+|`null`
+|`--rootDir`
+
+|HTTPS Port
+|Gets or sets the HTTPS port for the instance to bind to. A HTTPS port is not bound unless this value is manually set.
+|`int getSslPort()`
+|`PayaraMicro setSslPort(int sslPort)`
+|-2147483648 (MIN_VALUE) (Default value of 8443 set in default domain.xml is not read into instance variable)
+|`--sslPort`
+
+|No Clustering
+|Gets or sets whether clustering is enabled or disabled for an instance.
+|`boolean isNoCluster()`
+|`PayaraMicro setNoCluster(boolean noCluster)`
+|_false_
+|`--noCluster`
+
+|HTTP Auto-Binding
+|Enables or Disables auto-binding of the HTTP port for an instance.
+|`boolean getHttpAutoBind()`
+|`PayaraMicro setHttpAutoBind(boolean httpAutoBind)`
+|_false_
+|`--autoBindHttp`
+
+|HTTPS Auto-Binding
+|Enables or Disables auto-binding of the HTTPS port for an instance.
+|`boolean getSslAutoBind()`
+|`PayaraMicro setSslAutoBind(boolean sslAutoBind)`
+|_false_
+|`--autoBindSsl`
+
+|Auto-Bind Range
+|Sets the range for HTTP and HTTPS port auto-binding.
+|`int getAutoBindRange()`
+|`PayaraMicro setAutoBindRange(int autoBindRange)`
+|5
+|`--autoBindRange`
+|=======================================================================
+
+[[operation-methods]]
+== Operation Methods
+
+The other methods of the Payara Micro API that operate Payara
+Micro instances are detailed here. 
+
+The list of methods in the API:
+
+* xref:#deployment-methods[Deployment Methods]
+* xref:#setup-and-shutdown-methods[Setup and Shutdown Methods]
+* xref:#cdi-methods[CDI Methods]
+* xref:#run-methods[Run Methods]
+* xref:#get-methods[Get Methods]
+* xref:#library-methods[Library Methods]
+
+[[deployment-methods]]
+=== Deployment Methods
+
+Deployment methods are used for the deployment of applications to Payara Micro
+instances.
+
+[[payaramicro.class-methods]]
+==== `PayaraMicro.class` Methods
+
+[cols=",,",options="header"]
+|=======================================================================
+|Method |Description |Command Line Equivalent
+|`PayaraMicro addDeployment(String pathToWar)`
+|Adds the file found at the location of the `pathToWar` parameter to the list of
+files to be deployed upon starting the instance.
+|`--deploy`
+
+|`PayaraMicro addDeploymentFile(File file)`
+|Adds the file associated with the `file` parameter to the list of files to be
+deployed upon starting the instance.
+|`--deploy`
+|=======================================================================
+
+[[payaramicroruntime.class-methods]]
+==== `PayaraMicroRuntime.class` Methods
+
+[cols=",",options="header",]
+|=======================================================================
+|Method |Description
+|`boolean deploy(String name, InputStream is)`
+|Deploys an application from an `InputStream` with the name specified.
+|`boolean deploy(String name, String contextRoot, InputStream is)`
+|Deploys an application from an `InputStream`, with the specified name and
+context root.
+
+|`boolean deploy(File war)`
+|Deploys the application located at the _war_ parameter path.
+|`boolean undeploy(String name)`
+|Un-deploys the specified application.
+|=======================================================================
+
+[[setup-and-shutdown-methods]]
+=== Setup and Shutdown Methods
+
+These methods are required for setting up and cleaning Payara Micro instances.
+
+[[payaramicro.class-methods-1]]
+==== `PayaraMicro.class` Methods
+
+[cols=",",options="header",]
+|=======================================================================
+|Method |Description
+|`PayaraMicroRuntime bootStrap() throws BootstrapException`
+|Checks the supplied configuration parameters and starts a Payara Micro instance.
+|`PayaraMicro getInstance()`
+|Obtains the static singleton instance of the Payara Micro server. If one does
+not exist, one will be created and returned.
+|`PayaraMicro getInstance(boolean create)`
+|Obtains the static singleton instance of the Payara Micro server. If one does
+not exist and `create` is set to true, one will be created and returned, otherwise
+returns _null_.
+|`void shutdown() throws BootstrapException`
+|Stops and shuts down the Payara Micro instance.
+|=======================================================================
+
+[[payaramicroruntime.class-methods-1]]
+==== `PayaraMicroRuntime.class` Methods
+
+[cols=",",options="header",]
+|=======================================================================
+|Method |Description
+|`void shutdown() throws BootstrapException`
+|Stops and shuts down the Payara Micro instance.
+|=======================================================================
+
+[[cdi-methods]]
+=== CDI Methods
+
+These methods are used for firing CDI Events across running instances.
+
+[cols=",",options="header",]
+|=======================================================================
+|Method |Description
+|`void addCDIEventListener(CDIEventListener listener)`
+|Adds a CDI Event Listener.
+|`void removeCDIEventListener(CDIEventListener listener)`
+|Removes a CDI Event Listener.
+|`void addClusterListener(PayaraClusterListener listener)`
+|Adds a Cluster Listener.
+|`void removeClusterListener(PayaraClusterListener listener)`
+|Removes a Cluster Listener.
+|`void publishCDIEvent(PayaraClusteredCDIEvent event)`
+|Publishes a CDI Event.
+|=======================================================================
+
+[[run-methods]]
+=== Run Methods
+
+These methods are used for running `asadmin` commands or `Callable`
+objects on bootstrapped instances.
+
+[cols=",",options="header",]
+|=======================================================================
+|Method |Description
+|`Map<InstanceDescriptor, Future<ClusterCommandResult>> run (String command, String... args )`
+|Runs an asadmin command on all members of a Payara Micro Cluster.
+|`Map<InstanceDescriptor, Future<ClusterCommandResult>> run (Collection<InstanceDescriptor> members, String command, String... args )`
+|Runs an asadmin command on specified members of a Payara Micro Cluster.
+|`<T extends Serializable> Map<InstanceDescriptor, Future<T>> run (Callable<T> callable)`
+|Runs a Callable object on all members of a Payara Micro Cluster.
+|`<T extends Serializable> Map<InstanceDescriptor, Future<T>> run (Collection<InstanceDescriptor> members, Callable<T> callable)`
+|Runs a Callable object on specified members of a Payara Micro Cluster.
+|=======================================================================
+
+[[get-methods]]
+=== Get Methods
+
+These methods are used for getting information on running Payara Micro instances.
+For information on the `Get` methods of an non-bootstrapped instance, see the
+<<Configuration Methods>> section.
+
+[cols=",",options="header",]
+|=======================================================================
+|Method |Description
+|`Collection<InstanceDescriptor> getClusteredPayaras()`
+|Returns a collection of instance descriptors for all the Payara Micros instances
+in a cluster.
+|`Collection<String> getDeployedApplicationNames()`
+|Returns the names of the deployed applications.
+|`String getInstanceName()`
+|Returns the instance name.
+|`InstanceDescriptor getLocalDescriptor()`
+|Returns the instance descriptor of the instance the method is run on.
+|=======================================================================
+
+[[library-methods]]
+=== Library Methods
+
+These methods are used for configuring additional libraries to the instance's
+classpath.
+
+[cols=",",options="header",]
+|=======================================================================
+|Method |Description
+|`void addLibrary(File)`
+|Adds a new library source (a JAR file or a directory with multiple JAR files)
+to be considered for the instance's classpath
+|=======================================================================

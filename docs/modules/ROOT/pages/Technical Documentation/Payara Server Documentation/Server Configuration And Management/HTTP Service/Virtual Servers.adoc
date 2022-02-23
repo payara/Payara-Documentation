@@ -30,10 +30,11 @@ from the admin console. The ID cannot begin with a number.
 
 **Asadmin Command:**
 
-`set configs.config.server-config.http-service.virtual-server.${virtual-server-name}.id=value`
+[source, shell]
+----
+set configs.config.server-config.http-service.virtual-server.${virtual-server-name}.id=value
+----
 
-
----
 [[hosts]]
 === Hosts
 A comma separated list of values allowed in the `host` request header to select
@@ -186,11 +187,11 @@ Defines additional properties for the configuration of a virtual server.
 [cols="20,70,10",options="header",]
 |===
 | Key                         | Description | Default Value
-| *sso-max-inactive-seconds*  | The number of seconds of no activity after which a user's SSO record becomes elegible for purging.
+| *sso-max-inactive-seconds*  | The number of seconds of no activity after which a user's SSO record becomes eligible for purging.
   | 300
 | *sso-reap-interval-seconds* | The number of seconds between purges of SSO records. | 60
 | *setCacheControl*           | Comma separated list of Cache-Control response directives (See section 14.9 of: https://www.ietf.org/rfc/rfc2616.txt). | none
-| *allowLinking*             a| If set to true, resources that are symbolic links will be served for all applications deployed to this virtual server. Can be overriden for an individual application in the glassfish-web.xml with:
+| *allowLinking*             a| If set to true, resources that are symbolic links will be served for all applications deployed to this virtual server. Can be overridden for an individual application in the glassfish-web.xml with:
 ----
 <glassfish-web-app>
   <property name="allowLinking" value="false" />
@@ -206,7 +207,7 @@ Note: Setting this property to `true` on Windows systems exposes JSP source code
 | *denyRemoteAddress*         | Comma separated list of regular expression patterns to which the remote client's IP address is compared. The IP must not match any of the patterns to be accepted. | none
 | *allowRemoteHost*           | Comma separated list of regular expression patterns to which the remote client's host name is compared. The host name must match one of the patterns to be accepted. | none
 | *denyRemoteHost*            | Comma separated list of regular expression patterns to which the remote client's host name is compared. The host name must not match any of the patterns to be accepted. | none
-| *authRealm*                 | Specifies the name attribute of an auth-realm, which overrides the server's default realm for standalone web applications deployed to this virtual server. Can be overriden for an individual application with a realm defined in the web.xml. | none
+| *authRealm*                 | Specifies the name attribute of a security realm, which overrides the server's default realm for standalone web applications deployed to this virtual server. Can be overridden for an individual application with a realm defined in the web.xml. | none
 | *securePagesWithPragma*     | Set this property to false to ensure that for all web applications on this server file downloads using SSL work properly in Internet Explorer. | true
 | *contextXmlDefault*         | Sets the directory of the context.xml used for this virtual server, if one is used. For more information on the context.xml file, see https://tomcat.apache.org/tomcat-5.5-doc/config/context.html. | none
 | *alternatedocroot_n*        | Specifies an alternate document root, where n is a positive integer that allows specification of more than one. | none
@@ -220,11 +221,11 @@ E.g. `send-error_1="code=404 path=/dir/of/file/error.html reason=UNAUTHORIZED"`.
   | none
 | *redirect_n*               a| Specifies a redirect from an old url to a new one. The value is a string, composed of two values:
 
-- from -> The prefix of the requested URI to match.
-- url-prefix -> The prefix of the new URI to return to the client. The *from* prefix is replaced by this value.
+- `from` -> The prefix of the requested URI to match.
+- `url-prefix` -> The prefix of the new URI to return to the client. The *from* prefix is replaced by this value.
 
 E.g. `redirect_1="from=/fake url-prefix=http://another"`.
   | none
-| *listener_n*                | Specifies the fully qualified class name of a custom Catalina listener, where n is a positive integer that allows the specification of more than one. The listener class must implement the *org.apache.catalina.ContainerListener* or *org.apache.catalina.LifecycleListener* interface. | none
-| *errorReportValve*          | Specifies the fully qualified class name of a custom valve that produces default error pages for applications on this virtual server. Specify an empty string to disable the default error page mechanism for this virtual server. | *org.apache.catalina. valves.ErrorReportValve*
+| *listener_n*                | Specifies the fully qualified class name of a custom Catalina listener, where n is a positive integer that allows the specification of more than one. The listener class must implement the *`org.apache.catalina.ContainerListener`* or *`org.apache.catalina.LifecycleListener`* interface. | none
+| *errorReportValve*          | Specifies the fully qualified class name of a custom valve that produces default error pages for applications on this virtual server. Specify an empty string to disable the default error page mechanism for this virtual server. | *`org.apache.catalina.valves.ErrorReportValve`*
 |===
