@@ -1,0 +1,71 @@
+[[yubikey]]
+= Yubikey Support
+
+_Since Payara Server 5.182_
+
+The Payara API provides a way to authenticate with Yubikey using the `@YubikeyIdentityStoreDefinition` annotation. This works in the same way as other identity stores in the Java EE Security API.
+
+[[usage]]
+== Usage
+
+The Yubikey identity store is defined through the `@YubikeyIdentityStoreDefinition` annotation. Specifying this in a valid place as defined by the Security API will create the identity store. Often this may mean that any class is a valid position. 
+
+WARNING: This authentication mechanism currently supports cloud-based Yubikey authentication servers only.
+
+[[usage-example]]
+=== Example
+
+The following code sample illustrates how to configure Yubikey support:
+
+[source, java]
+----
+@YubikeyIdentityStoreDefinition(yubikeyAPIKey="qwertyuiop1234567890", yubikeyAPIClientID=98765)
+public class ApplicationConfiguration {
+
+}
+----
+
+
+[[configuration]]
+== Configuration
+
+The `@YubikeyIdentityStoreDefinition` annotation has several configuration attributes. These refer to the API access credentials from Yubico.
+
+IMPORTANT: One of `yubikeyAPIClientID`, `yubikeyAPIClientIDExpression` or a MicroProfile Configuration settings is mandatory for the feature to work correctly.
+
+.Configuration Options
+|===
+| Option | Required | Description
+
+| `yubikeyAPIClientID`
+| false
+| The client identifier used to identiy the application
+
+| `yubikeyAPIKey`
+| true
+| The API key
+
+| `priority`
+| false
+| The priority of the identity store
+
+| `priorityExpression`
+| false
+| EL expression which overrides the priority value
+
+| `yubikeyAPIClientIDExpression`
+| false
+| EL expression which overrides the yubikeyAPIClientID value
+|===
+
+These attributes can be overriden with MicroProfile configuration values:
+
+. `payara.security.yubikey.apikey` overrides `yubikeyAPIKey`
+. `payara.security.yubikey.clientid` overrides `yubikeyAPIClientID`
+. `payara.security.yubikey.identitystore.priority` overrides `priority`
+
+[[extra-Resources]]
+== Extra Resources
+
+To read more about Yubikey itself, visit https://www.yubico.com/.
+
