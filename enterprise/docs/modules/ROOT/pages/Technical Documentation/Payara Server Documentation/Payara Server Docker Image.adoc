@@ -1,0 +1,211 @@
+[[docker-image-overview]]
+= Payara Server Docker Image Overview
+
+Overview of the usage and details of the official Payara Server Enterprise Docker image.
+
+[[quickstart]]
+== Quick start
+
+Launch a new Payara Server domain running in a container listening in port `8080` with the following command:
+
+[source, shell]
+----
+docker run -p 8080:8080 nexus.payara.fish:5000/payara/server-full
+----
+
+Keep in mind the following:
+
+* The container starts the `production` domain in the foreground so the server's DAS becomes the main process. 
+* The _tini_ utility is used to guarantee that the server runs seamlessly as the single child process. 
+* The server's JVM process runs under the `payara` user.
+
+IMPORTANT: It is recommended to specify the tag of the correct Payara Enterprise version that will be used on your production environment for guaranteed long-term stability
+
+[source, shell, subs=attributes+]
+.Using a specific version
+----
+docker run -p 8080:8080 nexus.payara.fish:5000/payara/server-full:{currentVersion}
+----
+
+[[other-distributions]]
+== Other distributions
+
+Besides the Full Profile version, the Payara Server Web Profile distribution is also available as a Docker Image under the `payara/server-web` name. The image for this distribution behaves the same as its Full Profile counterpart.
+
+[[jdk-version]]
+== Specifying the JDK Version
+
+There are 2 different, alternative versions of the JDK images:
+
+* The default version which is based on **JDK8**, uses no suffix.
+* The **JDK 11** version, which uses the `-jdk11` suffix.
+
+To switch from the default JDK 8 based image to the JDK 11 compatible one, just add the corresponding suffix to the tag's name like this:
+
+[source, shell, subs=attributes+]
+----
+docker run -p 8080:8080 nexus.payara.fish:5000/payara/server-full:{currentVersion}-jdk11
+----
+
+[[ports]]
+== Exposed ports
+
+The default ports that are exposed by this image are:
+
+* 8080 - HTTP listener
+* 8181 - HTTPS listener
+* 4848 - Admin Service HTTPS listener
+* 9009 - JWDP Debug port
+
+[[administration]]
+== Administration Details
+
+To access the DAS' administration interface (either by remote asadmin commands or by using the Web Admin Console), just map the container's Admin Service port when launching the container:
+
+[source, shell, subs=attributes+]
+----
+docker run -p 4848:4848 -p 8080:8080 nexus.payara.fish:5000/payara/server-full:{currentVersion}
+----
+
+By default, the admin service will be secure-enabled, meaning that HTTPS communication will be used exclusively.
+
+IMPORTANT: The default administrator user with access to the admin interface will use the `admin/admin` credentials.
+
+CAUTION: Make sure to update the administrator credentials after the domain has started.
+
+[[installation-details]]
+== Installation Details
+
+The Payara Server installation is located in the `/opt/payara/appserver` directory (identified by the `PAYARA_DIR` environment variable). The `/opt/payara/` parent directory is the default working directory of the docker image. 
+
+IMPORTANT: The directory name is deliberately free of any versioning so that any scripts written to work with one version can be seamlessly migrated to the latest docker image.
+
+[[application-deployment]]
+== Application Deployment
+
+[[deploy-from-directory]]
+=== Deploy Applications from a Directory
+
+The default entrypoint will scan the `$DEPLOY_DIR` directory (which defaults to `/opt/payara/deployments`) for files and sub-folders and deploy them automatically after the domain is started.
+
+NOTE: Any RAR files artefacts found in the directory will always be deployed first
+
+To deploy your applications, you can mount this directory as a Docker volume mapped to a local directory that hosts your application artefacts. 
+
+The following sample command will launch a new Payara Server container and deploy all applications located in the `~/payara/apps` directory:
+
+[docker, shell, subs=attributes+]
+----
+docker run -p 8080:8080 -v ~/payara/apps:/opt/payara/deployments nexus.payara.fish:5000/payara/server-full:{currentVersion}
+----
+
+[[deploy-using-custom-image]]
+=== Deploy Applications using a Custom Image
+
+You can also prepare a custom image based on the official Payara Server Docker image and copy all application artifacts to the `$DEPLOY_DIR` directory. This way, you can re-package your applications in a simple distributable unit.
+
+The following sample _Dockerfile_ can be used to prepare a custom Payara Server image that deploys the `myapplication.war` artefact at runtime:
+
+[source, Docker, subs=attributes+]
+----
+FROM nexus.payara.fish:5000/payara/server-full:{currentVersion}
+COPY myapplication.war $DEPLOY_DIR
+----
+
+And to launch the container, simply build and run the image like this:
+
+[source, shell]
+----
+docker build -t mycompany/myapplication:1.0 .
+docker run -p 8080:8080 mycompany/myapplication:1.0
+----
+
+[[configuration]]
+== Configuration
+
+[[using-environment-variables]]
+=== Using Environment Variables
+
+The following environment variables can be used to configure multiple settings of the Payara Server's DAS before the domain is started. They can be either specified in a custom image's `Dockerfile`, passed to the `docker run` command via the `--env` or `--env-file` arguments or modified by an init script before the `startInForeground.sh` script is executed:
+
+[width="100%",cols="29%,50%,21%",options="header",]
+|===
+|Name |Description |Default Value
+|`PREBOOT_COMMANDS`| The name of the file containing commands to be executed before the domain is started. The file will not be modified by the Docker container| `$CONFIG_DIR/post-boot-commands.asadmin` and `$CONFIG_DIR/pre-boot-commands.asadmin`
+|`POSTBOOT_COMMANDS` |The name of the file containing commands to be executed after the domain is started. This is the file written to in the `generate_deploy_commands.sh` script. The file will not be modified by the Docker container| `$CONFIG_DIR/post-boot-commands.asadmin`
+|`MEM_MAX_RAM_PERCENTAGE`| Value for the JVM argument `-XX:MaxRAMPercentage` which indicates the percentage of memory assigned to the container that can be used by the Java process| `70`
+|`MEM_XSS`| Value for the JVM argument `-Xss` which controls the stack size| `512K`
+|`DEPLOY_PROPS`| Specifies a list of properties to be passed with the deploy commands generated in the `generate_deploy_commands.sh` script|
+|`PAYARA_ARGS`| Additional arguments passed to the `start-domain` command that starts the DAS. _Use with caution._|
+|`JVM_ARGS`| Additional JVM arguments which will be used to configure the Payara Servers DAS JVM settings|
+|===
+IMPORTANT: Preboot and post-boot command files will not be modified by the Docker container
+
+The following is a list of variables used by the Docker image to configure the Payara Server domain, so it is not recommended to alter their values:
+
+[width="100%",cols="29%,50%,21%",options="header",]
+|===
+|Name| Description| Value
+|`HOME_DIR`| The home directory for the `payara` user| `/opt/payara` 
+|`PAYARA_DIR`| The root directory of the Payara installation| `/opt/payara/appserver`
+|`SCRIPT_DIR`| The directory where the `generate_deploy_commands.sh` and `startInForeground.sh` scripts can be found| `/opt/payara/scripts` 
+|`CONFIG_DIR`| The directory where the post and pre boot files are generated to by default| `/opt/payara/config` 
+|`DEPLOY_DIR`| The directory where applications are searched for in `generate_deploy_commands.sh` script| `/opt/payara/deployments`
+|`ADMIN_USER`| The default username credential for the default administrator user| `admin`
+|`ADMIN_PASSWORD`| The default password credential for the default administrator user. Can only be set when the basic image is created| `admin`
+|`PASSWORD_FILE`| The location of the password file for asadmin. This can be passed to asadmin using the `--passwordfile` parameter| `/opt/payara/passwordFile`
+|`DOMAIN_NAME`| The name of the domain running within the container | `production`
+|`AS_ADMIN_MASTERPASSWORD`| The master password to pass to Payara Server. This is overridden if one is specified in the `$PASSWORD_FILE`| `changeit`
+|===
+
+[[executing-admin-commands-domain-startup]]
+=== Executing Administration Commands at Domain Startup
+
+It’s possible to run a set of custom administration commands during the domain startup. You can either specify the `PREBOOT_COMMANDS` or `POSTBOOT_COMMANDS` environment variables to point to the absolute path of a custom script file, or you can just copy the file to the expected paths (See above).
+
+For example, the following sample command will execute all commands listed in the `post-boot-commands.asadmin` file inside the `/local/path/with/boot/file` directory mounted volume:
+
+[source, shell, subs=attributes+]
+----
+docker run -p 8080:8080 -v /local/path/with/boot/file:/config -e POSTBOOT_COMMANDS=/config/post-boot-commands.asadmin nexus.payara.fish:5000/payara/server-full:{currentVersion}
+----
+
+Alternatively, the same outcome can be achieved by defining a custom Docker image:
+
+[source, Docker, subs=attributes+]
+----
+FROM nexus.payara.fish:5000/payara/server-full:{currentVersion}
+COPY post-boot-commands.asadmin $POSTBOOT_COMMANDS
+----
+
+[[executing-custom-scripts-before-domain-startup]]
+=== Executing Custom Scripts before Domain Startup
+
+If preboot command files are not enough, you can add your customized shell scripts to the `${SCRIPT_DIR}/init.d` directory. This will allow you to modify the environment before the Payara Server domain starts. 
+
+Scripts added to this folder should be link:https://www.gnu.org/software/bash/[Bash] scripts and they should end with the `.sh` suffix.
+
+TIP: Scripts in `${SCRIPT_DIR}/init.d` will be executed in the standard file order. If you need to start them in a specific order, we recommend prepending a prefix number to their name, for example, `01_script1.sh`, `02_script2.sh`, and so on.
+
+As with the preboot command file, you may either create a custom Docker image that already contains the script files in question or you can also mount a volume mapped to the `${SCRIPT_DIR}/init.d` directory instead.
+
+[[default-entrypoint]]
+=== The Default Docker Entrypoint
+
+The default entry point of the Docker image is defined using the https://github.com/krallin/tini[tini utility], to allow the DAS's JVM to run as a single child process.
+
+The default `CMD` argument for _tini_ runs the `bin/entrypoint.sh` shell script in `exec` mode, which in turn runs the following scripts in order:
+
+. `${SCRIPT_DIR}/init_1_generate_deploy_commands.sh`: This script outputs deploy commands to the post-boot command file located at `$POSTBOOT_COMMANDS` (default `$CONFIG_DIR/post-boot-commands.asadmin`). If deploy commands are already found in that file, this script does nothing.
+. `${SCRIPT_DIR}/init.d/\*.sh`: As described above, these scripts can be provided by you to run and configure the environment *before* the domain startup.
+. `${SCRIPT_DIR}/startInForeground.sh`. This script starts the domain in the foreground, in a manner that allows the JVM to be controlled by the docker host.
+
+[[browsing-container]]
+=== Browsing the Container
+
+You can override the default entrypoint if needed to test or browse the container to examine that everything's in place. The following command will start the container at a bash prompt, without starting the domain.
+
+[source, shell, subs=attributes+]
+----
+docker run -p 8080:8080 -it nexus.payara.fish:5000/payara/server-full:{currentVersion} bash
+----
