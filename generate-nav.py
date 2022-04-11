@@ -1,15 +1,17 @@
 import os
 
+### Constants ###
+
 DOCS_PREFIX = "docs/modules/ROOT/"
 PAGES_PREFIX = DOCS_PREFIX + "pages/"
 NAV_PATH = DOCS_PREFIX + "nav.adoc"
-
 LAYOUT_FILE = "nav.layout"
-
 DISTRIBUTIONS = ["enterprise/", "community/"]
-
 PARTIALS = {"Jakarta EE Certification":"jakarta-ee.adoc", 
     "Release Notes":"release-notes.adoc"}
+
+
+### Helpers ###
 
 def remove_substring(value:str, substring:str) -> str:
     return str(value).replace(substring, "")
@@ -23,28 +25,28 @@ def remove_substrings(value:str, substrings) -> str:
 
 
 def make_xref(depth:int, file:str) -> str:
-    file_name = file.rpartition("/")
-    file_name = file_name[len(file_name)-1]
+    file_name = get_name_from_path(file)
     file_name = remove_substring(file_name, ".adoc")
-    return depth * "*" + " xref:" + file + "[" + file_name + "]"
+    return "{fdepth} xref:{fpath} [{fname}]".format(fdepth=depth*"*", fpath=file, fname=file_name)
 
 
 def make_xref_unlinked(depth:int, name:str) -> str:
-    dir_name = name.rpartition("/")
-    dir_name = dir_name[len(dir_name)-1]
-    return depth * "*" + " " + dir_name
+    return "{ddepth} {dname}".format(ddepth=depth*"*", dname=get_name_from_path(name))
 
+def get_name_from_path(value:str) -> str:
+    value = value.rpartition("/")
+    return value[len(value)-1]
 
 def get_depth(file_path:str) -> int:
-    depth = file_path.count("/")
-    if(depth == 0):
-        return 1
-    return depth 
+    return file_path.count("/")
 
+
+### Functions ###
 
 def gen_nav(parent:str, distribution:str) -> list:
     output = []
     
+    #Bool value to determine if the parent directory exists only in the distribution specific documentation
     distribution_specific_parent = os.path.exists(os.path.join(distribution, parent)) and not os.path.exists(parent)
     if(distribution_specific_parent):
         parent = os.path.join(distribution, parent)
@@ -58,9 +60,13 @@ def gen_nav(parent:str, distribution:str) -> list:
             for dir_file in os.listdir(os.path.join(distribution, dir)):
                 files.append(dir_file)
 
+        #Avoid writing root title as unlinked xref
         if(dir != parent):
             output.append(make_xref_unlinked(get_depth(relative_dir), relative_dir))
         if(files):
+            #Put all Overview files to the beginning order
+            if "Overview.adoc" in files:
+                files.insert(0, files.pop(files.index("Overview.adoc")))
             for file in files:
                 output.append(make_xref(get_depth(os.path.join(relative_dir, file)), os.path.join(relative_dir, file)))
 
@@ -91,8 +97,8 @@ if __name__ == "__main__":
                 value = value.strip()
                 with open(NAV_LOCATION, 'a') as nav_file:
                     if value in PARTIALS:
-                        nav_file.write("\n" + "include::partial$" + PARTIALS[value] + "[]\n")
+                        nav_file.write("\n" + "include::partial${partial}".format(partial=PARTIALS[value]) + "[]\n")
                         continue
-                    nav_file.write( "\n" + value + "\n")
+                    nav_file.write( "\n.{title}\n".format(title=value))
                     for line in nav[value]:
                         nav_file.write(line + "\n")
