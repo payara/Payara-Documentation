@@ -27,7 +27,7 @@ def remove_substrings(value:str, substrings) -> str:
 def make_xref(depth:int, file:str) -> str:
     file_name = get_name_from_path(file)
     file_name = remove_substring(file_name, ".adoc")
-    return "{fdepth} xref:{fpath} [{fname}]".format(fdepth=depth*"*", fpath=file, fname=file_name)
+    return "{fdepth} xref:{fpath}[{fname}]".format(fdepth=depth*"*", fpath=file, fname=file_name)
 
 
 def make_xref_unlinked(depth:int, name:str) -> str:
@@ -97,7 +97,7 @@ if __name__ == "__main__":
                 value = value.strip()
                 with open(NAV_LOCATION, 'a') as nav_file:
                     if value in PARTIALS:
-                        nav_file.write("\n" + "include::partial${partial}".format(partial=PARTIALS[value]) + "[]\n")
+                        nav_file.write("\n" + "include::partial${partial}[]\n".format(partial=PARTIALS[value]))
                         continue
                     nav_file.write( "\n.{title}\n".format(title=value))
                     for line in nav[value]:
