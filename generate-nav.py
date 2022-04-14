@@ -56,7 +56,7 @@ def gen_nav(parent:str, distribution:str) -> list:
         relative_dir = remove_substring(relative_dir, PAGES_PREFIX)
 
         dir_in_distribution = os.path.exists(os.path.join(distribution, dir))
-        if(dir_in_distribution and files):
+        if(dir_in_distribution and files and distribution_specific_parent):
             for dir_file in os.listdir(os.path.join(distribution, dir)):
                 files.append(dir_file)
 
@@ -68,7 +68,8 @@ def gen_nav(parent:str, distribution:str) -> list:
             if "Overview.adoc" in files:
                 files.insert(0, files.pop(files.index("Overview.adoc")))
             for file in files:
-                output.append(make_xref(get_depth(os.path.join(relative_dir, file)), os.path.join(relative_dir, file)))
+                if file.endswith("adoc"):
+                    output.append(make_xref(get_depth(os.path.join(relative_dir, file)), os.path.join(relative_dir, file)))
 
     return output
 
