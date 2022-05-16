@@ -1,11 +1,17 @@
 [[security-fixes-summary]]
 = Security Fixes Summary
 
-The following is a list of tracked _**C**ommon **V**ulnerabilities and **E**xposures_ that have been reported and analyzed, which can or have impacted Payara Server across releases:
+The following is a list of tracked _**C**ommon **V**ulnerabilities and **E**xposures_ that have been reported and analyzed, which can or have impacted Payara Platform distributions across releases:
 
 [cols="<,<,<,<,<,<,<",options="header",]
 |=======================================================================
 |ID |CVSS v3.0 Base Score |Status |Summary |Release |Pull Requests |Observations
+
+|https://nvd.nist.gov/vuln/detail/CVE-2018-25032[CVE-2018-25032] | 7.5 | FIXED | ZLib allows memory corruption when deflating (i.e. when compressing) if the input has many distant matches. | 5.2022.2 | https://github.com/payara/Payara/pull/5638[#5638] | Fixed by upgrading to Azul JDK version using ZLib 1.2.12 in Payara Docker Images.
+
+|https://nvd.nist.gov/vuln/detail/cve-2022-22965[CVE-2022-22965] | 9.8 | FIXED | A Spring MVC or Spring WebFlux application running on JDK 9+ may be vulnerable to remote code execution (RCE) via data binding. | 5.2022.2 | https://github.com/payara/Payara/pull/5686[#5686] | The original vulnerability is in the Spring Framework 5.3.0 to 5.3.17, 5.2.0 to 5.2.19, and older versions. The fix in the Payara Platform mitigates the Spring vulnerability by blocking the Payara classloader from giving access to Payara Platform internals.
+
+|https://nvd.nist.gov/vuln/detail/CVE-2021-42392[CVE-2021-42392] | N/A | N/A | Unauthenticated RCE in H2 Database Console |  |  | Doesn't affect Payara Platform. The Payara Platform doesn't launch the H2 Database Console and doesn't make it available in any way.
 
 |https://nvd.nist.gov/vuln/detail/CVE-2021-40690/[CVE-2021-40690] | 7.5 | FIXED | The "secureValidation" property is not passed correctly when creating a `KeyInfo` from a `KeyInfoReference` element, allowing abuse of an XPath Transform to extract any local .xml files in a RetrievalMethod element. | 5.2021.10 | https://github.com/payara/Payara/pull/5505[#5505] | Fixed by upgrading Apache Santuario to 2.2.3
 
@@ -49,7 +55,7 @@ The following is a list of tracked _**C**ommon **V**ulnerabilities and **E**xpos
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2013-2035[CVE-2013-2035] |  N/A (V2: 4.4) | FIXED |Race condition in outdated *jLine* code allows arbitrary code execution |4.1.1.171 |https://github.com/payara/Payara/pull/931[#931], https://github.com/payara/Payara/pull/1005[#1005], https://github.com/payara/Payara/pull/1006[#1006], https://github.com/payara/Payara/pull/839[#839], https://github.com/payara/Payara/pull/841[#841], https://github.com/payara/Payara/pull/840[#840] |
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-0050[CVE-2014-0050] | N/A (V2: 7.5) | FIXED |Apache Commons FileUpload allows DDoS attacks via crafted `Content-Type` headers |4.1.1.154.1 |https://github.com/payara/Payara/pull/560[#560] |
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-0254[CVE-2015-0254] | N/A (V2: 7.5) | N/A |Vulnerabilities on Apache JSTL allows arbitrary code injection | | |Payara Server uses the `FEATURE_SECURE_PROCESSING` feature of JAXP so is not affected
-|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-3237[CVE-2015-3237] | N/A (V2: 6.4) | N/A |Vulnerabilities in smb_request_state function in *cURL* | | |Payara Server doesn't ship with either *cURL* or *licurl* so it's not affected
+|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-3237[CVE-2015-3237] | N/A (V2: 6.4) | N/A |Vulnerabilities in `smb_request_state` function in *cURL* | | |Payara Server doesn't ship with either `cURL` or `licurl` so it's not affected
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5346[CVE-2015-5346] | 8.1 | N/A |Apache Tomcat Vulnerability in session recycling for *SSL* requests | | |Payara Server implementation of the Request class doesn't contain the problematic variable being recycled
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5351[CVE-2015-5351] | 8.8 | N/A |Apache Tomcat Manager Applications Session and *CSRF* token vulnerabilities | | |Unrelated to Payara Server since this affects specific Tomcat applications
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0706[CVE-2016-0706] | 4.3 | N/A |Apache Tomcat Vulnerability on `StatusManagerServlet` component allows reads of HTTP requests and discover session IDs | | |Payara Server doesn't use the `StatusManagerServlet` component so it's not affected
@@ -61,8 +67,8 @@ The following is a list of tracked _**C**ommon **V**ulnerabilities and **E**xpos
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3608[CVE-2016-3608] | 5.8 | N/A |Unspecified vulnerability on Oracle GlassFish 3.0.1 affects confidentiality | | |Affects an older version of GlassFish but not Payara Server
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-5388[CVE-2016-5388] | 8.1 | FIXED |Apache Tomcat does not protect applications from untrusted data when using the CGI Servlet |4.1.1.163.1 |https://github.com/payara/Payara/pull/1051[#1051] |
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-5477[CVE-2016-5477] | 5.8 | N/A |Unspecified vulnerability on Oracle GlassFish 3.0.1 affects confidentiality | | |Affects an older version of GlassFish but not Payara Server
-|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-5519[CVE-2016-5519] | 8.8 | PENDING |Unspecified vulnerability on JSF implementation for Oracle Glassfish 3.0+ | | |Pending for assesment
-|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-6816[CVE-2016-6816] | 7.1 | N/A |Apache Tomcat HTTP request parsing vulnerability allow injection of data into reponse | | |Payara Server doesn't have included the Coyote components affected
+|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-5519[CVE-2016-5519] | 8.8 | PENDING |Unspecified vulnerability on JSF implementation for Oracle Glassfish 3.0+ | | |Pending for assessment
+|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-6816[CVE-2016-6816] | 7.1 | N/A |Apache Tomcat HTTP request parsing vulnerability allow injection of data into response | | |Payara Server doesn't have included the Coyote components affected
 |https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-1000028[CVE-2017-1000028] | 7.5 | FIXED | Oracle, GlassFish Server Open Source Edition 4.1 is vulnerable to both authenticated and unauthenticated Directory Traversal vulnerability, that can be exploited by issuing a specially crafted HTTP GET request. | 4.1.1.161 | https://github.com/payara/Payara/pull/632[#632] | Fixed by patching Woodstock
 |=======================================================================
 
@@ -72,8 +78,8 @@ as well:
 [cols="<,<,<,<,<,<",options="header",]
 |=======================================================================
 |Reference |Status |Summary | Release |Pull Requests |Observations
-| Payara Enterprise Support Ticket| FIXED | Vulnerability in Metro's WSDL Code Importing/Parsing - Remote Code Execution | 5.2021.3 | [https://github.com/payara/Payara/pull/5198[#5198]] | Recommended to immediately upgrade to this release if using any JAX-WS features in applications deployed in public-facing environments. 
-| https://www.owasp.org/index.php/Clickjacking_Defense_Cheat_Sheet[OWASP Docs] |FIXED | Web administration console is vulnerable against clickjacking/UI redress attacks. | 4.1.2.174 | https://github.com/payara/Payara/pull/2097[#2097] |
-| Payara Support Ticket | FIXED | Under some circumstances authenticated caller/user identities get confused. | 4.1.1.171.11 | https://github.com/payara/Payara/pull/2493/files[#2493] |
-| Payara Support Ticket | FIXED | CORBA security context gets corrupted under certain conditions | 4.1.2.181.2, 4.1.2.182, 5.182 |https://github.com/payara/Payara/pull/2493[#2493]|
+|Payara Enterprise Support Ticket| FIXED | Vulnerability in Metro's WSDL Code Importing/Parsing - Remote Code Execution | 5.2021.3 | [https://github.com/payara/Payara/pull/5198[#5198]] | Recommended to immediately upgrade to this release if using any JAX-WS features in applications deployed in public-facing environments. 
+|https://www.owasp.org/index.php/Clickjacking_Defense_Cheat_Sheet[OWASP Docs] |FIXED | Web administration console is vulnerable against clickjacking/UI redress attacks. | 4.1.2.174 | https://github.com/payara/Payara/pull/2097[#2097] |
+|Payara Support Ticket | FIXED | Under some circumstances authenticated caller/user identities get confused. | 4.1.1.171.11 | https://github.com/payara/Payara/pull/2493/files[#2493] |
+|Payara Support Ticket | FIXED | CORBA security context gets corrupted under certain conditions | 4.1.2.181.2, 4.1.2.182, 5.182 |https://github.com/payara/Payara/pull/2493[#2493]|
 |=======================================================================

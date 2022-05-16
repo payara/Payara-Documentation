@@ -1,13 +1,15 @@
 [[security-fixes-summary]]
 = Security Fixes Summary
 
-The following is a list of tracked _**C**ommon **V**ulnerabilities
-and **E**xposures_ that have been reported and analyzed, which
-can or have impacted Payara Server across releases:
+The following is a list of tracked _**C**ommon **V**ulnerabilities and **E**xposures_ that have been reported and analyzed, which can or have impacted Payara Platform distributions across releases:
 
 [cols="<,<,<,<,<,<",options="header",]
 |=======================================================================
 |ID |CVSS v3.0 Base Score |Status |Summary |Release |Observations
+
+|https://nvd.nist.gov/vuln/detail/CVE-2018-25032[CVE-2018-25032] | 7.5 | FIXED | ZLib allows memory corruption when deflating (i.e. when compressing) if the input has many distant matches. | 5.38.0 | Fixed by upgrading to Azul JDK version using ZLib 1.2.12 in Payara Docker Images.
+
+|https://nvd.nist.gov/vuln/detail/cve-2022-22965[CVE-2022-22965] | 9.8 | FIXED | A Spring MVC or Spring WebFlux application running on JDK 9+ may be vulnerable to remote code execution (RCE) via data binding. | 5.38.0 | The original vulnerability is in the Spring Framework 5.3.0 to 5.3.17, 5.2.0 to 5.2.19, and older versions. The fix in the Payara Platform mitigates the Spring vulnerability by blocking the Payara classloader from giving access to Payara Platform internals.
 
 |https://nvd.nist.gov/vuln/detail/CVE-2021-42392[CVE-2021-42392] | N/A | N/A | Unauthenticated RCE in H2 Database Console |  | Doesn't affect Payara Platform. The Payara Platform doesn't launch the H2 Database Console and doesn't make it available in any way.
 
@@ -57,20 +59,20 @@ can or have impacted Payara Server across releases:
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2013-2035[CVE-2013-2035] |  N/A (V2: 4.4) | FIXED |Race condition in outdated *jLine* code allows arbitrary code execution |4.1.1.171 |
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-0050[CVE-2014-0050] | N/A (V2: 7.5) | FIXED |Apache Commons FileUpload allows DDoS attacks via crafted `Content-Type` headers |4.1.1.154.1 |
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-0254[CVE-2015-0254] | N/A (V2: 7.5) | N/A |Vulnerabilities on Apache JSTL allows arbitrary code injection | | Payara Server uses the `FEATURE_SECURE_PROCESSING` feature of JAXP so is not affected
-|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-3237[CVE-2015-3237] | N/A (V2: 6.4) | N/A |Vulnerabilities in smb_request_state function in *cURL* | | Payara Server doesn't ship with either *cURL* or *licurl* so it's not affected
+|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-3237[CVE-2015-3237] | N/A (V2: 6.4) | N/A |Vulnerabilities in `smb_request_state` function in *cURL* | | Payara Server doesn't ship with either `cURL` or `licurl` so it's not affected
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5346[CVE-2015-5346] | 8.1 | N/A |Apache Tomcat Vulnerability in session recycling for *SSL* requests | | Payara Server implementation of the Request class doesn't contain the problematic variable being recycled
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5351[CVE-2015-5351] | 8.8 | N/A |Apache Tomcat Manager Applications Session and *CSRF* token vulnerabilities | | Unrelated to Payara Server since this affects specific Tomcat applications
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0706[CVE-2016-0706] | 4.3 | N/A |Apache Tomcat Vulnerability on `StatusManagerServlet` component allows reads of HTTP requests and discover session IDs | | Payara Server doesn't use the `StatusManagerServlet` component so it's not affected
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0714[CVE-2016-0714] | 8.8 | N/A |Session persistence in Apache Tomcat allows arbitrary code injection | | Payara Server doesn't use the affected objects in the same way that Tomcat does so the flaw is not present
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0763[CVE-2016-0763] | 6.3 | FIXED |Vulnerability in `ResourceLinkFactory.setGlobalContext` method on Apache Tomcat |4.1.1.164.1 |
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3092[CVE-2016-3092] | 7.5 | FIXED |Apache Commons FileUpload allows DDoS attacks via `Multipart` class |4.1.1.163 |
-|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3427[CVE-2016-3427] | 9.0 | FIXED |Unspecified vulnerability in various versions of the Oracle JDK and JRockit |4.1.1.164.1 |
+|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3427[CVE-2016-3427] | 9.0 | FIXED |Unspecified vulnerability in various versions of the Oracle JDK and `JRockit` |4.1.1.164.1 |
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3607[CVE-2016-3607] | 9.8 | FIXED |Unspecified vulnerability on Oracle GlassFish 3.0+ affects confidentiality |4.1.1.163 |
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3608[CVE-2016-3608] | 5.8 | N/A |Unspecified vulnerability on Oracle GlassFish 3.0.1 affects confidentiality | | Affects an older version of GlassFish but not Payara Server
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-5388[CVE-2016-5388] | 8.1 | FIXED |Apache Tomcat does not protect applications from untrusted data when using the CGI Servlet |4.1.1.163.1 |
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-5477[CVE-2016-5477] | 5.8 | N/A |Unspecified vulnerability on Oracle GlassFish 3.0.1 affects confidentiality | | Affects an older version of GlassFish but not Payara Server
 |http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-5519[CVE-2016-5519] | 8.8 | N/A |Unspecified vulnerability on JSF implementation for Oracle Glassfish 3.0+ | | Affects an older version of GlassFish but not Payara Server
-|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-6816[CVE-2016-6816] | 7.1 | N/A |Apache Tomcat HTTP request parsing vulnerability allow injection of data into reponse | | Payara Server doesn't have included the Coyote components affected
+|http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-6816[CVE-2016-6816] | 7.1 | N/A |Apache Tomcat HTTP request parsing vulnerability allow injection of data into response | | Payara Server doesn't have included the Coyote components affected
 |https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-1000028[CVE-2017-1000028] | 7.5 | FIXED | Oracle, GlassFish Server Open Source Edition 4.1 is vulnerable to both authenticated and unauthenticated Directory Traversal vulnerability, that can be exploited by issuing a specially crafted HTTP GET request. | 4.1.1.161 | Fixed by patching Woodstock
 |=======================================================================
 
