@@ -2,6 +2,7 @@ import os
 
 ### Constants ###
 
+IS_WINDOWS = os.name == 'nt'
 DOCS_PREFIX = "docs/modules/ROOT/"
 PAGES_PREFIX = DOCS_PREFIX + "pages/"
 NAV_PATH = DOCS_PREFIX + "nav.adoc"
@@ -102,4 +103,6 @@ if __name__ == "__main__":
                         continue
                     nav_file.write( "\n.{title}\n".format(title=value))
                     for line in nav[value]:
+                        if IS_WINDOWS:
+                            line = line.replace("\\", "/")
                         nav_file.write(line + "\n")
