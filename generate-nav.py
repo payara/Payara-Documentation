@@ -34,11 +34,11 @@ def make_xref_unlinked(depth:int, name:str) -> str:
     return "{ddepth} {dname}".format(ddepth=depth*"*", dname=get_name_from_path(name))
 
 def get_name_from_path(value:str) -> str:
-    value = value.rpartition("/")
+    value = value.rpartition(os.path.sep)
     return value[len(value)-1]
 
 def get_depth(file_path:str) -> int:
-    return file_path.count("/")
+    return file_path.count(os.path.sep)
 
 
 ### Functions ###
