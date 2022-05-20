@@ -2,6 +2,7 @@ import os
 
 ### Constants ###
 
+IS_WINDOWS = os.name == 'nt'
 DOCS_PREFIX = "docs/modules/ROOT/"
 PAGES_PREFIX = DOCS_PREFIX + "pages/"
 NAV_PATH = DOCS_PREFIX + "nav.adoc"
@@ -34,11 +35,11 @@ def make_xref_unlinked(depth:int, name:str) -> str:
     return "{ddepth} {dname}".format(ddepth=depth*"*", dname=get_name_from_path(name))
 
 def get_name_from_path(value:str) -> str:
-    value = value.rpartition("/")
+    value = value.rpartition(os.path.sep)
     return value[len(value)-1]
 
 def get_depth(file_path:str) -> int:
-    return file_path.count("/")
+    return file_path.count(os.path.sep)
 
 
 ### Functions ###
@@ -102,4 +103,6 @@ if __name__ == "__main__":
                         continue
                     nav_file.write( "\n.{title}\n".format(title=value))
                     for line in nav[value]:
+                        if IS_WINDOWS:
+                            line = line.replace("\\", "/")
                         nav_file.write(line + "\n")
