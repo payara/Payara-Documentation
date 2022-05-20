@@ -29,8 +29,10 @@ To configure the alias of the SSL certificate to be used in secure communication
 [cols="1,1", options="header"]
 |===
 |Property |Description
-|`fish.payara.jaxrs.client.certificate.alias` | The alias name of the certificate
+|`fish.payara.jaxrs.client.certificate.alias` | `PayaraConstants.JAXRS_CLIENT_CERTIFICATE_ALIAS` | The alias name of the certificate
 |===
+
+NOTE: The name of the property is defined as a constant in the `fish.payara.security.client.PayaraConstants` class.
 
 IMPORTANT: The certificate that corresponds to the given alias must exist in the domain's configured keystore.
 
@@ -42,9 +44,11 @@ Here's an example of how to set up the property when executing a new JAX-RS clie
 [source, java]
 ----
 ClientBuilder.newBuilder()
-              .property("fish.payara.jaxrs.client.certificate.alias", "someAliasName")
+              .property(PayaraConstants.JAXRS_CLIENT_CERTIFICATE_ALIAS, "someAliasName")
               .build()
               .target(new URI("https://localhost:8080/service"))
               .request()
               .get(Service.class)
 ----
+
+NOTE: For this example to work, you need to include the certificate with the given alias in the default Payara Server keystore.

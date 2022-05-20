@@ -73,20 +73,21 @@ Programmatically it is also possible to provide an implementation of the `javax.
 [[SSL-Context-configuration]]
 === SSL Context configuration
 
-To configure the alias of the SSL certificate to be used in secure communications established by the client, the following system property must be defined when establishing a new REST client call through the use of the `org.eclipse.microprofile.rest.client.ClientBuilder` interface:
+You can define the certificate alias rest client will use with one of the following approaches:
+
+[[during-rest-client-call]]
+==== During REST client call
 
 [cols="1,1", options="header"]
 |===
-|Property | MP Config Property| Description
-|`fish.payara.jaxrs.client.certificate.alias` | `payara.certificate.alias` | The alias name of the certificate
+|Property | Public API Constant| Description
+|`fish.payara.jaxrs.client.certificate.alias` | `PayaraConstants.REST_CLIENT_CERTIFICATE_ALIAS` | The alias name of the certificate
 |===
 
-If the MicroProfile Configuration property is defined, then it is not necessary to configure it through an implementation of the `ClientBuilder` interface.
+NOTE: The name of the property is defined as a constant in the `fish.payara.security.client.PayaraConstants` class.
 
-IMPORTANT: The certificate that corresponds to the given alias must exist in the domain's configured keystore.
-
-[[ssl-context-configuration-example]]
-==== Example
+[[during-rest-client-call-example]]
+===== Example
 
 Here's an example of how to set up the property when executing a new MP Rest Client call:
 
@@ -94,9 +95,22 @@ Here's an example of how to set up the property when executing a new MP Rest Cli
 ----
 RestClientBuilder.newBuilder()
                 .baseUri(new URI("https://localhost:8080/service"))
-                .property("fish.payara.rest.client.certificate.alias", "someAliasName")
+                .property(PayaraConstants.REST_CLIENT_CERTIFICATE_ALIAS, "someAliasName")
                 .build(Service.class);
 ----
+
+[[on-microprofile-configuration]]
+==== On MicroProfile Configuration
+
+[cols="1,1", options="header"]
+|===
+|Property | Public API Constant| Description
+|`payara.certificate.alias` | `PayaraConstants.MP_CONFIG_CLIENT_CERTIFICATE_ALIAS` | The alias name of the certificate
+|===
+
+You can define the alias globally as a xref:documentation/microprofile/config/README.adoc[MicroProfile Config] property, either in an application-specific config source only for a single application, or with a global config source for all applications. In this case you don't need to add it during every single Rest Client call.
+
+NOTE: For this to work, you need to include the certificate with the given alias in the default Payara Server keystore.
 
 [[proxy-configuration]]
 == Proxy Configuration
