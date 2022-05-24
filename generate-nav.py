@@ -9,7 +9,8 @@ NAV_PATH = DOCS_PREFIX + "nav.adoc"
 LAYOUT_FILE = "nav.layout"
 DISTRIBUTIONS = ["enterprise/", "community/"]
 PARTIALS = {"Jakarta EE Certification":"jakarta-ee.adoc", 
-    "Release Notes":"release-notes.adoc"}
+            "Eclipse MicroProfile Certification":"eclipse-microprofile.adoc",
+            "Release Notes":"release-notes.adoc"}
 
 
 ### Helpers ###
@@ -100,6 +101,8 @@ if __name__ == "__main__":
                 with open(NAV_LOCATION, 'a') as nav_file:
                     if value in PARTIALS:
                         nav_file.write("\n" + "include::partial${partial}[]\n".format(partial=PARTIALS[value]))
+                        continue
+                    if value not in nav:
                         continue
                     nav_file.write( "\n.{title}\n".format(title=value))
                     for line in nav[value]:
