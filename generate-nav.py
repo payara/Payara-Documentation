@@ -58,7 +58,7 @@ def gen_nav(parent:str, distribution:str) -> list:
         relative_dir = remove_substring(relative_dir, PAGES_PREFIX)
 
         dir_in_distribution = os.path.exists(os.path.join(distribution, dir))
-        if(dir_in_distribution and files and distribution_specific_parent):
+        if(dir_in_distribution):
             for dir_file in os.listdir(os.path.join(distribution, dir)):
                 files.append(dir_file)
 
