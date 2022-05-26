@@ -1,9 +1,9 @@
 [[monitoring-console]]
 = Payara InSight
 
-Payara InSight allows real-time visualisation and alerting for server and web application metrics.
+Payara InSight allows real-time visualization and alerting for server and web application metrics.
 
-It consists of a server module responsible for collecting a multitude of metrics from all nodes which are accumulated on the DAS to feed data to its frontend which visualises the data as a web-application deployed on the DAS.
+It consists of a server module responsible for collecting a multitude of metrics from all nodes which are accumulated on the DAS to feed data to its frontend which visualizes the data as a web-application deployed on the DAS.
 
 The metrics include server metrics from different sources within the server as well as metrics defined in user applications using _MicroProfile Metrics_ and metrics derived from _MicroProfile Health_ checks.
 
@@ -16,20 +16,23 @@ For `domain1` the GUI is not enabled by default and the `set-monitoring-console-
 
 To enable the GUI manually run the following asadmin command:
 
-        asadmin> set-monitoring-console-configuration --enabled=true
+[source, shell]
+----
+asadmin> set-monitoring-console-configuration --enabled=true
+----
 
 Payara InSight is now available at http://localhost:8080/monitoring-console/ .
 Like the admin GUI, it only runs on the DAS.
 
 To stop the GUI run:
 
-        asadmin> set-monitoring-console-configuration --enabled=false
+[source, shell]
+----
+asadmin> set-monitoring-console-configuration --enabled=false
+----
 
 Stopping the GUI does not disable the data collection.
 This is a background process that is controlled separately as described in the next section.
-
-NOTE: Payara InSight is only bundled with Payara Server Enterprise distribution.
-
 
 [[monitoring-console-disable]]
 == Enabling Data Collection
@@ -46,7 +49,9 @@ This allows typical "real-time" monitoring.
 These points represent the raw data as it is probed/collected.
 
 Without a history points that get "pushed" out of the sliding window are "forgotten".
-Since Payara Enterprise 5.23.1 a history can be enabled which aggregates the points per seconds to 1 aggregated point per minute, the minutes to 1 point per hour, the hours to 1 point per day.
+
+A history can be enabled which aggregates the points per seconds to 1 aggregated point per minute, the minutes to 1 point per hour, the hours to 1 point per day.
+
 These aggregations equally have sliding windows so they hold the recent hour, day or month worth of data.
 The longer points are in the past the less points per fixed time-frame there are.
 In the most recent minute there are the raw (not aggregated) points per second.
@@ -86,7 +91,7 @@ NOTE: Some metrics are only available when the monitoring configuration of certa
 
 [[monitoring-console-pages]]
 === Pages
-Payara InSight is organized in fully customisable pages. A page is a collection of xref:#monitoring-console-widgets[widgets] arranged in columns. Usually, pages are focused on visualising metrics of a specific area of the server, like HTTP or request tracing. The pre-configured pages are a starting point that can be changed and extended by the user. New custom pages can be created and populated with arbitrary metrics.
+Payara InSight is organized in fully customizable pages. A page is a collection of xref:#monitoring-console-widgets[widgets] arranged in columns. Usually, pages are focused on visualizing metrics of a specific area of the server, like HTTP or request tracing. The pre-configured pages are a starting point that can be changed and extended by the user. New custom pages can be created and populated with arbitrary metrics.
 
 
 [[monitoring-console-page-switch]]
@@ -213,7 +218,7 @@ This dialogue can also be opened from the _Pages_ application settings by clicki
 image::monitoring-console/mc_settings_app_pages-h.png[Page Synchronisation Application Settings]
 
 __Administrator__s also find a button to _Update Server..._ pages with any changes applied to local changes.
-This is only needed for pages that are not using _auto_matic updates in their page settings.
+This is only needed for pages that are not using automatic updates in their page settings.
 This simply should give administrators different approaches to managing the configuration of shared pages.
 To bulk update all server pages click the _Update Server..._ button and confirm the update:
 
@@ -464,7 +469,7 @@ Any widget can be removed from any page.
 Click the pencil symbol in the top right of the widget or its title to open the widget's settings.
 On the _General_ widget settings tab you find the _Remove_ button.
 
-image::monitoring-console/mc_settings_widget_general-h.png[Remove Widget Buttonin General Widget Settings]
+image::monitoring-console/mc_settings_widget_general-h.png[Remove Widget Button in General Widget Settings]
 
 Confirm you want to remove the widget
 
@@ -792,7 +797,7 @@ image::monitoring-console/mc_page_http.png[HTTP Page]
 
 [[monitoring-console-preset-jvm]]
 ==== JVM Page
-The _JVM_ pages gives a general overview of the state of the JVM running Payara Server Enterprise.
+The _JVM_ pages gives a general overview of the state of the JVM running Payara Server.
 
 image::monitoring-console/mc_page_jvm.png[JVM Page]
 
@@ -891,7 +896,7 @@ WARNING: Be aware that the graphs in the example images above show unrealistical
 
 [[monitoring-console-preset-sql]]
 ==== SQL Page
-The _SQL_ page gives insight into slow SQL queries for all connection pools configured in Payara Server Enterprise.
+The _SQL_ page gives insight into slow SQL queries for all connection pools configured in Payara Server.
 
 NOTE: To capture slow SQL queries the _JDBC Connection Pool_ configuration's _Slow Query Log Threshold_ in the _Advanced_ tab needs to be set to a positive number.
 

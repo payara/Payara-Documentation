@@ -1,31 +1,22 @@
 [[firing-and-listening-for-remote-cdi-events]]
 = Firing and Listening for remote CDI Events
 
-_Since Payara Server 4.1.1.171 (Full Edition), 4.1.2.172 (Web Edition) & Payara Micro 4.1.153_
-
-Payara Server Community is able to listen to and fire CDI events across the
-Hazelcast cluster. The CDI events can be fired and listened to by
-applications on Payara Server instances as well as Payara Micro
-instances provided that they are connected to the same cluster.
+Payara Server is able to listen to and fire CDI events across the Hazelcast cluster. The CDI events can be fired and listened to by applications on Payara Server instances as well as Payara Micro instances provided that they are connected to the same cluster.
 
 [[requirements]]
 == Requirements
 
 Hazelcast must be enabled for all Payara Server instances and they must be able to connect to the same Hazelcast cluster. See the xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Domain Data Grid And Hazelcast/Overview.adoc[Data Grid] section for more details.
 
-
 [[initializing-the-event-bus]]
 == Initializing the event bus
 
-The event bus is initialized automatically after an application is
-started. No additional configuration is necessary to fire and listen to
-remote events.
+The event bus is initialized automatically after an application is started. No additional configuration is necessary to fire and listen to remote events.
 
 [[firing-remote-cdi-events]]
 == Firing remote CDI events
 
-In order to fire a CDI event remotely, mark it with the `@Outbound`
-annotation:
+In order to fire a CDI event remotely, mark it with the `@Outbound` annotation:
 
 [source, java]
 ----
@@ -34,33 +25,24 @@ annotation:
 Event<String> event;
 ----
 
-The above will create an event with a String payload, which will be
-observable on remote instances in the cluster.
-
-An outbound event can be fired as any other CDI event:
+The above will create an event with a String payload, which will be observable on remote instances in the cluster. An outbound event can be fired as any other CDI event:
 
 [source, java]
 ----
 event.fire("This is an event");
 ----
 
-The payload passed as an argument to the `fire()` method has to
-implement the `Serializable` interface.
+The payload passed as an argument to the `fire()` method has to implement the `Serializable` interface.
 
-An outbound event will be fired asynchronously on a remote instance. If
-xref:#loopback[loopback] is allowed, it will be fired also on the same
-instance, but in a different thread. Therefore the call doesn't block
-the current thread.
+An outbound event will be fired asynchronously on a remote instance. If xref:#loopback[loopback] is allowed, it will be fired also on the same
+instance, but in a different thread. Therefore the call doesn't block the current thread.
 
-TIP: Since Payara Version 4.1.2.172, it's possible to use additional qualifiers to match
-event with observers. Any additional qualifier used with `@Outbound`
-will mean that the event will be matched with an `@Inbound` listener that accepts the qualifiers.
+TIP: It's possible to use additional qualifiers to match event with observers. Any additional qualifier used with `@Outbound` will mean that the event will be matched with an `@Inbound` listener that accepts the qualifiers.
 
 [[observing-remote-cdi-events]]
 == Observing remote CDI events
 
-Outbound events are observed by every CDI bean with a listener method
-that is marked with the `@Inbound` qualifier:
+Outbound events are observed by every CDI bean with a listener method that is marked with the `@Inbound` qualifier:
 
 [source, java]
 ----
@@ -68,15 +50,9 @@ public void receiveEvent(@Observes @Inbound String message) {
 }
 ----
 
-The observers may reside in any application running on one or more
-instances in a Hazelcast cluster, and they will listen to events fired
-in an application running on any instance within the same cluster. By
-default, events will be fired on all remote cluster instances (all
-instances except the one in which the event was fired).
+The observers may reside in any application running on one or more instances in a Hazelcast cluster, and they will listen to events fired in an application running on any instance within the same cluster. By default, events will be fired on all remote cluster instances (all instances except the one in which the event was fired).
 
-An event will be matched with observers by the payload class, using the
-same rules as usual CDI events. Observers will receive events that are
-assignable to the observed class.
+An event will be matched with observers by the payload class, using the same rules as usual CDI events. Observers will receive events that are assignable to the observed class.
 
 [[additional-options]]
 == Additional options
@@ -84,11 +60,7 @@ assignable to the observed class.
 [[qualifiers]]
 === Using CDI Qualifiers
 
-_Since Payara Version 4.1.2.172_
-
-It's possible to tag a remote event in a type-safe way using any 
-CDI qualifier. Only observers that match the qualifiers would receive 
-such event.
+It's possible to tag a remote event in a type-safe way using any CDI qualifier. Only observers that match the qualifiers would receive  such event.
 
 A remote event with a qualifier `@MyQualifier` can be triggered like this:
 
@@ -113,10 +85,7 @@ public void receiveEvent(@Observes @Inbound @MyQualifier String message) {
 [[event-name]]
 === Event name
 
-It is possible to tag a remote event with a name. In that case, only
-observers that listen to events of the same name will receive such
-events.
-
+It is possible to tag a remote event with a name. In that case, only observers that listen to events of the same name will receive such events.
 To fire an event with a name:
 
 [source, java]
@@ -137,10 +106,7 @@ public void receiveEvent(@Observes @Inbound("MyEvent") String message) {
 [[instance-name]]
 === Instance name
 
-By default, all remote instances in the same cluster will receive an
-outbound event, which matches the observed class and event name. If you
-want to target specific instances in the cluster, it is possible to
-define one or more target instances for an outbound event:
+By default, all remote instances in the same cluster will receive an outbound event, which matches the observed class and event name. If you want to target specific instances in the cluster, it is possible to define one or more target instances for an outbound event:
 
 [source, java]
 ----
@@ -158,22 +124,14 @@ Several instance names can be configured with an array:
 Event<String> event;
 ----
 
-If you are using Payara Server, the name of the DAS instance is `server`
-by default. In the case of a separate standalone instance, use the
-instance's name in the configuration. If you are using Payara Micro, the
-instance's name is configured using the `--name` option, or is generated
-by if not configured (see the section xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Configuring An Instance.adoc[Payara Micro Instance
-Names]).
+If you are using Payara Server, the name of the DAS instance is `server` by default. In the case of a separate standalone instance, use the instance's name in the configuration. If you are using Payara Micro, the instance's name is configured using the `--name` option, or is generated by if not configured (see the section xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Configuring An Instance.adoc[Payara Micro Instance Names]).
 
 [[loopback]]
 === Loopback
 
-When an outbound event is fired, by default, it is treated as a remote
-message and will be delivered only to remote instances in the cluster.
-It will not be delivered to listeners on the same server instance.
+When an outbound event is fired, by default, it is treated as a remote  message and will be delivered only to remote instances in the cluster. It will not be delivered to listeners on the same server instance.
 
-If an event should be delivered to observers in the local instance as
-well, it can be done by setting the `loopBack` attribute to true:
+If an event should be delivered to observers in the local instance as well, it can be done by setting the `loopBack` attribute to true:
 
 [source, java]
 ----
@@ -185,13 +143,9 @@ Event<String> event;
 [[dynamic-configuration]]
 == Dynamic configuration
 
-If required, events can also be fired programmatically, not only
-using the static `@Outbound` annotation next to the injection point.
-Although there is no special API to support it, CDI already supports
-programmatic configuration of events.
+If required, events can also be fired programmatically, not only using the static `@Outbound` annotation next to the injection point. Although there is no special API to support it, CDI already supports programmatic configuration of events.
 
-The following is an example of how to configure and fire an outbound
-event programmatically without using any injection points:
+The following is an example of how to configure and fire an outbound event programmatically without using any injection points:
 
 [source, java]
 ----
@@ -218,6 +172,4 @@ CDI.current().getBeanManager().fireEvent("This is an event", new Outbound() {
 });
 ----
 
-The above code creates a dynamic instance of the
-`@Outbound` annotation and fires the event `"This is an event"`
-using a bean manager retrieve via a static `CDI.current`()` method.
+The above code creates a dynamic instance of the `@Outbound` annotation and fires the event `"This is an event"` using a bean manager retrieve via a static `CDI.current`()` method.

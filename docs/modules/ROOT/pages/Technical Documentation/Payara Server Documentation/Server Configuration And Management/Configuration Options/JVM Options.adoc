@@ -1,9 +1,7 @@
 [[configurable-jdk-versions-jvm-options]]
 = Configurable JDK Versions for JVM Options
 
-_Since Payara Server 5.182_
-
-It is possible to allow specific JVM options configured for a Payara Server Community instance to be applied only on specific JDK versions. The configuration is flexible since it allows the user to define minimum and maximum versions of all JDKs upon which each JVM option should be applied.
+It is possible to allow specific JVM options configured for a Payara Server instance to be applied only on specific JDK versions. The configuration is flexible since it allows the user to define minimum and maximum versions of all JDKs upon which each JVM option should be applied.
 
 NOTE: If no minimum and/or maximum JDK versions are set for a particular JVM option, it shall be applied no matter which JDK is being used to run the server's instance (which is the default behaviour).
 
@@ -36,7 +34,7 @@ You can omit either the minimum or maximum versions by leaving the fields blank.
 
 JVM options can be configured using the 'create-jvm-options' asadmin command. The jvm option key value pair must be enclosed in quotation marks as follows: `_asadmin create-jvm-options --target=server-config "-Djava.awt.headless\=true"_`
 
-The `create-jvm-options` asadmin command has been modified to set the miminum and maximum JDK versions in the following ways:
+The `create-jvm-options` asadmin command has been modified to set the minimum and maximum JDK versions in the following ways:
 
 . Use the `--min-jvm` and `--max-jvm` arguments to set the versions when running the command:
 +
@@ -70,8 +68,6 @@ asadmin create-jvm-options --target=server-config "-Djava.awt.headless\=true:[|1
 [[multimode-double-escaping]]
 === Multimode double escaping
 
-_Since Payara Server 5.193_
-
 When creating JVM options in the multimode of asadmin, you need to perform a _double_ escaping of the values.
 
 So first, start up _asadmin_ in multimode.
@@ -90,8 +86,8 @@ asadmin> create-jvm-options "-XX\\:MaxPermSize=512m"
 
 [[deleting-jvm-options]]
 === Deleting JVM Options
-Deleting JVM options is done using either the Admin Console, or the `delete-jvm-options` asadmin command. It is not
-required for you to specify the JDK version braces for deleting a JVM option, though you can if you wish.
+
+Deleting JVM options is done using either the Admin Console, or the `delete-jvm-options` asadmin command. It is not required for you to specify the JDK version braces for deleting a JVM option, though you can if you wish.
 
 For example, given the option "[1.8.0.160|1.8.0.200]XX\:NewRatio=3", either of the following will work:
 
@@ -100,6 +96,3 @@ For example, given the option "[1.8.0.160|1.8.0.200]XX\:NewRatio=3", either of t
 asadmin> delete-jvm-options "XX\:NewRatio=3"
 asadmin> delete-jvm-options "[1.8.0.160|1.8.0.200]XX\:NewRatio=3"
 ----
-
-
-

@@ -1,7 +1,7 @@
 [[starting-an-instance]]
 = Starting an Instance
 
-This section details the very basics of starting a Payara Micro Community instance.
+This section details the very basics of starting a Payara Micro instance.
 
 [[starting-an-instance-from-the-command-line]]
 == Starting an Instance from the Command Line
@@ -13,21 +13,19 @@ To start an instance of Payara Micro from the command line, you simply run the J
 java -jar payara-micro.jar
 ----
 
-This single command is all you need to run Payara Micro Community instances; additional
-configuration options are all part of this command.
+This single command is all you need to run Payara Micro instances; additional configuration options are all part of this command.
 
 [[starting-an-instance-from-rootdir-launcher]]
 == Starting an Instance from Persistent Configuration Directory
 
-When using xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Jar Structure and Configuration/Root Directoryadoc[persistent root configuration directory], it is possible to generate a launcher bound to that directory using the command:
+When using xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Jar Structure and Configuration/Root Directory.adoc[persistent root configuration directory], it is possible to generate a launcher bound to that directory using the command:
 
 [source,shell]
 ----
 java -jar payara-micro.jar --outputlauncher --rootdir $rootDirectory
 ----
 
-This will create file `$rootDirectory/launch-micro.jar` and exit immediately.
-After that, it is possible to launch Payara Micro with plain
+This will create file `$rootDirectory/launch-micro.jar` and exit immediately. After that, it is possible to launch Payara Micro with plain
 
 [source,shell]
 ----
@@ -39,25 +37,19 @@ This makes configuration directory self-sufficient and the distribution file (`p
 [[starting-an-instance-programmatically]]
 == Starting an Instance Programmatically
 
-You need to import two classes from the `fish.payara.micro` package (contained
-in the Payara Micro JAR, see section
-xref:/Technical Documentation/Payara Micro Documentation/Maven Support.adoc[Maven Support] for
-instructions on importing this JAR with **Maven**):
+You need to import two classes from the `fish.payara.micro` package (contained in the Payara Micro JAR, see section xref:/Technical Documentation/Payara Micro Documentation/Maven Support.adoc[Maven Support] for instructions on importing this JAR with **Maven**):
 
-[source,Java]
+[source, java]
 ----
 import fish.payara.micro.BootstrapException;
 import fish.payara.micro.PayaraMicro;
 ----
 
-You can then start an instance with default settings by calling the `bootstrap()`
-method from the `PayaraMicro` class. This initialization will throw a
-`BootstrapException` exception, so you will need to surround it with a **try-catch**,
-or have the parent method throw the exception.
+You can then start an instance with default settings by calling the `bootstrap()` method from the `PayaraMicro` class. This initialization will throw a `BootstrapException` exception, so you will need to surround it with a **try-catch**, or have the parent method throw the exception.
 
 A simple example is as follows:
 
-[source,Java]
+[source, java]
 ----
 import fish.payara.micro.BootstrapException;
 import fish.payara.micro.PayaraMicro;
@@ -70,17 +62,9 @@ public class EmbeddedPayara{
 }
 ----
 
-To start an instance with non-default settings (configuration changes or deploying
-applications upon startup), you have to call the `getInstance()` method before
-using `bootstrap()`. More details on this can be found in the
-xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Configuring An Instance.adoc[Configuring an Instance Programmatically]
-section. The use of the `getInstance()` method does not exclude you from using
-the default settings however; calling the `bootstrap()` method on its own (as
-shown in the example above) is functionally equivalent to calling the
-`bootstrap()` method directly after the `getInstance()` method, such as in the
-example below:
+To start an instance with non-default settings (configuration changes or deploying applications upon startup), you have to call the `getInstance()` method before using `bootstrap()`. More details on this can be found in the xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Configuring An Instance.adoc[Configuring an Instance Programmatically] section. The use of the `getInstance()` method does not exclude you from using the default settings however; calling the `bootstrap()` method on its own (as shown in the example above) is functionally equivalent to calling the `bootstrap()` method directly after the `getInstance()` method, such as in the example below:
 
-[source,Java]
+[source, java]
 ----
 import fish.payara.micro.BootstrapException;
 import fish.payara.micro.PayaraMicro;
@@ -93,12 +77,9 @@ public class EmbeddedPayara{
 }
 ----
 
-The `bootStrap()` method returns a `PayaraMicroRuntime` object instance, which
-is comes with various methods that afford you control over the instance and its
-cluster after you have bootstrapped it. To take advantage of this, you have to
-initialize a `PayaraMicroRuntime` object from the `bootStrap` method, like so:
+The `bootStrap()` method returns a `PayaraMicroRuntime` object instance, which is comes with various methods that afford you control over the instance and its cluster after you have bootstrapped it. To take advantage of this, you have to initialize a `PayaraMicroRuntime` object from the `bootStrap` method, like so:
 
-[source,Java]
+[source, java]
 ----
 import fish.payara.micro.BootstrapException;
 import fish.payara.micro.PayaraMicro;

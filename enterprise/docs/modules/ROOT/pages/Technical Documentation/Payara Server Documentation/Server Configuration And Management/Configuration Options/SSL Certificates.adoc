@@ -1,844 +1,212 @@
-[[certificate-management]]
-= Integrated SSL/TLS Certificate Management
+[[ssl-certificates]]
+= Configure SSL Certificates
 
-_Since Payara Server 5.20.0_
+Payara Server uses a dedicated key and certificate store when using SSL/TLS connections. The files are located in the configuration directory of the domain `<payara-home>/glassfish/domains/<domain-name>/config` and referenced through JVM options so that they are used for the entire JVM.
 
-A set of commands to provide integrated management of SSL & TLS certificates in Payara Server.
+`keystore.jks`:: Java Keystore formatted file containing the Cryptographic keys, like the private keys associated with the certificates.
+`cacerts.jks`:: Java Keystore formatted file used as Trust Store file holding the X.509 certificates.
 
-[[generate-self-signed-certificate]]
-== `generate-self-signed-certificate`
+These keystores are protected with the Master Password of your domain.
 
-Usage::
-`asadmin> generate-self-signed-certificate --target=instancename --listener=listenername --dn="DN1" --alternativenames="ALT1;ALT2;ALT3" alias`
+[[add-certificate]]
+== Adding SSL Certificate
 
-Aim::
-This command can generate a self-signed certificate for an instance, placing the resultant key pair in the target
-instance or listener's key and trust stores.
+To add your SSL Certificate to the Payara Server configuration files, you need:
 
-If the instance or listener is configured to use the default key and trust store, the command will instead synchronise
-the instance with the DAS (under the assumption the certificate has been added to the default key and trust store of
-the DAS), since any certificates added to the instance stores would be lost upon next synchronisation.
+* The private key associated with your certificate.
+* The Certificate you received from the Certificate Authority based on your Certificate Signing Request (CSR).
 
-NOTE: This command will not overwrite an entry already present in the key store with the same alias. In this scenario no certificate is generated and the command exits. In the case however where there is not an entry with the same alias in the key store but there is in the trust store, a certificate will be generated and the entry in the trust store will be overwritten.
+You can generate a self-signed certificate using the command detailed xref:Technical Documentation/Payara Server Documentation/Server Configuration  and Management/Integrated Certificate Management.adoc#generate-self-signed-certificate[here]
 
-[[command-options-self]]
-=== Command Options
+[source,shell]
+----
+asadmin generate-self-signed-certificate --dn "CN=test.payara.fish,IP=127.0.0.1" mydomain_certificate
+----
 
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
+*Alternatively*::
+You can find the detailed steps of adding a self-signed certificate into Payara Server for testing purposes using `keytool` and `openssl` in the blog https://blog.payara.fish/securing-payara-server-with-custom-ssl-certificate[Securing Payara Server with Custom SSL Certificate].
 
-|`--target`
-|String
-|The name of the instance to add the certificate to.
-|server
-|no
+The private key can be stored in various formats. We assume that the key is in a format which can be read by the Java key tool program, such as PKCS#8 (file starts with `BEGIN ENCRYPTED PRIVATE KEY`)
 
-|`--reload`
-|Boolean
-|If the http listeners should be reloaded
-|false
-|no
+In a first step (if following the blog), we combine the Private key and the Certificate we received into a file. This file can then be used to merge our data into the files used by the Payara Server installation.
 
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to add the certificate to.
-|N/A
-|no
+In this step, we also specify an alias name for our key/certificate. This alias name is important as we will use it later to refer to our specific SSL Certificate.
 
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1 or the existing domain if only one exists
-|no
+The command to perform this combination is the following with OpenSSL:
 
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
+[source,shell]
+----
+openssl pkcs12 -export -in mycert.crt -inkey mycert.key -out mycert.p12 -name mydomain_certificate
+----
 
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
+The resulting p12 bundle can then be add to the keystore and truststore in Payara Server as described in the following sections.
 
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
+=== Import into `keystore.jks`
 
-|`--distinguishedname`, `--dn`
-|String
-|The distinguished name to use when generating the certificate.
-|N/A
-|yes
+The information needs to be imported into the `keystore.jks`` file of your Payara Server domain which will use it.
 
-|`--alternativenames`, `--altnames`
-|String[]
-|The semi-colon (;) separated list of additional Subject Alternative Names to add to the generated certificate.
-|N/A
-|no
+[[via-asadmin-cli-1]]
+==== Using Asadmin CLI
 
-|`--alias` (primary)
-|String
-|The alias name to use when generating the certificate and storing it in the key and trust stores.
-|N/A
-|yes
+You can use the `add-to-keystore` asadmin command, detailed xref:Technical Documentation/Payara Server Documentation/Server Configuration  and Management/Integrated Certificate Management.adoc#add-to-keystore[here].
 
-|===
+[source,shell]
+----
+asadmin add-to-keystore --file mycert.p12 mydomain_certificate
+----
 
-[[example-self]]
-=== Example
+[[via-admin-console-1]]
+==== Using the Admin Console
+
+From the Admin Console, open the instance details page (e.g. on the navigation bar select _Instances > $instanceName_) and navigate to the _Certificate Management_ tab. From here, Click on the _Add_ button of the keystore table (highlighted).
+
+image:certificate-management/CertificateManagementAddButton.png[Certificate Management Add Button]
+
+You can then enter the alias name and the path to the certificate bundle:
+
+image:certificate-management/CertificateManagementAddKeystoreEntry.png[Add Keystore Entry]
+
+[[via-keytool-command-1]]
+==== Using the `keytool` command
+
+You can also use the `keytool` command of the JDK:
 
 [source, shell]
 ----
-asadmin> generate-self-signed-certificate --dn "CN=test.payara.fish,IP=192.168.1.1"
---listener http-listener-2
---alternativenames "test2.payara.fish;DNS:test3.payara.fish,IP:127.0.0.1,EMAIL:anon@payara.fish"
---target Instance1
-test_cert
+keytool -importkeystore -destkeystore keystore.jks -srckeystore mycert.p12 -srcstoretype PKCS12 -alias mydomain_certificate
 ----
 
-[[renew-self-signed-certificates]]
-== `renew-self-signed-certificates`
+The parameters of the above command are self-explanatory. Important here is the correct alias value.
 
-_Since Payara Server 5.21.1_
+=== Import into `cacerts.jks`
 
-Usage::
-`asadmin> renew-self-signed-certificates`
+A similar command is used to import the information into the Trust Store file so that our certificate is trusted by the JVM.
 
-Aim::
-The renew-self-signed-certificates subcommand renews all self-signed certificates in a keystore using the old distinguished name and alias.
-These certificates are then placed in the key and trust stores of the target instance or listener, replacing the old ones.
+[[via-asadmin-cli-2]]
+==== Using Asadmin CLI
 
-[[command-options-renew]]
-=== Command Options
+You can use the `add-to-truststore` asadmin command, detailed xref:Technical Documentation/Payara Server Documentation/Server Configuration  and Management/Integrated Certificate Management.adoc#add-to-truststore[here].
 
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
+[source,shell]
+----
+asadmin add-to-truststore --file mycert.crt mydomain_certificate
+----
 
-|`--target`
-|String
-|The name of the instance to renew the certificates of.
-|server
-|no
+[[via-admin-console-2]]
+==== Using the Admin Console
 
-|`--reload`
-|Boolean
-|If the http listeners should be reloaded.
-|false
-|no
+You can also follow the same steps as done for adding the bundle to the keystore via the admin console, though selecting the *Add* button of the truststore table
 
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to renew the certificates of.
-|N/A
-|no
+image:certificate-management/CertificateManagementAddButton2.png[Certificate Management Add Button]
 
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1
-|no
+And then specifying the `mycert.crt` file.
 
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
+image:certificate-management/CertificateManagementAddTruststoreEntry.png[Add Truststore Entry]
 
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
+[[via-keytool-command-2]]
+==== Using the `keytool` command
 
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
+You can also use the `keytool` command of the JDK:
 
-|===
+[source,shell]
+----
+keytool -importcert -trustcacerts -destkeystore cacerts.jks -file mycert.crt -alias mydomain_certificate
+----
 
-[[example-renew]]
-=== Example
+=== Update HTTP Listener
 
+The last step we need to perform is the indication which 'certificate' needs to be used when Payara Server receives an SSL/TLS request. This can be done by specifying the alias name we have used when we integrated the required information into the key store files of the domain.
+
+[[via-asadmin-cli-3]]
+==== Using Asadmin CLI
+
+This information can be set via the CLI:
+
+[source,shell]
+----
+asadmin set configs.config.server-config.network-config.protocols.protocol.http-listener-2.ssl.cert-nickname=mydomain_certificate
+----
+
+NOTE: In a default installation, the _http-listener-2_ is responsible for handling the secure connections on port 8181. The above command sets the alias name so that the system knows which certificate needs to be used.
+
+[[via-admin-console-3]]
+==== Using the Admin Console
+
+The information can also be entered in the Web Administration console, by navigating to the page Configurations -> server-config -> HTTP Service -> HTTP Listeners > http-listener-2.
+
+[[loading-certificates-from-multiple-keystores]]
+== Loading Certificates From Multiple Keystores
+
+IMPORTANT: All additional keystores must have the same password as your domain master password.
+
+To add additional keystores to Payara Server you will need to have your keystore and truststore files in a local directory. You can then configure this using the admin console or asadmin commands. If you want to load more than one additional keystore, you will need to use a delimiter between the paths to the additional keystores. This is different depending on your OS, Windows uses ';' and Linux uses ':'.
+
+NOTE: When specifying the key or trust store for a specific listener, this is deemed as an absolute and any additional key or trust stores are not considered.
+
+The new JVM properties used to add additional keystores are:
+
+----
+-Dfish.payara.ssl.additionalKeyStores
+-Dfish.payara.ssl.additionalTrustStores
+----
+
+[[via-admin-console-4]]
+=== Using the Admin Console
+To configure the additional keystore locations in the admin console, head to the *Configurations -> <instance configuration> -> JVM Settings* and on the *JVM Options* tab click *Add JVM Option*.
+
+You can add the new JVM property and the relative paths to your keystores or truststores here.
+
+image::ssl/add-additional-keystores-admin-console.png[Configure additional keystores and truststores in Admin Console]
+
+[[via-asadmin-cli]]
+=== Using Asadmin CLI
+
+JVM options can be configured using the 'create-jvm-options' asadmin command, you can configure your additional keystore and truststore files using this command. If you are loading in multiple additional keystores via asadmin commands, you will need to prefix the appropriate delimiter for your OS with '\' to avoid creating multiple JVM options.
+
+*Additional Keystores*
 [source, shell]
 ----
-asadmin> renew-self-signed-certificates
+asadmin create-jvm-options "-Dfish.payara.ssl.additionalKeyStores=/path/to/keystore.jks\:/path2/to/keystore2.jks"
 ----
 
-[[generate-csr]]
-== `generate-csr`
-
-*Usage*::
-`asadmin> generate-csr --target=instancename --listener=listenername alias`
-
-*Aim*::
-This command can generate a certificate signing request (CSR) for an instance or listener's self-signed certificate,
-placing the resultant CSR file in ${installDir}/glassfish/tls, using the alias name as the file name.
-
-*Note*::
-This will overwrite a CSR with the same name already present in the ${installDir}/glassfish/tls directory.
-
-[[command-options-csr]]
-=== Command Options
-
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`--target`
-|String
-|The name of the instance to get the certificate from.
-|server
-|no
-
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to get the certificate from.
-|N/A
-|no
-
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1
-|no
-
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
-
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
-
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
-
-|`--alias` (primary)
-|String
-|The alias name of the certificate to generate a CSR for.
-|N/A
-|yes
-
-|===
-
-[[example-csr]]
-=== Example
-
+*Additional Truststores*
 [source, shell]
 ----
-asadmin> generate-csr --listener http-listener-2 --target Instance1 test_cert
+asadmin create-jvm-options "-Dfish.payara.ssl.additionalTrustStores=/path/to/truststore.jks\:/path2/to/truststore2.jks"
 ----
 
-[[add-to-keystore]]
-== `add-to-keystore`
+NOTE: If you load multiple keystores with the same alias, the server will use the first keystore with that alias, starting with the default and then the additional keystores in the order they are listed in the JVM option.
 
-*Usage*::
-`asadmin> add-to-keystore --target=instancename --listener=listenername --file /path/to/file alias`
+[[cetificate-expiration]]
+== Certificate expiration
 
-*Aim*::
-This command adds a certificate bundle (e.g. .p12 or .jks file) to the target instance
-or listener's key store using the provided alias.
+All the X.509 certificates have a validity period when they can be used. Once this validity period is passed, the users will see a warning or error message depending on the browser that the certificate is no longer valid.
 
-If the instance or listener is configured to use the default key store, the command will instead synchronise
-the instance with the DAS (under the assumption the certificate has been added to the default key store of
-the DAS), since any certificates added to the instance stores would be lost upon next synchronisation.
+Within the server log file, the expired certificates are listed when the system encounters one. Besides your custom certificates which are added as described in a previous chapter, the Trust Store also contains certificates from the Certificate Authorities. Also, they can expire and thus can be listed in the log.
 
-*Note*::
-This will overwrite an entry already present with the same alias. A certificate without a private key cannot be
-used by a HTTP listener and will return a warning.
+Since _Payara Server 5.194_ the log level of the expired certificates is of type WARNING. In previous versions, the entries showed as an ERROR.
 
-[[command-options-keystore]]
-=== Command Options
+[[removing-expired]]
+=== Removing expired certificates
 
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
+[[via-asadmin-cli-5]]
+==== Using Asadmin CLI
 
-|`--target`
-|String
-|The name of the instance to add the certificate to.
-|server
-|no
+If you wish to remove all expired certificates, you can use the `remove-expired-certificates`, `remove-from-keystore`, or `remove-from-truststore` commands detailed
+xref:Technical Documentation/Payara Server Documentation/Server Configuration  and Management/Integrated Certificate Management.adoc#remove-expired-certificates[here],
+xref:Technical Documentation/Payara Server Documentation/Server Configuration  and Management/Integrated Certificate Management.adoc#remove-from-keystore[here], and
+xref:Technical Documentation/Payara Server Documentation/Server Configuration  and Management/Integrated Certificate Management.adoc#remove-from-truststore[here] respectively.
 
-|`--reload`
-|Boolean
-|If the http listeners should be reloaded
-|false
-|no
-
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to add the certificate to.
-|N/A
-|no
-
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1
-|no
-
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
-
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
-
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
-
-|`--file`
-|File
-|The bundle file to add to the target key store
-|N/A
-|yes
-
-|`--alias` (primary)
-|String
-|The alias name to store the certificate bundle in the key store under.
-|N/A
-|yes
-
-|===
-
-[[example-keystore]]
-=== Example
-
-[source, shell]
+[source,shell]
 ----
-asadmin> add-to-keystore --file /home/anon/Downloads/mycert.p12 mycert
+asadmin remove-expired-certificates
+asadmin remove-from-keystore mydomain_certificate
+asadmin remove-from-truststore mydomain_certificate
 ----
 
-[[add-to-truststore]]
-== `add-to-truststore`
+[[via-admin-console-5]]
+==== Using the Admin Console
 
-*Usage*::
-`asadmin> add-to-truststore --target=instancename --listener=listenername --file /path/to/file alias`
+You can also remove individual or groups of certificates using the admin console Certificate Management tab (_Instances > $instanceName > Certificate Management_). Select the desired certificates from the key *or* trust store entries table (not both), and click on the _Delete_ button.
 
-*Aim*::
-This command adds a certificate (e.g. `.cert` file) to the target instance or listener's trust store.
-or listener's trust store using the provided alias.
-
-If the instance or listener is configured to use the default trust store, the command will instead synchronise
-the instance with the DAS (under the assumption the certificate has been added to the default trust store of
-the DAS), since any certificates added to the instance stores would be lost upon next synchronisation.
-
-*Note*::
-This will overwrite an entry already present with the same alias.
-
-[[command-options-truststore]]
-=== Command Options
-
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`--target`
-|String
-|The name of the instance to add the certificate to.
-|server
-|no
-
-|`--reload`
-|Boolean
-|If the http listeners should be reloaded
-|false
-|no
-
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to add the certificate to.
-|N/A
-|no
-
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1
-|no
-
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
-
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
-
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
-
-|`--file`
-|File
-|The certificate file to add to the target trust store
-|N/A
-|yes
-
-|`--alias` (primary)
-|String
-|The alias name to store the certificate in the trust store under.
-|N/A
-|yes
-
-|===
-
-[[example-truststore]]
-=== Example
-
-[source, shell]
-----
-asadmin> add-to-keystore --file /home/anon/Downloads/mycert.p12 mycert
-----
-
-[[remove-from-keystore]]
-== `remove-from-keystore`
-
-*Usage*::
-`asadmin> remove-from-keystore --target=instancename --listener=listenername alias`
-
-*Aim*::
-This command removes a certificate from the target instance or listener's key store matching the provided alias.
-
-If the instance or listener is configured to use the default key store, the command will instead synchronise
-the instance with the DAS (under the assumption the certificate has been removed from the default key store of
-the DAS), since any certificates removed from the instance stores would be lost upon next synchronisation.
-
-[[command-options-remove]]
-=== Command Options
-
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`--target`
-|String
-|The name of the instance to remove the certificate from.
-|server
-|no
-
-|`--reload`
-|Boolean
-|If the http listeners should be reloaded
-|false
-|no
-
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to remove the certificate from.
-|N/A
-|no
-
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1
-|no
-
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
-
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
-
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
-
-|`--alias` (primary)
-|String
-|The alias name of the certificate to remove.
-|N/A
-|yes
-
-|===
-
-[[example-remove]]
-=== Example
-
-[source, shell]
-----
-asadmin> remove-from-keystore --domain_name production --target Instance1 --listener http-listener-2 mycert
-----
-
-[[remove-from-truststore]]
-== `remove-from-truststore`
-
-*Usage*::
-`asadmin> remove-from-truststore --target=instancename --listener=listenername alias`
-
-*Aim*::
-This command removes a certificate from the target instance or listener's trust store matching the provided alias.
-
-If the instance or listener is configured to use the default trust store, the command will instead synchronise
-the instance with the DAS (under the assumption the certificate has been removed from the default trust store of
-the DAS), since any certificates removed from the instance stores would be lost upon next synchronisation.
-
-[[command-options-removetrust]]
-=== Command Options
-
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`--target`
-|String
-|The name of the instance to remove the certificate from.
-|server
-|no
-
-|`--reload`
-|Boolean
-|If the http listeners should be reloaded
-|false
-|no
-
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to remove the certificate from.
-|N/A
-|no
-
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1
-|no
-
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
-
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
-
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
-
-|`--alias` (primary)
-|String
-|The alias name of the certificate to remove.
-|N/A
-|yes
-
-|===
-
-[[example-removetrust]]
-=== Example
-
-[source, shell]
-----
-asadmin> remove-from-truststore --domain_name production --target Instance1 --listener http-listener-2 mycert
-----
-
-
-[[remove-expired-certificates]]
-== `remove-expired-certificates`
-
-*Usage*::
-`asadmin> remove-expired-certificates --target=instancename --listener=listenername`
-
-*Aim*::
-This command removes all expired certificates from the target instance or listener's key and trust stores.
-
-If the instance or listener is configured to use the default trust store, the command will instead synchronise
-the instance with the DAS (under the assumption the certificate has been removed from the default trust store of
-the DAS), since any certificates removed from the instance stores would be lost upon next synchronisation.
-
-[[command-options-expired]]
-=== Command Options
-
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`--target`
-|String
-|The name of the instance to remove expired certificates from.
-|server
-|no
-
-|`--reload`
-|Boolean
-|If the http listeners should be reloaded
-|false
-|no
-
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to remove expired certificates from.
-|N/A
-|no
-
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1
-|no
-
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
-
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
-
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
-
-|===
-
-[[example-expired]]
-=== Example
-
-[source, shell]
-----
-asadmin> remove-expired-certificates --domain_name production --target Instance1 --listener http-listener-2
-----
-
-[[list-keystore-entries]]
-== `list-keystore-entries`
-
-_Since Payara Server 5.21.0_
-
-*Usage*::
-`asadmin> list-keystore-entries --target=instancename --listener=listenername`
-
-*Aim*::
-This command displays either all or a specific store entry from the target instance or listener's key store.
-
-[[command-options-list]]
-=== Command Options
-
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`--target`
-|String
-|The name of the instance to list certificates from.
-|server
-|no
-
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to list certificates from.
-|N/A
-|no
-
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1
-|no
-
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
-
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
-
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
-
-|`--verbose`
-|Boolean
-|Whether or not to print the full entry details.
-|false
-|no
-
-|`--alias` (primary)
-|String
-|The alias name of the entry to list. If not provided then all entries are listed.
-|N/A
-|false
-
-|===
-
-[[example-list]]
-=== Example
-
-[source, shell]
-----
-asadmin> list-keystore-entries --domain_name production --target Instance1 --listener http-listener-2 mycert
-----
-
-[[list-truststore-entries]]
-== `list-truststore-entries`
-
-_Since Payara Server 5.21.0_
-
-*Usage*::
-`asadmin> list-truststore-entries --target=instancename --listener=listenername`
-
-*Aim*::
-This command displays either all or a specific store entry from the target instance or listener's trust store.
-
-[[command-options]]
-=== Command Options
-
-[cols="3,1,5,1,1",options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`--target`
-|String
-|The name of the instance to list certificates from.
-|server
-|no
-
-|`--listener`
-|String
-|The name of the HTTP or IIOP listener to list certificates from.
-|N/A
-|no
-
-|`--domainname`
-|String
-|The name of the domain where the target instance exists.
-|domain1
-|no
-
-|`--domaindir`
-|String
-|The path to the directory containing the target domain.
-|${installDir}/glassfish/domains
-|no
-
-|`--node`
-|String
-|The name of the node where the target instance exists.
-|localhost-$domainname
-|no
-
-|`--nodedir`
-|String
-|The path to the directory containing the target node.
-|${installDir}/glassfish/nodes
-|no
-
-|`--verbose`
-|Boolean
-|Whether or not to print the full entry details.
-|false
-|no
-
-|`--alias` (primary)
-|String
-|The alias name of the entry to list. If not provided then all entries are listed.
-|N/A
-|false
-
-|===
-
-[[example]]
-=== Example
-
-[source, shell]
-----
-asadmin> list-truststore-entries --domain_name production --target Instance1 --listener http-listener-2 mycert
-----
+image:certificate-management/CertificateManagementDeleteButton.png[Certificate Management Delete Button]

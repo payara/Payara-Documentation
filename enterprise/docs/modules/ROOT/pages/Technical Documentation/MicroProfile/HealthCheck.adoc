@@ -1,7 +1,5 @@
 = Eclipse MicroProfile Health Check API
 
-_Since Payara Server 4.1.2.181 and 5.181_
-
 Provided version of the API: {mpHealthSpecUrl}[MicroProfile Health Check {mpHealthVersion}]
 
 [[background]]
@@ -17,7 +15,7 @@ https://github.com/eclipse/microprofile-health/blob/master/README.adoc[the READM
 [[rest-endpoints]]
 == REST Endpoints
 
-The MicroProfile Healthchecks API defines the following list of REST endpoints that are available from the root context at `/health/${type}` by default:
+The MicroProfile HealthCheck API defines the following list of REST endpoints that are available from the root context at `/health/${type}` by default:
 
 [cols="1,1,3", options="header"]
 |====
@@ -51,13 +49,10 @@ NOTE: This endpoint will not be available until at least one application has bee
 
 Health Check can be configured by using Admin Console or Asadmin commands. 
 
-_Since *5.183*&nbsp;_
-
 [[using-the-admin-console]]
 === Using the Admin Console
 
-To configure the Health Check in the Admin Console, go to Configuration 
-→ [instance-configuration (like server-config)] → MicroProfile → Health Check:
+To configure the Health Check in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → Health Check:
 
 image:microprofile/health-check.png[Set Health Check Configuration]
 
@@ -68,8 +63,6 @@ The following administration commands can be used to configure the MicroProfile 
 
 [[set-microprofile-healthcheck-configuration]]
 ==== `set-microprofile-healthcheck-configuration`
-
-_Since Payara Server 4.1.2.182 and 5.182_
 
 *Usage*::
 ----
@@ -104,16 +97,12 @@ Enables or disables the MicroProfile healthcheck service and configures the endp
 |`securityenabled`
 |Boolean
 |Whether or not secure access to the health-check endpoint is enabled.
-
-_Since Payara Server 5.193_
 |false
 |No
 
 |`roles`
 |String
 |If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.
-
-_Since Payara Server 5.193_
 |`microprofile`
 |No
 
@@ -131,7 +120,7 @@ _Since Payara Server 5.193_
 
 |`virtualservers`
 |String
-|If defined, the '/health' endpoint will be assigned to the list of virtual servers specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available. _Since Payara Server 4.1.2.184 and 5.184_
+|If defined, the `/health`` endpoint will be assigned to the list of virtual servers specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available.
 |-
 |No
 |====
@@ -140,17 +129,13 @@ IMPORTANT: Changes made with this command will only be applied when the server o
 
 [[security-configuration]]
 === Security Configuration
-By default, HealthCheck endpoints bind to root context application which is 
-`__default-web-module` (docroot) system application and `__default-web-module` 
-application uses the default realm (`file`) of the server. If user application deployed 
-with the empty context-root then the security configuration of the deployed 
-application will be shared by HealthCheck endpoints.
+By default, HealthCheck endpoints bind to the root context application which is the `__default-web-module` (also known as *docroot*) system application and the `__default-web-module` application, which is secured under the default realm (`file`) of the server. 
+
+If a user application is deployed in the empty context-root, then the security configuration of this application will be shared by the HealthCheck endpoints, so exert extreme caution when making these changes.
 
 [[microprofile-4-upgrade]]
 == Upgrading from MicroProfile 3.x to 4.x
 
-MicroProfile 4.0 brings with it a number of changes to MicroProfile Health. The main incompatible change
-brought in by this upgrade is the removal of the deprecated `@Health` annotation.
+MicroProfile 4.0 brings with it a number of changes to MicroProfile Health. The main incompatible change brought in by this upgrade is the removal of the deprecated `@Health` annotation.
 
-There isn't a workaround for this, the annotation is simply gone: all health checks must be registered as a
-`@Readiness`, `@Liveness`, or `@Startup` check.
+There isn't a workaround for this, the annotation is simply gone: all health checks must be registered as a `@Readiness`, `@Liveness`, or `@Startup` check.

@@ -1,28 +1,19 @@
 :ordinal: 900
 = Eclipse MicroProfile Config API
 
-_Since *4.1.2.173*&nbsp;_
-
 Provided version of the API: {mpConfigSpecUrl}[MicroProfile Config {mpConfigVersion}]
 
 == Background
-The Config API was created to allow for the modification of application
-configuration from outside the application without needing the application to be
-repackaged.
+The Config API was created to allow for the modification of application configuration from outside the application without needing the application to be repackaged.
 
-A full overview for the reasoning behind the API can be found in
-https://github.com/eclipse/microprofile-config/blob/master/Overview.adoc[the
-Overview for the source code repository.]
+A full overview for the reasoning behind the API can be found in https://github.com/eclipse/microprofile-config/blob/master/Overview.adoc[the Overview for the source code repository.]
 
-{mpConfigSpecUrl}[The complete specification] is maintained in the same repository
+NOTE: {mpConfigSpecUrl}[The complete specification] is maintained in the same repository.
 
 [[config-sources]]
 == Config Sources
-A `ConfigSource` is a definition of a source of configuration values that can be
-used by an application. In addition to
-https://github.com/eclipse/microprofile-config/blob/master/spec/src/main/asciidoc/configsources.asciidoc#default-configsources[
-the default ConfigSources outlined by the specification], the following are also
-supported ConfigSources:
+
+A `ConfigSource` is a definition of a source of configuration values that can be used by an application. In addition to https://github.com/eclipse/microprofile-config/blob/master/spec/src/main/asciidoc/configsources.asciidoc#default-configsources[ the default ConfigSources outlined by the specification], the following are also supported ConfigSources:
 
 NOTE: Where multiple configuration properties exist, the property from a source with a higher ordinal number is preferred.
 
@@ -34,15 +25,11 @@ NOTE: Where multiple configuration properties exist, the property from a source 
 
 |`directory`
 |90
-|Reads configuration properties from files in a specified directory. Each file name
-is the configuration property name and the contents of the file are the config property
-value. This config source can be used to read https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod[Kubernetes secrets files].
-You can find out more about directory config sources here: xref:/Technical Documentation/MicroProfile/Config/Directory.adoc[Directory Config Sources]
+|Reads configuration properties from files in a specified directory. Each file name is the configuration property name and the contents of the file are the config property value. This config source can be used to read https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod[Kubernetes secrets files]. You can find out more about directory config sources here: xref:/Technical Documentation/MicroProfile/Config/Directory.adoc[Directory Config Sources]
 
 |`password`
 |105
-|Retrieves and stores config values in the password alias store. These will be
-available to all server instances in a domain.
+|Retrieves and stores config values in the password alias store. These will be available to all server instances in a domain.
 
 |`domain`
 |110
@@ -51,15 +38,11 @@ then apply to all instances within a domain
 
 |`jndi`
 |115
-|Retrieves and stores config values within the jndi tree. The property name being
-the dotted name path in the JNDI tree and the value being stored in the JNDI tree.
-These are modifiable by current admin console functionality.
+|Retrieves and stores config values within the JNDI tree. The property name being the dotted name path in the JNDI tree and the value being stored in the JNDI tree. These are modifiable by current admin console functionality.
 
 |`config`
 |120
-|Retrieves and stores config values at the level of the named configuration in
-the domain.xml; `server-config`, for example. MicroProfile Configuration property
-values will apply to all instances that use the Payara configuration specified.
+|Retrieves and stores config values at the level of the named configuration in the domain.xml; `server-config`, for example. MicroProfile Configuration property values will apply to all instances that use the Payara configuration specified.
 
 |`server`
 |130
@@ -68,29 +51,19 @@ Property values will only apply on the named server instance
 
 |`application`
 |140
-|Retrieves and stores config values at the level of the application. Property
-values will only be available for the specified application on all server
-instances it is deployed
+|Retrieves and stores config values at the level of the application. Property values will only be available for the specified application on all server instances it is deployed
 
 |`module`
 |150
-|Retrieves and stores config values at the level of an individual module within
-an appllication. Property values will only be available for the specified module
-on all server instances it is deployed
+|Retrieves and stores config values at the level of an individual module within an application. Property values will only be available for the specified module on all server instances it is deployed
 
 |`cluster`
 |160
-|Retrieves and stores config values in the *Hazelcast* cluster as name value pairs.
-These will be available for all server instances that are members of the cluster.
+|Retrieves and stores config values in the *Hazelcast* cluster as name value pairs. These will be available for all server instances that are members of the cluster.
 
 |`payara expression`
 |170
-|Reads configuration properties from a `payara-expression-config.properties` file. This
-should be stored in the same location as your `microprofile-config.properties` file.
-This file can be used to reference properties containing variables which will be
-translated to their actual values upon retrieval. The property values should be in
-the format referenced here:
-xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Configuration Options/Variable Substitution/Types of Variables.adoc[Types of Variables]
+|Reads configuration properties from a `payara-expression-config.properties` file. This should be stored in the same location as your `microprofile-config.properties` file This file can be used to reference properties containing variables which will be translated to their actual values upon retrieval. The property values should be in the format referenced here: xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Configuration Options/Variable Substitution/Types of Variables.adoc[Types of Variables]
 
 |`cloud`
 |180
@@ -110,13 +83,12 @@ xref:/Technical Documentation/Payara Server Documentation/Server Configuration A
 include::partial$tech-preview.adoc[]
 
 == Converters
-In addition to the standard converters specified by the API, Payara's implementation
-includes out-of-the-box converters for URL and InetAddress. These have `@Priority`
-of `1`, the same as the default converters.
 
-== Payara Specific Configuration Properties
-In addition to the standard configuration properties, Payara Server Community and Micro Community provide a number of out-of-the-box config properties
-you can use in your application to find information about the Payara runtime environment.
+In addition to the standard converters specified by the API, Payara Platform's implementation includes out-of-the-box converters for URL and `InetAddress`. These have `@Priority` of `1`, the same as the default converters.
+
+== Payara Platform Configuration Properties
+
+In addition to the standard configuration properties, Payara Server and Micro provide a number of out-of-the-box config properties you can use in your application to find information about the runtime environment.
 
 [cols="7,10", options="header"]
 |===
@@ -176,32 +148,26 @@ you can use in your application to find information about the Payara runtime env
 [[config-ordinal-configuration]]
 == Config Ordinal Configuration
 
-Config Ordinal can be configured by using Admin Console or Asadmin commands.
-
-_Since *5.183*&nbsp;_
+Configuration variables ordinal values can be configured by using Admin Console or via the Asadmin CLI.
 
 [[using-the-admin-console]]
 === Using the Admin Console
 
-To configure the Config Ordinal in the Admin Console, go to Configuration
-→ [instance-configuration (like server-config)] → MicroProfile → Config → Ordinal:
+To configure the ordinal value in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → Config → Ordinal:
 
 image:microprofile/config-ordinal.png[Set Config Ordinal]
 
 [[using-asadmin-commands]]
 === Using Asadmin Commands
 
-IMPORTANT: A `--source` value of `jndi` is not supported for these asadmin commands in
-4.1.2.173. The JNDI `ConfigSource` does exist and is usable from the Config API, though.
+IMPORTANT: A `--source` value of `jndi` is not supported for these asadmin commands yet. The JNDI `ConfigSource` does exist and is usable from the Config API, though.
 
 ==== `set-config-ordinal`
 
 *Usage*::
-`asadmin> set-config-ordinal --ordinal=<integer.value> --source=domain|config|
-server|application|module|cluster`
+`asadmin> set-config-ordinal --ordinal=<integer.value> --source=domain|config|server|application|module|cluster`
 *Aim*::
-Provides a way to set the ordinal for a given config source. Where multiple
-configuration properties exist, the property from a source with a higher ordinal number is preferred.
+Provides a way to set the ordinal for a given config source. Where multiple configuration properties exist, the property from a source with a higher ordinal number is preferred.
 
 ===== Command Options
 
@@ -213,14 +179,12 @@ configuration properties exist, the property from a source with a higher ordinal
 |Mandatory
 
 |`ordinal`
-|The value of the ordinal to set. This must be a number greater than 1. A lower
-number ordinal means lower order of precedence.
+|The value of the ordinal to set. This must be a number greater than 1. A lower number ordinal means lower order of precedence.
 |-
 |yes
 
 |`source`
-|The value of the source to change. Must be one of: `domain`, `config`, `server`,
-`application`, `module`, `cluster`
+|The value of the source to change. Must be one of: `domain`, `config`, `server`, `application`, `module`, `cluster`
 |-
 |yes
 
@@ -228,13 +192,11 @@ number ordinal means lower order of precedence.
 |The target Payara config to apply the change to
 |server (the DAS)
 |no
-
 |===
-
 
 ===== Example
 
-[source,Shell]
+[source, shell]
 ----
 asadmin> set-config-ordinal --ordinal=600 --source=application
 ----
@@ -260,13 +222,11 @@ Returns the ordinal value for the given ConfigSource type.
 `server`, `application`, `module`, `cluster`
 |-
 |yes
-
 |===
-
 
 ===== Example
 
-[source,Shell]
+[source, shell]
 ----
 asadmin> get-config-ordinal --source=cluster
 ----
@@ -274,15 +234,12 @@ asadmin> get-config-ordinal --source=cluster
 [[config-property-configuration]]
 == Config Property Configuration
 
-Config Property can be configured by using Admin Console or Asadmin commands.
-
-_Since *5.183*&nbsp;_
+Configuration properties can be configured by using Admin Console or Asadmin commands.
 
 [[using-the-admin-console-get]]
 === Using the Admin Console
 
-To configure the Config Property in the Admin Console, go to Configuration
-→ [instance-configuration (like server-config)] → MicroProfile → Config → Property:
+To configure the property in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → Config → Property:
 
 image:microprofile/config-property.png[Set Config Property]
 
@@ -292,15 +249,9 @@ image:microprofile/config-property.png[Set Config Property]
 ==== `set-config-property`
 
 *Usage*::
-`asadmin> set-config-property --propertyName=<property.name> --propertyValue=
-<property.val> --source=domain|config|server|application|module|cluster
---sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
+`asadmin> set-config-property --propertyName=<property.name> --propertyValue= <property.val> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
 *Aim*::
-Sets the given property name and value in one of the built-in config sources. The
-source is specified with `--source` and, where there is ambiguity, the `--sourceName`
-and `--moduleName` options can be used. For example, where the source is `server`,
-the `--sourceName` can be used to specify the name of the server where the config
-property is to be stored.
+Sets the given property name and value in one of the built-in config sources. The source is specified with `--source` and, where there is ambiguity, the `--sourceName` and `--moduleName` options can be used. For example, where the source is `server`, the `--sourceName` can be used to specify the name of the server where the config property is to be stored.
 
 ===== Command Options
 
@@ -327,17 +278,12 @@ property is to be stored.
 |yes
 
 |`sourceName`
-|The name of the ConfigSource when there may be ambiguity, for example a
-ConfigSource of type `application` must specify the name of the application. This
-property is required for sources of type: `config`, `server`, `application` or
-`module`
+|The name of the ConfigSource when there may be ambiguity, for example a ConfigSource of type `application` must specify the name of the application. This property is required for sources of type: `config`, `server`, `application` or `module`
 |-
 |no
 
 |`moduleName`
-|The name of the module when the ConfigSource is of type `module`. When this is
-specified, the `sourceName` parameter must be provided and must have the name of
-the application where the module is deployed.
+|The name of the module when the ConfigSource is of type `module`. When this is specified, the `sourceName` parameter must be provided and must have the name of the application where the module is deployed.
 |-
 |no
 
@@ -345,13 +291,12 @@ the application where the module is deployed.
 |The target configuration where the command should be run
 |server (the DAS)
 |no
-
 |===
 
 
 ===== Example
 
-[source,Shell]
+[source, shell]
 ----
 asadmin> set-config-property
     --propertyName=JMSBrokerURL
@@ -366,16 +311,9 @@ asadmin> set-config-property
 ==== `delete-config-property`
 
 *Usage*::
-`asadmin> delete-config-property --propertyName=<property.name> --source=domain|
-config|server|application|module|cluster --sourceName=<source.name>
---moduleName=<module.name> --target=<target[default:server]>`
+`asadmin> delete-config-property --propertyName=<property.name> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
 *Aim*::
-Deletes the given property name in one of the built-in config sources so that the property no longer exists. The
-source is specified with `--source` and, where there is ambiguity, the `--sourceName`
-and `--moduleName` options can be used. For example, where the source is `server`,
-the `--sourceName` can be used to specify the name of the server where the config
-property is to be stored. `moduleName` should only be used when the `--source=module`.
-
+Deletes the given property name in one of the built-in config sources so that the property no longer exists. The source is specified with `--source` and, where there is ambiguity, the `--sourceName` and `--moduleName` options can be used. For example, where the source is `server`, the `--sourceName` can be used to specify the name of the server where the config property is to be stored. `moduleName` should only be used when the `--source=module`.
 
 ===== Command Options
 
@@ -397,10 +335,7 @@ property is to be stored. `moduleName` should only be used when the `--source=mo
 |yes
 
 |`sourceName`
-|The name of the ConfigSource when there may be ambiguity, for example a
-ConfigSource of type `application` must specify the name of the application. This
-property is required for sources of type: `config`, `server`, `application` or
-`module`
+|The name of the ConfigSource when there may be ambiguity, for example a `ConfigSource` of type `application` must specify the name of the application. This property is required for sources of type: `config`, `server`, `application` or `module`
 |-
 |no
 
@@ -415,13 +350,11 @@ the application where the module is deployed.
 |The target configuration where the command should be run
 |server (the DAS)
 |no
-
 |===
-
 
 ===== Example
 
-[source,Shell]
+[source, shell]
 ----
 asadmin> delete-config-property
     --propertyName=JMSBrokerURL
@@ -431,21 +364,12 @@ asadmin> delete-config-property
     --target=myAppCluster
 ----
 
-
-
 ==== `get-config-property`
 
 *Usage*::
-`asadmin> get-config-property --propertyName=<property.name> --source=domain|
-config|server|application|module|cluster --sourceName=<source.name>
---moduleName=<module.name> --target=<target[default:server]>`
+`asadmin> get-config-property --propertyName=<property.name> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
 *Aim*::
-Gets the value for the given property name in one of the built-in config sources. The
-source is specified with `--source` and, where there is ambiguity, the `--sourceName`
-and `--moduleName` options can be used. For example, where the source is `server`,
-the `--sourceName` can be used to specify the name of the server where the config
-property is to be stored.
-
+Gets the value for the given property name in one of the built-in config sources. The source is specified with `--source` and, where there is ambiguity, the `--sourceName` and `--moduleName` options can be used. For example, where the source is `server`, the `--sourceName` can be used to specify the name of the server where the config property is to be stored.
 
 ===== Command Options
 
@@ -467,17 +391,13 @@ property is to be stored.
 |yes
 
 |`sourceName`
-|The name of the ConfigSource when there may be ambiguity, for example a
-ConfigSource of type `application` must specify the name of the application. This
-property is required for sources of type: `config`, `server`, `application` or
+|The name of the ConfigSource when there may be ambiguity, for example a `ConfigSource` of type `application` must specify the name of the application. This property is required for sources of type: `config`, `server`, `application` or
 `module`
 |-
 |no
 
 |`moduleName`
-|The name of the module when the ConfigSource is of type `module`. When this is
-specified, the `sourceName` parameter must be provided and must have the name of
-the application where the module is deployed.
+|The name of the module when the ConfigSource is of type `module`. When this is specified, the `sourceName` parameter must be provided and must have the name of the application where the module is deployed.
 |-
 |no
 
@@ -485,13 +405,11 @@ the application where the module is deployed.
 |The target configuration where the command should be run
 |server (the DAS)
 |no
-
 |===
-
 
 ===== Example
 
-[source,Shell]
+[source, 1shell]
 ----
 asadmin> get-config-property
     --propertyName=JMSBrokerURL
@@ -501,16 +419,12 @@ asadmin> get-config-property
     --target=myAppCluster
 ----
 
-
 [[config-cache-duration-configuration]]
 == Config Cache Duration
 
-_Since *5.2020.2*&nbsp;_
+The cache duration can be configured by using Asadmin commands. By default properties have a TTL (time to live) of 60 seconds.
+That means each individual property does not change for 60 seconds since it has been resolved before. Therefore it can take up to 60 seconds for changes made visible by a config source to become effective.
 
-Config cache duration can be configured by using Asadmin commands.
-By default properties have a TTL (time to live) of 60 seconds.
-That means each individual property does not change for 60 seconds since it has been resolved before.
-Therefore it can take up to 60 seconds for changes made visiable by a config source to become effective.
 If properties were not resolved recently, the change can become visible faster than the cache duration or even immediately because some time already passed since they had been last resolved and cached.
 
 === Using Asadmin Commands
@@ -540,14 +454,13 @@ Sets the cache duration for the target instance(s). Any duration equal to or bel
 |The target configuration where the command should be run
 |server (the DAS)
 |no
-
 |===
-
 
 ===== Example
 
 Disable caching:
-[source,Shell]
+
+[source, shell]
 ----
 asadmin> set-config-cache
     --duration=0
@@ -555,7 +468,8 @@ asadmin> set-config-cache
 ----
 
 Set cache TTL (time to live) for properties to 30 seconds.
-[source,Shell]
+
+[source, shell]
 ----
 asadmin> set-config-cache
     --duration=30

@@ -1,24 +1,15 @@
 = Network Listeners
 
-A network listener is a listener socket that has an IP address, port number, protocol,
-as well as various other configuration options. A listener can listen on a specific
-port on all network interfaces by using the IP `0.0.0.0`, and a configured port.
-A virtual server will then be used to select a combination of network listeners to
-use for an application. For example, Payara Server Community has two default network listeners
-for user deployed applications: an insecure listener on port 8080 (`http-listener-1`),
-and a secure listener on port 8181 (`http-listener-2`).
+A network listener is a listener socket that has an IP address, port number, protocol, as well as various other configuration options. A listener can listen on a specific port on all network interfaces by using the IP `0.0.0.0`, and a configured port.
+
+A virtual server will then be used to select a combination of network listeners to use for an application. For example, Payara Server has two default network listeners for user deployed applications: an insecure listener on port 8080 (`http-listener-1`), and a secure listener on port 8181 (`http-listener-2`).
 
 [[configuration]]
 == Configuration
 
-NOTE: When configuring network listeners from the admin console, there are some visible
-configuration options that transparently configure the protocol being used. If a
-configuration property isn't shown here but is visible in the admin console, see the page
-on xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/HTTP Service/Protocols.adoc[protocols].
+NOTE: When configuring network listeners from the admin console, there are some visible configuration options that transparently configure the protocol being used. If a configuration property isn't shown here but is visible in the admin console, see the page on xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/HTTP Service/Protocols.adoc[protocols].
 
-Existing network listeners can be configured from the admin console or with asadmin
-commands. The network listener configurations can be found in the admin console under
-*Configurations* -> *your-config* -> *Network Config* -> *Network Listeners*.
+Existing network listeners can be configured from the admin console or with asadmin commands. The network listener configurations can be found in the admin console under *Configurations* -> *your-config* -> *Network Config* -> *Network Listeners*.
 
 image::http/network-listener-config.png[Configuration Page Location]
 
@@ -58,8 +49,7 @@ The status of the network listener. This determines whether the listener will be
 [[configuration-jk-listener]]
 === JK Enabled
 
-Whether `mod_jk` support should be enabled for this listener. Should only be enabled if `mod_jk` is being
-explicitly configured on an Apache Web Server in conjunction with Payara Server Community.
+Whether `mod_jk` support should be enabled for this listener. Should only be enabled if `mod_jk` is being explicitly configured on an Apache Web Server in conjunction with Payara Server.
 
 *Asadmin Command:*
 
@@ -119,7 +109,6 @@ The thread pool used by the network listener. This determines the pool of thread
 [[sni]]
 == Server Name Indication - SNI
 
-
 Server Name Indication, SNI for short, allows you to use multiple SSL certificates with the same IP address. When enabled, the server will look for a certificate in the configured keystore using a nickname that matches the host name requested.  
 
 SNI can be enabled by configuring a network listener. Existing network listeners can be configured from the admin console or with asadmin commands. The network listener configurations can be found in the admin console under *Configurations -> <your-config> -> Network Config -> Network Listeners*.
@@ -132,14 +121,12 @@ IMPORTANT: For SNI to take effect, the network listener must have security enabl
 [[asadmin]]
 == Asadmin Commands
 
-The following asadmin commands are available for administering network listeners instead of using the admin console.
-The parameters are all explained in the configuration options above.
+The following asadmin commands are available for administering network listeners instead of using the Admin console. The parameters are all explained in the configuration options above.
 
 === create-network-listener
 
 The `create-network-listener` command creates a network listener. It requires an already created transport and protocol.
-For more information on creating protocols, see xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/HTTP Service/Protocols.adoc[protocols]. The parameters are all explained
-in the configuration options above.
+For more information on creating protocols, see xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/HTTP Service/Protocols.adoc[protocols]. The parameters are all explained in the configuration options above.
 
 ==== Format
 ----
@@ -159,10 +146,10 @@ asadmin> create-network-listener [--help]
 === restart-http-listeners
 
 
-The `restart-http-listeners` commands restarts all HTTP listeners but the `admin-listener` of the targeted instance(s).
-It is either used with the `--all` flag to target all instances or with a particular target instance, deployment group or cluster following the `--target` parameter.
-When `target` and `all` parameters are both omitted the default target is the DAS.
+The `restart-http-listeners` commands restarts all HTTP listeners but the `admin-listener` of the targeted instance(s). It is either used with the `--all` flag to target all instances or with a particular target instance, deployment group or cluster following the `--target` parameter. When `target` and `all` parameters are both omitted the default target is the DAS.
+
 When `--all` is used together with a target the target is ignored and the command affects all instances.
+
 NOTE: This command only restarts all HTTP listeners except the `admin-listener`. IIOP listeners are not affected and may require a server restart to make changes take effect.
 
 ==== Format
