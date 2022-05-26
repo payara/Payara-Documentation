@@ -1,7 +1,6 @@
 import argparse
 import os
 import logging
-import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument( "--log", default="INFO",
