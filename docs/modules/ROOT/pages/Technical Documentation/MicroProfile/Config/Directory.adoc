@@ -4,12 +4,9 @@
 
 Config Directory can be configured by using Admin Console or Asadmin commands.
 
-_Since *5.184*&nbsp;_
-
 === Using the Admin Console
 
-To configure the Config Directory in the Admin Console, go to Configuration
-→ [instance-configuration (like server-config)] → MicroProfile → Config → Directory:
+To configure the Config Directory in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → Config → Directory:
 
 image:microprofile/config-property.png[Set Config Property]
 
@@ -25,14 +22,12 @@ include::partial$tech-preview.adoc[]
 
 *Aim*::
 Sets the directory to be used for the directory config source.
-- *Leaf directory cannot start with a dot*, rendering `/home/payara/.secret`
-  an invalid path ("." means hidden on a POSIX filesystem).
-- If relative, will lookup beneath server instance location
-  (usually to be found at `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/`)
-- Defaults to `secrets`, targeting `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/secrets/`
 
-_Please note:_ after setting via `asadmin`, you will need to _restart_ the
-application server to reinitialize the config source!
+* *Leaf directory cannot start with a dot*, rendering `/home/payara/.secret` an invalid path ("." means hidden on a POSIX filesystem).
+* If relative, will lookup beneath server instance location (usually to be found at `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/`)
+* Defaults to `secrets`, targeting `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/secrets/`
+
+NOTE: After setting via `asadmin`, you will need to restart the application server to reinitialize the config source!
 
 ===== Command Options
 
@@ -53,13 +48,12 @@ application server to reinitialize the config source!
 |The target configuration where the command should be run
 |server-config
 |no
-
 |===
 
 
 ===== Example
 
-[source]
+[source, shell]
 ----
 asadmin> set-config-dir
     --directory=/home/payara/secrets
@@ -90,90 +84,60 @@ Gets the value of the directory to be used for the directory config source.
 |The target configuration where the command should be run
 |server-config
 |no
-
 |===
 
 
 ===== Example
 
-[source]
+[source, shell]
 ----
-asadmin> get-config-dir
-    --target=myAppCluster
+asadmin> get-config-dir --target=myAppCluster
 ----
 
 === Using Preboot or Postboot Scripts
-Especially when running Payara in a container, there is no way to restart after
-configuring via an `asadmin` command without loosing the domain configuration.
 
-Thus you should add the command to a bootscript as described at
-xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Asadmin Commands/Pre and Post Boot Commands.adoc[Pre- and Postboot scripts].
-See xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Docker Host Support/Docker Instances.adoc#_environment_variables[Payara Server container image env vars]
-for details how to use this within non-micro flavored containers.
+When running a Payara Platform distribution in a container, there is no way to restart a running instance after configuring via an `asadmin` command without losing the changes to the domain configuration.
 
+Thus you should add the corresponding command to a boot script as described at xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Asadmin Commands/Pre and Post Boot Commands.adoc[Pre- and Postboot scripts].
+
+See xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Docker Host Support/Docker Instances.adoc#environment_variables[Payara Server Docker Image environment variables] for details how to use this within non-micro containers.
 
 == Usage
 
-Usually this config source is used to map secrets mounted by Kubernetes or
-Docker to a directory inside a running container.
+Usually this config source is used to map secrets mounted by Kubernetes or Docker to a directory inside a running container.
 
-Once you configured a directory to read a config (secrets) from, you need to
-make sure file names correspond to properties in your codebase.
+Once you configured a directory to read a config (secrets) from, you need to make sure file names correspond to properties in your codebase.
 
 === Map property names to flat file hierarchy
 
-_Since *5.183*&nbsp;_
+. Say you have two properties `property1` and `foo.bar.property2`.
+. Payara is configured with secret directory `/home/payara/secrets`
+. Secrets mounted as files to `/home/payara/secrets/property1` and `/home/payara/secrets/foo.bar.property2` will be read.
 
-1. Say you have two properties `property1` and `foo.bar.property2`.
-2. Payara is configured with secret directory `/home/payara/secrets`
-3. Secrets mounted as files to `/home/payara/secrets/property1` and
-   `/home/payara/secrets/foo.bar.property2` will be read.
-
-Remember that the files may only contain the secret or other configuration
-value - no newlines, metadata, etc! Plaintext files only, no file extensions
-allowed.
+IMPORTANT: Remember that the files may only contain the secret or other configuration values. Plaintext files only, no file extensions allowed.
 
 === Map property names to a sub-directory structure
 
-_Since *5.2021.1*&nbsp;_
-
-1. Say you have two properties `property1` and `foo.bar.property2`.
-2. Payara is configured with secret directory `/home/payara/secrets`
-3. Secrets mounted as files to `/home/payara/secrets/property1` and
-   `/home/payara/secrets/foo/bar/property2` will be read.
+. Say you have two properties `property1` and `foo.bar.property2`.
+. Payara is configured with secret directory `/home/payara/secrets`
+. Secrets mounted as files to `/home/payara/secrets/property1` and `/home/payara/secrets/foo/bar/property2` will be read.
 
 Restrictions on the files content are the same as with the flat hierarchy.
 
-Updates to files and subdirectories are picked up at runtime. Retrieving
-the config property again will use the updated values. This allows for clearing
-a value by removing the file, too.
+Updates to files and subdirectories are picked up at runtime. Retrieving the config property again will use the updated values. This allows for clearing a value by removing the file, too.
 
 ==== Dots usage and depicting directories and file name
 
-Dots in property names are used to reflect scopes, for example to distinguish
-different applications, modules, etc.
+Dots in property names are used to reflect scopes, for example to distinguish different applications, modules, etc.
 
-1. Any dots in the property name may correspond to changing from one directory
-   to a subdirectory.
-   Example: `foo.bar.test` could be a file `test` in `foo/bar/` path.
-2. You may combine any number of dot-separated "components" into directories
-   and file name.
-   Example: `foo.bar.test.example` may be a file `test.example` in
-   `foo/bar/` path or a file `example` in path `foo/bar.test/` and so on.
-3. Do not use a file extension, as it would be taken as part of the
-   property name.
-4. The longest, most specific match "wins" for reading the value into the
-   property. This allows to create scoped directory structures as you see fit.
-   Example: `foo.bar/test.example` is less specific than `foo/bar/test.example`
-   and so on.
+. Any dots in the property name may correspond to changing from one directory to a subdirectory. Example: `foo.bar.test` could be a file `test` in `foo/bar/` path.
+. You may combine any number of dot-separated "components" into directories and file name. Example: `foo.bar.test.example` may be a file `test.example` in `foo/bar/` path or a file `example` in path `foo/bar.test/` and so on.
+. Do not use a file extension, as it would be taken as part of the property name.
+. The longest, most specific match "wins" for reading the value into the property. This allows to create scoped directory structures as you see fit. Example: `foo.bar/test.example` is less specific than `foo/bar/test.example` and so on.
 
-You cannot use directories or files whose names start with a dot. They will
-be ignored, following the POSIX philosophy of hidden files and folders.
+You cannot use directories or files whose names start with a dot. They will be ignored, following the POSIX philosophy of hidden files and folders.
 
-Symbolic links will be followed, so you can expose files from such hidden areas,
-allowing for all types of mangling with names etc. (This allows the Kubernetes
-Secret mounting magic to happen...). Don't link to directories, as the
-file monitors rely on real directories.
+Symbolic links will be followed, so you can expose files from such hidden areas, allowing for all types of mangling with names etc. Don't link to directories, as the file monitors rely on real directories.
 
 ==== Kubernetes Example
 
@@ -186,7 +150,7 @@ You want to retrieve a (secret) value via property `foo.bar.property1`:
 
 You deployed a secret to your Kubernetes cluster:
 
-[source,Yaml]
+[source, yaml]
 ----
 apiVersion: v1
 kind: Secret
@@ -197,10 +161,9 @@ stringData:
   property1: my-super-secret-value
 ----
 
-And your pod mounts it at `/home/payara/secrets/foo/bar`
-(only showing the relevant parts from the `Deployment` K8s YAML):
+And your pod mounts it at `/home/payara/secrets/foo/bar` (only showing the relevant parts from the `Deployment` K8s YAML):
 
-[source,Yaml]
+[source, yaml]
 ----
 volumeMounts:
   - name: test-secrets
@@ -211,7 +174,7 @@ volumes:
       secretName: foobar
 ----
 
-[source]
+[source, shell]
 ----
 / # ls -la /home/payara/secrets/foo/bar
 total 3
@@ -222,5 +185,4 @@ lrwxrwxrwx 1 root root   31 Nov 25 10:51 ..data -> ..2020_11_25_10_51_55.2830095
 lrwxrwxrwx 1 root root   15 Nov 25 10:51 property1 -> ..data/property1
 ----
 
-Now Payara will pick up the file and read its content as a value for property
-`foo.bar.property1`
+The server instance will pick up the file and read its content as a value for property `foo.bar.property1`

@@ -1,8 +1,6 @@
 [[eclipse-microprofile-opentracing]]
 = Eclipse MicroProfile OpenTracing
 
-_Since Payara Server 4.1.2.182 and 5.182_
-
 Provided version of the API: {mpOpenTracingSpecUrl}[MicroProfile Open Tracing {mpOpenTracingVersion}]
 
 [[background]]
@@ -17,8 +15,6 @@ A full overview for the reasoning behind the API can be found in https://github.
 [[text-and-binary-carriers]]
 == Text and Binary Carriers Support
 
-_Since Payara Platform 4.1.2.183 and 5.183_
-
 The Payara Platform implementation of the `io.opentracing.Tracer` interface supports the following carriers:
 
 * `TextMap` carriers with `HTTP_HEADERS` and `TEXT_MAP` formats 
@@ -26,8 +22,6 @@ The Payara Platform implementation of the `io.opentracing.Tracer` interface supp
 
 [[jax-ws-support]]
 == JAX-WS Support
-
-_Since Payara Server 5.192_
 
 The Payara Platform's MicroProfile implementation supports tracing of requests that are handled by SOAP Web Services implemented via the JAX-WS API. Since JAX-WS is only supported on Payara Server Full Profile, this support is not covered on Payara Micro.
 
@@ -39,24 +33,24 @@ You can configure the notifiers and open tracing service by using the xref:Techn
 [[alternative-implementation]]
 == Using Alternate Opentracing Implementations
 
-_Since Payara Server 5.194_
-
 If you wish to use an alternative implementation of OpenTracing, i.e. Jaeger, then the alternative implementation must be provided as a jar in the lib directory of your domain. In it must be a file named `io.opentracing.Tracer` under _META-INF/services_, with the name of the class implementing `io.opentracing.Tracer`. That implementation must have a no-argument constructor. Alternate Opentracing implementations will only trace JAX-RS, JAX-WS and classes or methods annotated with `@Traced`; Payara's own request tracing service can trace xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/Overview.adoc[more types of request]. Payara's request tracing service MUST also be enabled, whichever implementation is being used in order for tracing to occur. All other configuration within Payara's request tracing service will have no effect on the supplied tracer, which must be configured separately to Payara.
 
 Activating Request Tracing is done either via the admin console or using the commands:
 
-`set-requesttracing-configuration --enabled=true --dynamic=true`
-`bootstrap-requesttracing`
+[source, shell]
+----
+set-requesttracing-configuration --enabled=true --dynamic=true
+bootstrap-requesttracing
+----
 
-NOTE: All other options for request tracing are ignored as the created Spans are not processed within Payara.
+NOTE: All other options for request tracing are ignored as the created spans are not processed in the server's runtime.
 
-As an example, see https://github.com/payara/ecosystem-jaeger-tracing, which shows how to integrate a Jaeger client tracer. This can be added as a library to Payara with the command `add-library jaeger-tracer-lib-with-dependencies`. Enabling request tracing in Payara Server is then required, which will then send traces from OpenTracing to a Jaeger collector on the same host.
+As an example, see https://github.com/payara/ecosystem-jaeger-tracing, which shows how to integrate a Jaeger client tracer. This can be added as a library to Payara Server with the command `add-library jaeger-tracer-lib-with-dependencies`. Enabling request tracing in Payara Server is then required, which will then send traces from OpenTracing to a Jaeger collector on the same host.
 
 [[microprofile-4-upgrade]]
 == Upgrading from MicroProfile 3.x to 4.x
-MicroProfile 4.0 brings with it a number of changes to MicroProfile OpenTracing, among these changes are some which break
-previous behaviour. The breaking changes are primarily to do with the removal of a number of methods from the API, and
-only affect the use of OpenTracing programmatically (the use of the annotations has not changed).
+
+MicroProfile 4.0 brings with it a number of changes to MicroProfile OpenTracing, among these changes are some which break previous behaviour. The breaking changes are primarily to do with the removal of a number of methods from the API, and only affect the use of OpenTracing programmatically (the use of the annotations has not changed).
 
 The following methods have all been removed, and the alternative method to use provided if available:
 

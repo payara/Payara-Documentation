@@ -1,11 +1,9 @@
 :ordinal: 900
 = Cloud Connectors
 
-The Payara Cloud Connectors are a collection of JCA adapters for use with
-various popular cloud messaging providers. These connectors can be deployed to
-Payara Server Community or Payara Micro Community version 172 or higher.
+The Payara Cloud Connectors are a collection of JCA adapters for use with various popular cloud messaging providers. These connectors can be deployed to either Payara Server or Payara Micro.
 
-The available connectors are:
+The following connectors are available:
 
 * xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Apache Kafka.adoc[Apache Kafka]
 * xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Amazon SQS.adoc[Amazon SQS]
@@ -14,17 +12,18 @@ The available connectors are:
 
 == Obtaining the connectors
 
-Cloud connectors are currently not available in binary form, but have to be
-built from source as follows:
+Cloud connectors are currently not available in binary form, but have to be built from source as follows:
 
 Clone the https://github.com/payara/Cloud-Connectors[Cloud-Connectors] git repository:
 
+[source, shell]
 ----
 git clone git@github.com:payara/Cloud-Connectors.git
 ----
 
 Build and install the connectors:
 
+[source, shell]
 ----
 cd Cloud-Connectors/
 mvn clean install
@@ -39,17 +38,13 @@ The connectors can be found in the following locations as JCA RARs:
 
 [[Installing-a-connector]]
 == Installing a connector
-A connector (JCA rar) is installed by deploying it to Payara Micro in the same
-way as an application archive (e.g. a .war) is deployed. The following shows an
-example:
+A connector (JCA rar) is installed by deploying it to Payara Micro in the same way as an application archive (e.g. a .war) is deployed. The following shows an example:
 
 ----
 java -jar payara-micro.jar --autobindhttp --deploy KafkaRAR-0.1.0-SNAPSHOT.rar
 ----
 
-The connector is subsequently available to all other applications deployed to
-Payara Micro. An application using a connector and the connector itself can be
-deployed simultaneously:
+The connector is subsequently available to all other applications deployed to Payara Micro. An application using a connector and the connector itself can be deployed simultaneously:
 
 ----
 java -jar payara-micro.jar --autobindhttp --deploy KafkaRAR-0.1.0-SNAPSHOT.rar --deploy myapp.war
@@ -57,10 +52,5 @@ java -jar payara-micro.jar --autobindhttp --deploy KafkaRAR-0.1.0-SNAPSHOT.rar -
 
 == Securing credentials
 
-In the documentation pages for the currently available cloud connectors,
-much of the configuration shown is done via annotations. This configuration
-contains credentials as well, which as a rule of thumb should not directly be
-placed in code. On Payara all properties can be replaced via System properties
-using the syntax ${system.property.name} or environment variables using the
-syntax `${ENV=evironment.property.name}` or password aliases using the syntax
-`${ALIAS=alias.name}`.
+In the documentation pages for the currently available cloud connectors, much of the configuration shown is done via annotations. This configuration
+contains credentials as well, which as a rule of thumb should not directly be placed in code. On Payara all properties can be replaced via System properties using the syntax ${system.property.name} or environment variables using the syntax `${ENV=evironment.property.name}` or password aliases using the syntax `${ALIAS=alias.name}`.

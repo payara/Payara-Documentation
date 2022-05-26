@@ -1,9 +1,7 @@
 [[http-and-https-auto-binding]]
 = HTTP and HTTPS Auto-Binding
 
-Payara Micro Community supports an auto-binding feature for its HTTP and HTTPS port,
-allowing Payara Micro Community to dynamically find a free HTTP or HTTPS port as required
-during startup.
+Payara Micro supports an auto-binding feature for its HTTP and HTTPS port, allowing Payara Micro to dynamically find a free HTTP or HTTPS port as required during startup.
 
 This feature is controlled through these three options:
 
@@ -11,23 +9,16 @@ This feature is controlled through these three options:
 `--autoBindSsl`:: Enables auto-bind functionality for the HTTPS port
 `--autoBindRange`:: Sets the range for the auto-bind feature
 
-When auto-binding is enabled, Payara Micro will attempt to connect to the port
-specified with the `--port` or `--sslPort` option (or, if these options are not
-specified, to port *8080* and *8181* respectively), and if that port is busy,
-it will instead try to bind on the next port up, repeating this process until
-it finds a free port, or the `--autoBindRange` limiter is reached.
+When auto-binding is enabled, Payara Micro will attempt to connect to the port specified with the `--port` or `--sslPort` option (or, if these options are not specified, to port *8080* and *8181* respectively), and if that port is busy, it will instead try to bind on the next port up, repeating this process until it finds a free port, or the `--autoBindRange` limiter is reached.
 
-For example, if ports *8080* and *8081* were busy, and ports *8082* and *8182*
-were free, then starting Payara Micro Community with the following command would have the
-HTTP port bind to *8082* and the HTTPS port bind to *8182*:
+For example, if ports *8080* and *8081* were busy, and ports *8082* and *8182* were free, then starting Payara Micro with the following command would have the HTTP port bind to *8082* and the HTTPS port bind to *8182*:
 
 [source, shell]
 ----
 java -jar payara-micro.jar --autoBindHttp --sslPort 8181 --autoBindSsl
 ----
 
-Whereas the following would fail to start in the same situation because
-`--autoBindRange` is not large enough (no free port within the range of
+Whereas the following would fail to start in the same situation because `--autoBindRange` is not large enough (no free port within the range of
 **8080**-**8081**):
 
 [source, shell]
@@ -35,7 +26,4 @@ Whereas the following would fail to start in the same situation because
 java -jar payara-micro.jar --port 8080 --autoBindHttp --sslPort 8181 --autoBindSsl --autoBindRange 1
 ----
 
-WARNING: Be aware that the auto-bind feature does not currently read port values from 
-domain.xml files; if the `--port` and `--sslPort` options are not used, then
-the `--autoBindHttp` and `--autoBindSsl` options will assume that the HTTP and
-HTTPS ports will be at the default values of 8080 and 8181 respectively.
+WARNING: Be aware that the auto-bind feature does not currently read port values from domain.xml files; if the `--port` and `--sslPort` options are not used, then the `--autoBindHttp` and `--autoBindSsl` options will assume that the HTTP and HTTPS ports will be at the default values of 8080 and 8181 respectively.

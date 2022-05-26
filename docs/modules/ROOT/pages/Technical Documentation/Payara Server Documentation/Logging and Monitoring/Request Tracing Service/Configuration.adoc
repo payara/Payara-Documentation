@@ -1,52 +1,34 @@
 [[Request Tracing Service-configuration]]
 = Request Tracing Configuration
 
-As with any other services available in Payara Server Community, the Request tracing service
-can be configured by using the web console, administration commands or editing
-the _domain.xml_ configuration file directly.
+As with any other services available in Payara Server, the Request tracing service can be configured by using the web console, administration commands or editing the _domain.xml_ configuration file directly.
 
 [[using-the-web-console]]
 == Using the Web Administration Console
 
-To configure the Request Tracing Service in the Administration Console, go to
-_Configuration -> [instance-configuration (like server-config)] -> Request Tracing_:
+To configure the Request Tracing Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Request Tracing_:
 
 image:Request Tracing Service/configuration-admin-console.png[Request Tracing Configuration in the Admin Console]
 
-Check the *Enabled* box (and the *Dynamic* box too if you don't want to
-restart the domain) to switch the request tracing service on.
+Check the *Enabled* box (and the *Dynamic* box too if you don't want to restart the domain) to switch the request tracing service on.
 
-You can configure the request tracing service settings using the following
-attributes:
+You can configure the request tracing service settings using the following attributes:
 
-**Sample Rate**:: This defines the percentage chance of a trace being sampled (as in, not discarded).
-This accepts a value between 0 and 1, with a value of 1 meaning 100% of traces are sampled.
-**Adaptive Sampling**:: This option is an alternative to using Sample Rate, allowing the sample rate to change in
-accordance with how many traces are being sampled over a period of time.
+**Sample Rate**:: This defines the percentage chance of a trace being sampled (as in, not discarded). This accepts a value between 0 and 1, with a value of 1 meaning 100% of traces are sampled.
+**Adaptive Sampling**:: This option is an alternative to using Sample Rate, allowing the sample rate to change in accordance with how many traces are being sampled over a period of time.
 **Target Count**:: This defines the number of sampled traces that the adaptive sampling shall attempt to hit over a period of time.
 **Time Value**:: This defines the period of time that the adaptive sampling will try to hit the _Target Count_ in.
 **Time Unit**:: This defines the time unit of the _Time Value_ attribute.
-**Applications Only**:: When enabled, traces that originate from outside of deployed applications
-(e.g. the Admin Console) will not be sampled.
+**Applications Only**:: When enabled, traces that originate from outside of deployed applications (e.g. the Admin Console) will not be sampled.
 **Threshold Value**:: This defines the number of units beyond which a request will be traced.
-**Threshold Unit**:: This defines the time duration per unit. The accepted options are any valid
-https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/TimeUnit.html[java.util.concurrent.TimeUnit] values.
-The default value is _SECONDS_.
-**Sample Rate First**:: When enabled, the sample rate will be checked as a trace begins, meaning that traces that
-would have broken the thresholds are potentially discarded. When disabled, the sample rate is checked after a trace has
-completed, meaning that you're only sampling traces that have breached your threshold values. Having this disabled will
-potentially give more accurate trace data, at the expense of a small extra performance overhead.
-**Reservoir Sampling**:: When disabled, the trace stores will contain the longest request traces. When enabled, the
-chance of any sampled request being in the trace stores becomes constant. Note that this applies to both trace stores -
-in most circumstances it doesn't make sense to have this enabled if _Store Historic Traces_ is also enabled.
+**Threshold Unit**:: This defines the time duration per unit. The accepted options are any valid https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/TimeUnit.html[java.util.concurrent.TimeUnit] values. The default value is _SECONDS_.
+**Sample Rate First**:: When enabled, the sample rate will be checked as a trace begins, meaning that traces that would have broken the thresholds are potentially discarded. When disabled, the sample rate is checked after a trace has completed, meaning that you're only sampling traces that have breached your threshold values. Having this disabled will potentially give more accurate trace data, at the expense of a small extra performance overhead.
+**Reservoir Sampling**:: When disabled, the trace stores will contain the longest request traces. When enabled, the chance of any sampled request being in the trace stores becomes constant. Note that this applies to both trace stores in most circumstances it doesn't make sense to have this enabled if _Store Historic Traces_ is also enabled.
 **Trace Store Size**:: The maximum number of traces to be stored in the local rolling trace store. A store shared in a cluster uses the maximum setting of this property of any instance in the cluster with request tracing enabled.
-**Trace Store Timeout**:: The timeout value for when traces will be removed from the rolling trace store. This is
-ignored when reservoir sampling is enabled.
+**Trace Store Timeout**:: The timeout value for when traces will be removed from the rolling trace store. This is ignored when reservoir sampling is enabled.
 **Store Historic Traces**:: When enabled, a second trace store is created to store the longest historical request traces.
-**Historic Trace Store Size**:: Determines the number of historical trace events that can be stored in memory when
-historical storing is enabled. The default value is **20** records. A store shared in a cluster uses the maximum setting of this property of any instance in the cluster with request tracing enabled.
-**Historic Trace Store Timeout**:: Determines how long before Request Tracing messages are removed. This field is
-specified in the format "%d %h %m %s" where % is an integer. Any of the units can also be omitted.
+**Historic Trace Store Size**:: Determines the number of historical trace events that can be stored in memory when historical storing is enabled. The default value is **20** records. A store shared in a cluster uses the maximum setting of this property of any instance in the cluster with request tracing enabled.
+**Historic Trace Store Timeout**:: Determines how long before Request Tracing messages are removed. This field is specified in the format "%d %h %m %s" where % is an integer. Any of the units can also be omitted.
 
 Aside from this configuration settings, you can also define which notifiers will be used to relay the request tracing events by moving them to the **Selected Notifiers** box.
 
@@ -59,5 +41,4 @@ TIP: You don't need to manually add each notifier on this screen. When enabling 
 [[from-the-command-line]]
 === From the Command Line
 
-You can configure the Request Tracing Service by using the administrations commands
-documented on the xref:/Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/Overview.adoc[corresponding section]
+You can configure the Request Tracing Service by using the administrations commands documented on the xref:/Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/Overview.adoc[corresponding section]

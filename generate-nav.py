@@ -9,7 +9,8 @@ NAV_PATH = DOCS_PREFIX + "nav.adoc"
 LAYOUT_FILE = "nav.layout"
 DISTRIBUTIONS = ["enterprise/", "community/"]
 PARTIALS = {"Jakarta EE Certification":"jakarta-ee.adoc", 
-    "Release Notes":"release-notes.adoc"}
+            "Eclipse MicroProfile Certification":"eclipse-microprofile.adoc",
+            "Release Notes":"release-notes.adoc"}
 
 
 ### Helpers ###
@@ -57,7 +58,7 @@ def gen_nav(parent:str, distribution:str) -> list:
         relative_dir = remove_substring(relative_dir, PAGES_PREFIX)
 
         dir_in_distribution = os.path.exists(os.path.join(distribution, dir))
-        if(dir_in_distribution and files and distribution_specific_parent):
+        if(dir_in_distribution):
             for dir_file in os.listdir(os.path.join(distribution, dir)):
                 files.append(dir_file)
 
@@ -100,6 +101,8 @@ if __name__ == "__main__":
                 with open(NAV_LOCATION, 'a') as nav_file:
                     if value in PARTIALS:
                         nav_file.write("\n" + "include::partial${partial}[]\n".format(partial=PARTIALS[value]))
+                        continue
+                    if value not in nav:
                         continue
                     nav_file.write( "\n.{title}\n".format(title=value))
                     for line in nav[value]:
