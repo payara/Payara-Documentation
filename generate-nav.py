@@ -1,17 +1,35 @@
+import argparse
 import os
+import logging
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument( "--log", default="INFO",
+    help=(
+        "Provide logging level. "
+        "INFO | WARNING"
+        "Example --log warning', default='INFO'")
+)
+args = parser.parse_args()
+logging.basicConfig(level=args.log.upper())
 
 ### Constants ###
 
 IS_WINDOWS = os.name == 'nt'
+
 DOCS_PREFIX = "docs/modules/ROOT/"
 PAGES_PREFIX = DOCS_PREFIX + "pages/"
+
+FILE_EXTENSION="adoc"
+OVERVIEW_FILE_NAME="Overview.{extension}".format(extension=FILE_EXTENSION)
+
 NAV_PATH = DOCS_PREFIX + "nav.adoc"
+
 LAYOUT_FILE = "nav.layout"
 DISTRIBUTIONS = ["enterprise/", "community/"]
-PARTIALS = {"Jakarta EE Certification":"jakarta-ee.adoc", 
-            "Eclipse MicroProfile Certification":"eclipse-microprofile.adoc",
-            "Release Notes":"release-notes.adoc"}
-
+PARTIALS = {"Jakarta EE Certification":"jakarta-ee.adoc",
+    "Eclipse MicroProfile Certification":"eclipse-microprofile.adoc",
+    "Release Notes":"release-notes.adoc"}
 
 ### Helpers ###
 
@@ -28,7 +46,7 @@ def remove_substrings(value:str, substrings) -> str:
 
 def make_xref(depth:int, file:str) -> str:
     file_name = get_name_from_path(file)
-    file_name = remove_substring(file_name, ".adoc")
+    file_name = remove_substring(file_name, ".{0}".format(FILE_EXTENSION))
     return "{fdepth} xref:{fpath}[{fname}]".format(fdepth=depth*"*", fpath=file, fname=file_name)
 
 
@@ -47,31 +65,32 @@ def get_depth(file_path:str) -> int:
 
 def gen_nav(parent:str, distribution:str) -> list:
     output = []
-    
     #Bool value to determine if the parent directory exists only in the distribution specific documentation
-    distribution_specific_parent = os.path.exists(os.path.join(distribution, parent)) and not os.path.exists(parent)
-    if(distribution_specific_parent):
+    if(not os.path.exists(parent)):
         parent = os.path.join(distribution, parent)
     
     for dir, subdirs, files in os.walk(parent, topdown=True):
-        relative_dir = remove_substrings(dir, DISTRIBUTIONS)
-        relative_dir = remove_substring(relative_dir, PAGES_PREFIX)
+        relative_dir = remove_substrings(dir, DISTRIBUTIONS + [PAGES_PREFIX])
 
-        dir_in_distribution = os.path.exists(os.path.join(distribution, dir))
-        if(dir_in_distribution):
-            for dir_file in os.listdir(os.path.join(distribution, dir)):
-                files.append(dir_file)
+        logging.debug("Relative Directory {0}".format(relative_dir))
+
+        dirstribution_dir_path = os.path.join(distribution, dir)
+        if(os.path.exists(dirstribution_dir_path)):
+            files += os.listdir(dirstribution_dir_path)
+
+        logging.debug("Files {0}".format(files))
 
         #Avoid writing root title as unlinked xref
-        if(dir != parent):
+        if(dir is not parent):
             output.append(make_xref_unlinked(get_depth(relative_dir), relative_dir))
         if(files):
             #Put all Overview files to the beginning order
-            if "Overview.adoc" in files:
-                files.insert(0, files.pop(files.index("Overview.adoc")))
+            if OVERVIEW_FILE_NAME in files:
+                files.insert(0, files.pop(files.index(OVERVIEW_FILE_NAME)))
             for file in files:
-                if file.endswith("adoc"):
-                    output.append(make_xref(get_depth(os.path.join(relative_dir, file)), os.path.join(relative_dir, file)))
+                if file.endswith(FILE_EXTENSION):
+                    joint_path = os.path.join(relative_dir, file)
+                    output.append(make_xref(get_depth(joint_path), joint_path))
 
     return output
 
@@ -79,18 +98,21 @@ if __name__ == "__main__":
     for distribution in DISTRIBUTIONS:
         nav = {}
 
+        logging.debug("Beginning Generation for {0}".format(distribution))
+
         #Virtually combine directory trees for the base documentation + distribution documentation
-        root_dirs = {dir for dir in os.listdir(PAGES_PREFIX)}
-        for dir in os.listdir(os.path.join(distribution, PAGES_PREFIX)):
-            if dir not in PARTIALS:
-                root_dirs.add(dir)
+        root_dirs = set(os.listdir(os.path.join(distribution, PAGES_PREFIX))).symmetric_difference(PARTIALS).union(os.listdir(PAGES_PREFIX))
+
+        logging.debug("Root directories {0}".format(root_dirs))
 
         #Loop through the top level directories
         for set_dir in root_dirs:
-            if(os.path.isdir(os.path.join(PAGES_PREFIX, set_dir)) or os.path.isdir(os.path.join(distribution, PAGES_PREFIX, set_dir))):
-                nav[set_dir] = gen_nav(os.path.join(PAGES_PREFIX, set_dir), distribution)
+            dir_path = os.path.join(PAGES_PREFIX, set_dir)
+            if(os.path.isdir(dir_path) or os.path.isdir(os.path.join(distribution, dir_path))):
+                nav[set_dir] = gen_nav(dir_path, distribution)
 
         NAV_LOCATION = os.path.join(distribution, NAV_PATH)
+        
         #Clear file contents
         with open(NAV_LOCATION, 'w') as f:
             pass
@@ -100,12 +122,20 @@ if __name__ == "__main__":
                 value = value.strip()
                 with open(NAV_LOCATION, 'a') as nav_file:
                     if value in PARTIALS:
-                        nav_file.write("\n" + "include::partial${partial}[]\n".format(partial=PARTIALS[value]))
+                        nav_file.write("\ninclude::partial${partial}[]\n".format(partial=PARTIALS[value]))
+                        logging.info("{0} value was replaced by a Partial file in the {1} nav.".format(value, distribution))
                         continue
+
                     if value not in nav:
+                        logging.warning("{0} value was not found in nav. It was skipped instead.".format(value))
                         continue
+                    
                     nav_file.write( "\n.{title}\n".format(title=value))
+                    
                     for line in nav[value]:
                         if IS_WINDOWS:
+                            logging.warning("Windows back slash replaced with forward slash")
                             line = line.replace("\\", "/")
                         nav_file.write(line + "\n")
+
+    logging.info("Generation Complete")
