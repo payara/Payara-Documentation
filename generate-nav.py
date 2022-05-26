@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument( "--log", default="INFO",
     help=(
         "Provide logging level. "
-        "INFO | WARNING"
+        "INFO | WARNING | DEBUG"
         "Example --log warning', default='INFO'")
 )
 args = parser.parse_args()
