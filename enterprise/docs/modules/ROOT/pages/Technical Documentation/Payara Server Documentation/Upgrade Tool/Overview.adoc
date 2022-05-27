@@ -1,0 +1,148 @@
+[[upgrade-server]]
+= Payara Server Upgrade Tool
+:page-aliases: upgrade-server.adoc
+
+This tool can be used to upgrade an existing Payara Server installation to a newer version. The Upgrade Tool is bundled in Payara Server versions starting from release `5.24.0` and is mantained as a separate JAR artifact under the `fish.payara.extras: payara-upgrade-tool` GAV coordinates.
+
+TIP: The upgrade tool can be manually installed to Payara Platform `5.20.0` and newer if needed. To do so, download the latest JAR release from Payara Nexus using https://nexus.payara.fish/#browse/browse:payara-enterprise-downloadable-artifacts:fish%2Fpayara%2Fextras%2Fpayara-upgrade-tool[this link] and then drop it into your Payara Server installation under the `payara5/glassfish/lib/asadmin` folder, replacing an older version of the artifact in case it exists.
+
+[[commands]]
+== Asadmin CLI Commands
+
+The following are the Asadmin CLI commands available to the upgrade tool.
+
+[[upgrade-server-command]]
+=== Upgrade Server Command
+
+*Usage*:: `asadmin> upgrade-server`
+
+*Aim*::
+This command can be used to upgrade Payara Server to the specified distribution along with all SSH nodes in the `domain.xml` configuration file.
+
+The command will also back up the old version and domains in the default location (`payara5/glassfish/domains`) or the location specified using the `--domaindir` option to allow for rolling back. The command can also be used to downgrade to an older Payara version although this is not encouraged.
+
+[[command-options-1]]
+==== Command Options
+
+[cols=",,,,",options="header",]
+|=======================================================================
+|Option |Type |Description |Default |Mandatory
+|`--username` |String | The username for the Payara Nexus server.||Yes, unless `--usedownloaded` is specified
+|`--version` |String |Specifies the version number of the new version of Payara to use.| |Yes, unless `--usedownloaded` is specified
+|`--distribution` |Enum |Specifies the distribution of Payara Server to download. This can payara, payara-web, payara-ml, or payara-web-ml.|payara|No
+|`--stage` |Boolean |Determines if the upgrade should be installed in-place, or staged into "_x.new_" directories. Scripts are provided that can be used to apply and rollback the staged install. This option is automatically enabled when running the command on Windows. |False on Unix, True on Windows| No
+|`--domaindir` |String |The directory containing the domains. The domains in this directory are backed up, and their config is used to determine the nodes which will also be upgraded. | `${as-install}/domains` | No
+|`--usedownloaded` |String |The path to the local Payara Server zip archive to use for upgrading instead of downloading from the Payara Enterprise repository. When this parameter is specified, the `--username`, `--password`, and `--version` parameters are not required.| |No
+|=======================================================================
+
+[[upgrade-example]]
+==== Example
+
+This example upgrades a Payara Web distribution to version 5.24.1
+
+[source, shell]
+----
+asadmin> upgrade-server --username example-user --distribution web --version 5.24.1
+----
+
+[[rollback-server-command]]
+=== Rollback Server Command
+
+*Usage*:: `asadmin> rollback-server`
+
+*Aim*:: This command can be used to rollback Payara Server to the point before the upgrade-server command was run, restoring the most recent backup of the domain (expected to be the backup created during execution of the `upgrade-server` command).
+
+WARNING: This command is not supported on Windows OS, please use the `rollbackUpgrade.bat` script instead.
+
+[[command-options-2]]
+==== Command Options
+
+[cols=",,,,",options="header",]
+|=======================================================================
+|Option |Type |Description |Default |Mandatory
+|`--domaindir` |String |The directory containing the domains. The domains in this directory are backed up, and their config is used to determine the nodes which will also be upgraded. | $`{as-install}/domains` | No
+|=======================================================================
+
+[[staged-upgrades]]
+== Staged Upgrades
+
+When the `upgrade-server` command is either used on Windows or with the `--stage` option enabled, the new server files are installed next to the current installation in various _.new_ directories (e.g. `payara5/glassfish/bin.new`). The following helper scripts are available to interact with staged upgrades.
+
+[[apply-staged-upgrades]]
+=== Apply Staged Upgrade Script
+
+*Usage*::
+`> ./payara5/glassfish/bin/applyStagedUpgrade`
+
+*Aim*::
+This script is used to apply an upgrade staged using the `upgrade-server` command.
+It will move the current installation into _.old_ directories, and the staged _.new_ installation into the expected "current" location.
+It will then upgrade the nodes of the domains in the default domain dir, or the domains in the directory provided using `--domaindir`
+
+[[command-options-3]]
+==== Command Options
+
+[cols=",,,,",options="header",]
+|=======================================================================
+|Option |Type |Description |Default |Mandatory
+|`--domaindir` |String |The directory containing the domains. The config of the domains in this directory are used to determine the nodes which will also be upgraded. | ${as-install}/domains | No
+|=======================================================================
+
+[[rollback-upgrade-script]]
+=== Rollback Upgrade Script
+
+*Usage*::
+`> ./payara5/glassfish/bin/rollbackUpgrade`
+
+*Aim*::
+This script is used to rollback a server upgrade applied using the `applyStagedUpgrade` script.
+It will move the _.old_ installation back into the expected "current" location, and the applied upgrade back into _.new_ directories.
+It will then rollback the nodes of the domains in the default domain dir, or the domains in the directory provided using `--domaindir`
+
+[[command-options-4]]
+==== Command Options
+
+[cols=",,,,",options="header",]
+|=======================================================================
+|Option |Type |Description |Default |Mandatory
+|`--domaindir` |String |The directory containing the domains. The config of the domains in this directory are used to determine the nodes which will also be rolled back. | `${as-install}/domains` | No
+|=======================================================================
+
+[[cleanup-upgrade]]
+=== Cleanup Upgrade Script
+
+*Usage*::
+`> ./payara5/glassfish/bin/cleanupUpgrade`
+
+*Aim*::
+This script is used to clean up any leftovers from a staged upgrade: any _.old_ folders and any _.new_ folders will be deleted.
+
+WARNING: Use of this script will prevent you from rolling back or applying a staged upgrade.
+
+IMPORTANT: This script cannot be used to clean up upgrades from releases prior to `5.26.0`, as it uses a config file to determine the directories to delete which is only generated by the `upgrade-server` command from release `5.26.0` onwards.
+
+[[configure-logging-levels]]
+== Configure Logging Levels
+
+The upgrade tool commands and helper scripts will print a set of minimum details of the operations executed (upgrade, staging, rollback). For troubleshooting scenarions, or if wanting to review in detail all executed actions, the following 2 environment variables are available to control the level of logging done by the Upgrade tool:
+
+`AS_DEBUG`:: Set to `true` to configure the Upgrade Tool's logging level to `FINER`.
+`AS_TRACE`:: Set to `true` to configure the Upgrade Tool's logging level to `FINESET`.
+
+These variables can also be configured as system properties in the Asadmin CLI script file located in the `{as-install}/bin` folder like this:
+
+[source, bash]
+----
+AS_INSTALL=`dirname "$0"`/../glassfish
+AS_INSTALL_LIB="$AS_INSTALL/lib"
+. "${AS_INSTALL}/config/asenv.conf"
+JAVA=java
+#Depends upon Java from ../config/asenv.conf
+if [ ${AS_JAVA} ]; then
+    JAVA=${AS_JAVA}/bin/java
+fi
+
+exec "$JAVA" -DAS_DEBUG=true  -XX:+IgnoreUnrecognizedVMOptions -jar "$AS_INSTALL_LIB/client/appserver-cli.jar" "$@"
+----
+
+IMPORTANT: Remember to turn off these logger level settings after executing a server upgrade, as this setting will affect all future executions of any Asadmin CLI commands, which will cause them to print out more information than usual.
