@@ -172,10 +172,11 @@ if __name__ == "__main__":
 
         with open(LAYOUT_FILE, encoding="utf-8") as layout:
             for value in layout.readlines():
-                value = value.strip()
+                value = value.strip()                
                 with open(NAV_LOCATION, 'a', encoding="utf-8") as nav_file:
                     if value in PARTIALS:
-                        nav_file.write(f"\ninclude::partial${value}[]\n")
+                        path = PARTIALS[value]
+                        nav_file.write(f"\ninclude::partial${path}[{value}]\n")
                         logging.info("%s value was replaced by a Partial file in the %s nav.", value, distribution)
                         continue
 
