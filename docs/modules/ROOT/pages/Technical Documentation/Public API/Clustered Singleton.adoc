@@ -13,13 +13,15 @@ Examples can be found here: https://github.com/payara/Payara-Examples/tree/maste
 
 [[timers]]
 == `@Clustered` and EJB Timers
-Persistent EJB Timers (which are the default) will work correctly with clustered singletons since they will only be executed in a single node of the cluster
+Persistent EJB Timers (which are the default) will work correctly with clustered singletons since they will only be executed in a single node of the cluster or deployment group.
+
+IMPORTANT: If the purpose of a clustered singleton bean is to only define a persistent EJB timer which needs to be fired **once** per cluster or deployment group on a Payara Server domain, then it is better to use an stateless session bean instead. The default behaviour of Payara Server is to trigger expired persistence EJB timers once per deployment group or cluster, so the added redundancy provided by this feature is not necessary.
 
 [[initialization]]
 == `@Clustered` and `@Startup` / `@Initialized` `@ApplicationScoped`
 
-Care must be taken in this scenario. By default, `@PostConsctuct` is called for every instance in the cluster for these beans. This behavior needs to be disabled by using `@Clustered(callPostConstructOnAttach = false)` and possibly `callPreDestoyOnDetach = false` as well, so only the `@PostConstcut` method will be called only once per cluster.
-`@Observed` `@Initialzed` methods are called for every instance in the cluster. The only valid method for cluster-wide initialization is @PostConstruct method configured as described above.
+Care must be taken in this scenario. By default, the `@PostConstruct` lifecycle method is called for every instance in the cluster for these beans. This behavior needs to be disabled by using `@Clustered(callPostConstructOnAttach = false)` and possibly `callPreDestoyOnDetach = false` as well, so only the `@PostConstcut` method will be called only once per cluster.
+`@Observed` `@Initialzed` methods are called for every instance in the cluster. The only valid method for cluster-wide initialization is to use the `@PostConstruct` lifecycle method configured as described above.
 
 [[cdinotes]]
 == CDI Considerations and Notes
