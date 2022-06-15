@@ -14,13 +14,10 @@ logging.basicConfig(level=args.log.upper())
 
 ### Constants ###
 
-
-
 IS_WINDOWS = os.name == 'nt'
 
-FILE_SEP = os.path.sep
-DOCS_PREFIX = f"docs{FILE_SEP}modules{FILE_SEP}ROOT{FILE_SEP}"
-PAGES_PREFIX = DOCS_PREFIX + f"pages{FILE_SEP}"
+DOCS_PREFIX = "docs/modules/ROOT/"
+PAGES_PREFIX = DOCS_PREFIX + "pages/"
 
 FILE_EXTENSION="adoc"
 OVERVIEW_FILE_NAME="Overview.adoc"
@@ -28,7 +25,7 @@ OVERVIEW_FILE_NAME="Overview.adoc"
 NAV_PATH = DOCS_PREFIX + "nav.adoc"
 
 LAYOUT_FILE = "nav.layout"
-DISTRIBUTIONS = [f"enterprise{FILE_SEP}", f"community{FILE_SEP}"]
+DISTRIBUTIONS = ["enterprise/", "community/"]
 PARTIALS = {"Jakarta EE Certification":"jakarta-ee.adoc",
     "Eclipse MicroProfile Certification":"eclipse-microprofile.adoc",
     "Release Notes":"release-notes.adoc"}
