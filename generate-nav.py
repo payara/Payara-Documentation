@@ -20,15 +20,15 @@ DOCS_PREFIX = "docs/modules/ROOT/"
 PAGES_PREFIX = DOCS_PREFIX + "pages/"
 
 FILE_EXTENSION="adoc"
-OVERVIEW_FILE_NAME="Overview.adoc"
+OVERVIEW_FILE_NAME=f"Overview.{FILE_EXTENSION}"
 
-NAV_PATH = DOCS_PREFIX + "nav.adoc"
+NAV_PATH = DOCS_PREFIX + f"nav.{FILE_EXTENSION}"
 
 LAYOUT_FILE = "nav.layout"
 DISTRIBUTIONS = ["enterprise/", "community/"]
-PARTIALS = {"Jakarta EE Certification":"jakarta-ee.adoc",
-    "Eclipse MicroProfile Certification":"eclipse-microprofile.adoc",
-    "Release Notes":"release-notes.adoc"}
+PARTIALS = {"Jakarta EE Certification":f"jakarta-ee.{FILE_EXTENSION}",
+    "Eclipse MicroProfile Certification":f"eclipse-microprofile.{FILE_EXTENSION}",
+    "Release Notes":f"release-notes.{FILE_EXTENSION}"}
 
 ### Helpers ###
 
@@ -50,27 +50,14 @@ def remove_substrings(string:str, substrings) -> str:
 def make_xref(depth:int, file:str) -> str:
     '''Creates a formatted Xref line from the filepath and filename.'''
 
-    file_name = get_name_from_path(file)
-    file_name = remove_substring(file_name, ".{0}".format(FILE_EXTENSION))
+    file_name = remove_substring(get_path_subsection(file, 1), f".{FILE_EXTENSION}")
     return "{fdepth} xref:{fpath}[{fname}]".format(fdepth=depth*"*", fpath=file, fname=file_name)
 
 
 def make_xref_unlinked(depth:int, name:str) -> str:
     '''Makes a formatted unlinked Xref line from the filepath and filename.'''
 
-    return "{ddepth} {dname}".format(ddepth=depth*"*", dname=get_name_from_path(name))
-
-
-def get_name_from_path(string:str) -> str:
-    '''Divides the filepath and returns only the filename.'''
-
-    return get_path_subsection(string, 1)
-
-
-def get_dir_up(string:str) -> str:
-    '''Returns the next directory up in the file path.'''
-
-    return get_path_subsection(string, 3)
+    return "{ddepth} {dname}".format(ddepth=depth*"*", dname=get_path_subsection(name, 1))
 
 
 def get_path_subsection(string:str, index:int) -> str:
@@ -115,7 +102,7 @@ def gen_nav(parent:str, distribution:str):
     tree = get_tree(parent)
     distribution_tree = get_tree(os.path.join(distribution, parent))
 
-    key_list = [key for key in tree]
+    key_list = list(tree)
     
     for key in distribution_tree:
         agnostic_path = remove_substring(key, distribution)
@@ -124,7 +111,7 @@ def gen_nav(parent:str, distribution:str):
         
         dir_up = agnostic_path
         while(dir_up and dir_up not in key_list):
-            dir_up = get_dir_up(dir_up)
+            dir_up = get_path_subsection(dir_up, 3)
 
         if(dir_up):
             key_list.insert(key_list.index(dir_up)+1, agnostic_path)
@@ -149,6 +136,7 @@ def gen_nav(parent:str, distribution:str):
 
 if __name__ == "__main__":
     for distribution in DISTRIBUTIONS:
+        NAV_LOCATION = os.path.join(distribution, NAV_PATH)
         nav = {}
 
         logging.debug("Beginning Generation for %s", distribution)
@@ -163,11 +151,9 @@ if __name__ == "__main__":
             dir_path = os.path.join(PAGES_PREFIX, set_dir)
             if(os.path.isdir(dir_path) or os.path.isdir(os.path.join(distribution, dir_path))):
                 nav[set_dir] = gen_nav(dir_path, distribution)
-
-        NAV_LOCATION = os.path.join(distribution, NAV_PATH)
         
         #Clear file contents
-        with open(NAV_LOCATION, 'w', encoding="utf-8") as f:
+        with open(NAV_LOCATION, 'w', encoding="utf-8") as _:
             pass
 
         with open(LAYOUT_FILE, encoding="utf-8") as layout:
