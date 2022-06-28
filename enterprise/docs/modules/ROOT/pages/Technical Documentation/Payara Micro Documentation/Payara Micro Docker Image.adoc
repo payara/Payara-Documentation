@@ -24,7 +24,7 @@ IMPORTANT: It is recommended to specify the tag name of the Docker image that yo
 [source, shell, subs=attributes+]
 .Using a specific version
 ----
-docker run -p 8080:8080 nexus.payara.fish:5000/payara/micro:{currentVersion}
+docker run -p 8080:8080 nexus.payara.fish:5000/payara/micro:{page-version}
 ----
 
 [[jdk-version]]
@@ -40,14 +40,14 @@ To switch from the default JDK 8 based image to the JDK 11 compatible one, just 
 
 [source, shell]
 ----
-docker run -p 8080:8080 nexus.payara.fish:5000/payara/micro:{currentVersion}-jdk11
+docker run -p 8080:8080 nexus.payara.fish:5000/payara/micro:{page-version}-jdk11
 ----
 
 To switch from the default JDK 8 based image to the JDK 17 compatible one, just add the corresponding suffix to the tag's name like this:
 
 [source, shell]
 ----
-docker run -p 8080:8080 nexus.payara.fish:5000/payara/micro:{currentVersion}-jdk17
+docker run -p 8080:8080 nexus.payara.fish:5000/payara/micro:{page-version}-jdk17
 ----
 
 [[ports]]
@@ -86,7 +86,7 @@ The following command will start a new Payara Micro instance container and deplo
 [source, shell, subs=attributes+]
 ----
 docker run -p 8080:8080 \
- -v ~/payara-micro/applications:/opt/payara/deployments nexus.payara.fish:5000/payara/micro:{currentVersion}
+ -v ~/payara-micro/applications:/opt/payara/deployments nexus.payara.fish:5000/payara/micro:{page-version}
 ----
 
 To only deploy a specific artefact within the directory, simply pass the `--deploy` argument to the container's run command and specify which application to deploy:
@@ -95,7 +95,7 @@ To only deploy a specific artefact within the directory, simply pass the `--depl
 ----
 docker run -p 8080:8080 \
  -v ~/payara-micro/applications:/opt/payara/deployments \
- nexus.payara.fish:5000/payara/micro:{currentVersion} --deploy /opt/payara/deployments/myapplication.war
+ nexus.payara.fish:5000/payara/micro:{page-version} --deploy /opt/payara/deployments/myapplication.war
 ----
 
 NOTE: Make sure to prefix the artefact names with the absolute path to the local deployment directory.
@@ -109,7 +109,7 @@ The following sample _Dockerfile_ can be used to prepare a custom Payara Micro i
 
 [source, docker, subs=attributes+]
 ----
-FROM nexus.payara.fish:5000/payara/micro:{currentVersion}
+FROM nexus.payara.fish:5000/payara/micro:{page-version}
 COPY myapplication.war $DEPLOY_DIR
 ----
 
@@ -122,7 +122,7 @@ Here's an example of how to deploy a sample application located in a local Maven
 
 [source, shell, subs=attributes+]
 ----
-docker run -p 8080:8080 nexus.payara.fish:5000/payara/micro:{currentVersion} \
+docker run -p 8080:8080 nexus.payara.fish:5000/payara/micro:{page-version} \
  --deployFromGAV "fish.payara.examples:my-application:1.0-SNAPSHOT" \
  --additionalRepository https://172.17.0.10/content/repositories/snapshots
 ----
@@ -145,7 +145,7 @@ Here are some basic examples:
 .One application deployed, uses the `myRoot` context root
 ----
 docker run -p 8080:8080 \
- -v ~/payara-micro/applications:/opt/payara/deployments nexus.payara.fish:5000/payara/micro:{currentVersion}  \
+ -v ~/payara-micro/applications:/opt/payara/deployments nexus.payara.fish:5000/payara/micro:{page-version}  \
 --deploymentDir /opt/payara/deployments  \
  --contextroot myRoot
 ----
@@ -155,7 +155,7 @@ docker run -p 8080:8080 \
 ----
 docker run -p 8080:8080 \
  -v ~/payara-micro/applications:/opt/payara/deployments \
- nexus.payara.fish:5000/payara/micro:{currentVersion} \
+ nexus.payara.fish:5000/payara/micro:{page-version} \
  --deploy /opt/payara/deployments/myapplication.war \
  --contextroot ROOT
 ----
@@ -164,7 +164,7 @@ You can also prepare a custom Docker image that overrides the default `CMD` inst
 
 [source, Docker, subs=attributes+]
 ----
-FROM nexus.payara.fish:5000/payara/micro:{currentVersion}
+FROM nexus.payara.fish:5000/payara/micro:{page-version}
 COPY myapplication.war $DEPLOY_DIR
 CMD ["--deploymentDir", "/opt/payara/deployments", "--contextroot", "my"]
 ----
@@ -181,7 +181,7 @@ To disable the Data Grid, you can pass the `--noCluster` argument to the entry p
 [source, shell, subs=attributes+]
 ----
 docker run -p 8080:8080 \
- -v ~/payara-micro/applications:/opt/payara/deployments nexus.payara.fish:5000/payara/micro:{currentVersion} --noCluster
+ -v ~/payara-micro/applications:/opt/payara/deployments nexus.payara.fish:5000/payara/micro:{page-version} --noCluster
 ----
 
 [[using-environment-variables]]
