@@ -639,3 +639,28 @@ It is now possible to configure the MDB bean pool size with the `ActivationConfi
 ----
 
 The `MaxPoolSize`, `MaxWaitTimeInMillis`, `PoolResizeQuantity`, `SteadyPoolSize` and `PoolIdleTimeoutInSeconds` are all MDB pool properties that can configured using the `@ActivationConfigProperty` annotation.
+
+[[accessing-ejb-components]]
+== Accessing EJB Components Using the CosNaming Naming Context
+
+If EJB client code explicitly instantiates an InitialContext that points to the CosNaming
+naming service, it is necessary to set the java.naming.factory.initial property to
+com.sun.jndi.cosnaming.CNCtxFactory in the client JVM software when accessing
+EJB components. You can set this property using the asadmin create-jvm-options
+command, as follows:
+
+`asadmin> create-jvm-options -Djava.naming.factory.initial=org.glassfish.jndi.cosnaming.CNCtxFactory`
+
+Or you can set this property in the code, as follows:
+```
+Properties properties = null;
+    try {
+        properties = new Properties();
+        properties.put("java.naming.factory.initial",
+            "org.glassfish.jndi.cosnaming.CNCtxFactory");
+        ...
+        }
+    ...
+```
+The java.naming.factory.initial property applies to only one instance. The
+property is not cluster-aware.
