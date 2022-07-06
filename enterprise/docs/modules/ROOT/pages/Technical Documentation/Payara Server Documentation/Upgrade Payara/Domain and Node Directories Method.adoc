@@ -1,0 +1,54 @@
+[[move-the-domain-directory-and-node-directories]]
+== Move the domain directory and node directories
+
+You can also upgrade Payara Enterprise by creating the domain and node directories in a directory separate to the installation. For example, if you download _Payara Server 5.35.0_, created a domain, and then wanted to use _Payara Server 5.40.0_, you would use the following process:
+
+[source, shell]
+----
+/opt/payara/payara-5.35.0/payara5 bin/asadmin create-domain --domaindir /tmp myTempDomain
+/opt/payara/payara-5.35.0/payara5 cd ../../payara-5.40.0/payara5
+/opt/payara/payara-5.40.0/payara5 bin/asadmin start-domain --domaindir /tmp myTempDomain
+----
+
+This will use the _5.35.0_ installation to create a new domain, and then run it with the _5.40.0_ installation.
+
+Nodes can also be created in a separate directory by using the `--nodedir` property when creating a node.
+
+[source, shell]
+----
+/opt/payara/payara-5.35.0/payara5 bin/asadmin create-node --nodedir /tmp myLocalNode
+----
+
+By using this method, the user configuration is always kept separate to the installation, and rollback is as simple as using the previous installation directory.
+
+If you are using Payara Server on *Linux*, you could take advantage of symbolic links. When your domain directory is in a non-standard location, you need to specify its location with each `start`/`stop`/`restart` command. If you were to create a symbolic link to the domain directory inside the default domains directory, then all of your existing scripts will carry on as normal.
+
+This means that any rollback is as simple as stopping the server, updating a symbolic link and starting it again.
+
+If you choose not to use symbolic links, the asadmin `start-domain` command has a `--domaindir` option which allows you to specify the location of a domain directory. So you could have a directory structure like the following:
+
+----
+/opt/payara/5.35.0/payara5/...
+/opt/payara/5.38.0/payara5/...
+/opt/payara/5.40.0/payara5/...
+/opt/payara/domains/myDomain
+/opt/payara/nodes/myLocalNode
+----
+
+Then you could start your domain with whatever version of Payara Server you wanted, by running the start-domain command from the corresponding Payara installation directory.
+
+[source, shell]
+----
+/opt/payara/5.35.0/payara5/bin/asadmin start-domain --domaindir /opt/payara/domains myDomain
+/opt/payara/5.38.0/payara5/bin/asadmin start-domain --domaindir /opt/payara/domains myDomain
+/opt/payara/5.40.0/payara5/bin/asadmin start-domain --domaindir /opt/payara/domains myDomain
+----
+
+NOTE: The `--domaindir` option specifies the parent directory for your domain, and where you would store all of your domains if needed.
+
+Just as you can create nodes by using the `--domaindir` property, you can also start nodes in the same way.
+
+[source, shell]
+----
+/opt/payara/5.40.0/payara5/bin/asadmin start-local-instance --nodedir /opt/payara/nodes myLocalNode
+----

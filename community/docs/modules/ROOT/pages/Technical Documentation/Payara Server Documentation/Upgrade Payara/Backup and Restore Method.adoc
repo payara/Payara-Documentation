@@ -1,0 +1,97 @@
+[[backup-and-restore]]
+= Backup and Restore
+
+You will need to download the version of Payara Community you are planning to upgrade to before beginning the backup and restore method of upgrading Payara. The latest version of Payara Community is recommended.
+
+== Backup a Payara Server Domain
+NOTE: To create a domain backup, that domain must be stopped.
+
+To create a backup of a domain, the asadmin `backup-domain` command is used:
+[source, shell]
+----
+asadmin backup-domain {domain_name}
+----
+
+The resulting ZIP file will be saved in a destination with this structure:
+
+`{backupDir}/{domain_name}/<domain-name>_<YYYY_MM_DD>_v<backup-number>`
+
+Where the backup number is a consecutive integer representing how many backups of the domain have been made.
+
+You can get additional details of the backup operation by using the `--long` argument when running the command, which will output the following data:
+
+[source, text]
+----
+asadmin> backup-domain --backupDir /home/james/payarabackup --long domain1
+
+Backed up domain1 at Tue Jul 05 13:48:54 BST 2022.
+
+Description               : domain1 backup created on 2022_07_05 by user james
+GlassFish Version         : Payara Server  5.2022.1 #badassfish (build 880)
+Backup User               : james
+Backup Date               : Tue Jul 05 13:48:54 BST 2022
+Domain Name               : domain1
+Backup Type               : full
+Backup Config Name        :
+Backup Filename (origin)  : /home/james/payarabackup/domain1/domain1_2022_07_05_v00002.zip
+Domain Directory          : /home/james/5.2022.1/payara5/glassfish/domains/domain1
+
+Command backup-domain executed successfully.
+----
+
+Read more about the
+xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Asadmin Commands/Server Management Asadmin Commands.adoc#backup-domain[Backup Domain Command]
+
+== Restore a Payara Server Domain
+IMPORTANT: Since instances are stored separately from a domain, and they may be on remote hosts, the command will have no effect on restoring instance data.
+
+To restore from a backup, the asadmin `restore-domain` command is used:
+[source, shell]
+----
+asadmin restore-domain --filename {path_to_backup} {domain_name}
+----
+
+You can get additional details of the restore operation by using the `--long` argument when running the command, which will output the following data:
+
+[source, text]
+----
+asadmin> restore-domain --filename /home/james/payarabackup/domain1/domain1_2022_07_04_v00001.zip --long domain1
+
+Restored the domain (domain1) to /home/james/5.2022.2/payara5/glassfish/domains/domain1
+
+Description               : domain1 backup created on 2022_07_05 by user james
+GlassFish Version         : Payara Server  5.2022.1 #badassfish (build 880)
+Backup User               : james
+Backup Date               : Tue Jul 05 13:48:54 BST 2022
+Domain Name               : domain1
+Backup Type               : full
+Backup Config Name        :
+Backup Filename (origin)  : /home/james/payarabackup/domain1/domain1_2022_07_05_v00001.zip
+Domain Directory          : /home/james/5.2022.1/payara5/glassfish/domains/domain1
+
+Command restore-domain executed successfully.
+----
+
+Read more about the
+xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Asadmin Commands/Server Management Asadmin Commands.adoc#restore-domain[Restore Domain Command]
+
+== Restoring an Instance
+Since all data in an instance directory is kept in sync with the DAS, there is no added data (besides logs, caches and some MQ data when a file-based store is used) and an instance can be completely restored simply by making sure there is an empty directory with the name of the instance inside a node folder of the correct name.
+
+For example:
+`payara5/glassfish/nodes/localhost-example/myInstance`
+
+Running the `start-local-instance` command with the `sync` property set to `full` full sync, will restore the instance completely:
+
+[source, shell]
+----
+asadmin> start-local-instance --sync=full myInstance
+----
+
+Read more about the
+xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Asadmin Commands/Server Management Asadmin Commands.adoc#start-local-instance[Start Local Instance Command]
+
+== Considerations for OpenMQ
+If OpenMQ (Payara Server’s JMS broker) is being used, the default configuration is to use EMBEDDED mode, meaning that Payara Server will fully manage the JMS broker within the same JVM as the server instance and a file-based store is used for persistent messages.
+
+The alternative option of LOCAL allows for the use of an “enhanced” broker cluster, whereby the JMS broker instances are started as separate JVMs and use a database connection for storage. Assuming the database is highly available, this completely avoids any danger when needing to use --sync=full on the instance.
