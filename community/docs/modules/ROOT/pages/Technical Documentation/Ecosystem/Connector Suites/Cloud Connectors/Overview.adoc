@@ -38,7 +38,42 @@ The connectors can be found in the following locations as JCA RARs:
 
 [[Installing-a-connector]]
 == Installing a connector
-A connector (JCA rar) is installed by deploying it to Payara Micro in the same way as an application archive (e.g. a .war) is deployed. The following shows an example:
+
+Installing Cloud Connectors for Payara Server and Payara Micro both require the Cloud Connector jar to be deployed. However, Payara Server requires some additional configuration to classloading.
+
+A connector (JCA rar) is installed by deploying it in the same way as an application archive (e.g. a .war) is deployed:
+
+=== Payara Server
+
+You can configure Payara Server through the Admin Console or through the Asadmin CLI.
+
+==== Using the Admin Console
+
+You can deploy the connector with the admin console;
+
+image:cloud-connectors/admin-console.png[Admin Console]
+
+Then configure the `Connector Classloading Policy` to `Global` in `{config} > Connector Service > Connector Classloading Policy`.
+
+image:cloud-connectors/classloading-configuration.png[Classloading Config]
+
+This allows the classes from the cloud connector to be globally available in the server.
+
+==== Using the Asadmin CLI
+
+Deploy the application with the CLI;
+
+----
+asadmin> deploy --target=server amazon-sqs-rar.rar
+----
+
+Configure the classloading policy;
+
+----
+asadmin> set configs.config.server-config.connector-service.class-loading-policy=global
+----
+
+=== Payara Micro
 
 ----
 java -jar payara-micro.jar --autobindhttp --deploy KafkaRAR-0.1.0-SNAPSHOT.rar
