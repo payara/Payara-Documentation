@@ -129,6 +129,45 @@ To forcibly stop all running domains, run the following command:
 asadmin> stop-all-domains --force=false
 ----
 
+[[backup-domain]]
+== `backup-domain`
+
+*Usage*::
+`asadmin> backup-domain <options> <domain_name>`
+
+*Aim*::
+This command performs a backup on the domain. The `backup-domain` command requires the domain being backed up to be stopped. Backups have the following naming scheme: `domain-name_YYYY_MM_DD_backup-number`
+
+[cols="2,1,3,2,1",options="header"]
+|===
+|Options | Type | Description | Default | Mandatory
+| `--long`| `Boolean` | Displays detailed information about the backup operation| `false`| No
+| `--description` | `String` | A description to store in the backup zip || No
+| `--domaindir` | `String`| Specifies the domain root directory | `~/payara5/glassfish/domains`| No
+| `--backupdir` | `String` | Specifies the directory where the backup is to be stored | `~/payara5/glassfish/domains/{domain_name}/backups`| No
+|===
+
+[[restore-domain]]
+== `restore-domain`
+
+*Usage*::
+`asadmin> restore-domain <options> <domain_name>`
+
+*Aim*::
+This command restores files under the domain name from a backup directory.
+
+WARNING: If a domain is restored on an already existing domain folder, all the files will be overwritten when the command is run.
+
+[cols="2,1,3,2,1",options="header"]
+|===
+|Options | Type | Description | Default | Mandatory
+| `--long`| `Boolean` | Displays detailed information about the backup operation| `false`| No
+| `--filename` | `String` | The name of the backup file to use as the source || No
+| `--domaindir` | `String`| Specifies the domain root directory | `~/payara5/glassfish/domains`| No
+| `--backupdir` | `String` | Specifies the directory where the backup file is stored | `~/payara5/glassfish/domains/{domain_name}/backups`| No
+| `--force` | `Boolean` | Forces the restore-domain command to continue when the name of the domain to restore does not match the name of the domain in the backup file | `false` | No
+|===
+
 [[start-instance]]
 == `start-instance`
 
@@ -146,7 +185,7 @@ NOTE: These are not the same options available for the `start-local-instance` co
 [cols="2,1,4,1,1",options="header",]
 |====
 |Option |Type |Description |Default |Mandatory
-|`--sync` | `none`\|`normal`\|`full` |Specifies whether the instance is to be synced with the DAS. In normal mode only config files and top-level application file are synched. In full all files are synced. | `normal`| No
+|`--sync` | `none`\|`normal`\|`full` |Specifies whether the instance is to be synced with the DAS. In normal mode only config files and top-level application file are synced. In full all files are synced. | `normal`| No
 |`--debug` |`Boolean` |Specifies whether the instance is started in debug mode |`false` |No
 |`--terse` |`Boolean` |Specifies whether information on the result is output |`false` |No
 |`--timeout` |`Integer` |Specifies how long to take for the instance to start in seconds. If starting the instance takes longer than this amount then this command will fail |`120` |No
@@ -185,7 +224,7 @@ NOTE: These are not the same as the options available for the `start-instance` c
 |`-w, --watchdog` | `Boolean` |Starts the server in watchdog mode. This is only useful if verbose is false. It does the same thing as verbose -- except without the dumping of output to standard out and err streams.| false |No
 |`-d, --debug` |`Boolean` |Specifies whether the instance is started in debug mode |false |No
 |`-n, --dry-run` |`Boolean` | Specifies to dump the full human readable JVM invocation command that would be used to launch the instance instead of actually launching it. |false |No
-|`--sync` | `none` \| `normal` \| `full` |Specifies whether the instance is to be synced with the DAS. In normal mode only config files and top-level application file are synched. In full all files are synced. | `normal` |No
+|`--sync` | `none` \| `normal` \| `full` |Specifies whether the instance is to be synced with the DAS. In normal mode only config files and top-level application file are synced. In full all files are synced. | `normal` |No
 |`--nodedir` | String | Specifies the folder on the local filesystem where the node the instance is in resides. | `${PAYARA_INSTALL_DIR}/glassfish/nodes/`. |No
 |`--node` | String | Specifies the node the instance is in. | The single folder inside the `nodedir` directory, in the case that there's only a single folder. 
 | No:: If the node directory contains a single folder
