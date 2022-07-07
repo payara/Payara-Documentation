@@ -129,6 +129,45 @@ To forcibly stop all running domains, run the following command:
 asadmin> stop-all-domains --force=false
 ----
 
+[[backup-domain]]
+== `backup-domain`
+
+*Usage*::
+`asadmin> backup-domain <options> <domain_name>`
+
+*Aim*::
+This command performs a backup on the domain. The `backup-domain` command requires the domain being backed up to be stopped. Backups have the following naming scheme: `domain-name_YYYY_MM_DD_backup-number`
+
+[cols="2,1,3,2,1",options="header"]
+|===
+|Options | Type | Description | Default | Mandatory
+| `--long`| `Boolean` | Displays detailed information about the backup operation| `false`| No
+| `--description` | `String` | A description to store in the backup zip || No
+| `--domaindir` | `String`| Specifies the domain root directory | `~/payara5/glassfish/domains`| No
+| `--backupdir` | `String` | Specifies the directory where the backup is to be stored | `~/payara5/glassfish/domains/{domain_name}/backups`| No
+|===
+
+[[restore-domain]]
+== `restore-domain`
+
+*Usage*::
+`asadmin> restore-domain <options> <domain_name>`
+
+*Aim*::
+This command restores files under the domain name from a backup directory.
+
+WARNING: If a domain is restored on an already existing domain folder, all the files will be overwritten when the command is run.
+
+[cols="2,1,3,2,1",options="header"]
+|===
+|Options | Type | Description | Default | Mandatory
+| `--long`| `Boolean` | Displays detailed information about the backup operation| `false`| No
+| `--filename` | `String` | The name of the backup file to use as the source || No
+| `--domaindir` | `String`| Specifies the domain root directory | `~/payara5/glassfish/domains`| No
+| `--backupdir` | `String` | Specifies the directory where the backup file is stored | `~/payara5/glassfish/domains/{domain_name}/backups`| No
+| `--force` | `Boolean` | Forces the restore-domain command to continue when the name of the domain to restore does not match the name of the domain in the backup file | `false` | No
+|===
+
 [[start-instance]]
 == `start-instance`
 
