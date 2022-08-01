@@ -1,0 +1,118 @@
+[[configuring-context-services]]
+= Configuring Context Services
+
+Context services are used to create dynamic proxy objects that capture the context of a container and enable applications to run within that context at a later time. The context of the container is propagated to the thread executing the task. 
+
+The following tasks are used to administer context service resources:
+
+* To Create a Context Service
+* To List Context Services
+* To Update a Context Service
+* To Delete a Context Service
+
+[[to-create-context-service]]
+== To Create a Context Service
+
+Use the `create-context-service` subcommand in remote mode to create a context service resource.
+
+Because all JNDI names are in the `java:comp/env` subcontext, when specifying the JNDI name of a context service, use only the `concurrent/name` format. For example, `concurrent/Context1`. 
+
+For more information about the default context service resource included with Payara Server, see xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Concurrency Enhancements/Default Concurrent Resources.adoc[Default Concurrent Resources].
+
+IMPORTANT: Creating a context service resource is a dynamic event and typically does not require server restart. Applications can use a resource as soon as it is created. However, if an application tried to use a resource before it was created, and that resource is created later, the application or the server must be restarted. Otherwise, the application will not be able to locate the resource.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. Create a context service by using the `create-context-service` subcommand. 
+. If necessary, notify users that the new resource has been created.
+
+=== Creating a Context Service
+This example creates a context service resource named `concurrent/Context1`.
+[source, shell, subs="quotes"]
+----
+asadmin> *create-context-service concurrent/Context1*
+Context service concurrent/Context1 created successfully.
+Command create-context-service executed successfully.
+----
+
+=== See Also
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-context-service` at the command line.
+
+[[to-list-context-services]]
+== To List Context Services
+
+Use the `list-context-services` subcommand in remote mode to list the existing
+context service resources.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. List context service resources by using the `list-context-services` subcommand.
+
+=== Listing Context Service
+This example lists context service resources on the default server instance, server.
+[source, shell, subs="quotes"]
+----
+asadmin> *list-context-services*
+concurrent/__defaultContextService
+concurrent/Context1
+concurrent/Context2 
+Command list-context-services executed successfully.
+----
+
+=== See Also
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-context-service` at the command line.
+
+[[to-update-context-services]]
+== To Update a Context Service
+
+You can change all of the settings for an existing context service resource except its
+JNDI name. Use the `get` and `set` subcommands to view and change the values of the
+context service attributes.
+
+IMPORTANT: When a resource is updated, the existing resource is shut
+down and recreated. If an application used the resource prior to the
+update, the application or the server must be restarted.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. List the context service resources by using the `list-context-services`
+subcommand.
+. View the attributes of a specific context service by using the `get` subcommand. +
+For example: +
+`asadmin> *get resources.context-service.concurrent/Context1.**`
+. Set an attribute of the context service by using the set subcommand. +
+For example: +
+`asadmin> *set resources.context-service.concurrent/Context1.deployment-order=120*`
+
+[[to-delete-context-services]]
+== To Delete a Context Service
+
+Use the `delete-context-service` subcommand in remote mode to delete an existing
+context service. Deleting a context service is a dynamic event and does not require
+server restart.
+
+Before deleting a context service resource, all associations to the resource must be
+removed.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. List the context service resources by using the `list-context-services`
+subcommand.
+. If necessary, notify users that the context service is being deleted.
+. Delete the context service by using the `delete-context-service` subcommand.
+
+=== Deleting a Context Service
+This example deletes the context service resource named `concurrent/Context1`.
+
+[source, shell, subs="quotes"]
+----
+asadmin> *delete-context-service concurrent/Context1*
+Context service concurrent/Context1 deleted successfully.
+Command delete-context-service executed successfully.
+----
+
+=== See Also
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help delete-context-service` at the command line.
