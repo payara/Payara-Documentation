@@ -1,0 +1,112 @@
+[[configuring-managed-thread-factories]]
+= Configuring Managed Thread Factories
+
+Managed thread factories are used by applications to create managed threads on demand. The threads are started and managed by the container. The context of the container is propagated to the thread executing the task. 
+
+The following tasks are used to administer managed thread factory resources:
+
+* xref:#to-create-managed-thread-factory[To Create a Managed Thread Factory]
+* xref:#to-list-managed-thread-factory[To List Managed Thread Factories]
+* xref:#to-update-managed-thread-factory[To Update a Managed Thread Factory]
+* xref:#to-delete-managed-thread-factory[To Delete a Managed Thread Factory]
+
+[[to-create-managed-thread-factory]]
+== To Create a Managed Thread Factory
+
+Use the `create-managed-thread-factory` subcommand in remote mode to create a managed thread factory resource.
+
+Because all JNDI names are in the `java:comp/env` subcontext, when specifying the JNDI name of a managed thread factory, use only the `concurrent/name` format. For example, `concurrent/Factory1`. 
+
+For more information about the default managed thread factory resource included with Payara Server, see xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Concurrency Enhancements/Default Concurrent Resources.adoc[Default Concurrent Resources].
+
+IMPORTANT: Creating a managed thread factory resource is a dynamic event and typically does not require server restart. Applications can use a resource as soon as it is created. However, if an application tried to use a resource before it was created, and that resource is created later, the application or the server must be restarted. Otherwise, the application will not be able to locate the resource.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. Create a managed thread factory by using the `create-managed-thread-factory` subcommand.
+. If necessary, notify users that the new resource has been created.
+
+=== Creating a Managed Thread Factory
+This example creates  a managed thread factory resource named `concurrent/Factory1`.
+[source, shell, subs="quotes"]
+----
+asadmin> *create-managed-thread-factory concurrent/Factory1*
+Managed thread factory concurrent/Factory1 created successfully.
+Command create-managed-thread-factory executed successfully.
+----
+
+=== See Also
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-managed-thread-factory` at the command line.
+
+[[to-list-managed-thread-factory]]
+== To List Managed Thread Factories
+
+Use the `list-managed-thread-factories` subcommand in remote mode to list the existing managed thread factory resources.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. List managed thread factory resources by using the
+`list-managed-thread-factories` subcommand.
+
+=== Listing Managed Thread Factories
+This example lists managed thread factory resources on the default server instance, `server`.
+[source, shell, subs="quotes"]
+----
+asadmin> *list-managed-thread-factories*
+concurrent/__defaultManagedThreadFactory
+concurrent/Factory1
+concurrent/Factory2
+Command list-managed-thread-factories executed successfully.
+----
+
+=== See Also
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-managed-thread-factories` at the command line.
+
+[[to-update-managed-thread-factory]]
+== To Update a Managed Thread Factory
+
+You can change all of the settings for an existing managed thread factory resource except its JNDI name. Use the `get` and `set` subcommands to view and change the values of the managed thread factory attributes.
+
+IMPORTANT: When a resource is updated, the existing resource is shut down and recreated. If an application used the resource prior to the update, the application or the server must be restarted.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. List the managed thread factory resources by using the `list-managed-thread-factories` subcommand.
+. View the attributes of a managed thread factory by using the `get` subcommand. +
+For example: +
+`asadmin> *get resources.managed-thread-factory.concurrent/Factory1.**`
+. Set an attribute of the managed thread factory by using the `set` subcommand. +
+For example: +
+`asadmin> *set
+resources.managed-thread-factory.concurrent/Factory1.deployment-order=120*`
+
+[[to-delete-managed-thread-factory]]
+== To Delete a Managed Thread Factory
+
+Use the `delete-managed-thread-factory` subcommand in remote mode to delete an existing managed thread factory. Deleting a managed thread factory is a dynamic event and does not require server restart.
+
+Before deleting a managed thread factory resource, all associations to the resource must be removed.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. List the managed thread factory resources by using the
+`list-managed-thread-factories` subcommand.
+. If necessary, notify users that the managed thread factory is being deleted.
+. Delete the managed thread factory by using the `delete-managed-thread-factory` subcommand.
+
+=== Deleting a Managed Thread Factory
+This example deletes the managed thread factory resource named
+`concurrent/Factory1`.
+
+[source, shell, subs="quotes"]
+----
+asadmin> *delete-managed-thread-factory concurrent/Factory1*
+Managed thread factory concurrent/Factory1 deleted successfully.
+Command delete-managed-thread-factory executed successfully.
+----
+
+=== See Also
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help delete-managed-thread-factory` at the command line.
