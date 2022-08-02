@@ -1,0 +1,111 @@
+[[configuring-managed-executor-services]]
+= Configuring Managed Executor Services
+
+Managed executor services are used by applications to execute submitted tasks asynchronously. Tasks are executed on threads that are started and managed by the container. The context of the container is propagated to the thread executing the task.
+
+The following tasks are used to administer managed executor service resources:
+
+* xref:#to-create-managed-executor-service[To Create a Managed Executor Service]
+* xref:#to-list-managed-executor-services[To List Managed Executor Services]
+* xref:#to-update-managed-executor-services[To Update a Managed Executor Service]
+* xref:#to-delete-managed-executor-services[To Delete a Managed Executor Service]
+
+[[to-create-managed-executor-service]]
+== To Create a Managed Executor Service
+
+Use the `create-managed-executor-service` subcommand in remote mode to create a managed executor service resource.
+
+Because all JNDI names are in the `java:comp/env` subcontext, when specifying the JNDI name of a managed executor service, use only the `concurrent/name` format. For example, `concurrent/Executor1`.
+
+For more information about the default managed executor service resource included with Payara Server, see xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Concurrency Enhancements/Default Concurrent Resources.adoc[Default Concurrent Resources].
+
+IMPORTANT: Creating a managed executor service resource is a dynamic event and typically does not require server restart. Applications can use a resource as soon as it is created. However, if an application tried to use a resource before it was created, and that resource is created later, the application or the server must be restarted. Otherwise, the application will not be able to locate the resource.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. Create a managed executor service by using the `create-managed-executor-service` subcommand. 
+. If necessary, notify users that the new resource has been created.
+
+=== Creating a Managed Executor Service
+This example creates a managed executor service resource named `concurrent/Executor1`.
+[source, shell, subs="quotes"]
+----
+asadmin> *create-managed-executor-service concurrent/Executor1*
+Managed executor service concurrent/Executor1 created successfully.
+Command create-managed-executor-service executed successfully.
+----
+
+=== See Also
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-managed-executor-service` at the command line.
+
+[[to-list-managed-executor-services]]
+== To List Managed Executor Services
+
+Use the `list-managed-executor-services` subcommand in remote mode to list the existing managed executor service resources. 
+
+. Ensure that the server is running. +
+Remote subcommands require a running server. 
+
+. List managed executor service resources by using the `list-managed-executor-services` subcommand.
+
+=== Listing Managed Executor Services
+This example lists managed executor service resources on the default server instance, `server`.
+[source, shell, subs="quotes"]
+----
+asadmin> *list-managed-executor-services*
+concurrent/__defaultManagedExecutorService 
+concurrent/Executor1 
+concurrent/Executor2 
+Command list-managed-executor-services executed successfully.
+----
+
+=== See Also
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-managed-executor-services` at the command line.
+
+[[to-update-managed-executor-services]]
+== To Update a Managed Executor Service
+
+You can change all of the settings for an existing managed executor service resource except its JNDI name. Use the `get` and `set` subcommands to view and change the values of the managed executor service attributes.
+
+IMPORTANT: When a resource is updated, the existing resource is shut down and recreated. If an application used the resource prior to the update, the application or the server must be restarted.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. List the context service resources by using the `list-managed-executor-services`
+subcommand.
+. View the attributes of a managed executor service by using the `get` subcommand. +
+For example: +
+`asadmin> *get resources.managed-executor-service.concurrent/Executor1.**`
+. Set an attribute of the managed executor service by using the set subcommand. +
+For example: +
+`asadmin> *set resources.managed-executor-service.concurrent/Executor1.deployment-order=120*`
+
+[[to-delete-managed-executor-services]]
+== To Delete a Managed Executor Service
+
+Use the `delete-managed-executor-service` subcommand in remote mode to delete an existing managed executor service. Deleting a managed executor service is a dynamic event and does not require server restart.
+
+Before deleting a managed executor service resource, all associations to the resource must be removed.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. List the managed executor service resources by using the `list-managed-executor-services`
+subcommand.
+. If necessary, notify users that the managed executor service is being deleted.
+. Delete the managed executor service by using the `delete-managed-executor-service` subcommand.
+
+=== Deleting a Managed Executor Service
+This example deletes the managed executor service resource named `concurrent/Executor1`.
+
+[source, shell, subs="quotes"]
+----
+asadmin> *delete-managed-executor-service concurrent/Executor1*
+Managed executor service concurrent/Executor1 deleted successfully.
+Command delete-Managed Executor-service executed successfully.
+----
+
+=== See Also
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help delete-managed-executor-service` at the command line.
