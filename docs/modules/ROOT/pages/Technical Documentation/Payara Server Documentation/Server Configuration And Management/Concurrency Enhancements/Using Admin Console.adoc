@@ -1,0 +1,469 @@
+[[using-admin-console]]
+= Using Admin Console
+
+Concurrent resources can be created by using Admin Console or Asadmin commands. 
+
+To configure the resources in the Admin Console, go to Resources → Concurrent Resources:
+
+image:concurrency/concurrent_resources.png[Concurrent Resources]
+
+The four types of concurrent resources can be created via Admin Console.
+
+== New Context Service
+
+To create a new Context Service in the Admin Console, go to Resources → Concurrent Resources → Context Services → New:
+
+image:concurrency/new_context_service.png[New Context Service]
+
+Or it can be created using asadmin command:
+
+=== `create-context-service`
+
+*Usage*::
+----
+asadmin> create-context-service [--help]
+        [--enabled={false|true}]
+        [--contextinfoenabled={false|true}]
+        [--contextinfo={Classloader|JNDI|Security|WorkArea}]]
+        [--description description]
+        [--property property]
+        [--target target]
+        jndi_name
+----
+*Aim*::
+The `create-context-service` subcommand creates a context service resource. +
+This subcommand is supported in remote mode only.
+
+==== Command Options
+
+[cols=",,,,", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Determines whether the resource is enabled at runtime.
+|true
+|No
+
+|`contextinfoenabled`
+|Boolean
+|Determines whether container contexts are propagated to threads. If set to `true`, the contexts specified in the `--contextinfo` option are propagated. If set to `false`, no contexts are propagated and the `--contextinfo` option is ignored.
+|true
+|No
+
+|`contextinfo`
+|String
+|Specifies individual container contexts to propagate to threads. Valid values are Classloader, JNDI, Security, and WorkArea. Values are specified in a comma-separated list and are case-insensitive.
+|`Classloader,JNDI,Security,WorkArea`
+|No
+
+|`description`
+|String
+|Descriptive details about the resource.
+|-
+|No
+
+|`property`
+|String
+|Optional attribute name/value pairs for configuring the resource. {product---name} does not define any additional properties for this resource. Moreover, this resource does not currently use any additional properties
+|-
+|No
+
+|`target`
+|String
+|Specifies the target for which you are creating the resource. Valid targets are: server, domain, cluster_name, instance_name
+|server
+|No
+|===
+
+==== Command Operands
+*jndi_name*::
+The JNDI name of this resource.
+
+==== Example
+
+[source,Shell]
+----
+asadmin> *create-context-service* --description "context example" --property name=Jose --target domain concurrent/myContextService
+Context service concurrent/myContextService created successfully.
+Command create-context-service executed successfully.
+----
+
+== New Managed Thread Factory
+
+To create a new Managed Thread Factory in the Admin Console, go to Resources → Concurrent Resources → Managed Thread Factories → New:
+
+image:concurrency/new_managed_thread_factory.png[New Managed Thread Factory]
+
+Or it can be created using asadmin command:
+
+=== `create-managed-thread-factory`
+
+*Usage*::
+----
+asadmin> create-managed-thread-factory [--help]
+        [--enabled={false|true}]
+        [--contextinfoenabled={false|true}]
+        [--contextinfo={Classloader|JNDI|Security|WorkArea}]
+        [--threadpriority threadpriority]
+        [--description description]
+        [--property property]
+        [--target target]
+        jndi_name
+----
+*Aim*::
+The `create-managed-thread-factory` subcommand creates a managed thread factory resource. +
+This subcommand is supported in remote mode only.
+
+==== Command Options
+
+[cols=",,,,", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Determines whether the managed thread factory is enabled at runtime.
+|true
+|No
+
+|`contextinfoenabled`
+|Boolean
+|Determines whether container contexts are propagated to threads. If set to `true`, the contexts specified in the `--contextinfo` option are propagated. If set to `false`, no contexts are propagated and the `--contextinfo` option is ignored.
+|true
+|No
+
+|`contextinfo`
+|String
+|Specifies individual container contexts to propagate to threads. Valid values are Classloader, JNDI, Security, and WorkArea. Values are specified in a comma-separated list and are case-insensitive.
+|`Classloader,JNDI,Security,WorkArea`
+|No
+
+|`threadpriority`
+|Integer
+|Specifies the priority to assign to created threads.
+|5
+|No
+
+|`description`
+|String
+|Descriptive details about the resource.
+|-
+|No
+
+|`property`
+|String
+|Optional attribute name/value pairs for configuring the resource. {product---name} does not define any additional properties for this resource. Moreover, this resource does not currently use any additional properties
+|-
+|No
+
+|`target`
+|String
+|Specifies the target for which you are creating the resource. Valid targets are: server, domain, cluster_name, instance_name
+|server
+|No
+|===
+
+==== Command Operands
+*jndi_name*::
+The JNDI name of this resource.
+
+==== Example
+
+[source,Shell]
+----
+asadmin> *create-managed-thread-factory* --description "Thread Factory example" --threadpriority 1 concurrent/myThreadFactory
+Managed thread factory concurrent/myThreadFactory created successfully.
+Command create-managed-thread-factory executed successfully.
+----
+
+== New Managed Executor Service
+
+To create a new Managed Executor Service in the Admin Console, go to Resources → Concurrent Resources → Managed Executor Services → New:
+
+image:concurrency/new_managed_executor_service.png[New Managed Executor Service]
+
+Or it can be created using asadmin command:
+
+=== `create-managed-executor-service`
+
+*Usage*::
+----
+asadmin> create-managed-executor-service [--help]
+        [--enabled={false|true}]
+        [--contextinfoenabled={false|true}]
+        [--contextinfo={Classloader|JNDI|Security|WorkArea}]
+        [--threadpriority threadpriority]
+        [--longrunningtasks={false|true}]
+        [--useforkjoinpool={false|true}]
+        [--hungafterseconds hungafterseconds]
+        [--corepoolsize corepoolsize]
+        [--maximumpoolsize maximumpoolsize]
+        [--keepaliveseconds keepaliveseconds]
+        [--threadlifetimeseconds threadlifetimeseconds]
+        [--taskqueuecapacity taskqueuecapacity]
+        [--description description]
+        [--property property]
+        [--target target]
+        jndi_name
+----
+*Aim*::
+The `create-managed-executor-service` subcommand creates a managed executor service resource. +
+This subcommand is supported in remote mode only.
+
+==== Command Options
+
+[cols=",,,,", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Determines whether the resource is enabled at runtime.
+|true
+|No
+
+|`contextinfoenabled`
+|Boolean
+|Determines whether container contexts are propagated to threads. If set to `true`, the contexts specified in the `--contextinfo` option are propagated. If set to `false`, no contexts are propagated and the `--contextinfo` option is ignored.
+|true
+|No
+
+|`contextinfo`
+|String
+|Specifies individual container contexts to propagate to threads. Valid values are Classloader, JNDI, Security, and WorkArea. Values are specified in a comma-separated list and are case-insensitive.
+|`Classloader,JNDI,Security,WorkArea`
+|No
+
+|`threadpriority`
+|Integer
+|Specifies the priority to assign to created threads.
+|5
+|No
+
+|`longrunningtasks`
+|Boolean
+|Specifies whether the resource should be used for long-running tasks. If set to true, long-running tasks are not reported as stuck.
+|false
+|No
+
+|`useforkjoinpool`
+|Boolean
+|If enabled, a ForkJoinPool will be used instead of the default thread pool. This pool uses the Fork/Join framework, where all threads in the pool attempt to find and execute tasks, with free threads attempting to "steal" work from deques of busy threads.
+|false
+|No
+
+|`hungafterseconds`
+|Integer
+|Specifies the number of seconds that a task can execute before it is considered unresponsive.
+|0
+|No
+
+|`corepoolsize`
+|Integer
+|Specifies the number of threads to keep in a thread pool, even if they are idle. When a new task is submitted and the number of running threads is less than `corepoolsize`, a new thread is created to handle the request. When the value for `corepoolsize` is 0 (the default), new threads are never created unless the task queue is full or the resource is using direct queuing. Direct queuing occurs when `taskqueuecapacity` is 0, or when `taskqueuecapacity` is 2147483647 and `corepoolsize` is 0.
+|0
+|No
+
+|`maximumpoolsize`
+|Integer
+|Specifies the maximum number of threads that a thread pool can contain.
+|2147483647
+|No
+
+|`keepaliveseconds`
+|Integer
+|Specifies the number of seconds that threads can remain idle when the number of threads is greater than corepoolsize.
+|60
+|No
+
+|`threadlifetimeseconds`
+|Integer
+|Specifies the number of seconds that threads can remain in a thread pool before being purged, regardless of whether the number of threads is greater than `corepoolsize` or whether the threads are idle.
+|0
+|No
+
+|`taskqueuecapacity`
+|Integer
+|Specifies the number of submitted tasks that can be stored in the task queue awaiting execution.
+|2147483647
+|No
+
+|`description`
+|String
+|Descriptive details about the resource.
+|-
+|No
+
+|`property`
+|String
+|Optional attribute name/value pairs for configuring the resource. {product---name} does not define any additional properties for this resource. Moreover, this resource does not currently use any additional properties
+|-
+|No
+
+|`target`
+|String
+|Specifies the target for which you are creating the resource. Valid targets are: server, domain, cluster_name, instance_name
+|server
+|No
+|===
+
+==== Command Operands
+*jndi_name*::
+The JNDI name of this resource.
+
+==== Example
+
+[source,Shell]
+----
+asadmin> *create-managed-executor-service* --description "Executor Service example" --useforkjoinpool concurrent/myExecutor
+Managed executor service concurrent/myExecutor created successfully.
+Command create-managed-executor-service executed successfully.
+----
+
+== New Managed Scheduled Executor Service
+
+To create a new Managed Scheduled Executor Service in the Admin Console, go to Resources → Concurrent Resources → Managed Scheduled Executor Services → New:
+
+image:concurrency/new_managed_scheduled_executor_service.png[New Managed Scheduled Executor Service]
+
+Or it can be created using asadmin command:
+
+=== `create-managed-scheduled-executor-service`
+
+*Usage*::
+----
+asadmin> *create-managed-scheduled-executor-service* [--help]
+        [--enabled={false|true}]
+        [--contextinfoenabled={false|true}]
+        [--contextinfo={Classloader|JNDI|Security|WorkArea}]
+        [--threadpriority threadpriority]
+        [--longrunningtasks={false|true}]
+        [--hungafterseconds hungafterseconds]
+        [--corepoolsize corepoolsize]
+        [--keepaliveseconds keepaliveseconds]
+        [--threadlifetimeseconds threadlifetimeseconds]
+        [--taskqueuecapacity taskqueuecapacity]
+        [--description description]
+        [--property property]
+        [--target target]
+        jndi_name
+----
+*Aim*::
+The `create-managed-scheduled-executor-service` subcommand creates a managed executor service resource. +
+This subcommand is supported in remote mode only.
+
+==== Command Options
+
+[cols=",,,,", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Determines whether the resource is enabled at runtime.
+|true
+|No
+
+|`contextinfoenabled`
+|Boolean
+|Determines whether container contexts are propagated to threads. If set to `true`, the contexts specified in the `--contextinfo` option are propagated. If set to `false`, no contexts are propagated and the `--contextinfo` option is ignored.
+|true
+|No
+
+|`contextinfo`
+|String
+|Specifies individual container contexts to propagate to threads. Valid values are Classloader, JNDI, Security, and WorkArea. Values are specified in a comma-separated list and are case-insensitive.
+|`Classloader,JNDI,Security,WorkArea`
+|No
+
+|`threadpriority`
+|Integer
+|Specifies the priority to assign to created threads.
+|5
+|No
+
+|`longrunningtasks`
+|Boolean
+|Specifies whether the resource should be used for long-running tasks. If set to true, long-running tasks are not reported as stuck.
+|false
+|No
+
+|`hungafterseconds`
+|Integer
+|Specifies the number of seconds that a task can execute before it is considered unresponsive.
+|0
+|No
+
+|`corepoolsize`
+|Integer
+|Specifies the number of threads to keep in a thread pool, even if they are idle.
+|0
+|No
+
+|`keepaliveseconds`
+|Integer
+|Specifies the number of seconds that threads can remain idle when the number of threads is greater than `corepoolsize`.
+|60
+|No
+
+|`threadlifetimeseconds`
+|Integer
+|Specifies the number of seconds that threads can remain in a thread pool before being purged, regardless of whether the number of threads is greater than corepoolsize or whether the threads are idle.
+|0
+|No
+
+|`taskqueuecapacity`
+|Integer
+|Specifies the number of submitted tasks that can be stored in the task queue awaiting execution.
+|2147483647
+|No
+
+|`description`
+|String
+|Descriptive details about the resource.
+|-
+|No
+
+|`property`
+|String
+|Optional attribute name/value pairs for configuring the resource. {product---name} does not define any additional properties for this resource. Moreover, this resource does not currently use any additional properties
+|-
+|No
+
+|`target`
+|String
+|Specifies the target for which you are creating the resource. Valid targets are: server, domain, cluster_name, instance_name
+|server
+|No
+|===
+
+==== Command Operands
+*jndi_name*::
+The JNDI name of this resource.
+
+==== Example
+
+[source,Shell]
+----
+asadmin> *create-managed-scheduled-executor-service* --description "Scheduled Executor example" concurrent/myScheduledExecutor
+Managed scheduled executor service concurrent/myScheduledExecutor created successfully.
+Command create-managed-scheduled-executor-service executed successfully.
+----
