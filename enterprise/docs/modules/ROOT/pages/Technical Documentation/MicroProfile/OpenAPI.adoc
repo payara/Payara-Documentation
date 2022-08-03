@@ -140,6 +140,38 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
     }
 ----
 
+*yaml Result [http://localhost:8080/openapi]*::
+[source, yml]
+----
+openapi: 3.0.0
+info:
+  title: A Test Application
+  version: "1.0"
+servers:
+- url: http://localhost:8080/openapi-example-1.0
+  description: Default Server.
+- url: https://localhost:8181/openapi-example-1.0
+  description: Default Server.
+paths:
+  /api/hello:
+    get:
+      operationId: hello-world
+      responses:
+        default:
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: Default Response.
+      deprecated: false
+endpoints:
+  /openapi-example-1.0:
+  - /api/hello
+components: {}
+----
+
+IMPORTANT: The item `endpoints` is a Payara extension from the Specification. It was created to expose the endpoints for each application deployed.
+
 [[openApi-configuration]]
 == OpenAPI Configuration
 
