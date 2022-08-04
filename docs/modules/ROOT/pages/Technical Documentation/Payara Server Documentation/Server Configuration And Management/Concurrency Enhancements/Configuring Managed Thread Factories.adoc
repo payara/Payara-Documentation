@@ -18,11 +18,15 @@ This Jakarta Concurrency standard name is mapped to the `concurrent/__defaultMan
 [[to-create-managed-thread-factory]]
 == To Create a Managed Thread Factory
 
-Use the `create-managed-thread-factory` subcommand in remote mode to create a managed thread factory resource.
+Managed Thread Factories can be created by using Admin Console or Asadmin commands.
+
+To create a new Managed Thread Factory in the Admin Console, go to Resources → Concurrent Resources → Managed Thread Factories → New:
+
+image:concurrency/new_managed_thread_factory.png[New Managed Thread Factory]
+
+Or use the `create-managed-thread-factory` subcommand in remote mode to create a managed thread factory resource.
 
 Because all JNDI names are in the `java:comp/env` subcontext, when specifying the JNDI name of a managed thread factory, use only the `concurrent/name` format. For example, `concurrent/Factory1`. 
-
-For more information about the default managed thread factory resource included with Payara Server, see xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Concurrency Enhancements/Default Concurrent Resources.adoc[Default Concurrent Resources].
 
 IMPORTANT: Creating a managed thread factory resource is a dynamic event and typically does not require server restart. Applications can use a resource as soon as it is created. However, if an application tried to use a resource before it was created, and that resource is created later, the application or the server must be restarted. Otherwise, the application will not be able to locate the resource.
 
@@ -31,18 +35,87 @@ Remote subcommands require a running server.
 . Create a managed thread factory by using the `create-managed-thread-factory` subcommand.
 . If necessary, notify users that the new resource has been created.
 
-=== Creating a Managed Thread Factory
-This example creates  a managed thread factory resource named `concurrent/Factory1`.
+=== Usage
+----
+asadmin> create-managed-thread-factory [--help]
+        [--enabled={false|true}]
+        [--contextinfoenabled={false|true}]
+        [--contextinfo={Classloader|JNDI|Security|WorkArea}]
+        [--threadpriority threadpriority]
+        [--description description]
+        [--property property]
+        [--target target]
+        jndi_name
+----
+*Aim*::
+The `create-managed-thread-factory` subcommand creates a managed thread factory resource. +
+This subcommand is supported in remote mode only.
+
+=== Command Options
+
+[cols=",,,,", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Determines whether the managed thread factory is enabled at runtime.
+|true
+|No
+
+|`contextinfoenabled`
+|Boolean
+|Determines whether container contexts are propagated to threads. If set to `true`, the contexts specified in the `--contextinfo` option are propagated. If set to `false`, no contexts are propagated and the `--contextinfo` option is ignored.
+|true
+|No
+
+|`contextinfo`
+|String
+|Specifies individual container contexts to propagate to threads. Valid values are Classloader, JNDI, Security, and WorkArea. Values are specified in a comma-separated list and are case-insensitive.
+|`Classloader,JNDI,Security,WorkArea`
+|No
+
+|`threadpriority`
+|Integer
+|Specifies the priority to assign to created threads.
+|5
+|No
+
+|`description`
+|String
+|Descriptive details about the resource.
+|-
+|No
+
+|`property`
+|String
+|Optional attribute name/value pairs for configuring the resource. {product---name} does not define any additional properties for this resource. Moreover, this resource does not currently use any additional properties
+|-
+|No
+
+|`target`
+|String
+|Specifies the target for which you are creating the resource. Valid targets are: server, domain, cluster_name, instance_name
+|server
+|No
+|===
+
+=== Command Operands
+*jndi_name*::
+The JNDI name of this resource.
+
+=== Example
+
 [source, shell, subs="quotes"]
 ----
-asadmin> *create-managed-thread-factory concurrent/Factory1*
-Managed thread factory concurrent/Factory1 created successfully.
+asadmin> *create-managed-thread-factory* --description "Thread Factory example" --threadpriority 1 concurrent/myThreadFactory
+Managed thread factory concurrent/myThreadFactory created successfully.
 Command create-managed-thread-factory executed successfully.
 ----
-
-=== See Also
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help create-managed-thread-factory` at the command line.
 
 [[to-list-managed-thread-factory]]
 == To List Managed Thread Factories
