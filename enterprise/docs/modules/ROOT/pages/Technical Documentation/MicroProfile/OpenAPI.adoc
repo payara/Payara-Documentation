@@ -140,7 +140,7 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
     }
 ----
 
-*yaml Result [http://localhost:8080/openapi]*::
+*Here's an example of how the OpenAPI document of a sample application would look like:*::
 [source, yml]
 ----
 openapi: 3.0.0
@@ -170,7 +170,78 @@ endpoints:
 components: {}
 ----
 
-IMPORTANT: The item `endpoints` is a Payara extension from the Specification. It was created to expose the endpoints for each application deployed.
+==== Deployed endpoints
+In case we have more than one application deployed, a merge is done in openapi document. The resultant document has all applications and paths. In order to make the document more legible, the attribute `endpoints` was added as a Payara Platform-specific extension which lists all deployed endpoints grouped by application context root.
+
+*The following example shows an OpenAPI document for two applications deployed:*::
+[source, yml]
+----
+openapi: 3.0.0
+info:
+  title: Deployed Resources
+  version: 1.0.0
+servers:
+- url: http://localhost:8080/ClusteredSingleton
+  description: Default Server.
+- url: https://localhost:8181/ClusteredSingleton
+  description: Default Server.
+- url: http://localhost:8080/SimpleWAR
+  description: Default Server.
+- url: https://localhost:8181/SimpleWAR
+  description: Default Server.
+paths:
+  /resources/javaee8:
+    get:
+      operationId: ping
+      responses:
+        default:
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: Default Response.
+  /resources/randomNumberGen:
+    get:
+      operationId: randomNumberGen
+      responses:
+        default:
+          content:
+            '*/*':
+              schema:
+                type: integer
+          description: Default Response.
+  /rest/request:
+    get:
+      operationId: getXml
+      responses:
+        default:
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: Default Response.
+    put:
+      operationId: putXml
+      requestBody:
+        content:
+          application/xml:
+            schema:
+              type: string
+      responses:
+        default:
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: Default Response.
+endpoints:
+  /ClusteredSingleton:
+  - /resources/javaee8
+  - /resources/randomNumberGen
+  /SimpleWAR:
+  - /rest/request
+components: {}
+----
 
 [[openApi-configuration]]
 == OpenAPI Configuration
