@@ -3,20 +3,13 @@
 
 Managed scheduled executor services are used by applications to execute submitted tasks asynchronously at specific times. Tasks are executed on threads that are started and managed by the container. The context of the container is propagated to the thread executing the task.
 
-The following tasks are used to administer managed scheduled executor service resources:
-
-* To Create a Managed Scheduled Executor Service
-* To List Managed Scheduled Executor Services
-* To Update a Managed Scheduled Executor Service
-* To Delete a Managed Scheduled Executor Service
-
 NOTE: The Jakarta EE specifies that certain default resources be made available to applications, and defines specific JNDI names for these default resources. Payara Server makes these names available through the use of logical JNDI names, which map Jakarta EE JNDI names to specific Payara Server resources. +
-For managed scheduled executor services, the mapping is as follow: +
+For managed scheduled executor services, the mapping is as follows: +
 `java:comp/DefaultManagedScheduledExecutorService` +
 This Jakarta Concurrency standard name is mapped to the `concurrent/__defaultManagedScheduledExecutorService` resource.
 
-[[to-create-managed-scheduled-executor-service]]
-== To Create a Managed Scheduled Executor Service
+[[create-managed-scheduled-executor-service]]
+== Create a Managed Scheduled Executor Service
 
 Managed Scheduled Executor Services can be created by using Admin Console or Asadmin commands.
 
@@ -24,20 +17,15 @@ To create a new Managed Scheduled Executor Service in the Admin Console, go to R
 
 image:concurrency/new_managed_scheduled_executor_service.png[New Managed Scheduled Executor Service]
 
-Or use the `create-managed-scheduled-executor-service` subcommand in remote mode to create a managed scheduled executor service resource.
+Alternatively, the `create-managed-scheduled-executor-service` asadmin command can be used to create a managed scheduled executor service resource.
 
 Because all JNDI names are in the `java:comp/env` subcontext, when specifying the JNDI name of a managed scheduled executor service, use only the `concurrent/name` format. For example, `concurrent/ScheduledExecutor1`.
 
 IMPORTANT: Creating a managed scheduled executor service resource is a dynamic event and typically does not require server restart. Applications can use a resource as soon as it is created. However, if an application tried to use a resource before it was created, and that resource is created later, the application or the server must be restarted. Otherwise, the application will not be able to locate the resource.
 
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. Create a managed scheduled executor service by using the `create-managed-scheduled-executor-service` subcommand. 
-. If necessary, notify users that the new resource has been created.
-
 === Usage
 ----
-asadmin> *create-managed-scheduled-executor-service* [--help]
+asadmin> create-managed-scheduled-executor-service [--help]
         [--enabled={false|true}]
         [--contextinfoenabled={false|true}]
         [--contextinfo={Classloader|JNDI|Security|WorkArea}]
@@ -54,12 +42,11 @@ asadmin> *create-managed-scheduled-executor-service* [--help]
         jndi_name
 ----
 *Aim*::
-The `create-managed-scheduled-executor-service` subcommand creates a managed executor service resource. +
-This subcommand is supported in remote mode only.
+The `create-managed-scheduled-executor-service` asadmin command creates a managed executor service resource.
 
 === Command Options
 
-[cols=",,,,", options="header"]
+[cols="25,10,40,15,10", options="header"]
 |===
 |Option
 |Type
@@ -135,7 +122,7 @@ This subcommand is supported in remote mode only.
 
 |`property`
 |String
-|Optional attribute name/value pairs for configuring the resource. {product---name} does not define any additional properties for this resource. Moreover, this resource does not currently use any additional properties
+|Optional attribute name/value pairs for configuring the resource.
 |-
 |No
 
@@ -170,41 +157,24 @@ concurrent/ScheduledExecutor2
 Command list-managed-scheduled-executor-services executed successfully.
 ----
 
-=== See Also
+[[update-managed-scheduled-executor-services]]
+== Update a Managed Scheduled Executor Service
 
-You can also view the full syntax and options of the subcommand by typing `asadmin help list-managed-scheduled-executor-services` at the command line.
-
-[[to-update-managed-scheduled-executor-services]]
-== To Update a Managed Scheduled Executor Service
-
-You can change all of the settings for an existing managed scheduled executor service resource except its JNDI name. Use the `get` and `set` subcommands to view and change the values of the managed scheduled executor service attributes.
+You can change all of the settings for an existing managed scheduled executor service resource except its JNDI name. Use the `get` and `set` asadmin commands to view and change the values of the managed scheduled executor service attributes.
 
 IMPORTANT: When a resource is updated, the existing resource is shut down and recreated. If an application used the resource prior to the update, the application or the server must be restarted.
 
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. List the context service resources by using the `list-managed-scheduled-executor-services`
-subcommand.
-. View the attributes of a managed scheduled executor service by using the `get` subcommand. +
-For example: +
-`asadmin> *get resources.managed-scheduled-executor-service.concurrent/ScheduledExecutor1.**`
-. Set an attribute of the managed scheduled executor service by using the set subcommand. +
-For example: +
-`asadmin> *set resources.managed-scheduled-executor-service.concurrent/ScheduledExecutor1.deployment-order=120*`
+. View the attributes of a managed scheduled executor service by using the `get` asadmin command. +
+`asadmin> *get resources.managed-scheduled-executor-service.{resource-JNDI-name}.**`
+. Set an attribute of the managed scheduled executor service by using the set asadmin command. +
+`asadmin> *set resources.managed-scheduled-executor-service.{resource-JNDI-name}.deployment-order=120*`
 
-[[to-delete-managed-scheduled-executor-services]]
-== To Delete a Managed Scheduled Executor Service
+[[delete-managed-scheduled-executor-services]]
+== Delete a Managed Scheduled Executor Service
 
-Use the `delete-managed-scheduled-executor-service` subcommand in remote mode to delete an existing managed scheduled executor service. Deleting a managed scheduled executor service is a dynamic event and does not require server restart.
+The `delete-managed-scheduled-executor-service` asadmin command to delete an existing managed scheduled executor service. Deleting a managed scheduled executor service is a dynamic event and does not require server restart.
 
 Before deleting a managed scheduled executor service resource, all associations to the resource must be removed.
-
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. List the managed scheduled executor service resources by using the `list-managed-scheduled-executor-services`
-subcommand.
-. If necessary, notify users that the managed scheduled executor service is being deleted.
-. Delete the managed scheduled executor service by using the `delete-managed-scheduled-executor-service` subcommand.
 
 === Deleting a Managed scheduled Executor Service
 This example deletes the managed scheduled executor service resource named `concurrent/ScheduledExecutor1`.
@@ -215,7 +185,3 @@ asadmin> *delete-managed-scheduled-executor-service concurrent/ScheduledExecutor
 Managed scheduled executor service concurrent/ScheduledExecutor1 deleted successfully.
 Command delete-managed-scheduled-executor-service executed successfully.
 ----
-
-=== See Also
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help delete-managed-scheduled-executor-service` at the command line.
