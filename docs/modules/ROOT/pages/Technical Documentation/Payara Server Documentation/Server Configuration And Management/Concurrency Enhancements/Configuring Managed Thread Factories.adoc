@@ -1,0 +1,150 @@
+[[configuring-managed-thread-factories]]
+= Configuring Managed Thread Factories
+
+Managed thread factories are used by applications to create managed threads on demand. The threads are started and managed by the container. The context of the container is propagated to the thread executing the task.
+
+NOTE: Jakarta Concurrency specifies that certain default resources be made available to applications, and defines specific JNDI names for these default resources. Payara Server makes these names available through the use of logical JNDI names, which map Jakarta EE JNDI names to specific Payara Server resources. +
+For managed thread factories, the mapping is as follows: +
+`java:comp/DefaultManagedThreadFactory` +
+This Jakarta Concurrency standard name is mapped to the `concurrent/__defaultManagedThreadFactory` resource.
+
+[[create-managed-thread-factory]]
+== Create a Managed Thread Factory
+
+Managed Thread Factories can be created by using Admin Console or Asadmin commands.
+
+To create a new Managed Thread Factory in the Admin Console, go to Resources → Concurrent Resources → Managed Thread Factories → New:
+
+image:concurrency/new_managed_thread_factory.png[New Managed Thread Factory]
+
+Alternatively, the `create-managed-thread-factory` asadmin command can be used to create a managed thread factory resource.
+
+Because all JNDI names are in the `java:comp/env` subcontext, when specifying the JNDI name of a managed thread factory, use only the `concurrent/name` format. For example, `concurrent/Factory1`. 
+
+IMPORTANT: Creating a managed thread factory resource is a dynamic event and typically does not require server restart. Applications can use a resource as soon as it is created. However, if an application tried to use a resource before it was created, and that resource is created later, the application or the server must be restarted. Otherwise, the application will not be able to locate the resource.
+
+=== Usage
+----
+asadmin> create-managed-thread-factory [--help]
+        [--enabled={false|true}]
+        [--contextinfoenabled={false|true}]
+        [--contextinfo={Classloader|JNDI|Security|WorkArea}]
+        [--threadpriority threadpriority]
+        [--description description]
+        [--property property]
+        [--target target]
+        jndi_name
+----
+*Aim*::
+The `create-managed-thread-factory` asadmin command creates a managed thread factory resource.
+
+=== Command Options
+
+[cols="25,10,40,15,10", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Determines whether the managed thread factory is enabled at runtime.
+|true
+|No
+
+|`contextinfoenabled`
+|Boolean
+|Determines whether container contexts are propagated to threads. If set to `true`, the contexts specified in the `--contextinfo` option are propagated. If set to `false`, no contexts are propagated and the `--contextinfo` option is ignored.
+|true
+|No
+
+|`contextinfo`
+|String
+|Specifies individual container contexts to propagate to threads. Valid values are `Classloader`, `JNDI`, `Security`, and `WorkArea`. Values are specified in a comma-separated list and are case-insensitive.
+|`Classloader,JNDI,Security,WorkArea`
+|No
+
+|`threadpriority`
+|Integer
+|Specifies the priority to assign to created threads.
+|5
+|No
+
+|`description`
+|String
+|Descriptive details about the resource.
+|-
+|No
+
+|`property`
+|String
+|Optional attribute name/value pairs for configuring the resource.
+|-
+|No
+
+|`target`
+|String
+|Specifies the target for which you are creating the resource. Valid targets are: server, domain, cluster_name, instance_name
+|server
+|No
+|===
+
+=== Command Operands
+*jndi_name*::
+The JNDI name of this resource.
+
+=== Example
+
+[source, shell, subs="quotes"]
+----
+asadmin> *create-managed-thread-factory* --description "Thread Factory example" --threadpriority 1 concurrent/myThreadFactory
+Managed thread factory concurrent/myThreadFactory created successfully.
+Command create-managed-thread-factory executed successfully.
+----
+
+[[list-managed-thread-factory]]
+== List Managed Thread Factories
+
+You can use the `list-managed-thread-factories` asadmin command to list the existing managed thread factory resources.
+
+=== Listing Managed Thread Factories
+This example lists managed thread factory resources on the default server instance, `server`.
+[source, shell, subs="quotes"]
+----
+asadmin> *list-managed-thread-factories*
+concurrent/__defaultManagedThreadFactory
+concurrent/Factory1
+concurrent/Factory2
+Command list-managed-thread-factories executed successfully.
+----
+
+[[update-managed-thread-factory]]
+== Update a Managed Thread Factory
+
+You can change all of the settings for an existing managed thread factory resource except its JNDI name. Use the `get` and `set` asadmin commands to view and change the values of the managed thread factory attributes.
+
+IMPORTANT: When a resource is updated, the existing resource is shut down and recreated. If an application used the resource prior to the update, the application or the server must be restarted.
+
+. View the attributes of a managed thread factory by using the `get` asadmin command. +
+`asadmin> *get resources.managed-thread-factory.{resource-JNDI-name}.**`
+. Set an attribute of the managed thread factory by using the `set` asadmin command. +
+`asadmin> *set resources.managed-thread-factory.{resource-JNDI-name}.deployment-order=120*`
+
+[[delete-managed-thread-factory]]
+== Delete a Managed Thread Factory
+
+The `delete-managed-thread-factory` asadmin command can be used to delete an existing managed thread factory. Deleting a managed thread factory is a dynamic event and does not require server restart.
+
+Before deleting a managed thread factory resource, all associations to the resource must be removed.
+
+=== Deleting a Managed Thread Factory
+This example deletes the managed thread factory resource named `concurrent/Factory1`.
+
+[source, shell, subs="quotes"]
+----
+asadmin> *delete-managed-thread-factory concurrent/Factory1*
+Managed thread factory concurrent/Factory1 deleted successfully.
+Command delete-managed-thread-factory executed successfully.
+----
