@@ -25,10 +25,10 @@ OVERVIEW_FILE_NAME=f"Overview.{FILE_EXTENSION}"
 NAV_PATH = DOCS_PREFIX + f"nav.{FILE_EXTENSION}"
 
 LAYOUT_FILE = "nav.layout"
-DISTRIBUTIONS = ["enterprise/", "community/"]
-PARTIALS = {"Jakarta EE Certification":f"jakarta-ee.{FILE_EXTENSION}",
-    "Eclipse MicroProfile Certification":f"eclipse-microprofile.{FILE_EXTENSION}",
-    "Release Notes":f"release-notes.{FILE_EXTENSION}"}
+PARTIALS = {"Jakarta EE Certification":f"jakarta-ee{FILE_EXTENSION}",
+    "Eclipse MicroProfile Certification":f"eclipse-microprofile{FILE_EXTENSION}",
+    "Release Notes":f"release-notes{FILE_EXTENSION}",
+    "Appendix":f"appendix{FILE_EXTENSION}"}
 
 ### Helpers ###
 
