@@ -29,7 +29,8 @@ NAV_PATH = DOCS_PREFIX + f"nav{FILE_EXTENSION}"
 LAYOUT_FILE = "nav.layout"
 PARTIALS = {"Jakarta EE Certification":f"jakarta-ee{FILE_EXTENSION}",
     "Eclipse MicroProfile Certification":f"eclipse-microprofile{FILE_EXTENSION}",
-    "Release Notes":f"release-notes{FILE_EXTENSION}"}
+    "Release Notes":f"release-notes{FILE_EXTENSION}",
+    "Appendix":f"appendix{FILE_EXTENSION}"}
 
 DISTRIBUTIONS = ['enterprise/', 'community/']
 
