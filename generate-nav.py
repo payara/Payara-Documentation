@@ -170,7 +170,7 @@ def get_xfiles(parent:Xdirectory, distribution: str) -> _Xobject:
             if os.path.isdir(filepath):
                 xobject = get_xfiles(Xdirectory(parent, filepath), distribution)
             elif os.path.isfile(filepath):
-                if "ord" not in filepath:
+                if not bool(re.search(r"\.ord\d+", filepath)):
                     xobject = Xfile(parent, filepath, file, distribution)
 
             if xobject:
