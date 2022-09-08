@@ -29,8 +29,8 @@ NAV_PATH = DOCS_PREFIX + f"nav{FILE_EXTENSION}"
 LAYOUT_FILE = "nav.layout"
 PARTIALS = {"Jakarta EE Certification":f"jakarta-ee{FILE_EXTENSION}",
     "Eclipse MicroProfile Certification":f"eclipse-microprofile{FILE_EXTENSION}",
-    "Release Notes":f"release-notes{FILE_EXTENSION}",
-    "Appendix":f"appendix{FILE_EXTENSION}"}
+    "Appendix":f"appendix{FILE_EXTENSION}",
+    "Release Notes":f"release-notes{FILE_EXTENSION}"}
 
 DISTRIBUTIONS = ['enterprise/', 'community/']
 
@@ -143,7 +143,7 @@ class Xfile(_Xobject):
             self._opened = True
             with open(self.path, 'r', encoding="utf-8") as file:
                 for _ in range(3):
-                    ordinal_string = next(file).strip().replace("-", "\\-")
+                    ordinal_string = next(file, '').strip().replace("-", "\\-")
                     ordinal_match = re.search(self._ordinal_regex, ordinal_string)
                     if ordinal_match:
                         self._ordinal = int(ordinal_match.group().strip())
