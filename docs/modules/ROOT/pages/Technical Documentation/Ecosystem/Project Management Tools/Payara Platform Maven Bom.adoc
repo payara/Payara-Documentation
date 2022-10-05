@@ -48,7 +48,7 @@ Add following snippet to your Maven project:
 </repositories>
 ----
 
-An example application utilizing the BOM can be seen in repository https://github.com/payara/Payara-Examples[Payara Examples]/. See the https://github.com/payara/Payara-Examples/tree/master/ecosystem/payara-bom/bom-import[ecosystem/payara-bom/bom-import/] subproject for more details.
+An example application utilizing the BOM can be seen in the https://github.com/payara/Payara-Examples[Payara Examples] repository. See specifically the https://github.com/payara/Payara-Examples/tree/master/ecosystem/payara-bom/bom-import[ecosystem/payara-bom/bom-import] subproject for an example of using the Payara BOM.
 
 [[bom-contents]]
 == BOM Contents
@@ -60,13 +60,12 @@ The following is a summary of all dependencies included in the BOM, grouped by c
 
 Distribution artifacts do not define a Maven scope and are therefore imported in `compile` scope.
 
-[%header, cols=",a,"]
+[header, cols="2,8a,3"]
 |===
 |Artifact | Example usage | Note
 
 | Payara Server
-|
-[source, xml]
+| [source, xml]
 ----
 <dependency>
   <groupId>fish.payara.distributions</groupId>
@@ -74,11 +73,12 @@ Distribution artifacts do not define a Maven scope and are therefore imported in
   <type>zip</type>
 </dependency>
 ----
-| Also available are `payara-ml`, `payara-web`, `payara-web-ml`
+| Also available are `payara-ml` +
+`payara-web` +
+`payara-web-ml`
 
 | Payara Micro
-|
-[source, xml]
+| [source, xml]
 ----
 <dependency>
   <groupId>fish.payara.extras</groupId>
@@ -88,19 +88,18 @@ Distribution artifacts do not define a Maven scope and are therefore imported in
 |
 
 | Payara Embedded
-|
-[source, xml]
+| [source, xml]
 ----
 <dependency>
   <groupId>fish.payara.extras</groupId>
   <artifactId>payara-embedded-all</artifactId>
 </dependency>
 ----
-| Also available `payara-embedded-web`
+| Also available +
+`payara-embedded-web`
 
 | EJB HTTP Client
-|
-[source, xml]
+| [source, xml]
 ----
 <dependency>
   <groupId>fish.payara.extras</groupId>
@@ -110,8 +109,7 @@ Distribution artifacts do not define a Maven scope and are therefore imported in
 |
 
 | Appclient
-|
-[source, xml]
+| [source, xml]
 ----
 <dependency>
   <groupId>fish.payara.server.appclient</groupId>
@@ -121,8 +119,7 @@ Distribution artifacts do not define a Maven scope and are therefore imported in
 |
 
 | Payara Public API
-|
-[source, xml]
+| [source, xml]
 ----
 <dependency>
   <groupId>fish.payara.api</groupId>
@@ -138,24 +135,22 @@ Distribution artifacts do not define a Maven scope and are therefore imported in
 
 Standard APIs are defined in `provided` scope, as they already include classes that are present in the server's runtime.
 
-[%header, cols=",a,"]
+[%header, cols=",a,",options="autowidth"]
 |===
 |Artifact | Example usage | Note
 
 | Jakarta EE
-|
-[source, xml]
+| [source, xml]
 ----
 <dependency>
   <groupId>jakarta.platform</groupId>
   <artifactId>jakarta.jakartaee-api</artifactId>
 </dependency>
 ----
-|Also available `jakarta.jakartaee-web-api`, and all individual API artifacts.
+|Also available `jakarta.jakartaee-web-api` and all individual API artifacts.
 
 | Eclipse Microprofile
-|
-[source, xml]
+| [source, xml]
 ----
 <dependency>
   <groupId>org.eclipse.microprofile</groupId>
@@ -166,15 +161,14 @@ Standard APIs are defined in `provided` scope, as they already include classes t
 | Individual APIs are also declared.
 
 | OSGi
-|
-[source, xml]
+| [source, xml]
 ----
 <dependency>
   <groupId>org.osgi</groupId>
   <artifactId>org.osgi.core</artifactId>
 </dependency>
 ----
-| Also available are `org.osgi.compendium` and `org.osgi.enterprise`
+| Also available are `org.osgi.compendium`, `org.osgi.enterprise`
 
 |===
 
@@ -185,7 +179,7 @@ Arquillian is the recommended way to run integration tests written for Payara Se
 
 Payara Server includes the H2 database, so their matching versions are also declared, but in their default scope.
 
-[%header, cols=",a"]
+[%header, cols="1,4a"]
 |===
 |Artifact | Example usage
 
@@ -244,113 +238,4 @@ Payara Server includes the H2 database, so their matching versions are also decl
 [[api-implementation]]
 === Libraries and API implementations
 
-This is a non-exhaustive list of dependencies. By default all are declared in their respective default scopes, but it is more correct to use them with scope `provided` if they are already present in the server's internal modules.
-
-[%header, cols=",a,"]
-|===
-|Artifact | Example usage | Note
-
-| Jersey
-|
-[source, xml]
-----
-<dependency>
-  <groupId>org.glassfish.jersey.core</groupId>
-  <artifactId>jersey-client</artifactId>
-  <scope>test</scope>
-</dependency>
-<dependency>
-  <groupId>org.glassfish.jersey.inject</groupId>
-  <artifactId>jersey-hk2</artifactId>
-  <scope>test</scope>
-</dependency>
-----
-| Example: JAX-RS clients in tests. All artifacts of the Jersey BOM are imported.
-
-| Hibernate Validator
-|
-[source, xml]
-----
-<dependency>
-  <groupId>org.hibernate.validator</groupId>
-  <artifactId>hibernate-validator</artifactId>
-  <scope>test</scope>
-</dependency>
-----
-|
-
-| EclipseLink - JPA Metamodel generator
-|
-[source, xml]
-----
-<dependency>
-  <groupId>org.eclipse.persistence</groupId>
-  <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-</dependency>
-----
-| The only dependency that is `provided` scoped, as it is an annotation processor.
-
-| EclipseLink
-|
-[source, xml]
-----
-<dependency>
-  <groupId>org.eclipse.persistence</groupId>
-  <artifactId>org.eclipse.persistence.jpa</artifactId>
-  <scope>provided</scope>
-</dependency>
-----
-|
-
-| Hazelcast
-|
-[source, xml]
-----
-<dependency>
-  <groupId>com.hazelcast</groupId>
-  <artifactId>hazelcast</artifactId>
-  <scope>provided</scope>
-</dependency>
-----
-| The `hazelcast-kubernetes` dependency is also available.
-
-| Jackson
-|
-[source, xml]
-----
-<dependency>
-  <groupId>com.fasterxml.jackson.datatype</groupId>
-  <artifactId>jackson-datatype-jdk8</artifactId>
-</dependency>
-----
-| All artifacts of the Jackson BOM are imported.
-
-| Yasson
-|
-[source, xml]
-----
-<dependency>
-  <groupId>org.eclipse</groupId>
-  <artifactId>yasson</artifactId>
-  <scope>test</scope>
-</dependency>
-----
-| 
-
-| Tyrus
-| 
-[source, xml]
-----
-<dependency>
-  <groupId>org.glassfish.tyrus</groupId>
-  <artifactId>tyrus-client</artifactId>
-  <scope>test</scope>
-</dependency>
-<dependency>
-  <groupId>org.glassfish.tyrus</groupId>
-  <artifactId>tyrus-container-grizzly-client</artifactId>
-  <scope>test</scope>
-</dependency>
-----
-|
-|===
+To prevent conflicts on the classpath, libraries and API implementations already provided by Payara Server should be added as a dependency with the scope `provided` and the version provided by the Payara BOM.
