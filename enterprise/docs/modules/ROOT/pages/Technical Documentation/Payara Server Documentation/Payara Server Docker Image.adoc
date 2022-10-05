@@ -37,18 +37,10 @@ Besides the Full Profile version, the Payara Server Web Profile distribution is 
 
 There are 3 different, alternative versions of the JDK images:
 
-* The default version which is based on **JDK8**, uses no suffix.
-* The **JDK 11** version, which uses the `-jdk11` suffix.
+* The default version which is based on **JDK11**, uses no suffix.
 * The **JDK 17** version, which uses the `-jdk17` suffix.
 
-To switch from the default JDK 8 based image to the JDK 11 compatible one, just add the corresponding suffix to the tag's name like this:
-
-[source, shell, subs=attributes+]
-----
-docker run -p 8080:8080 nexus.payara.fish:5000/payara/server-full:{page-version}-jdk11
-----
-
-To switch from the default JDK 8 based image to the JDK 17 compatible one, just add the corresponding suffix to the tag's name like this:
+To switch from the default JDK 11 based image to the JDK 17 compatible one, just add the corresponding suffix to the tag's name like this:
 
 [source, shell, subs=attributes+]
 ----
@@ -86,7 +78,7 @@ CAUTION: Make sure to update the administrator credentials after the domain has 
 
 The Payara Server installation is located in the `/opt/payara/appserver` directory (identified by the `PAYARA_DIR` environment variable). The `/opt/payara/` parent directory is the default working directory of the docker image. 
 
-IMPORTANT: The directory name is deliberately free of any versioning so that any scripts written to work with one version can be seamlessly migrated to the latest docker image.
+NOTE: The directory name is deliberately free of any versioning so that any scripts written to work with one version can be seamlessly migrated to the latest docker image.
 
 [[application-deployment]]
 == Application Deployment
@@ -205,7 +197,7 @@ The default entry point of the Docker image is defined using the https://github.
 The default `CMD` argument for _tini_ runs the `bin/entrypoint.sh` shell script in `exec` mode, which in turn runs the following scripts in order:
 
 . `${SCRIPT_DIR}/init_1_generate_deploy_commands.sh`: This script outputs deploy commands to the post-boot command file located at `$POSTBOOT_COMMANDS` (default `$CONFIG_DIR/post-boot-commands.asadmin`). If deploy commands are already found in that file, this script does nothing.
-. `${SCRIPT_DIR}/init.d/\*.sh`: As described above, these scripts can be provided by you to run and configure the environment *before* the domain startup.
+. `${SCRIPT_DIR}/init.d/*.sh`: As described above, these scripts can be provided by you to run and configure the environment **before** the domain startup.
 . `${SCRIPT_DIR}/startInForeground.sh`. This script starts the domain in the foreground, in a manner that allows the JVM to be controlled by the docker host.
 
 [[browsing-container]]
