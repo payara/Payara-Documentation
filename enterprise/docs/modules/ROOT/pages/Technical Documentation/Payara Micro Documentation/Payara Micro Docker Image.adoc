@@ -176,12 +176,25 @@ Payara Micro will start in "clustering" mode by booting up the xref:Technical Do
 
 The Data Grid initialization and maintenance consumes extra resources, so in cases where clustering is not needed, it is recommended to disable the Data Grid completely.
 
-To disable the Data Grid, you can pass the `--noCluster` argument to the entry point of the run command:
+To disable the Data Grid, you can pass the `--noHazelcast` argument to the entry point of the run command:
 
 [source, shell, subs=attributes+]
 ----
-docker run -p 8080:8080 \
- -v ~/payara-micro/applications:/opt/payara/deployments nexus.payara.fish:5000/payara/micro:{page-version} --noCluster
+docker run -p 8080:8080 -v ~/payara-micro/applications:/opt/payara/deployments nexus.payara.fish:5000/payara/micro:{page-version} --noHazelcast
+----
+
+[[disabling-clustering]]
+=== Disable Clustering
+
+By default, Payara Micro will start with hazelcast enabled, allowing other instances reachable in the network to join the datagrid automatically and cluster.
+
+Disabling Hazelcast with the <<disabling-data-grid, --noHazelcast>> option will also disable all features that depend on Hazelcast, including JCache. The `--noCluster` option allows you to keep Hazelcast and therefore all features depending on Hazelcast, but disable clustering. This will significantly improve performance and is the recommended option if you require Hazelcast dependant features, but do not intend to use clustering.
+
+To disable clustering, you can pass the `--noCluster` argument to the entry point of the run command:
+
+[source, shell]
+----
+docker run -p 8080:8080 -v ~/payara-micro/applications:/opt/payara/deployments nexus.payara.fish:5000/payara/micro:{page-version} --noCluster
 ----
 
 [[using-environment-variables]]
