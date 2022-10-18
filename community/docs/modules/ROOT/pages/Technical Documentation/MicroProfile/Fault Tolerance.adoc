@@ -1,12 +1,14 @@
 = Eclipse MicroProfile Fault Tolerance API
 
-Provided version of the API: {mpFaultToleranceSpecUrl}[MicroProfile Fault Tolerance {mpFaultToleranceVersion}]
+Payara Server {page-version} provides MicroProfile Fault Tolerance {mpFaultToleranceVersion}
 
 == Background
 
 The Fault Tolerance API was created to help separate execution logic from execution. The execution can be configured with a number of fault tolerance policies.
 
-A full overview for the reasoning behind the API can be found in https://github.com/eclipse/microprofile-fault-tolerance/blob/master/Overview.adoc[the Overview for the source code repository.]
+{mpFaultToleranceSpecUrl}[The complete specification] can be found on the Eclipse MicroProfile website.
+
+Breaking changes introduced in MicroProfile Fault Tolerance {mpFaultToleranceVersion} are listed in the official specification under {mpFaultToleranceSpecUrl}#_backward_incompatible_changes[Backwards Incompatible Changes]
 
 == Additions to the Fault Tolerance Spec
 
@@ -30,19 +32,9 @@ MP_Fault_Tolerance_Alternative_Asynchronous_Annotations=javax.ejb.Asynchronous
 [[annotation-priority]]
 === Annotation Priority
 
-Prior to release 5.192 the order that the fault tolerance annotations are invoked is as follows:
-
-* Fallback (_SPECIAL CASE - you'll ONLY get here if there is an exception kicking off the asynchronous thread_)
-* Asynchronous
-* Fallback
-* Retry
-* Bulkhead
-* CircuitBreaker
-* Timeout
-
 Since the asynchronous annotation is invoked first, if it's combined with any other fault tolerance annotations they will be processed on the asynchronous thread.
 
-Starting from release 5.192 interactions between annotations are handled as described by the 2.0 specification effectively nesting computation in the following way (skipping handling for annotations not present):
+Interactions between annotations are handled as described by the {mpFaultToleranceVersion} specification effectively nesting computation in the following way (skipping handling for annotations not present):
 
 . Asynchronous
 . Fallback
