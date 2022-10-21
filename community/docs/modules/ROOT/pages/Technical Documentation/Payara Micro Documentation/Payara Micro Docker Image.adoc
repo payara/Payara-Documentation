@@ -28,20 +28,12 @@ docker run -p 8080:8080 payara/micro:{page-version}
 [[jdk-version]]
 == Specifying the JDK Version
 
-There are 3 different, alternative versions of the JDK images:
+There are 2 different, alternative versions of the JDK images:
 
-* The default version which is based on **JDK8**, uses no suffix.
-* The **JDK 11** version, which uses the `-jdk11` suffix.
+* The default version which is based on **JDK11**, uses no suffix.
 * The **JDK 17** version, which uses the `-jdk17` suffix.
 
-To switch from the default JDK 8 based image to the JDK 11 compatible one, just add the corresponding suffix to the tag's name like this:
-
-[source, shell, subs=attributes+]
-----
-docker run -p 8080:8080 payara/micro:{page-version}-jdk11
-----
-
-To switch from the default JDK 8 based image to the JDK 17 compatible one, just add the corresponding suffix to the tag's name like this:
+To switch from the default JDK 11 based image to the JDK 17 compatible one, just add the corresponding suffix to the tag's name like this:
 
 [source, shell, subs=attributes+]
 ----
@@ -83,17 +75,14 @@ The following command will start a new Payara Micro instance container and deplo
 
 [source, shell]
 ----
-docker run -p 8080:8080 \
- -v ~/payara-micro/applications:/opt/payara/deployments payara/micro
+docker run -p 8080:8080 -v ~/payara-micro/applications:/opt/payara/deployments payara/micro
 ----
 
 To only deploy a specific artefact within the directory, simply pass the `--deploy` argument to the container's run command and specify which application to deploy:
 
 [source, shell]
 ----
-docker run -p 8080:8080 \
- -v ~/payara-micro/applications:/opt/payara/deployments \
- payara/micro --deploy /opt/payara/deployments/myapplication.war
+docker run -p 8080:8080 -v ~/payara-micro/applications:/opt/payara/deployments payara/micro --deploy /opt/payara/deployments/myapplication.war
 ----
 
 NOTE: Make sure to prefix the artefact names with the absolute path to the local deployment directory.
@@ -120,9 +109,7 @@ Here's an example of how to deploy a sample application located in a local Maven
 
 [source, shell]
 ----
-docker run -p 8080:8080 payara/micro \
- --deployFromGAV "fish.payara.examples:my-application:1.0-SNAPSHOT" \
- --additionalRepository https://172.17.0.10/content/repositories/snapshots
+docker run -p 8080:8080 payara/micro --deployFromGAV "fish.payara.examples:my-application:1.0-SNAPSHOT"  --additionalRepository https://172.17.0.10/content/repositories/snapshots
 ----
 
 Notice that the example also uses the `--additionalRepository` argument to specify the URL of the repository where the artefact lives since by default, Payara Micro will only look for artefacts in the Maven Central repository.
@@ -142,20 +129,13 @@ Here are some basic examples:
 [source, shell]
 .One application deployed, uses the `myRoot` context root
 ----
-docker run -p 8080:8080 \
- -v ~/payara-micro/applications:/opt/payara/deployments payara/micro  \
---deploymentDir /opt/payara/deployments  \
- --contextroot myRoot
+docker run -p 8080:8080 -v ~/payara-micro/applications:/opt/payara/deployments payara/micro --deploymentDir /opt/payara/deployments --contextroot myRoot
 ----
 
 [source, shell]
 .First application in the directory uses the `/` context root
 ----
-docker run -p 8080:8080 \
- -v ~/payara-micro/applications:/opt/payara/deployments \
- payara/micro \
- --deploy /opt/payara/deployments/myapplication.war \
- --contextroot ROOT
+docker run -p 8080:8080 -v ~/payara-micro/applications:/opt/payara/deployments payara/micro --deploy /opt/payara/deployments/myapplication.war --contextroot ROOT
 ----
 
 You can also prepare a custom Docker image that overrides the default `CMD` instruction to specify the context root like this:
