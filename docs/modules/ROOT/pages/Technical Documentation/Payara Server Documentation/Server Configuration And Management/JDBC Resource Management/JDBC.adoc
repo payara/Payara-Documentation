@@ -71,6 +71,160 @@ You can test the connection to the database from the command line run the follow
 asadmin> ping-connection-pool test-pool
 ----
 
+[[connection-pool-sizing]]
+== Connection pool sizing
+
+Connection pools should be sized to cater for the maximum number of concurrent
+connections.
+
+The maximum size should be set in accordance with the maximum number of client
+requests your system or application can process. If your application receives
+100 requests and each of those requires a database connection then if your
+connection pool is anything less than 100 some of those requests will have to
+wait for a connection to either be created or become available.
+
+The minimum size of the connection pool ensures that a number of connections
+to the database are always established - this means that if you have a pool
+with a minimum size of 10 and you receive 10 requests then all can retrieve a
+database connection without waiting for the pool to create a new connection.
+
+[[setting-the-sizes-via-the-admin-console]]
+=== Setting the sizes using the admin console
+
+Click on the connection pool name and under the _Pool Settings_ section you
+will find Initial and Minimum Pool Size and Maximum Pool Size. Set these to
+your required sizes:
+
+image:connection-pools/connection_pools_3.png[Connection Pool sizes in the admin console]
+
+[[setting-the-sizes-via-asadmin]]
+=== Setting the sizes using administration commands
+
+To set the initial and minimum pool size (to the value of *10* for example),
+use the following administration commands:
+
+[source, shell]
+----
+asadmin> set resources.jdbc-connection-pool.test-pool.steady-pool-size=10
+----
+
+To set the maximum pool size (to the value of *200* for example), use the
+following administration commands:
+
+[source, shell]
+----
+asadmin> set resources.jdbc-connection-pool.test-pool.max-pool-size=200
+----
+
+[[connection-validation]]
+== Connection validation
+
+Connection validation ensures that connections aren't assigned to your application
+after the connection has already gone stale.
+
+Connection validation is always a trade-off between how sure you want to be that
+a connection is valid and the performance impact that the validation mechanism can
+exert into application that use the pool. There will be a negative performance
+impact by having to return an invalid connection by your application and borrow
+a new one, so finding the right balance is key.
+
+Before using a connection from the pool a simple query is sent to test the
+connection. If there is an issue with the connection, it is removed from the pool
+and another one is used. If you have an issue such as the database being down
+and you have a large number of connections then each of those connections will
+be tested and removed.
+
+In order to avoid this, you can set a connection validation so that if a connection
+fails, all remaining open connections are closed.
+
+[[set-up-the-validation-via-the-admin-console]]
+=== Set up the validation using the admin console
+
+. Click on the name of the connection pool
+. Select the _Advanced_ tab
+. Scroll down to the _Connection Validation_ section and select the following
+settings:
+.. _Connection Validation required_
+.. _Validation method_ - custom-validation
+.. _Validation class name_ – a proper class name for the chosen JDBC driver,
+such as `org.glassfish.api.jdbc.validation.DerbyConnectionValidation` for a
+*Derby DB*
+
+From the same screen, you can also set whether to close all connections on
+failure.
+
+image:connection-pools/connection_pools_4.png[Connection validation configuration in Admin console]
+
+[[set-up-the-validation-using-asadmin]]
+=== Set up the validation using administration commands
+
+To turn on connection validation using `asadmin` commands:
+
+[source, shell]
+----
+asadmin> set resources.jdbc-connection-pool.test-pool.connection-validation-method=custom-validation
+asadmin> set resources.jdbc-connection-pool.test-pool.validation-classname= org.glassfish.api.jdbc.validation.DerbyConnectionValidation
+asadmin> set resources.jdbc-connection-pool.test-pool.is-connection-validation-required=true
+----
+
+You can also set whether to close all connections on failure with the
+following command:
+
+[source, shell]
+----
+asadmin> set resources.jdbc-connection-pool.test-pool.fail-all-connections=true
+----
+[[statement-and-connection-leak-detection]]
+== Statement and Connection Leak Detection
+
+This feature allows you to set specific time-outs so that if SQL statements or
+JDBC connections haven't been closed by an application (potentially leading to a
+memory leak) they can be logged and/or closed.
+
+By default these values are set to *0* meaning this detection feature is turned off.
+
+TIP: When working on a test or staging environment, it is recommended that
+leaks are logged after a short timeout but not closed. On production environments,
+it is recommended that leaks are closed and all logged leaks are monitored instead.
+
+[[setting-leak-detection-via-the-admin-console]]
+=== Configuring Leak Detection using the admin console
+
+. Click on the name of the JDBC connections pool
+. Select the _Advanced_ tab
+. Scroll down to _Connection Settings_
+. Set the _Connection Leak Timeout_ and _Statement Leak Timeout_ value in seconds
+
+image:connection-pools/connection_pools_5.png[Leak Detection setting in Admin console]
+
+[[setting-leak-detection-via-asadmin]]
+=== Configuring Leak Detection using administration commands
+
+You also can set the time-out values using the following `asadmin` commands:
+
+[source, shell]
+----
+asadmin> set resources.jdbc-connection-pool.test-pool.statement-leak-timeout-in-seconds=5
+asadmin> set resources.jdbc-connection-pool.test-pool.connection-leak-timeout-in-seconds=5
+----
+
+You can turn on reclaiming of the leaking resources with the following commands:
+
+[source, shell]
+----
+asadmin> set resources.jdbc-connection-pool.DerbyPool.connection-leak-reclaim=true
+asadmin> setresources.jdbc-connection-pool.DerbyPool.statement-leak-reclaim=true
+----
+
+Once these values are set, if connection or statement leaks are detected, you
+will see messages similar to the example below in the application log:
+
+[source, log]
+----
+WARNING: A potential connection leak detected for connection pool test-pool. The stack trace of the thread is provided below:
+ ...
+----
+
 [[jdbc-call-logging-sql-tracing]]
 == JDBC Call Logging (SQL Tracing)
 :page-aliases:Technical Documentation/Payara Server Documentation/advanced-jdbc/log-jdbc-calls.adoc
