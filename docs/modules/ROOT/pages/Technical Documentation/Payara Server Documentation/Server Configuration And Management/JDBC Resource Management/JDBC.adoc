@@ -27,7 +27,7 @@ Click the _New_ button and enter the following values:
 |=======================================================================
 |Setting Name |Value
 |Pool Name |test-pool
-|Resource Type |`jakarta.sql.DataSource`
+|Resource Type |`javax.sql.DataSource`
 |Driver Vendor |(value for the driver, e.g. Derby30 for a Derby DB, MySQL for a MySQL DB)
 |=======================================================================
 
@@ -59,7 +59,7 @@ You can also create a JDBC connection pool using the `asadmin` command line tool
 
 [source, shell]
 ----
-asadmin> create-jdbc-connection-pool --datasourceclassname com.mysql.jdbc.jdbc2.optional.MysqlDataSource --restype jakarta.sql.DataSource --property user=root:password=test:DatabaseName=test:ServerName=localhost:port=3306 test-pool
+asadmin> create-jdbc-connection-pool --datasourceclassname com.mysql.jdbc.jdbc2.optional.MysqlDataSource --restype javax.sql.DataSource --property user=root:password=test:DatabaseName=test:ServerName=localhost:port=3306 test-pool
 ----
 
 With this command, you need to specify the full name of the driver's class instead of just selecting a value from a drop-down menu.
@@ -240,7 +240,7 @@ With *Log JDBC Calls* configured on the connection call each call into the conne
 
 [source, log]
 ----
-[#|2016-02-04T18:51:01.467+0000|FINE|Payara 6.2022.1|jakarta.enterprise.resource.sqltrace.com.sun.gjc.util|_ThreadID=35;_ThreadName=http-listener-1(5);_TimeMillis=1454611861467;_LevelValue=500;ClassName=com.sun.gjc.util.SQLTraceLogger;MethodName=sqlTrace;|
+[#|2016-02-04T18:51:01.467+0000|FINE|Payara 6.2022.1|javax.enterprise.resource.sqltrace.com.sun.gjc.util|_ThreadID=35;_ThreadName=http-listener-1(5);_TimeMillis=1454611861467;_LevelValue=500;ClassName=com.sun.gjc.util.SQLTraceLogger;MethodName=sqlTrace;|
   PoolName=H2Pool | ExecutionTime=1ms | ClassName=org.apache.derby.client.net.NetConnection40 | MethodName=prepareStatement | arg[0]=SELECT ID, AGE, BIO, BIRTHDATE, BIRTHDAY, DATEFORMAT, DATEOFBIRTH, DATEOFHIRE, EMAIL, HIREDATE, HIREDAY, MEMBERAGE, NAME, TODAYSDATE FROM MEMBERENTITY WHERE (NAME = ?) | arg[1]=1003 | arg[2]=1007 | |#]
 ----
 
@@ -301,7 +301,7 @@ or in the definition of a `jdbc-connection-pool` in a __payara-resources.xml__ f
 [source, xml]
 ----
 <jdbc-connection-pool name="examplePool"
-        res-type="jakarta.sql.DataSource"
+        res-type="javax.sql.DataSource"
         datasource-classname="org.h2.jdbcx.JdbcDataSource" log-jdbc-calls="true">
     <property name="user" value="test"/>
     <property name="password" value="test"/>
@@ -314,7 +314,7 @@ This can also be done in the creation of a JDBC Connection Pool with the `--logj
 
 [source, shell]
 ----
-asadmin create jdbc-connection-pool --datasourceclassname org.h2.jdbcx.JdbcDataSource --restype jakarta.sql.XADataSource --logjdbccalls=true examplePool
+asadmin create jdbc-connection-pool --datasourceclassname org.h2.jdbcx.JdbcDataSource --restype javax.sql.XADataSource --logjdbccalls=true examplePool
 ----
 
 [[advance-connection-pool-properties-in-deployment-descriptors]]

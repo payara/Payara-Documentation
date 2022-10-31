@@ -340,11 +340,11 @@ public class Bean implements BeanRemote, Serializable {
 +
 [source, java]
 ----
-import static jakarta.naming.Context.INITIAL_CONTEXT_FACTORY;
-import static jakarta.naming.Context.PROVIDER_URL;
+import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
+import static javax.naming.Context.PROVIDER_URL;
 import java.util.Properties;
-import jakarta.naming.Context;
-import jakarta.naming.InitialContext;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 public class RemoteEJBLiteClient{
     public static void main(String... args) throws NamingException{
         Properties environment = new Properties();
@@ -397,20 +397,20 @@ Then, the corresponding HTTP endpoint to use would be `https://localhost:8181/ej
 +
 Then the credentials required to correctly authenticate the user for the call have to be specified in the JNDI context with the following properties:
 +
-* `jakarta.naming.Context.SECURITY_PRINCIPAL` for the username
-* `jakarta.naming.Context.SECURITY_CREDENTIALS` for the password
+* `javax.naming.Context.SECURITY_PRINCIPAL` for the username
+* `javax.naming.Context.SECURITY_CREDENTIALS` for the password
 
 Here's an example of the complete client code used to call a secured remote EJB:
 
 [source, java]
 ----
-import static jakarta.naming.Context.INITIAL_CONTEXT_FACTORY;
-import static jakarta.naming.Context.PROVIDER_URL;
-import static jakarta.naming.Context.SECURITY_CREDENTIALS;
-import static jakarta.naming.Context.SECURITY_PRINCIPAL;
+import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
+import static javax.naming.Context.PROVIDER_URL;
+import static javax.naming.Context.SECURITY_CREDENTIALS;
+import static javax.naming.Context.SECURITY_PRINCIPAL;
 import java.util.Properties;
-import jakarta.naming.Context;
-import jakarta.naming.InitialContext;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 public class RemoteEJBLiteClient{
     public static void main(String... args) throws NamingException{
         Properties environment = new Properties();
@@ -450,10 +450,10 @@ Under the covers the remote EJB proxy uses a JAX-RS (Jersey) REST client builder
 | Instance of `java.security.KeyStore` or a `String` representing its fully qualified classname.
 |`fish.payara.sslContext`
 | The SSL context that will be used by the proxy for creating secured connections to the Payara remote server. This context *must* be fully initialized, including the trust and key managers. Should not be used in conjunction with the `fish.payara.keyStore` and/or `fish.payara.trustStore` properties.
-| Instance of `jakarta.net.ssl.SSLContext` or a `String` representing its fully qualified classname.
+| Instance of `javax.net.ssl.SSLContext` or a `String` representing its fully qualified classname.
 |`fish.payara.hostnameVerifier`
 | The hostname verifier to be used by the proxy to verify the endpoint's hostname against the identification information of it.
-| Instance of a `jakarta.net.ssl.HostnameVerifier` or a `String` representing its fully qualified classname.
+| Instance of a `javax.net.ssl.HostnameVerifier` or a `String` representing its fully qualified classname.
 |`fish.payara.provider.principal`
 | The principal to be used by the proxy to access the secured endpoint.
 | Instance of a `String`.
@@ -488,7 +488,7 @@ The constants are also exposed as static attributes of the `fish.payara.ejb.rest
 [[system-properties-fallbacks]]
 ==== System Properties Fallbacks
 
-The JNDI customization options listed above as well the environment variables defined in `jakarta.naming.Context` (except `APPLET`) can be set by setting a system property of the same name that will act as a fallback.
+The JNDI customization options listed above as well the environment variables defined in `javax.naming.Context` (except `APPLET`) can be set by setting a system property of the same name that will act as a fallback.
 That means it will not override an environment variable that is already present but would be used in the case that it is not defined when `InitialContextFactory.getInitialContext` is invoked.
 
 [[client-side-adapter]]
