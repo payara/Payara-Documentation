@@ -8,7 +8,7 @@ file_ext = ".adoc"
 start_file = f"loe{file_ext}"
 
 exclusion_list = ["ROOT", "order.py"]
-dirs = l3 = [x for x in os.listdir() if x not in exclusion_list]
+dirs = [x for x in os.listdir() if x not in exclusion_list]
 
 while dirs:
     dir = f"{dirs.pop()}"
