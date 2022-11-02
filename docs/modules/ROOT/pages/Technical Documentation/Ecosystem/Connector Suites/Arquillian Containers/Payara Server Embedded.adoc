@@ -68,12 +68,16 @@ boot of the embedded server. These values should be formatted as when executing 
 `create-system-properties` command.
 |
 
+| `hazelcastConfigurationFile`
+| Full path to a hazelcast configuration file used to override the hazelcast bootstrap default configuration.
+| 
+
 |===
 
 [[examples]]
 == Examples
 
-To configure the Arquillian Container options, you need to use an `arquillian.xml` file placed on the test classpath. Here's an example `arquillian.xml` file. It configures `adminPort` with a static value. It configures `bindHttpsPort` as a value of a system property `my.httpsport`, which you can specify for example in the maven `surefire` plugin using the `systemPropertyVariables` option or on command line like `mvn -Dmy.httpsport=8081 test`.
+To configure the Arquillian Container options, you need to use an `arquillian.xml` file placed on the test classpath. Here's an example `arquillian.xml` file. It configures `adminPort` with a static value. It configures `bindHttpsPort` as a value of a system property `my.httpsport`, which you can specify for example in the maven `surefire` plugin using the `systemPropertyVariables` option or on command line like `mvn -Dmy.httpsport=8081 test`. It overrides hazelcast bootstrap configuration indicating a path for a XML file in property `hazelcastConfigurationFile`.
 
 [source,XML]
 .Example `arquillian.xml` file
@@ -88,6 +92,7 @@ To configure the Arquillian Container options, you need to use an `arquillian.xm
         <configuration>
             <property name="bindHttpPort">8080</property>
             <property name="bindHttpsPort">${my.httpsport}</property>
+            <property name="hazelcastConfigurationFile">/home/payara/hazelcast-config.xml</property>
         </configuration>
     </container>
 </arquillian>
