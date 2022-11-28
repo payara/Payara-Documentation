@@ -1,37 +1,12 @@
-type=page
-status=published
-title=Administering Database Connectivity
-next=connectors.html
-prev=part-res-and-svcs-admin.html
-~~~~~~
-Administering Database Connectivity
-===================================
-
-[[GSADG00015]][[ablih]]
-
-
 [[administering-database-connectivity]]
-11 Administering Database Connectivity
---------------------------------------
+= Administering Database Connectivity
 
 This chapter provides procedures for performing database connectivity
-tasks in the GlassFish Server Open Source Edition 5.0 environment by
+tasks in the Payara Server environment by
 using the `asadmin` command-line utility.
 
-The following topics are addressed here:
-
-* link:#gipbp[About Database Connectivity]
-* link:#ggkon[Setting Up the Database]
-* link:#ggndx[Configuring Access to the Database]
-* link:#beamw[Configuration Specifics for JDBC Drivers]
-
-Instructions for accomplishing these tasks by using the Administration
-Console are contained in the Administration Console online help.
-
-[[gipbp]][[GSADG00576]][[about-database-connectivity]]
-
-About Database Connectivity
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[[about-database-connectivity]]
+== About Database Connectivity
 
 A database management system (DBMS) provides facilities for storing,
 organizing, and retrieving data. The information in databases is often
@@ -44,101 +19,80 @@ The key elements of database connectivity are the following:
 
 * Database. The repository where data is stored for an enterprise. Java
 EE applications access relational databases through the JDBC API. For
-administration procedures, see link:#ggkon[Setting Up the Database].
+administration procedures, see xref:docs:administration-guide:jdbc.adoc#setting-up-the-database[Setting Up the Database].
 * JDBC Connection Pool. A JDBC connection pool is a group of reusable
 connections for a particular database. For administration procedures,
-see link:#gharo[Administering JDBC Connection Pools].
+see xref:docs:administration-guide:jdbc.adoc#administering-jdbc-connection-pools[Administering JDBC Connection Pools].
 * JDBC Resource. A JDBC resource (data source) provides applications
 with a means of connecting to a database. To create a JDBC resource,
 specify the connection pool with which it is associated. Multiple JDBC
 resources can specify a single connection pool. A JDBC resource is
 identified by its Java Naming and Directory Interface (JNDI) name. For
-administration procedures, see link:#ggndp[Administering JDBC
+administration procedures, see  xref:docs:administration-guide:jdbc.adoc#administering-jdbc-resources[Administering JDBC
 Resources].
 * JDBC Driver. A database driver is a software component that enables a
 Java application to interact with a database connectivity API . Each
 database requires its own driver. For administration procedures, see
-link:#ghatb[Integrating the JDBC Driver].
+xref:docs:administration-guide:jdbc.adoc#integrating-the-jdbc-driver[Integrating the JDBC Driver].
 
 At runtime, the following sequence occurs when an application connects
 to a database:
 
-1.  The application gets the JDBC resource associated with the database
+. The application gets the JDBC resource associated with the database
 by making a call through the JNDI API. +
 Using the JNDI name of the resource, the naming and directory service
 locates the JDBC resource. Each JDBC resource specifies a connection
 pool.
-2.  Using the JDBC resource, the application gets a database connection. +
-GlassFish Server retrieves a physical connection from the connection
+. Using the JDBC resource, the application gets a database connection. +
+Payara Server retrieves a physical connection from the connection
 pool that corresponds to the database. The pool defines connection
 attributes such as the database name (URL), user name, and password.
-3.  After the database connection is established, the application can
+. After the database connection is established, the application can
 read, modify, and add data to the database. +
 The application accesses the database by making calls to the JDBC API.
 The JDBC driver translates the application's JDBC calls into the
 protocol of the database server.
-4.  When the application is finished accessing the database, the
+. When the application is finished accessing the database, the
 application closes the connection and returns the connection to the
 connection pool.
 
-[[ggkon]][[GSADG00577]][[setting-up-the-database]]
-
-Setting Up the Database
-~~~~~~~~~~~~~~~~~~~~~~~
+[[setting-up-the-database]]
+== Setting Up the Database
 
 Most applications use relational databases to store, organize, and
 retrieve data. Applications access relational databases through the Java
 Database Connectivity (JDBC) API.
+[[to-install-the-database-and-database-driver]]
+=== To Install the Database and Database Driver
 
-The following topics are addressed here:
-
-* link:#gharl[To Install the Database and Database Driver]
-* link:#ggndz[To Start the Database]
-* link:#ggnbw[To Stop the Database]
-* link:#ghmbq[Apache Derby Database Utility Scripts]
-
-[[gharl]][[GSADG00416]][[to-install-the-database-and-database-driver]]
-
-To Install the Database and Database Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-1.  Install a supported database product. +
-To see the current list of database products supported by GlassFish
-Server, refer to the link:../release-notes/toc.html#GSRLN[GlassFish Server Open Source Edition
-Release Notes].
-2.  Install a supported JDBC driver for the database product. +
-For a list of drivers supported by GlassFish Server, see
-link:#beamw[Configuration Specifics for JDBC Drivers].
-3.  Make the JDBC driver JAR file accessible to the domain
-administration server (DAS). +
-See link:#ghatb[Integrating the JDBC Driver].
-4.  Create the database. +
-The application provider usually delivers scripts for creating and
+. Install a supported database product.To see the current list of database products supported by Payara
+Server, refer to the xref:community:relase-notes.adoc[Payara Server Release Notes].
+.  Install a supported JDBC driver for the database product. For a list of drivers supported by Payara Server, see
+xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
+. Make the JDBC driver JAR file accessible to the domain administration server (DAS). +
+See xref:docs:administration-guide:jdbc.adoc#integrating-the-jdbc-driver[Integrating the JDBC Driver].
+. Create the database. The application provider usually delivers scripts for creating and
 populating the database.
 
-[[GSADG949]]
-
-Next Steps
+*Next Steps*
 
 You are now ready to create a connection pool for the database, and a
-JDBC resource that points to the connection pool. See link:#ggnfv[To
-Create a JDBC Connection Pool] and link:#ggnda[To Create a JDBC
+JDBC resource that points to the connection pool. See xref:docs:administration-guide:jdbc.adoc#to-create-a-jdbc-connection-pool[To
+Create a JDBC Connection Pool] and xref:docs:administration-guide:jdbc.adoc#to-create-a-jdbc-resource[To Create a JDBC
 Resource]. The final step is to integrate the JDBC driver into an
-administrative domain as described in link:#ghatb[Integrating the JDBC
+administrative domain as described in xref:docs:administration-guide:jdbc.adoc#integrating-the-jdbc-driver[Integrating the JDBC
 Driver].
 
-[[ggndz]][[GSADG00417]][[to-start-the-database]]
+[[to-start-the-database]]
+=== To Start the Database
 
-To Start the Database
-^^^^^^^^^^^^^^^^^^^^^
-
-GlassFish Server includes an implementation of the Apache Derby
+Payara Server includes an implementation of the Apache Derby
 database, however, you can use any JDBC-compliant database. The database
-is not started automatically when you start GlassFish Server, so if you
+is not started automatically when you start Payara Server, so if you
 have applications that require a database, you need to start Apache
 Derby database manually by using the local `start-database` subcommand.
 
-Start the database by using the link:../reference-manual/start-database.html#GSRFM00234[`start-database`]
+Start the database by using the xref:docs:reference-manual:start-database.adoc#GSRFM00234[`start-database`]
 subcommand.
 
 When the database server starts, or a client connects to it
@@ -149,15 +103,13 @@ specified by the `--dbhome` option:
 with its standard output and standard error information.
 * The database files contain your schema (for example, database tables).
 
-[[GSADG00212]][[ggooc]]
-
-
-Example 11-1 Starting a Database
+[[example-to-start-a-database]]
+=== Example
 
 This example starts the Apache Derby database on the host host1 and port
 5001.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> start-database --dbhost host1 --dbport 5001 --terse=true
 Starting database in the background. 
@@ -165,30 +117,22 @@ Log redirected to /opt/SUNWappserver/databases/javadb.log.
 Command start-database executed successfully.
 ----
 
-[[GSADG950]]
-
-See Also
-
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help start-database` at the command line.
 
-[[ggnbw]][[GSADG00418]][[to-stop-the-database]]
-
-To Stop the Database
-^^^^^^^^^^^^^^^^^^^^
+[[to-stop-the-database]]
+=== To Stop the Database
 
 Use the local `stop-database` subcommand to stop the Apache Derby
 database on a specified port. A single host can have multiple database
 server processes running on different ports.
 
-1.  If necessary, notify users that the database is being stopped.
-2.  Stop the database by using the link:../reference-manual/stop-database.html#GSRFM00239[`stop-database`]
+. If necessary, notify users that the database is being stopped.
+. Stop the database by using the xref:docs:reference-manual:stop-database.adoc#GSRFM00239[`stop-database`]
 subcommand.
 
-[[GSADG00213]][[ggorc]]
-
-
-Example 11-2 Stopping a Database
+[[example-to-stop-the-database]]
+=== Example
 
 This example stops the Apache Derby database on port 5001 of
 `localhost`.
@@ -202,9 +146,8 @@ at 2008-10-17 23:34:2 7.218 GMT
 Command stop-database executed successfully.
 ----
 
-[[GSADG951]]
-
-Troubleshooting
+[[database-troubleshooting]]
+=== Troubleshooting
 
 For a laptop that roams between networks, you might have trouble
 shutting down the database. If you start the Apache Derby database and
@@ -216,20 +159,14 @@ similar to the following to stop the database:
 
 `asadmin stop-database` `dbhost` `localhost`
 
-[[GSADG952]]
-
-See Also
-
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help stop-database` at the command line.
 
-[[ghmbq]][[GSADG00744]][[apache-derby-database-utility-scripts]]
-
-Apache Derby Database Utility Scripts
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[apache-derby-database-utility-scripts]]
+=== Apache Derby Database Utility Scripts
 
 The Apache Derby database configuration that is available for use with
-GlassFish Server includes scripts that can help you use the Apache Derby
+Payara Server includes scripts that can help you use the Apache Derby
 database. The following scripts are available in the
 as-install`/javadb/bin` directory:
 
@@ -247,19 +184,14 @@ as-install`/javadb/bin` directory:
 `NetworkServerControl,NetworkServerControl.bat`::
   Script to execute commands on the `NetworkServerControl` API
 
-[[ghmbj]][[GSADG00419]][[to-configure-your-environment-to-run-the-apache-derby-database-utility-scripts]]
+[[to-configure-your-environment-to-run-the-apache-derby-database-utility-scripts]]
+=== To Configure Your Environment to Run the Apache Derby Database Utility Scripts
 
-To Configure Your Environment to Run the Apache Derby Database Utility Scripts
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-1.  Ensure that the `JAVA_HOME` environment variable specifies the
+. Ensure that the `JAVA_HOME` environment variable specifies the
 directory where the JDK is installed.
-2.  Set the `JAVADB_HOME` environment variable to point to the
+. Set the `JAVADB_HOME` environment variable to point to the
 as-install`/javadb` directory.
 
-[[GSADG953]]
-
-See Also
 
 For more information about these utilities, see the following
 documentation:
@@ -269,39 +201,27 @@ Utilities Guide]
 * http://db.apache.org/derby/docs/10.13/adminguide/[Derby Server and
 Administration Guide]
 
-[[ggndx]][[GSADG00578]][[configuring-access-to-the-database]]
+[[configuring-access-to-the-database]]
 
-Configuring Access to the Database
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+== Configuring Access to the Database
 
 After establishing the database, you are ready to set up access for
-GlassFish Server applications. The high-level steps include creating a
+Payara Server applications. The high-level steps include creating a
 JDBC connection pool, creating a JDBC resource for the connection pool,
 and integrating a JDBC driver into an administrative domain.
 
-Instructions for performing these steps are contained in the following
-sections:
-
-* link:#gharo[Administering JDBC Connection Pools]
-* link:#ggndp[Administering JDBC Resources]
-* link:#gkudf[Enabling the `jdbc/__default` Resource in a Clustered
-Environment]
-* link:#ghatb[Integrating the JDBC Driver]
-
-[[gharo]][[GSADG00745]][[administering-jdbc-connection-pools]]
-
-Administering JDBC Connection Pools
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[administering-jdbc-connection-pools]]
+=== Administering JDBC Connection Pools
 
 A JDBC connection pool is a group of reusable connections for a
 particular database. Because creating each new physical connection is
-time consuming, GlassFish Server maintains a pool of available
+time consuming, Payara Server maintains a pool of available
 connections. When an application requests a connection, it obtains one
 from the pool. When an application closes a connection, the connection
 is returned to the pool. JDBC connection pools can be globally
 accessible or be scoped to an enterprise application, web module, EJB
 module, connector module or application client module, as described in
-"link:../application-deployment-guide/deploying-applications.html#GSDPG00075[Application-Scoped Resources]" in GlassFish Server
+"xref:docs:application-deployment-guide:deploying-applications.adoc#GSDPG00075[Application-Scoped Resources]" in Payara Server
 Open Source Edition Application Deployment Guide.
 
 A JDBC resource is created by specifying the connection pool with which
@@ -310,21 +230,8 @@ connection pool. The properties of connection pools can vary with
 different database vendors. Some common properties are the database name
 (URL), the user name, and the password.
 
-The following tasks and information are used to administer JDBC
-connection pools:
-
-* link:#ggnfv[To Create a JDBC Connection Pool]
-* link:#ggnby[To List JDBC Connection Pools]
-* link:#ggnwn[To Contact (Ping) a Connection Pool]
-* link:#gjiqp[To Reset (Flush) a Connection Pool]
-* link:#giosk[To Update a JDBC Connection Pool]
-* link:#ggngb[To Delete a JDBC Connection Pool]
-* link:#gktdi[Configuring Specific JDBC Connection Pool Features]
-
-[[ggnfv]][[GSADG00420]][[to-create-a-jdbc-connection-pool]]
-
-To Create a JDBC Connection Pool
-++++++++++++++++++++++++++++++++
+[[to-create-a-jdbc-connection-pool]]
+==== To Create a JDBC Connection Pool
 
 Use the `create-jdbc-connection-pool` subcommand in remote mode to
 register a new JDBC connection pool with the specified JDBC connection
@@ -338,7 +245,7 @@ One connection pool is needed for each database, possibly more depending
 on the application. When you are building the connection pool, certain
 data specific to the JDBC driver and the database vendor is required.
 You can find some of the following specifics in
-link:#beamw[Configuration Specifics for JDBC Drivers]:
+xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]:
 
 * Database vendor name
 * Resource type, such as `javax.sql.DataSource` (local transactions
@@ -349,34 +256,28 @@ password
 
 Creating a JDBC connection pool is a dynamic event and does not require
 server restart. However, there are some parameters that do require
-server restart. See link:overview.html#ghciy[Configuration Changes That
-Require Restart].
+server restart. See xref:docs:administration-guide:overview.adoc#ghciy[Configuration Changes That Require Restart].
 
-[[GSADG954]]
-
-Before You Begin
+*Before You Begin*
 
 Before creating the connection pool, you must first install and
 integrate the database and its associated JDBC driver. For instructions,
-see link:#ggkon[Setting Up the Database].
+see xref:docs:administration-guide:jdbc.adoc#setting-up-the-database[Setting Up the Database].
 
-1.  Ensure that the server is running. +
+. Ensure that the server is running. +
 Remote subcommands require a running server.
-2.  Create the JDBC connection pool by using the
-link:../reference-manual/create-jdbc-connection-pool.html#GSRFM00036[`create-jdbc-connection-pool`] subcommand.
-3.  If needed, restart the server. +
-Some parameters require server restart. See
-link:overview.html#ghciy[Configuration Changes That Require Restart].
+. Create the JDBC connection pool by using the
+xref:docs:reference-manual:create-jdbc-connection-pool.adoc#create-jdbc-connection-pool[`create-jdbc-connection-pool`] subcommand.
+. If needed, restart the server. Some parameters require server restart. See
+xref:docs:administration-guide:overview.adoc#ghciy[Configuration Changes That Require Restart].
 
-[[GSADG00214]][[ggrgh]]
-
-
-Example 11-3 Creating a JDBC Connection Pool
+[[example-to-create-a-jdbc-connection-pool]]
+==== Example
 
 This example creates a JDBC connection pool named `sample_derby_pool` on
 `localhost`.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> create-jdbc-connection-pool 
 --datasourceclassname org.apache.derby.jdbc.ClientDataSource 
@@ -387,34 +288,25 @@ es=\;create\\=true sample_derby_pool
 Command create-jdbc-connection-pool executed successfully.
 ----
 
-[[GSADG955]]
-
-See Also
-
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help create-jdbc-connection-pool` at the command line.
 
-[[ggnby]][[GSADG00421]][[to-list-jdbc-connection-pools]]
-
-To List JDBC Connection Pools
-+++++++++++++++++++++++++++++
+[[to-list-jdbc-connection-pools]]
+==== To List JDBC Connection Pools
 
 Use the `list-jdbc-connection-pools` subcommand in remote mode to list
 all existing JDBC connection pools.
 
-1.  Ensure that the server is running. +
-Remote subcommands require a running server.
-2.  List the JDBC connection pools by using the
-link:../reference-manual/list-jdbc-connection-pools.html#GSRFM00173[`list-jdbc-connection-pools`] subcommand.
+. Ensure that the server is running. Remote subcommands require a running server.
+. List the JDBC connection pools by using the
+xref:docs:reference-manual:list-jdbc-connection-pools.adoc#GSRFM00173[`list-jdbc-connection-pools`] subcommand.
 
-[[GSADG00215]][[ggpcf]]
-
-
-Example 11-4 Listing JDBC Connection Pools
+[[example-to-list-jdbc-connection-pools]]
+==== Example
 
 This example lists the JDBC connection pools that are on `localhost`.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> list-jdbc-connection-pools
 sample_derby_pool2
@@ -425,17 +317,11 @@ sample_derby_pool
 Command list-jdbc-connection-pools executed successfully.
 ----
 
-[[GSADG956]]
-
-See Also
-
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help list-jdbc-connection-pools` at the command line.
 
-[[ggnwn]][[GSADG00422]][[to-contact-ping-a-connection-pool]]
-
-To Contact (Ping) a Connection Pool
-+++++++++++++++++++++++++++++++++++
+[[to-contact-ping-a-connection-pool]]
+==== To Contact (Ping) a Connection Pool
 
 Use the `ping-connection-pool` subcommand in remote mode to test if a
 connection pool is usable. For example, if you create a new JDBC
@@ -444,47 +330,36 @@ later, you can test the JDBC pool with this subcommand before the
 application is deployed. Running a ping will force the creation of the
 pool if it hasn't already been created.
 
-[[GSADG957]]
-
-Before You Begin
+*Before You Begin*
 
 Before you can contact a connection pool, the connection pool must be
 created with authentication, and the server or database must be running.
 
-1.  Ensure that the server is running. +
-Remote subcommands require a running server.
-2.  Ping a connection pool by using the
-link:../reference-manual/ping-connection-pool.html#GSRFM00214[`ping-connection-pool`] subcommand.
+. Ensure that the server is running. Remote subcommands require a running server.
+. Ping a connection pool by using the
+xref:docs:reference-manual:ping-connection-pool.adoc#GSRFM00214[`ping-connection-pool`] subcommand.
 
-[[GSADG00216]][[ggpcs]]
-
-
-Example 11-5 Contacting a Connection Pool
+[[example-to-contact-ping-a-connection-pool]]
+==== Example
 
 This example tests to see if the `DerbyPool` connection pool is usable.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> ping-connection-pool DerbyPool
 Command ping-connection-pool executed successfully
 ----
-
-[[GSADG958]]
-
-See Also
 
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help ping-connection-pool` at the command line.
 
 You can also specify that a JDBC connection pool is automatically tested
 when created or reconfigured by setting its `--ping` option to `true`
-(the default is `false`). See link:#ggnfv[To Create a JDBC Connection
-Pool] or link:#giosk[To Update a JDBC Connection Pool].
+(the default is `false`). See xref:docs:administration-guide:jdbc.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC ConnectionPool] +
+or xref:docs:administration-guide:jdbc.adoc#to-update-a-jdbc-connection-pool[To Update a JDBC Connection Pool].
 
-[[gjiqp]][[GSADG00423]][[to-reset-flush-a-connection-pool]]
-
-To Reset (Flush) a Connection Pool
-++++++++++++++++++++++++++++++++++
+[[to-reset-flush-a-connection-pool]]
+==== To Reset (Flush) a Connection Pool
 
 Use the `flush-connection-pool` in remote mode to reinitialize all
 connections established in the specified connection pool without the
@@ -496,133 +371,83 @@ that the transactions associated with these connections are lost and
 must be retried. The subcommand then recreates the initial connections
 for the pool, and restores the pool to its steady pool size.
 
-1.  Ensure that the server is running. +
-Remote subcommands require a running server.
-2.  Reset a connection pool by using
-theolink:GSRFM00135[`flush-connection-pool`] subcommand.
+. Ensure that the server is running. Remote subcommands require a running server.
+. Reset a connection pool by using the `flush-connection-pool` subcommand.
 
-[[GSADG00217]][[gjirk]]
-
-
-Example 11-6 Resetting (Flushing) a Connection Pool
+==== Example
 
 This example resets the JDBC connection pool named `__TimerPool` to its
 steady pool size.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> flush-connection-pool __TimerPool 
 Command flush-connection-pool executed successfully.
 ----
 
-[[GSADG959]]
-
-See Also
-
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help flush-connection-pool` at the command line.
 
-[[giosk]][[GSADG00424]][[to-update-a-jdbc-connection-pool]]
-
-To Update a JDBC Connection Pool
-++++++++++++++++++++++++++++++++
+[[to-update-a-jdbc-connection-pool]]
+==== To Update a JDBC Connection Pool
 
 You can change all of the settings for an existing pool except its name.
 Use the `get` and `set` subcommands to view and change the values of the
 JDBC connection pool properties.
 
-1.  List the JDBC connection pools by using the
-link:../reference-manual/list-jdbc-connection-pools.html#GSRFM00173[`list-jdbc-connection-pools`] subcommand.
-2.  View the attributes of the JDBC connection pool by using the get
-subcommand. +
-For example: +
-[source,oac_no_warn]
-----
-asadmin get resources.jdbc-connection-pool.DerbyPool.property
-----
-3.  Set the attribute of the JDBC connection pool by using the set
-subcommand. +
-For example: +
-[source,oac_no_warn]
-----
-asadmin set resources.jdbc-connection-pool.DerbyPool.steady-pool-size=9
-----
-4.  If needed, restart the server. +
-Some parameters require server restart. See
-link:overview.html#ghciy[Configuration Changes That Require Restart].
-
-[[GSADG960]]
-
-See Also
+. List the JDBC connection pools by using the
+xref:docs:reference-manual:list-jdbc-connection-pools.adoc#GSRFM00173[`list-jdbc-connection-pools`] subcommand.
+. View the attributes of the JDBC connection pool by using the get subcommand. +
+For example: `asadmin get resources.jdbc-connection-pool.DerbyPool.property`
+. Set the attribute of the JDBC connection pool by using the setsubcommand. +
+For example: `asadmin set resources.jdbc-connection-pool.DerbyPool.steady-pool-size=9`
+. If needed, restart the server. Some parameters require server restart. See +
+xref:docs:administration-guide:overview.adoc#ghciy[Configuration Changes That Require Restart].
 
 For information about how to tune a connection pool, see the
-link:../performance-tuning-guide/toc.html#GSPTG[GlassFish Server Open Source Edition Performance Tuning
-Guide].
+xref:docs:performance-tuning-guide:toc.adoc#GSPTG[Payara Server Performance Tuning Guide].
 
-[[ggngb]][[GSADG00425]][[to-delete-a-jdbc-connection-pool]]
-
-To Delete a JDBC Connection Pool
-++++++++++++++++++++++++++++++++
+[[to-delete-a-jdbc-connection-pool]]
+==== To Delete a JDBC Connection Pool
 
 Use the `delete-jdbc-connection-pool` subcommand in remote mode to
 delete an existing JDBC connection pool. Deleting a JDBC connection pool
 is a dynamic event and does not require server restart.
 
-[[GSADG961]]
-
-Before You Begin
+*Before You Begin*
 
 Before deleting a JDBC connection pool, all associations to the resource
 must be removed.
 
-1.  Ensure that the server is running. +
-Remote subcommands require a running server.
-2.  List the JDBC connection pools by using the
-link:../reference-manual/list-jdbc-connection-pools.html#GSRFM00173[`list-jdbc-connection-pools`] subcommand.
-3.  If necessary, notify users that the JDBC connection pool is being
-deleted.
-4.  Delete the connection pool by using the
-link:../reference-manual/delete-jdbc-connection-pool.html#GSRFM00088[`delete-jdbc-connection-pool`] subcommand.
+. Ensure that the server is running. Remote subcommands require a running server.
+. List the JDBC connection pools by using the
+xref:docs:reference-manual:list-jdbc-connection-pools.adoc#GSRFM00173[`list-jdbc-connection-pools`] subcommand.
+. If necessary, notify users that the JDBC connection pool is being deleted.
+. Delete the connection pool by using the
+xref:docs:reference-manual:delete-jdbc-connection-pools.adoc#GSRFM00088[`delete-jdbc-connection-pool`] subcommand.
 
-[[GSADG00218]][[ggpis]]
-
-
-Example 11-7 Deleting a JDBC Connection Pool
+[[example-to-delete-a-jdbc-connection-pool]]
+=== Example
 
 This example deletes the JDBC connection pool named `DerbyPool`.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> delete-jdbc-connection-pool jdbc/DerbyPool
 Command delete-jdbc-connection-pool executed successfully.
 ----
 
-[[GSADG962]]
-
-See Also
-
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help delete-jdbc-connection-pool` at the command line.
 
-[[gktdi]][[GSADG00670]][[configuring-specific-jdbc-connection-pool-features]]
+[[configuring-specific-jdbc-connection-pool-features]]
+=== Configuring Specific JDBC Connection Pool Features
 
-Configuring Specific JDBC Connection Pool Features
-++++++++++++++++++++++++++++++++++++++++++++++++++
+In Payara Server, JDBC Connection Pools support a variety of features
+to simplify administration, monitoring and performance tuning. 
 
-In GlassFish Server, JDBC Connection Pools support a variety of features
-to simplify administration, monitoring and performance tuning. The
-following topics address several of these features:
-
-* link:#gktcv[Transparent Pool Reconfiguration]
-* link:#gkter[Using an Initialization Statement]
-* link:#gktcc[Setting a Statement Timeout]
-* link:#gktec[Statement Leak Detection and Leaked Statement Reclamation]
-* link:#gktej[Statement Caching]
-* link:#gktbu[Statement Tracing]
-
-[[gktcv]][[GSADG00085]][[transparent-pool-reconfiguration]]
-
-Transparent Pool Reconfiguration
+[[transparent-pool-reconfiguration]]
+==== Transparent Pool Reconfiguration
 
 When the properties or attributes of a JDBC connection pool are changed,
 the connection pool is destroyed and re-created. Normally, applications
@@ -646,9 +471,9 @@ in the Administration Console. For more information, click the Help
 button in the Administration Console.
 * Specify it using the `--property` option in the
 `create-jdbc-connection-pool` subcommand. For more information, see
-link:../reference-manual/create-jdbc-connection-pool.html#GSRFM00036[`create-jdbc-connection-pool`(1)].
+xref:docs:reference-manual:create-jdbc-connection-pool.adoc#GSRFM00036[`create-jdbc-connection-pool`].
 * Set it using the `set` subcommand. For example: +
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin set resources.jdbc-connection-pool.pool-name.property.dynamic-reconfiguration-wait-timeout-in-seconds=15
 ----
@@ -658,9 +483,7 @@ connections to close and in-flight transactions to complete. Any
 connections in use or transaction in flight past this time must be
 retried.
 
-[[gkter]][[GSADG00086]][[using-an-initialization-statement]]
-
-Using an Initialization Statement
+==== Using an Initialization Statement
 
 You can specify a statement that executes each time a physical
 connection to the database is created (not reused) from a JDBC
@@ -674,17 +497,16 @@ Attributes page in the Administration Console. For more information,
 click the Help button in the Administration Console.
 * Specify the `--initsql` option in the
 `asadmin create-jdbc-connection-pool` command. For more information, see
-link:../reference-manual/create-jdbc-connection-pool.html#GSRFM00036[`create-jdbc-connection-pool`(1)].
+xref:docs:reference-manual:create-jdbc-connection-pool.adoc#GSRFM00036[`create-jdbc-connection-pool`].
 * Specify the `init-sql` option in the `asadmin set` command. For
 example: +
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin set domain1.resources.jdbc-connection-pool.DerbyPool.init-sql="sql-string"
 ----
 
-[[gktcc]][[GSADG00087]][[setting-a-statement-timeout]]
-
-Setting a Statement Timeout
+[[setting-a-statement-timeout]]
+==== Setting a Statement Timeout
 
 An abnormally long running JDBC query executed by an application may
 leave it in a hanging state unless a timeout is explicitly set on the
@@ -702,11 +524,10 @@ Attributes page in the Administration Console. For more information,
 click the Help button in the Administration Console.
 * Specify the `--statementtimeout` option in the
 `asadmin create-jdbc-connection-pool` command. For more information, see
-link:../reference-manual/create-jdbc-connection-pool.html#GSRFM00036[`create-jdbc-connection-pool`(1)].
+xref:docs:reference-manual:create-jdbc-connection-pool.adoc#GSRFM00036[`create-jdbc-connection-pool`].
 
-[[gktec]][[GSADG00088]][[statement-leak-detection-and-leaked-statement-reclamation]]
-
-Statement Leak Detection and Leaked Statement Reclamation
+[[statement-leak-detection-and-leaked-statement-reclamation]]
+==== Statement Leak Detection and Leaked Statement Reclamation
 
 If statements are not closed by an application after use, it is possible
 for the application to run out of cursors. Enabling statement leak
@@ -720,10 +541,10 @@ of the following ways:
 
 * Specify the `--statementleaktimeout` option in the
 `create-jdbc-connection-pool` subcommand. For more information, see
-link:../reference-manual/create-jdbc-connection-pool.html#GSRFM00036[`create-jdbc-connection-pool`(1)].
+xref:docs:reference-manual:create-jdbc-connection-pool.adoc#GSRFM00036[`create-jdbc-connection-pool`].
 * Specify the `statement-leak-timeout-in-seconds` option in the `set`
 subcommand. For example: +
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin set resources.jdbc-connection-pool.pool-name.statement-leak-timeout-in-seconds=300
 ----
@@ -742,17 +563,16 @@ pool to a `true` value in one of the following ways:
 
 * Specify the `--statementleakreclaim=true` option in the
 `create-jdbc-connection-pool` subcommand. For more information, see
-link:../reference-manual/create-jdbc-connection-pool.html#GSRFM00036[`create-jdbc-connection-pool`(1)].
+xref:docs:reference-manual:create-jdbc-connection-pool.adoc#GSRFM00036[`create-jdbc-connection-pool`].
 * Specify the `statement-leak-reclaim` option in the `set` subcommand.
 For example: +
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin set resources.jdbc-connection-pool.pool-name.statement-leak-reclaim=true
 ----
 
-[[gktej]][[GSADG00089]][[statement-caching]]
-
-Statement Caching
+[[statement-caching]]
+==== Statement Caching
 
 Statement caching stores statements, prepared statements, and callable
 statements that are executed repeatedly by applications in a cache,
@@ -760,7 +580,7 @@ thereby improving performance. Instead of the statement being prepared
 each time, the cache is searched for a match. The overhead of parsing
 and creating new statements each time is eliminated.
 
-Statement caching is usually a feature of the JDBC driver. The GlassFish
+Statement caching is usually a feature of the JDBC driver. The Payara
 Server provides caching for drivers that do not support caching. To
 enable this feature, set the Statement Cache Size for the JDBC
 connection pool in one of the following ways:
@@ -770,10 +590,10 @@ Advanced Attributes page in the Administration Console. For more
 information, click the Help button in the Administration Console.
 * Specify the `--statementcachesize` option in the
 `asadmin create-jdbc-connection-pool` command. For more information, see
-link:../reference-manual/create-jdbc-connection-pool.html#GSRFM00036[`create-jdbc-connection-pool`(1)].
+xref:docs:reference-manual:create-jdbc-connection-pool.adoc#GSRFM00036[`create-jdbc-connection-pool`].
 * Specify the `statement-cache-size` option in the `asadmin set`
 command. For example: +
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin set domain1.resources.jdbc-connection-pool.DerbyPool.statement-cache-size=10
 ----
@@ -784,9 +604,8 @@ nonzero value. The built-in cache eviction strategy is LRU-based (Least
 Recently Used). When a connection pool is flushed, the connections in
 the statement cache are recreated.
 
-[[gktbu]][[GSADG00090]][[statement-tracing]]
-
-Statement Tracing
+[[statement-tracing]]
+==== Statement Tracing
 
 You can trace the SQL statements executed by applications that use a
 JDBC connection pool. Set the SQL Trace Listeners attribute to a
@@ -798,41 +617,41 @@ Advanced Attributes page in the Administration Console. For more
 information, click the Help button in the Administration Console.
 * Specify the `--sqltracelisteners` option in the
 `asadmin create-jdbc-connection-pool` command. For more information, see
-link:../reference-manual/create-jdbc-connection-pool.html#GSRFM00036[`create-jdbc-connection-pool`(1)].
+xref:docs:reference-manual:create-jdbc-connection-pool.adoc#GSRFM00036[`create-jdbc-connection-pool`].
 * Specify the `sql-trace-listeners` option in the `asadmin set` command.
 For example: +
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin set domain1.resources.jdbc-connection-pool.DerbyPool.sql-trace-listeners=listeners
 ----
 
-The GlassFish Server provides a public interface,
+The Payara Server provides a public interface,
 org.glassfish.api.jdbc.SQLTraceListener , that implements a means of
 recording `SQLTraceRecord` objects. To make custom implementations of
-this interface available to the GlassFish Server, place the
+this interface available to the Payara Server, place the
 implementation classes in as-install`/lib`.
 
-The GlassFish Server provides an SQL tracing logger to log the SQL
+The Payara Server provides an SQL tracing logger to log the SQL
 operations in the form of `SQLTraceRecord` objects in the `server.log`
 file. The module name under which the SQL operation is logged is
 `jakarta.enterprise.resource.sqltrace`. SQL traces are logged as FINE
 messages along with the module name to enable easy filtering of the SQL
 logs. A sample SQL trace record looks like this:
 
-[source,oac_no_warn]
+[source,shell]
 ----
-[#|2009-11-27T15:46:52.202+0530|FINE|glassfishv3.0|jakarta.enterprise.resource.sqltrace.com.sun.gjc.util
+|2009-11-27T15:46:52.202+0530|FINE|glassfishv3.0|jakarta.enterprise.resource.sqltrace.com.sun.gjc.util
 |_ThreadID=29;_ThreadName=Thread-1;ClassName=com.sun.gjc.util.SQLTraceLogger;MethodName=sqlTrace;
 |ThreadID=77 | ThreadName=p: thread-pool-1; w: 6 | TimeStamp=1259317012202 
 | ClassName=com.sun.gjc.spi.jdbc40.PreparedStatementWrapper40 | MethodName=executeUpdate 
-| arg[0]=insert into table1(colName) values(100) | arg[1]=columnNames | |#]
+| arg[0]=insert into table1(colName) values(100) | arg[1]=columnNames | |
 ----
 
 This trace shows that an `executeUpdate(String sql, String columnNames)`
 operation is being done.
 
 When SQL statement tracing is enabled and JDBC connection pool
-monitoring is enabled, GlassFish Server maintains a tracing cache of
+monitoring is enabled, Payara Server maintains a tracing cache of
 recent queries and their frequency of use. The following JDBC connection
 pool properties can be configured to control this cache and the
 monitoring statistics available from it:
@@ -851,17 +670,15 @@ page in the Administration Console. For more information, click the Help
 button in the Administration Console.
 * Specify them using the `--property` option in the
 `create-jdbc-connection-pool` subcommand. For more information, see
-link:../reference-manual/create-jdbc-connection-pool.html#GSRFM00036[`create-jdbc-connection-pool`(1)].
+xref:docs:reference-manual:create-jdbc-connection-pool.adoc#GSRFM00036[`create-jdbc-connection-pool`].
 * Set them using the `set` subcommand. For example: +
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin set resources.jdbc-connection-pool.pool-name.property.time-to-keep-queries-in-minutes=10
 ----
 
-[[ggndp]][[GSADG00746]][[administering-jdbc-resources]]
-
-Administering JDBC Resources
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[administering-jdbc-resources]]
+=== Administering JDBC Resources
 
 A JDBC resource, also known as a data source, provides an application
 with a means of connecting to a database. Typically, you create a JDBC
@@ -869,8 +686,8 @@ resource for each database that is accessed by the applications deployed
 in a domain. Multiple JDBC resources can be specified for a database.
 JDBC resources can be globally accessible or be scoped to an enterprise
 application, web module, EJB module, connector module or application
-client module, as described in "link:../application-deployment-guide/deploying-applications.html#GSDPG00075[Application-Scoped
-Resources]" in GlassFish Server Open Source Edition Application
+client module, as described in "xref:docs:application-deployment-guide:deploying-applications.adoc#GSDPG00075[Application-Scoped
+Resources]" in Payara Server Open Source Edition Application
 Deployment Guide.
 
 A JDBC resource is created by specifying the connection pool with which
@@ -881,24 +698,14 @@ name for the resource of a payroll database might be
 
 The Java EE standard specifies that certain default resources be made
 available to applications, and defines specific JNDI names for these
-default resources. GlassFish Server makes these names available through
+default resources. Payara Server makes these names available through
 the use of logical JNDI names, which map Java EE standard JNDI names to
-specific GlassFish Server resources. For JDBC resources, the Java EE
+specific Payara Server resources. For JDBC resources, the Java EE
 standard name `java:comp/DefaultDataSource` is mapped to the
 `jdbc/__default` resource.
 
-The following tasks and information are used to administer JDBC
-resources:
-
-* link:#ggnda[To Create a JDBC Resource]
-* link:#ggnhl[To List JDBC Resources]
-* link:#giwjv[To Update a JDBC Resource]
-* link:#ggnhz[To Delete a JDBC Resource]
-
-[[ggnda]][[GSADG00426]][[to-create-a-jdbc-resource]]
-
-To Create a JDBC Resource
-+++++++++++++++++++++++++
+[[to-create-a-jdbc-resource]]
+==== To Create a JDBC Resource
 
 Use the `create-jdbc-resource` subcommand in remote mode to create a
 JDBC resource. Creating a JDBC resource is a dynamic event and does not
@@ -909,63 +716,47 @@ specifying the JNDI name of a JDBC resource in the Administration
 Console, use only the `jdbc/`name format. For example, a payroll
 database might be specified as `jdbc/payrolldb`.
 
-[[GSADG963]]
-
-Before You Begin
+*Before You Begin*
 
 Before creating a JDBC resource, you must first create a JDBC connection
-pool. For instructions, see link:#ggnfv[To Create a JDBC Connection
-Pool].
+pool. For instructions, see xref:docs:administration-guide:jdbc.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool].
 
-1.  Ensure that the server is running. +
-Remote subcommands require a running server.
-2.  Create a JDBC resource by using the
-link:../reference-manual/create-jdbc-resource.html#GSRFM00037[`create-jdbc-resource`] subcommand. +
+. Ensure that the server is running. Remote subcommands require a running server.
+. Create a JDBC resource by using the
+xref:docs:reference-manual:create-jdbc-resource.adoc#GSRFM00037[`create-jdbc-resource`] subcommand. +
 Information about properties for the subcommand is included in this help
 page.
-3.  If necessary, notify users that the new resource has been created.
+. If necessary, notify users that the new resource has been created.
 
-[[GSADG00219]][[ggplj]]
-
-
-Example 11-8 Creating a JDBC Resource
-
+[[example-to-create-a-jdbc-resource]]
+==== Example 
 This example creates a JDBC resource named `DerbyPool`.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> create-jdbc-resource --connectionpoolid DerbyPool jdbc/DerbyPool
 Command create-jdbc-resource executed successfully.
 ----
 
-[[GSADG964]]
-
-See Also
-
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help create-jdbc-resource` at the command line.
 
-[[ggnhl]][[GSADG00427]][[to-list-jdbc-resources]]
-
-To List JDBC Resources
-++++++++++++++++++++++
+[[to-list-jdbc-resources]]
+==== To List JDBC Resources
 
 Use the `list-jdbc-resources` subcommand in remote mode to list the
 existing JDBC resources.
 
-1.  Ensure that the server is running. +
-Remote subcommands require a running server.
-2.  List JDBC resources by using the
-link:../reference-manual/list-jdbc-resources.html#GSRFM00174[`list-jdbc-resources`] subcommand.
+. Ensure that the server is running. Remote subcommands require a running server.
+. List JDBC resources by using the
+xref:docs:reference-manual:list-jdbc-resources.adoc#GSRFM00174[`list-jdbc-resources`] subcommand.
 
-[[GSADG00220]][[ggpgi]]
-
-
-Example 11-9 Listing JDBC Resources
+[[example-to-list-jdbc-resources]]
+==== Example
 
 This example lists JDBC resources for `localhost`.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> list-jdbc-resources
 jdbc/__TimerPool
@@ -975,116 +766,85 @@ jdbc1
 Command list-jdbc-resources executed successfully.
 ----
 
-[[GSADG965]]
-
-See Also
-
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help list-jdbc-resources` at the command line.
 
-[[giwjv]][[GSADG00428]][[to-update-a-jdbc-resource]]
-
-To Update a JDBC Resource
-+++++++++++++++++++++++++
+[[to-update-a-jdbc-resource]]
+==== To Update a JDBC Resource
 
 You can enable or disable a JDBC resource by using the `set` subcommand.
 The JDBC resource is identified by its dotted name.
 
-1.  List JDBC resources by using the
-link:../reference-manual/list-jdbc-resources.html#GSRFM00174[`list-jdbc-resources`] subcommand.
-2.  Modify the values for the specified JDBC resource by using the
-link:../reference-manual/set.html#GSRFM00226[`set`] subcommand. +
+. List JDBC resources by using the
+xref:docs:reference-manual:list-jdbc-resources.adoc#GSRFM00174[`list-jdbc-resources`] subcommand.
+. Modify the values for the specified JDBC resource by using the
+xref:docs:reference-manual:set.adoc#GSRFM00226[`set`] subcommand. +
 For example:
 
-[[GSADG00221]][[gjkrz]]
-
-
-Example 11-10 Updating a JDBC Resource
-
+[[example-to-update-a-jdbc-resource]]
+==== Example
 This example changes the `res1` enabled setting to false.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin>set resources.jdbc-resource.res1.enabled=false
 ----
 
-[[ggnhz]][[GSADG00429]][[to-delete-a-jdbc-resource]]
-
-To Delete a JDBC Resource
-+++++++++++++++++++++++++
+[[to-delete-a-jdbc-resource]]
+==== To Delete a JDBC Resource
 
 Use the `delete-jdbc-resource` subcommand in remote mode to delete an
 existing JDBC resource. Deleting a JDBC resource is a dynamic event and
 does not require server restart.
 
-[[GSADG966]]
-
-Before You Begin
+*Before You Begin*
 
 Before deleting a JDBC resource, all associations with this resource
 must be removed.
 
-1.  Ensure that the server is running. +
-Remote subcommands require a running server.
-2.  List JDBC resources by using the
-link:../reference-manual/list-jdbc-resources.html#GSRFM00174[`list-jdbc-resources`] subcommand.
-3.  If necessary, notify users that the JDBC resource is being deleted.
-4.  Delete a JDBC resource by using the
-link:../reference-manual/delete-jdbc-resource.html#GSRFM00089[`delete-jdbc-resource`] subcommand.
+. Ensure that the server is running. Remote subcommands require a running server.
+. List JDBC resources by using the
+xref:docs:reference-manual:list-jdbc-resources.adoc#GSRFM00174[`list-jdbc-resources`] subcommand.
+. If necessary, notify users that the JDBC resource is being deleted.
+. Delete a JDBC resource by using the
+xref:docs:reference-manual:delete-jdbc-resource.adoc#GSRFM00089[`delete-jdbc-resource`] subcommand.
 
-[[GSADG00222]][[ggpga]]
-
-
-Example 11-11 Deleting a JDBC Resource
+[[example-to-delete-a-jdbc-resource]]
+==== Example 
 
 This example deletes a JDBC resource named `DerbyPool`.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> delete-jdbc-resource jdbc/DerbyPool
 Command delete-jdbc-resource executed successfully.
 ----
 
-[[GSADG967]]
-
-See Also
-
 You can also view the full syntax and options of the subcommand by
 typing `asadmin help delete-jdbc-resource` at the command line.
 
-[[gkudf]][[GSADG00747]][[enabling-the-jdbc__default-resource-in-a-clustered-environment]]
+[[enabling-the-jdbc__default-resource-in-a-clustered-environment]]
+=== Enabling the `jdbc/__default` Resource in a Clustered Environment
 
-Enabling the `jdbc/__default` Resource in a Clustered Environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-GlassFish Server 5.0 includes a preconfigured JDBC resource with the
+Payara Server 5.0 includes a preconfigured JDBC resource with the
 JNDI name `jdbc/__default`. This `jdbc/__default` resource is not
 enabled by default, so you need to explicitly enable it if you want to
 use it in a cluster.
 
-[[gkubj]][[GSADG00430]][[to-enable-the-jdbc__default-resource-for-a-clustered-environment]]
-
-To Enable the `jdbc/__default` Resource for a Clustered Environment
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[[to-enable-the-jdbc__default-resource-for-a-clustered-environment]]
+==== To Enable the `jdbc/__default` Resource for a Clustered Environment
 
 Instructions for creating JDBC resources in general are provided in
-link:#ggnda[To Create a JDBC Resource]. Use the following procedure to
+xref:docs:administration-guide:jdbc.adoc#to-create-a-jdbc-resource[To Create a JDBC Resource]. Use the following procedure to
 enable the preconfigured `jdbc/__default` resource for a clustered
-GlassFish Server environment.
+Payara Server environment.
 
-1.  Create the `jdbc/__default` resource reference for the cluster. +
-[source,oac_no_warn]
-----
-asadmin create-resource-ref --target cluster-name jdbc/__default
-----
-2.  Enable the resource on the DAS that manages the cluster. +
-[source,oac_no_warn]
-----
-asadmin set resources.jdbc-connection-pool.DerbyPool.property.serverName=DAS-machine-name
-----
-This step is only required if the cluster includes remote instances.
-3.  Restart the DAS and the target cluster(s). +
-[source,oac_no_warn]
+. Create the `jdbc/__default` resource reference for the cluster. for example: 'asadmin create-resource-ref --target cluster-name jdbc/__default'
+. Enable the resource on the DAS that manages the cluster, for example: 'asadmin set resources.jdbc-connection-pool.DerbyPool.property.serverName=DAS-machine-name'
+
+This step is only required if the cluster includes remote instances. Restart the DAS and the target cluster(s). 
+
+[source,shell]
 ----
 asadmin stop-cluster cluster-name
 asadmin stop-domain domain-name
@@ -1092,35 +852,26 @@ asadmin start-domain domain-name
 asadmin start-cluster cluster-name
 ----
 
-[[ghatb]][[GSADG00748]][[integrating-the-jdbc-driver]]
-
-Integrating the JDBC Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[integrating-the-jdbc-driver]]
+=== Integrating the JDBC Driver
 
 To use JDBC features, you must choose a JDBC driver to work with the
-GlassFish Server, then you must set up the driver. This section covers
-these topics:
+Payara Server, then you must set up the driver.
 
-* link:#gkpdj[Supported Database Drivers]
-* link:#gkpci[Making the JDBC Driver JAR Files Accessible]
-* link:#gkpfj[Automatic Detection of Installed Drivers]
-
-[[gkpdj]][[GSADG00671]][[supported-database-drivers]]
-
-Supported Database Drivers
-++++++++++++++++++++++++++
+[[supported-database-drivers]]
+==== Supported Database Drivers
 
 Supported JDBC drivers are those that have been fully tested by Oracle.
-For a list of the JDBC drivers currently supported by the GlassFish
-Server, see the link:../release-notes/toc.html#GSRLN[GlassFish Server Open Source Edition Release
+For a list of the JDBC drivers currently supported by the Payara
+Server, see the xref:docs:release-notes:toc.adoc#GSRLN[Payara Release
 Notes]. For configurations of supported and other drivers, see
-link:#beamw[Configuration Specifics for JDBC Drivers].
+xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 
 
 [NOTE]
 =======================================================================
 
-Because the drivers and databases supported by the GlassFish Server are
+Because the drivers and databases supported by the Payara Server are
 constantly being updated, and because database vendors continue to
 upgrade their products, always check with Oracle technical support for
 the latest database support information.
@@ -1128,28 +879,23 @@ the latest database support information.
 =======================================================================
 
 
-[[gkpci]][[GSADG00672]][[making-the-jdbc-driver-jar-files-accessible]]
+[[making-the-jdbc-driver-jar-files-accessible]]
+==== Making the JDBC Driver JAR Files Accessible
 
-Making the JDBC Driver JAR Files Accessible
-+++++++++++++++++++++++++++++++++++++++++++
-
-To integrate the JDBC driver into a GlassFish Server domain, copy the
+To integrate the JDBC driver into a Payara Server domain, copy the
 JAR files into the domain-dir`/lib` directory, then restart the server.
 This makes classes accessible to all applications or modules deployed on
 servers that share the same configuration. For more information about
-GlassFish Server class loaders, see "link:../application-development-guide/class-loaders.html#GSDVG00003[Class Loaders]" in
-GlassFish Server Open Source Edition Application Development Guide.
+Payara Server class loaders, see "xref:docs:application-development-guide:class-loaders.adoc#GSDVG00003[Class Loaders]" in
+Payara Server Application Development Guide.
 
 If you are using an Oracle database with EclipseLink extensions, copy
 the JAR files into the domain-dir`/lib/ext` directory, then restart the
-server. For details, see "link:../application-development-guide/jpa.html#GSDVG00390[Oracle Database
-Enhancements]" in GlassFish Server Open Source Edition Application
-Development Guide.
+server. For details, see "xref:docs:application-development-guide:jpa.adoc#GSDVG00390[Oracle Database Enhancements]" in 
+Payara Server Application Development Guide.
 
-[[gkpfj]][[GSADG00673]][[automatic-detection-of-installed-drivers]]
-
-Automatic Detection of Installed Drivers
-++++++++++++++++++++++++++++++++++++++++
+[[automatic-detection-of-installed-drivers]]
+==== Automatic Detection of Installed Drivers
 
 The Administration Console detects installed JDBC Drivers automatically
 when you create a JDBC connection pool. To create a JDBC connection pool
@@ -1165,44 +911,19 @@ implementation class name on the next page, additional properties
 relevant to the installed JDBC driver are displayed in the Additional
 Properties section.
 
-[[beamw]][[GSADG00579]][[configuration-specifics-for-jdbc-drivers]]
+== Configuration Specifics for JDBC Drivers
 
-Configuration Specifics for JDBC Drivers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Payara Server is designed to support connectivity to any database
+management system by using a corresponding JDBC driver.
 
-GlassFish Server is designed to support connectivity to any database
-management system by using a corresponding JDBC driver. Configuration
-information is provided for these JDBC drivers:
-
-* link:#beanc[IBM DB2 Database Type 2 Driver]
-* link:#glhim[IBM DB2 Database Type 4 Driver]
-* link:#beamx[Apache Derby DB/Derby Type 4 Driver]
-* link:#gbsor[MySQL Server Database Type 4 Driver]
-* link:#beani[Oracle 10 Database Driver]
-* link:#beanh[Oracle 11 Database Driver]
-* link:#gjksj[PostgreSQL Type 4 Driver]
-* link:#beamy[DataDirect Type 4 Driver for IBM DB2 Database]
-* link:#beanj[DataDirect Type 4 Driver for IBM Informix]
-* link:#beana[DataDirect Type 4 Driver for Microsoft SQL Server
-Database]
-* link:#gjksd[DataDirect Type 4 Driver for MySQL Server Database]
-* link:#beamz[DataDirect Type 4 Driver for Oracle 11 Database]
-* link:#beanb[DataDirect Type 4 Driver for Sybase Database]
-* link:#beane[Inet Oraxo Driver for Oracle Database]
-* link:#beanf[Inet Merlia Driver for Microsoft SQL Server Database]
-* link:#beang[Inet Sybelux Driver for Sybase Database]
-* link:#beand[JConnect Type 4 Driver for Sybase ASE 12.5 Database]
-
-[[beanc]][[GSADG00749]][[ibm-db2-database-type-2-driver]]
-
-IBM DB2 Database Type 2 Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[ibm-db2-database-type-2-driver]]
+=== IBM DB2 Database Type 2 Driver
 
 The JAR files for the DB2 driver are `db2jcc.jar`,
 `db2jcc_license_cu.jar`, and `db2java.zip`. Set your environment
 variables . For example:
 
-[source,oac_no_warn]
+[source,shell]
 ----
 LD_LIBRARY_PATH=/usr/db2user/sqllib/lib:${Java EE.home}/lib
 DB2DIR=/opt/IBM/db2/V8.2
@@ -1230,10 +951,8 @@ Configure the connection pool using the following settings:
 
 ** `deferPrepares` - Set to `false`.
 
-[[glhim]][[GSADG00750]][[ibm-db2-database-type-4-driver]]
-
-IBM DB2 Database Type 4 Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[ibm-db2-database-type-4-driver]]
+=== IBM DB2 Database Type 4 Driver
 
 The JAR file for the DB2 driver is `db2jcc.jar`. Configure the
 connection pool using the following settings:
@@ -1252,14 +971,12 @@ connection pool using the following settings:
 
 ** `driverType` - Set to `4`.
 
-[[beamx]][[GSADG00751]][[apache-derby-dbderby-type-4-driver]]
+[[apache-derby-dbderby-type-4-driver]]
+=== Apache Derby DB/Derby Type 4 Driver
 
-Apache Derby DB/Derby Type 4 Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The Apache Derby DB/Derby JDBC driver is included with GlassFish Server
+The Apache Derby DB/Derby JDBC driver is included with Payara Server
 by default, so you do not need to integrate this JDBC driver with
-GlassFish Server.
+Payara Server.
 
 The JAR file for the Apache Derby DB driver is `derbyclient.jar`.
 Configure the connection pool using the following settings:
@@ -1268,7 +985,7 @@ Configure the connection pool using the following settings:
 * Resource Type: Specify the appropriate value.
 * Database Vendor: Apache Derby
 * DataSource Classname: Specify one of the following: +
-[source,oac_no_warn]
+[source,shell]
 ----
 org.apache.derby.jdbc.ClientDataSource40
 org.apache.derby.jdbc.ClientXADataSource40
@@ -1293,10 +1010,8 @@ the tables reside.
 This is only necessary if the Apache Derby database is configured to use
 authentication.
 
-[[gbsor]][[GSADG00752]][[mysql-server-database-type-4-driver]]
-
-MySQL Server Database Type 4 Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[mysql-server-database-type-4-driver]]
+=== MySQL Server Database Type 4 Driver
 
 The JAR file for the MySQL driver is
 `mysql-connector-java-5.1.14-bin.jar`. Configure the connection pool
@@ -1306,7 +1021,7 @@ using the following settings:
 * Resource Type: Specify the appropriate value.
 * Database Vendor: MySql
 * DataSource Classname: +
-[source,oac_no_warn]
+[source,shell]
 ----
 com.mysql.jdbc.jdbc2.optional.MysqlDataSource
 com.mysql.jdbc.jdbc2.optional.MysqlXADataSource
@@ -1324,10 +1039,8 @@ server.
 
 ** `password` - Set as appropriate.
 
-[[beani]][[GSADG00753]][[oracle-10-database-driver]]
-
-Oracle 10 Database Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^
+[[oracle-10-database-driver]]
+=== Oracle 10 Database Driver
 
 The JAR file for the Oracle 10 database driver is `ojdbc14.jar`. Make
 sure that the shared library is available through `LD_LIBRARY_PATH` and
@@ -1336,7 +1049,7 @@ that the `ORACLE_HOME` property is set.
 To make the Oracle driver behave in a Java EE-compliant manner, you must
 define the following JVM property:
 
-[source,oac_no_warn]
+[source,shell]
 ----
 -Doracle.jdbc.J2EE13Compliant=true
 ----
@@ -1347,7 +1060,7 @@ Configure the connection pool using the following settings:
 * Resource Type: Specify the appropriate value.
 * Database Vendor: Oracle
 * DataSource Classname: Specify one of the following: +
-[source,oac_no_warn]
+[source,shell]
 ----
 oracle.jdbc.pool.OracleDataSource
 oracle.jdbc.xa.client.OracleXADataSource
@@ -1358,17 +1071,15 @@ oracle.jdbc.xa.client.OracleXADataSource
 
 ** `password` - Set as appropriate.
 
-[[beanh]][[GSADG00754]][[oracle-11-database-driver]]
-
-Oracle 11 Database Driver
-^^^^^^^^^^^^^^^^^^^^^^^^^
+[[oracle-11-database-driver]]
+=== Oracle 11 Database Driver
 
 The JAR file for the Oracle 11 database driver is `ojdbc6.jar`.
 
 To make the Oracle driver behave in a Java EE-compliant manner, you must
 define the following JVM property:
 
-[source,oac_no_warn]
+[source,shell]
 ----
 -Doracle.jdbc.J2EE13Compliant=true
 ----
@@ -1379,7 +1090,7 @@ Configure the connection pool using the following settings:
 * Resource Type: Specify the appropriate value.
 * Database Vendor: Oracle
 * DataSource Classname: Specify one of the following: +
-[source,oac_no_warn]
+[source,shell]
 ----
 oracle.jdbc.pool.OracleDataSource
 oracle.jdbc.xa.client.OracleXADataSource
@@ -1399,7 +1110,7 @@ XA specifications, the Transaction Manager initially calls this method
 with `TMSTARTSCAN` and then with `TMNOFLAGS` repeatedly until no Xids
 are returned. The `XAResource.commit` method also has some issues.
 
-To disable this GlassFish Server workaround, the
+To disable this Payara Server workaround, the
 `oracle-xa-recovery-workaround` property value must be set to `false`.
 
 Additionally, in order for the transaction manager to recover
@@ -1413,10 +1124,8 @@ DBA_2PC_PENDING and DBA_2PC_NEIGHBORS.
 =======================================================================
 
 
-[[gjksj]][[GSADG00755]][[postgresql-type-4-driver]]
-
-PostgreSQL Type 4 Driver
-^^^^^^^^^^^^^^^^^^^^^^^^
+[[postgresql-type-4-driver]]
+=== PostgreSQL Type 4 Driver
 
 The JAR file for the PostgreSQL driver is
 `postgresql-9.0-801.jdbc4.jar`. Configure the connection pool using the
@@ -1439,10 +1148,8 @@ server.
 
 ** `password` - Set as appropriate.
 
-[[beamy]][[GSADG00756]][[datadirect-type-4-driver-for-ibm-db2-database]]
-
-DataDirect Type 4 Driver for IBM DB2 Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[datadirect-type-4-driver-for-ibm-db2-database]]
+=== DataDirect Type 4 Driver for IBM DB2 Database
 
 The JAR file for DataDirect driver is `db2.jar`. Configure the
 connection pool using the following settings:
@@ -1464,10 +1171,8 @@ server.
 
 ** `password` - Set as appropriate.
 
-[[beanj]][[GSADG00757]][[datadirect-type-4-driver-for-ibm-informix]]
-
-DataDirect Type 4 Driver for IBM Informix
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[datadirect-type-4-driver-for-ibm-informix]]
+=== DataDirect Type 4 Driver for IBM Informix
 
 Configure the connection pool using the following settings:
 
@@ -1475,7 +1180,7 @@ Configure the connection pool using the following settings:
 * Resource Type: Specify the appropriate value.
 * Database Vendor: DataDirect-Informix
 * DataSource Classname: Specify one of the following: +
-[source,oac_no_warn]
+[source,shell]
 ----
 com.informix.jdbcx.IfxDataSource
 com.informix.jdbcx.IfxXADataSource
@@ -1497,10 +1202,8 @@ DataDirect DataSource Classname:
 ** `IfxIFXHost` - Specify the host name or IP address of the database
 server.
 
-[[beana]][[GSADG00758]][[datadirect-type-4-driver-for-microsoft-sql-server-database]]
-
-DataDirect Type 4 Driver for Microsoft SQL Server Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[datadirect-type-4-driver-for-microsoft-sql-server-database]]
+=== DataDirect Type 4 Driver for Microsoft SQL Server Database
 
 The JAR file for the DataDirect driver is `sqlserver.jar`. Configure the
 connection pool using the following settings:
@@ -1522,10 +1225,8 @@ the database server.
 
 ** `selectMethod` - Set to `cursor`.
 
-[[gjksd]][[GSADG00759]][[datadirect-type-4-driver-for-mysql-server-database]]
-
-DataDirect Type 4 Driver for MySQL Server Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[datadirect-type-4-driver-for-mysql-server-database]]
+=== DataDirect Type 4 Driver for MySQL Server Database
 
 The JAR file for the DataDirect driver is `mysql.jar`. Configure the
 connection pool using the following settings:
@@ -1547,17 +1248,15 @@ the database server.
 
 ** `selectMethod` - Set to `cursor`.
 
-[[beamz]][[GSADG00760]][[datadirect-type-4-driver-for-oracle-11-database]]
-
-DataDirect Type 4 Driver for Oracle 11 Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[datadirect-type-4-driver-for-oracle-11-database]]
+=== DataDirect Type 4 Driver for Oracle 11 Database
 
 The JAR file for the DataDirect driver is `oracle.jar`.
 
 To make the Oracle driver behave in a Java EE-compliant manner, you must
 define the following JVM property:
 
-[source,oac_no_warn]
+[source,shell]
 ----
 -Doracle.jdbc.J2EE13Compliant=true
 ----
@@ -1579,10 +1278,8 @@ server.
 
 ** `password` - Set as appropriate.
 
-[[beanb]][[GSADG00761]][[datadirect-type-4-driver-for-sybase-database]]
-
-DataDirect Type 4 Driver for Sybase Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[datadirect-type-4-driver-for-sybase-database]]
+=== DataDirect Type 4 Driver for Sybase Database
 
 The JAR file for the DataDirect driver is `sybase.jar`. Configure the
 connection pool using the following settings:
@@ -1616,10 +1313,8 @@ PreparedStatement by default. If this situation arises, add the property
 =======================================================================
 
 
-[[beane]][[GSADG00762]][[inet-oraxo-driver-for-oracle-database]]
-
-Inet Oraxo Driver for Oracle Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[inet-oraxo-driver-for-oracle-database]]
+=== Inet Oraxo Driver for Oracle Database
 
 The JAR file for the Inet Oracle driver is `Oranxo.jar`. Configure the
 connection pool using the following settings:
@@ -1641,12 +1336,12 @@ server.
 
 ** `serviceName` - Specify the URL of the database. The syntax is as
 follows: +
-[source,oac_no_warn]
+[source,shell]
 ----
 jdbc:inetora:server:port:dbname
 ----
 For example: +
-[source,oac_no_warn]
+[source,shell]
 ----
 jdbc:inetora:localhost:1521:payrolldb
 ----
@@ -1658,10 +1353,8 @@ database URL, see the Oracle documentation.
 ** `streamstolob` - If the size of BLOB or CLOB data types exceeds 4 KB
 and this driver is used for CMP, this property must be set to `true`.
 
-[[beanf]][[GSADG00763]][[inet-merlia-driver-for-microsoft-sql-server-database]]
-
-Inet Merlia Driver for Microsoft SQL Server Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[inet-merlia-driver-for-microsoft-sql-server-database]]
+=== Inet Merlia Driver for Microsoft SQL Server Database
 
 The JAR file for the Inet Microsoft SQL Server driver is `Merlia.jar`.
 Configure the connection pool using the following settings:
@@ -1681,10 +1374,8 @@ the database server.
 
 ** `password` - Set as appropriate.
 
-[[beang]][[GSADG00764]][[inet-sybelux-driver-for-sybase-database]]
-
-Inet Sybelux Driver for Sybase Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[inet-sybelux-driver-for-sybase-database]]
+=== Inet Sybelux Driver for Sybase Database
 
 The JAR file for the Inet Sybase driver is `Sybelux.jar`. Configure the
 connection pool using the following settings:
@@ -1707,10 +1398,8 @@ only the database name.
 
 ** `password` - Set as appropriate.
 
-[[beand]][[GSADG00765]][[jconnect-type-4-driver-for-sybase-ase-12.5-database]]
-
-JConnect Type 4 Driver for Sybase ASE 12.5 Database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[jconnect-type-4-driver-for-sybase-ase-12.5-database]]
+=== JConnect Type 4 Driver for Sybase ASE 12.5 Database
 
 The JAR file for the Sybase driver is `jconn4.jar`. Configure the
 connection pool using the following settings:
@@ -1718,12 +1407,14 @@ connection pool using the following settings:
 * Name: Use this name when you configure the JDBC resource later.
 * Resource Type: Specify the appropriate value.
 * Database Vendor: Sybase
-* DataSource Classname: Specify one of the following: +
-[source,oac_no_warn]
+* DataSource Classname: Specify one of the following: 
+
+[source,shell]
 ----
 com.sybase.jdbc4.jdbc.SybDataSource
 com.sybase.jdbc4.jdbc.SybXADataSource
 ----
+
 * Properties:
 
 ** `serverName` - Specify the host name or IP address of the database
@@ -1741,5 +1432,3 @@ only the database name.
 ** `BE_AS_JDBC_COMPLIANT_AS_POSSIBLE` - Set to `true`.
 
 ** `FAKE_METADATA` - Set to `true`.
-
-
