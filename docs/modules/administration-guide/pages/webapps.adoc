@@ -1,139 +1,73 @@
-type=page
-status=published
-title=Administering Web Applications
-next=logging.html
-prev=threadpools.html
-~~~~~~
-Administering Web Applications
-==============================
-
-[[GSADG00009]][[gbbjk]]
-
-
 [[administering-web-applications]]
-6 Administering Web Applications
---------------------------------
+= Administering Web Applications
 
-This chapter explains how to administer web applications in the
-GlassFish Server Open Source Edition 5.0 environment.
+This chapter explains how to administer web applications in the Payara Server Open Source Edition 5.0 environment.
 
-The following topics are addressed here:
+Instructions for accomplishing some of these tasks by using the Administration Console are contained in the Administration Console online help.
 
-* link:#beagk[Invoking a Servlet by Alternate Means]
-* link:#gixud[Changing Log Output for a Servlet]
-* link:#beagc[Defining Global Features for Web Applications]
-* link:#gixrb[Redirecting a URL]
-* link:#gfaad[Administering `mod_jk`]
-* link:#CIHJDAJD[Administering `mod_proxy_ajp`]
+[[invoking-a-servlet-by-alternate-means]]
+== Invoking a Servlet by Alternate Means
 
-Instructions for accomplishing some of these tasks by using the
-Administration Console are contained in the Administration Console
-online help.
+You can call a servlet deployed to Payara Server by using a URL in a browser or embedded as a link in an HTML or JSP file. The format of a servlet invocation URL is as follows:
 
-[[beagk]][[GSADG00548]][[invoking-a-servlet-by-alternate-means]]
-
-Invoking a Servlet by Alternate Means
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can call a servlet deployed to GlassFish Server by using a URL in a
-browser or embedded as a link in an HTML or JSP file. The format of a
-servlet invocation URL is as follows:
-
-[source,oac_no_warn]
+[source,shell]
 ----
 http://server:port/context-root/servlet-mapping?name=value
 ----
 
-The following table describes each URL section.
-
-[[GSADG857]][[sthref20]][[fvyhk]]
-
-
-Table 6-1 URL Fields for Servlets Within an Application
-
-[width="100%",cols="21%,79%",options="header",]
-|=======================================================================
+.Table 6-1 URL Fields for Servlets Within an Application
+[header, cols="3,7"]
+|===
 |URL element |Description
-|server`:`port a|
-The IP address (or host name) and optional port number.
+|server`:`port
+| The IP address (or host name) and optional port number. +
+To access the default web module for a virtual server, specify only this URL section. You do not need to specify the context-root or servlet-name unless you also wish to specify name-value parameters. +
 
-To access the default web module for a virtual server, specify only this
-URL section. You do not need to specify the context-root or servlet-name
-unless you also wish to specify name-value parameters.
+| context-root
+| For an application, the context root is defined in the `context-root` element of the `application.xml`, `sun-application.xml`, or `sun-web.xml` file. For an individually deployed web module, the context  root is specified during deployment. +
+For both applications and individually deployed web modules, the default context root is the name of the WAR file minus the `.war` suffix.
 
-|context-root a|
-For an application, the context root is defined in the `context-root`
-element of the `application.xml`, `sun-application.xml`, or
-`sun-web.xml` file. For an individually deployed web module, the context
-root is specified during deployment.
+| servlet-mapping
+| The `servlet-mapping` as configured in the `web.xml` file.
 
-For both applications and individually deployed web modules, the default
-context root is the name of the WAR file minus the `.war` suffix.
+| `?`name`=`value`...`
+| Optional request parameters.
+|===
 
-|servlet-mapping |The `servlet-mapping` as configured in the `web.xml`
-file.
+In this example, `localhost` is the host name, `MortPages` is the context root, and `calcMortgage` is the servlet mapping.
 
-|`?`name`=`value`...` |Optional request parameters.
-|=======================================================================
-
-
-[[GSADG00166]][[giyhf]]
-
-
-Example 6-1 Invoking a Servlet With a URL
-
-In this example, `localhost` is the host name, `MortPages` is the
-context root, and `calcMortgage` is the servlet mapping.
-
-[source,oac_no_warn]
+.Example 6-1 Invoking a Servlet With a URL
+[source,shell]
 ----
 http://localhost:8080/MortPages/calcMortgage?rate=8.0&per=360&bal=180000
 ----
 
-[[GSADG00167]][[giyib]]
+To invoke a servlet from within a JSP file, you can use a relative path. For example:
 
-
-Example 6-2 Invoking a Servlet From Within a JSP File
-
-To invoke a servlet from within a JSP file, you can use a relative path.
-For example:
-
-[source,oac_no_warn]
+.Example 6-2 Invoking a Servlet From Within a JSP File
+[source,shell]
 ----
 <jsp:forward page="TestServlet"/><jsp:include page="TestServlet"/>
 ----
 
-[[gixud]][[GSADG00549]][[changing-log-output-for-a-servlet]]
+[[changing-log-output-for-a-servlet]]
+== Changing Log Output for a Servlet
 
-Changing Log Output for a Servlet
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`ServletContext.log` messages are sent to the server log. By default, the `System.out` and `System.err` output of servlets are sent to the server log.
+During startup, server log messages are echoed to the `System.err` output. Also by default, there is no Windows-only console for the `System.err` output.
 
-`ServletContext.log` messages are sent to the server log. By default,
-the `System.out` and `System.err` output of servlets are sent to the
-server log. During startup, server log messages are echoed to the
-`System.err` output. Also by default, there is no Windows-only console
-for the `System.err` output.
+You can change these defaults using the Administration Console Write to System Log box. If this box is checked, `System.out` output is sent to the server log.
+If it is unchecked, `System.out` output is sent to the system default location only.
 
-You can change these defaults using the Administration Console Write to
-System Log box. If this box is checked, `System.out` output is sent to
-the server log. If it is unchecked, `System.out` output is sent to the
-system default location only.
+[[defining-global-features-for-web-applications]]
+== Defining Global Features for Web Applications
 
-[[beagc]][[GSADG00550]][[defining-global-features-for-web-applications]]
+You can use the `default-web.xml` file to define features such as filters and security constraints that apply to all web applications.
 
-Defining Global Features for Web Applications
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+For example, directory listings are disabled by default for added security. To enable directory listings in your domain's
+`default-web.xml` file, search for the definition of the servlet whose `servlet-name` is equal to `default`, and set the value of the `init-param` named `listings` to `true`. Then restart the server.
 
-You can use the `default-web.xml` file to define features such as
-filters and security constraints that apply to all web applications.
-
-For example, directory listings are disabled by default for added
-security. To enable directory listings in your domain's
-`default-web.xml` file, search for the definition of the servlet whose
-`servlet-name` is equal to `default`, and set the value of the
-`init-param` named `listings` to `true`. Then restart the server.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 <init-param>
    <param-name>listings</param-name>
@@ -141,11 +75,9 @@ security. To enable directory listings in your domain's
 </init-param>
 ----
 
-If `listings` is set to `true`, you can also determine how directory
-listings are sorted. Set the value of the `init-param` named `sortedBy`
-to `NAME`, `SIZE`, or `LAST_MODIFIED`. Then restart the server.
+If `listings` is set to `true`, you can also determine how directory listings are sorted. Set the value of the `init-param` named `sortedBy` to `NAME`, `SIZE`, or `LAST_MODIFIED`. Then restart the server.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 <init-param>
    <param-name>sortedBy</param-name>
@@ -153,154 +85,95 @@ to `NAME`, `SIZE`, or `LAST_MODIFIED`. Then restart the server.
 </init-param>
 ----
 
-The `mime-mapping` elements in `default-web.xml` are global and
-inherited by all web applications. You can override these mappings or
-define your own using `mime-mapping` elements in your web application's
-`web.xml` file. For more information about `mime-mapping` elements, see
-the Servlet specification.
+The `mime-mapping` elements in `default-web.xml` are global and inherited by all web applications. You can override these mappings or
+define your own using `mime-mapping` elements in your web application's `web.xml` file. For more information about `mime-mapping` elements, see the Servlet specification.
 
-You can use the Administration Console to edit the `default-web.xml`
-file, or edit the file directly using the following steps.
+You can use the Administration Console to edit the `default-web.xml` file, or edit the file directly using the following steps.
 
-[[fvymc]][[GSADG00370]][[to-use-the-default-web.xml-file]]
+[[to-use-the-default-web.xml-file]]
+=== To Use the `default-web.xml` File
 
-To Use the `default-web.xml` File
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+. Place the JAR file for the filter, security constraint, or other feature in the domain-dir`/lib` directory.
+. Edit the domain-dir`/config/default-web.xml` file to refer to the JAR file.
+. To apply your changes, restart Payara Server. See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
-1.  Place the JAR file for the filter, security constraint, or other
-feature in the domain-dir`/lib` directory.
-2.  Edit the domain-dir`/config/default-web.xml` file to refer to the
-JAR file.
-3.  To apply your changes, restart GlassFish Server. +
-See link:domains.html#ginqj[To Restart a Domain].
+[[redirecting-a-url]]
+== Redirecting a URL
 
-[[gixrb]][[GSADG00551]][[redirecting-a-url]]
+You can specify that a request for an old URL be treated as a request for a new URL. This is called redirecting a URL.
 
-Redirecting a URL
-~~~~~~~~~~~~~~~~~
+To specify a redirected URL for a virtual server, use the `redirect_n` property, where n is a positive integer that allows specification of more than one. Each of these `redirect_n` properties is inherited by all web applications deployed on the virtual server.
 
-You can specify that a request for an old URL be treated as a request
-for a new URL. This is called redirecting a URL.
+The value of each `redirect_n` property has two components which can be specified in any order:
 
-To specify a redirected URL for a virtual server, use the `redirect_n`
-property, where n is a positive integer that allows specification of
-more than one. Each of these `redirect_n` properties is inherited by all
-web applications deployed on the virtual server.
+* The first component, `from`, specifies the prefix of the requested URI to match.
+* The second component, `url-prefix`, specifies the new URL prefix to return to the client. The from prefix is replaced by this URL prefix.
 
-The value of each `redirect_n` property has two components which can be
-specified in any order:
-
-* The first component, `from`, specifies the prefix of the requested URI
-to match.
-* The second component, `url-prefix`, specifies the new URL prefix to
-return to the client. The from prefix is replaced by this URL prefix.
-
-[[GSADG00168]][[giyis]]
-
-
-Example 6-3 Redirecting a URL
 
 This example redirects `from` `dummy` to `etude`:
-
-[source,oac_no_warn]
+.Example 6-3 Redirecting a URL
+[source,shell]
 ----
 <property name="redirect_1" value="from=/dummy url-prefix=http://etude"/>
 ----
 
-[[gfaad]][[GSADG00552]][[administering-mod_jk]]
+[[administering-mod_jk]]
+== Administering `mod_jk`
 
-Administering `mod_jk`
-~~~~~~~~~~~~~~~~~~~~~~
+The Apache Tomcat Connector `mod_jk` can be used to connect the web container with web servers such as Apache HTTP Server. By using `mod_jk`, which comes with Payara Server, you can front Payara Server with Apache HTTP Server.
 
-The Apache Tomcat Connector `mod_jk` can be used to connect the web
-container with web servers such as Apache HTTP Server. By using
-`mod_jk`, which comes with GlassFish Server, you can front GlassFish
-Server with Apache HTTP Server.
-
-You can also use `mod_jk` directly at the JSP/servlet engine for load
-balancing. For more information about configuring `mod_jk` and Apache
-HTTP Server for load balancing with GlassFish Server 5.0 refer to
-"link:../ha-administration-guide/http-load-balancing.html#GSHAG00009[Configuring HTTP Load Balancing]" in GlassFish Server
+You can also use `mod_jk` directly at the JSP/servlet engine for load balancing. For more information about configuring `mod_jk` and Apache
+HTTP Server for load balancing with Payara Server 5.0 refer to xref:docs:ha-administration-guide/http-load-balancing.html#configuring-http-load-balancing[Configuring HTTP Load Balancing] in Payara Server
 Open Source Edition High Availability Administration Guide.
 
-The following topics are addressed here:
+[[to-enable-mod_jk]]
+=== To Enable `mod_jk`
 
-* link:#gixqw[To Enable `mod_jk`]
-* link:#gixpx[To Load Balance Using `mod_jk` and GlassFish Server]
-* link:#gjpat[To Enable SSL Between the `mod_jk` Load Balancer and the
-Browser]
-* link:#gjpan[To Enable SSL Between the `mod_jk` Load Balancer and
-GlassFish Server]
+You can front Payara Server with Apache HTTP Server by enabling the `mod_jk` protocol for one of Payara Server's network listeners, as described in this procedure. A typical use for `mod_jk` would be to have
+Apache HTTP Server handle requests for static resources, while having requests for dynamic resources, such as servlets and JavaServer Pages (JSPs), forwarded to, and handled by the Payara Server back-end instance.
 
-[[gixqw]][[GSADG00371]][[to-enable-mod_jk]]
+When you use the `jk-enabled` attribute of the network listener, you do not need to copy any additional JAR files into the `/lib` directory.
+You can also create JK connectors under different virtual servers by using the network listener attribute `jk-enabled`.
 
-To Enable `mod_jk`
-^^^^^^^^^^^^^^^^^^
-
-You can front GlassFish Server with Apache HTTP Server by enabling the
-`mod_jk` protocol for one of GlassFish Server's network listeners, as
-described in this procedure. A typical use for `mod_jk` would be to have
-Apache HTTP Server handle requests for static resources, while having
-requests for dynamic resources, such as servlets and JavaServer Pages
-(JSPs), forwarded to, and handled by the GlassFish Server back-end
-instance.
-
-When you use the `jk-enabled` attribute of the network listener, you do
-not need to copy any additional JAR files into the `/lib` directory. You
-can also create JK connectors under different virtual servers by using
-the network listener attribute `jk-enabled`.
-
-1.  Install Apache HTTP Server and `mod_jk`.
-* For information on installing Apache HTTP Server, see
-`http://httpd.apache.org/docs/2.2/install.html`.
-* For information on installing `mod_jk`, see
-`http://tomcat.apache.org/connectors-doc/webserver_howto/apache.html`.
-2.  Configure the following files:
+. Install Apache HTTP Server and `mod_jk`.
+* For information on installing Apache HTTP Server, see `http://httpd.apache.org/docs/2.2/install.html`.
+* For information on installing `mod_jk`, see `http://tomcat.apache.org/connectors-doc/webserver_howto/apache.html`.
+. Configure the following files:
 * `apache2/conf/httpd.conf`, the main Apache configuration file
-* `apache2/conf/workers.properties` +
-link:#gixrq[Example 6-4] and link:#gixqt[Example 6-5] provide examples
-of configuring these two files.
-3.  Start Apache HTTP Server (`httpd`).
-4.  Start GlassFish Server with at least one web application deployed. +
-In order for the `mod_jk`-enabled network listener to start listening
-for requests, the web container must be started. Normally, this is
-achieved by deploying a web application.
-5.  Create a jk-enabled network listener by using the
-link:../reference-manual/create-network-listener.html#GSRFM00046[`create-network-listener`] subcommand. +
-[source,oac_no_warn]
+* `apache2/conf/workers.properties` xref:docs:administration-guide:webapps.adoc#example-6-4[Example 6-4] and xref:docs:administration-guide:webapps.adoc#example-6-5[Example 6-5] provide examples of configuring these two files.
+. Start Apache HTTP Server (`httpd`).
+. Start Payara Server with at least one web application deployed. +
+In order for the `mod_jk`-enabled network listener to start listening for requests, the web container must be started. Normally, this is achieved by deploying a web application.
+. Create a jk-enabled network listener by using the xref:docs:reference-manual:create-network-listener.adoc[`create-network-listener`] subcommand.
++
+[source,shell]
 ----
 asadmin> create-network-listener --protocol http-listener-1 \
 --listenerport 8009 --jkenabled true jk-connector
 ----
-6.  If you are using the `glassfish-jk.properties` file to use
-non-default values of attributes described at
-`http://tomcat.apache.org/tomcat-5.5-doc/config/ajp.html`), set the
-`jk-configuration-file` property of the network listener to the
-fully-qualified file name of the `glassfish-jk.properties` file. +
-[source,oac_no_warn]
+. If you are using the `glassfish-jk.properties` file to use non-default values of attributes described at
+`http://tomcat.apache.org/tomcat-5.5-doc/config/ajp.html`), set the `jk-configuration-file` property of the network listener to the fully-qualified file name of the `glassfish-jk.properties` file.
++
+[source,shell]
 ----
 asadmin> set server-config.network-config.network-listeners.network-listener.\
 jk-connector.jk-configuration-file=domain-dir/config/glassfish-jk.properties
 ----
-7.  If you expect to need more than five threads for the listener,
-increase the maximum threads in the `http-thread-pool` pool: +
-[source,oac_no_warn]
+. If you expect to need more than five threads for the listener, increase the maximum threads in the `http-thread-pool` pool:
++
+[source,shell]
 ----
 asadmin> set configs.config.server-config.thread-pools.thread-pool.\
 http-thread-pool.max-thread-pool-size=value
 ----
-8.  To apply your changes, restart GlassFish Server. +
-See link:domains.html#ginqj[To Restart a Domain].
+. To apply your changes, restart Payara Server. + See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
-[[GSADG00169]][[gixrq]]
+[[example-6-4]]
+==== Example 6-4 `httpd.conf` File for `mod_jk`
 
+This example shows an `httpd.conf` file that is set for `mod_jk`. In this example, `mod_jk` used as a simple pass-through.
 
-Example 6-4 `httpd.conf` File for `mod_jk`
-
-This example shows an `httpd.conf` file that is set for `mod_jk`. In
-this example, `mod_jk` used as a simple pass-through.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 LoadModule jk_module /usr/lib/httpd/modules/mod_jk.so
 JkWorkersFile /etc/httpd/conf/worker.properties
@@ -322,14 +195,12 @@ JkMount /glassfish-test/* worker1
 
 [[GSADG00170]][[gixqt]]
 
+[[example-6-5]]
+==== Example 6-5 `workers.properties` File for `mod_jk`
 
-Example 6-5 `workers.properties` File for `mod_jk`
+This example shows a `workers.properties` that is set for `mod_jk`. This `workers.properties` file is referenced in the second line of xref:docs:administration-guide:webapps.adoc#example-6-4[Example 6-4].
 
-This example shows a `workers.properties` that is set for `mod_jk`. This
-`workers.properties` file is referenced in the second line of
-link:#gixrq[Example 6-4].
-
-[source,oac_no_warn]
+[source,shell]
 ----
 # Define 1 real worker using ajp13
 worker.list=worker1
@@ -339,58 +210,37 @@ worker.worker1.host=localhost
 worker.worker1.port=8009
 ----
 
-[[GSADG858]]
+* For more information on Apache, see `http://httpd.apache.org/`.
+* For more information on Apache Tomcat Connector, see `http://tomcat.apache.org/connectors-doc/index.html`.
 
-See Also
+[[to-load-balance-using-mod_jk-and-payara-server]]
+=== To Load Balance Using `mod_jk` and Payara Server
 
-For more information on Apache, see `http://httpd.apache.org/`.
+Load balancing is the process of dividing the amount of work that a computer has to do between two or more computers so that more work gets done in the same amount of time. Load balancing can be configured with or without security.
 
-For more information on Apache Tomcat Connector, see
-`http://tomcat.apache.org/connectors-doc/index.html`.
+In order to support stickiness, the Apache `mod_jk` load balancer relies on a `jvmRoute` system property that is included in any `JSESSIONID`
+received by the load balancer. This means that every Payara Server instance that is front-ended by the Apache load balancer must be configured with a unique `jvmRoute` system property.
 
-[[gixpx]][[GSADG00372]][[to-load-balance-using-mod_jk-and-glassfish-server]]
+.  On each of the instances, perform the steps in xref:docs:administration-guide:webapps.adoc#to-enable-mod_jk[To Enable `mod_jk`]. +
+If your instances run on the same machine, you must choose different JK ports. The ports must match `worker.worker*.port` in your `workers.properties` file. See the properties file in xref:docs:administration-guide:webapps.adoc#example-6-5[Example 6-5].
 
-To Load Balance Using `mod_jk` and GlassFish Server
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Load balancing is the process of dividing the amount of work that a
-computer has to do between two or more computers so that more work gets
-done in the same amount of time. Load balancing can be configured with
-or without security.
-
-In order to support stickiness, the Apache `mod_jk` load balancer relies
-on a `jvmRoute` system property that is included in any `JSESSIONID`
-received by the load balancer. This means that every GlassFish Server
-instance that is front-ended by the Apache load balancer must be
-configured with a unique `jvmRoute` system property.
-
-1.  On each of the instances, perform the steps in link:#gixqw[To Enable
-`mod_jk`]. +
-If your instances run on the same machine, you must choose different JK
-ports. The ports must match `worker.worker*.port` in your
-`workers.properties` file. See the properties file in
-link:#gixqt[Example 6-5].
-2.  On each of the instances, create the `jvmRoute` system property of
-GlassFish Server by using the link:../reference-manual/create-jvm-options.html#GSRFM00042[`create-jvm-options`]
-subcommand. +
-Use the following format: +
-[source,oac_no_warn]
+. On each of the instances, create the `jvmRoute` system property of Payara Server by using the xref:docs:reference-manual:create-jvm-options.adoc[`create-jvm-options`] subcommand. +
+Use the following format:
++
+[source,shell]
 ----
 asadmin> create-jvm-options "-DjvmRoute=/instance-worker-name"/
 ----
 where instance-worker-name is the name of the worker that you defined to
 represent the instance in the `workers.properties` file.
-3.  To apply your changes, restart Apache HTTP Server and GlassFish
-Server.
+. To apply your changes, restart Apache HTTP Server and Payara Server.
 
-[[GSADG00171]][[gjjzu]]
-
-
-Example 6-6 `httpd.conf` File for Load Balancing
+[[example-6-6]]
+==== Example 6-6 `httpd.conf` File for Load Balancing
 
 This example shows an `httpd.conf` file that is set for load balancing.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 LoadModule jk_module /usr/lib/httpd/modules/mod_jk.so 
 JkWorkersFile /etc/httpd/conf/worker.properties 
@@ -410,16 +260,12 @@ JkMount /*.jsp worker1
 JkMount /glassfish-test/* loadbalancer
 ----
 
-[[GSADG00172]][[gjjzf]]
+[[example-6-7]]
+==== Example 6-7 `workers.properties` File for Load Balancing
 
+This example shows a `workers.properties` or `glassfish-jk.properties` file that is set for load balancing. The `worker.worker*.port` should match with JK ports you created.
 
-Example 6-7 `workers.properties` File for Load Balancing
-
-This example shows a `workers.properties` or `glassfish-jk.properties`
-file that is set for load balancing. The `worker.worker*.port` should
-match with JK ports you created.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 worker.list=worker1,worker2,loadbalancer
 worker.worker1.type=ajp13
@@ -438,52 +284,41 @@ worker.loadbalancer.type=lb
 worker.loadbalancer.balance_workers=worker1,worker2
 ----
 
-[[gjpat]][[GSADG00373]][[to-enable-ssl-between-the-mod_jk-load-balancer-and-the-browser]]
+[[to-enable-ssl-between-the-mod_jk-load-balancer-and-the-browser]]
+=== To Enable SSL Between the `mod_jk` Load Balancer and the Browser
 
-To Enable SSL Between the `mod_jk` Load Balancer and the Browser
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To activate security for `mod_jk` on Payara Server, you must first generate a Secure Socket Layer (SSL) self-signed certificate on the Apache HTTP Server with the `mod_ssl` module. The tasks include generating a private key, a Certificate Signing Request (CSR), a self-signed certificate, and configuring SSL-enabled virtual hosts.
 
-To activate security for `mod_jk` on GlassFish Server, you must first
-generate a Secure Socket Layer (SSL) self-signed certificate on the
-Apache HTTP Server with the `mod_ssl` module. The tasks include
-generating a private key, a Certificate Signing Request (CSR), a
-self-signed certificate, and configuring SSL-enabled virtual hosts.
+Before You Begin, The `mod_jk` connector must be enabled.
 
-[[GSADG859]]
-
-Before You Begin
-
-The `mod_jk` connector must be enabled.
-
-1.  Generate the private key as follows: +
-[source,oac_no_warn]
+. Generate the private key as follows: +
+[source,shell]
 ----
 openssl genrsa -des3 -rand file1:file2:file3:file4:file5 -out server.key 1024
 ----
 where `file1:file2:` and so on represents the random compressed files.
-2.  Remove the pass-phrase from the key as follows: +
-[source,oac_no_warn]
+. Remove the pass-phrase from the key as follows: +
+[source,shell]
 ----
 openssl rsa -in server.key -out server.pem 
 ----
-3.  Generate the CSR is as follows: +
-[source,oac_no_warn]
+. Generate the CSR is as follows: +
+[source,shell]
 ----
 openssl req -new -key server.pem -out server.csr
 ----
 Enter the information you are prompted for.
-4.  Generate a temporary certificate as follows: +
-[source,oac_no_warn]
+. Generate a temporary certificate as follows: +
+[source,shell]
 ----
 openssl x509 -req -days 60 -in server.csr -signkey server.pem -out server.crt
 ----
 This temporary certificate is good for 60 days.
-5.  Create the `http-ssl.conf` file under the `/etc/apache2/conf.d`
-directory.
-6.  In the `http-ssl.conf` file, add one of the following redirects:
+. Create the `http-ssl.conf` file under the `/etc/apache2/conf.d` directory.
+. In the `http-ssl.conf` file, add one of the following redirects:
 * Redirect a web application, for example, `JkMount /hello/* worker1`.
 * Redirect all requests, for example, `JkMount /* worker1`. +
-[source,oac_no_warn]
+[source,shell]
 ----
 # Send all jsp requests to GlassFish
 JkMount /*.jsp worker1
@@ -491,15 +326,12 @@ JkMount /*.jsp worker1
 JkMount /glassfish-test/* loadbalancer 
 ----
 
-[[GSADG00173]][[gjpnc]]
+[[example-6-8]]
+==== Example 6-8 `http-ssl.conf` File for `mod_jk` Security
 
+A basic SSL-enabled virtual host will appear in the `http-ssl.conf` file. In this example, all requests are redirected.
 
-Example 6-8 `http-ssl.conf` File for `mod_jk` Security
-
-A basic SSL-enabled virtual host will appear in the `http-ssl.conf`
-file. In this example, all requests are redirected.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 Listen 443
 <VirtualHost _default_:443>
@@ -511,37 +343,24 @@ JkMount /* worker1
 </VirtualHost>
 ----
 
-[[gjpan]][[GSADG00374]][[to-enable-ssl-between-the-mod_jk-load-balancer-and-glassfish-server]]
+[[to-enable-ssl-between-the-mod_jk-load-balancer-and-payara-server]]
+=== To Enable SSL Between the `mod_jk` Load Balancer and Payara Server
 
-To Enable SSL Between the `mod_jk` Load Balancer and GlassFish Server
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This procedure does not enable SSL transfer between `mod_jk` and Payara Server. It enables `mod_jk` to forward SSL-encrypted information from the browser to Payara Server.
 
-This procedure does not enable SSL transfer between `mod_jk` and
-GlassFish Server. It enables `mod_jk` to forward SSL-encrypted
-information from the browser to GlassFish Server.
+Before You Begin, The self-signed certificate must be configured.
 
-[[GSADG860]]
-
-Before You Begin
-
-The self-signed certificate must be configured.
-
-1.  Perform the steps in link:#gixqw[To Enable `mod_jk`].
-2.  Start another GlassFish Server with at least one web application
-deployed. +
-In order for the `mod_jk`-enabled network listener to start listening
-for requests, the web container must be started. Normally, this is
-achieved by deploying a web application.
-3.  Follow instructions from link:http_https.html#ggnbj[To Configure an
-HTTP Listener for SSL] on the `mod_jk` connector. +
+. Perform the steps in xref:docs:administration-guide:webapps.adoc#to-enable-mod_jk[To Enable `mod_jk`].
+. Start another Payara Server with at least one web application deployed. +
+In order for the `mod_jk`-enabled network listener to start listening for requests, the web container must be started. Normally, this is achieved by deploying a web application.
+. Follow instructions from xref:docs:administration-guide:http_https.adoc#to-configure-an-http-listener-for-ssl[To Configure and HTTP Listener for SSL] on the `mod_jk` connector. +
 Use the following format: +
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> create-ssl --type http-listener --certname sampleCert new-listener
 ----
-4.  Add the following directives in the `httpd.conf` file under the
-`/etc/apache2/conf.d` directory: +
-[source,oac_no_warn]
+. Add the following directives in the `httpd.conf` file under the `/etc/apache2/conf.d` directory: +
+[source,shell]
 ----
 # Should mod_jk send SSL information (default is On)
 JkExtractSSL On
@@ -554,40 +373,22 @@ JkCIPHERIndicator SSL_CIPHER
 # What is the indicator for the client SSL certificated? (default is SSL_CLIENT_CERT )
 JkCERTSIndicator SSL_CLIENT_CERT
 ----
-5.  To apply your changes, restart Apache HTTP Server and GlassFish
-Server.
+5.  To apply your changes, restart Apache HTTP Server and Payara Server.
 
-[[CIHJDAJD]][[GSADG861]][[administering-mod_proxy_ajp]]
+[[administering-mod_proxy_ajp]]
+== Administering `mod_proxy_ajp`
 
-Administering `mod_proxy_ajp`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The Apache Connector `mod_proxy_ajp` can be used to connect the web
-container with Apache HTTP Server. By using `mod_proxy_ajp`, you can
-front GlassFish Server with Apache HTTP Server.
-
-[[GSADG862]][[sthref21]]
-
+The Apache Connector `mod_proxy_ajp` can be used to connect the web container with Apache HTTP Server. By using `mod_proxy_ajp`, you can front Payara Server with Apache HTTP Server.
 
 [[to-enable-mod_proxy_ajp]]
-To Enable `mod_proxy_ajp`
-^^^^^^^^^^^^^^^^^^^^^^^^^
+=== To Enable `mod_proxy_ajp`
 
-You can front GlassFish Server with Apache HTTP Server and its
-`mod_proxy_ajp` connector by enabling the AJP protocol for one of
-GlassFish Server's network listeners, as described in this procedure. A
-typical use for `mod_proxy_ajp` would be to have Apache HTTP Server
-handle requests for static resources, while having requests for dynamic
-resources, such as servlets and JavaServer Pages (JSPs), forwarded to,
-and handled by the GlassFish Server back-end instance.
+You can front Payara Server with Apache HTTP Server and its `mod_proxy_ajp` connector by enabling the AJP protocol for one of Payara Server's network listeners, as described in this procedure.
+A typical use for `mod_proxy_ajp` would be to have Apache HTTP Server handle requests for static resources, while having requests for dynamic resources, such as servlets and JavaServer Pages (JSPs), forwarded to, and handled by the Payara Server back-end instance.
 
-1.  Install Apache HTTP Server. +
-For information on installing Apache HTTP Server, see
-`http://httpd.apache.org/docs/2.2/install.html`.
-2.  Configure `apache2/conf/httpd.conf`, the main Apache configuration
-file. +
-For example: +
-[source,oac_no_warn]
+. Install Apache HTTP Server. For information on installing Apache HTTP Server, see `http://httpd.apache.org/docs/2.2/install.html`.
+. Configure `apache2/conf/httpd.conf`, the main Apache configuration file. For example: +
+[source,shell]
 ----
 LoadModule proxy_module /usr/lib/httpd/modules/mod_proxy.so
 LoadModule proxy_ajp_module /usr/lib/httpd/modules/mod_proxy_ajp.so
@@ -609,66 +410,41 @@ NameVirtualHost *:1979
    ProxyPassReverse / ajp://localhost:8009/
 </VirtualHost>
 ----
-3.  Start Apache HTTP Server (`httpd`).
-4.  Create a jk-enabled network listener by using the
-`create-network-listener` subcommand. +
-[source,oac_no_warn]
+. Start Apache HTTP Server (`httpd`).
+. Create a jk-enabled network listener by using the `create-network-listener` subcommand. +
+[source,shell]
 ----
 asadmin> create-network-listener --protocol http-listener-1 \
 --listenerport 8009 --jkenabled true jk-connector
 ----
-5.  If you expect to need more than five threads for the listener,
-increase the maximum threads in the `http-thread-pool` pool: +
-[source,oac_no_warn]
+. If you expect to need more than five threads for the listener, increase the maximum threads in the `http-thread-pool` pool: +
+[source,shell]
 ----
 asadmin> set configs.config.server-config.thread-pools.thread-pool.\
 http-thread-pool.max-thread-pool-size=value
 ----
-6.  To apply your changes, restart GlassFish Server. +
-See link:domains.html#ginqj[To Restart a Domain].
+. To apply your changes, restart Payara Server. +
+See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
-[[GSADG863]]
-
-See Also
-
-For more information on Apache, see `http://httpd.apache.org/`.
-
-For more information on the Apache `mod_proxy_ajp` Connector, see
-`http://httpd.apache.org/docs/2.1/mod/mod_proxy.html` and
-`http://httpd.apache.org/docs/2.1/mod/mod_proxy_ajp.html`.
-
-For more information on the AJP protocol, see
-`http://tomcat.apache.org/connectors-doc/ajp/ajpv13a.html`.
-
-[[GSADG1049]][[sthref22]]
+* For more information on Apache, see `http://httpd.apache.org/`.
+* For more information on the Apache `mod_proxy_ajp` Connector, see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html and https://httpd.apache.org/docs/2.4/mod/mod_proxy_ajp.html.
+* For more information on the AJP protocol, see http://tomcat.apache.org/connectors-doc/ajp/ajpv13a.html.
 
 
-[[to-load-balance-using-mod_proxy_ajp-and-glassfish-server]]
-To Load Balance Using `mod_proxy_ajp` and GlassFish Server
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[to-load-balance-using-mod_proxy_ajp-and-payara-server]]
+=== To Load Balance Using `mod_proxy_ajp` and Payara Server
 
-Load balancing is the process of dividing the amount of work that a
-computer has to do between two or more computers so that more work gets
-done in the same amount of time. In the GlassFish Server context, load
-balancing is most frequently used to distribute work among the instances
-in a GlassFish Server cluster.
+Load balancing is the process of dividing the amount of work that a computer has to do between two or more computers so that more work gets done in the same amount of time.
+In the Payara Server context, load balancing is most frequently used to distribute work among the instances in a Payara Server cluster.
 
-To configure load balancing using `mod_proxy_ajp`, you must use the
-`mod_proxy_balancer` Apache module in addition to `mod_proxy_ajp`.
+To configure load balancing using `mod_proxy_ajp`, you must use the `mod_proxy_balancer` Apache module in addition to `mod_proxy_ajp`.
 
-In order to support stickiness, the `mod_proxy_balancer` load balancer
-relies on a `jvmRoute` system property that is included in any
-`JSESSIONID` received by the load balancer. Consequently, every
-GlassFish Server instance that is front-ended by the Apache load
-balancer must be configured with a unique `jvmRoute` system property.
+In order to support stickiness, the `mod_proxy_balancer` load balancer relies on a `jvmRoute` system property that is included in any `JSESSIONID` received by the load balancer.
+ Consequently, every Payara Server instance that is front-ended by the Apache load balancer must be configured with a unique `jvmRoute` system property.
 
-1.  Install Apache HTTP Server. +
-For information on installing Apache HTTP Server, see
-`http://httpd.apache.org/docs/2.2/install.html`.
-2.  [[BABIFEEC]] +
-Configure `apache2/conf/httpd.conf`, the main Apache configuration file. +
-For example: +
-[source,oac_no_warn]
+. Install Apache HTTP Server. For information on installing Apache HTTP Server, see http://httpd.apache.org/docs/2.2/install.html
+. Configure `apache2/conf/httpd.conf`, the main Apache configuration file. For example: +
+[source,shell]
 ----
 LoadModule proxy_module /usr/lib/httpd/modules/mod_proxy.so
 LoadModule proxy_ajp_module /usr/lib/httpd/modules/mod_proxy_ajp.so
@@ -685,7 +461,7 @@ ProxyPreserveHost On
       Allow from localhost
    </Proxy>
  
-# Each BalancerMember corresponds to an instance in the GlassFish Server
+# Each BalancerMember corresponds to an instance in the Payara Server
 # cluster. The port specified for each instance must match the ajp port
 # specified for that instance.
 <Proxy balancer://localhost>
@@ -694,38 +470,29 @@ ProxyPreserveHost On
     BalancerMember ajp://localhost:8011
 </Proxy>
 ----
-3.  Start Apache HTTP Server (`httpd`).
-4.  In GlassFish Server, use the `create-network-listener` subcommand to
-create a jk-enabled network listener targeted to the cluster. +
-For example: +
-[source,oac_no_warn]
+. Start Apache HTTP Server (`httpd`).
+. In Payara Server, use the `create-network-listener` subcommand to create a jk-enabled network listener targeted to the cluster. For example: +
+[source,shell]
 ----
 asadmin> create-network-listener --jkenabled true --target cluster1 \
 --protocol http-listener-1 --listenerport ${AJP_PORT} jk-listener
 ----
-In this example, `cluster1` is the name of the cluster and `jk-listener`
-is the name of the new listener.
-5.  If you expect to need more than five threads for the listener,
-increase the maximum threads in the `http-thread-pool` pool: +
-[source,oac_no_warn]
+In this example, `cluster1` is the name of the cluster and `jk-listener` is the name of the new listener.
+. If you expect to need more than five threads for the listener, increase the maximum threads in the `http-thread-pool` pool: +
+[source,shell]
 ----
 asadmin> set configs.config.cluster1-config.thread-pools.thread-pool.\
 http-thread-pool.max-thread-pool-size=value
 ----
-6.  Use the `create-jvm-options` subcommand to create the `jvmRoute`
-property targeted to the cluster. +
-For example: +
-[source,oac_no_warn]
+. Use the `create-jvm-options` subcommand to create the `jvmRoute` property targeted to the cluster. For example: +
+[source,shell]
 ----
 asadmin> create-jvm-options --target cluster1 \
 "-DjvmRoute=\${AJP_INSTANCE_NAME}"
 ----
-7.  Use the `create-system-properties` subcommand to define the
-`AJP_PORT` and `AJP_INSTANCE_NAME` properties for each of the instances
-in the cluster, making sure to match the port values you used in
-Step link:#BABIFEEC[2] when specifying the load balancer members. +
-For example: +
-[source,oac_no_warn]
+. Use the `create-system-properties` subcommand to define the `AJP_PORT` and `AJP_INSTANCE_NAME` properties for each of the instances
+in the cluster, making sure to match the port values you used in Step 2 when specifying the load balancer members. For example: +
+[source,shell]
 ----
 asadmin> create-system-properties --target instance1 AJP_PORT=8009
 asadmin> create-system-properties --target instance1 \
@@ -737,9 +504,8 @@ asadmin> create-system-properties --target instance3 AJP_PORT=8011
 asadmin> create-system-properties --target instance3 \
 AJP_INSTANCE_NAME=instance3
 ----
-In this example, `instance1`, `instance2` and `instance3` are the names
-of the GlassFish Server instances in the cluster.
-8.  To apply your changes, restart GlassFish Server. +
-See link:domains.html#ginqj[To Restart a Domain].
+In this example, `instance1`, `instance2` and `instance3` are the names of the Payara Server instances in the cluster.
+. To apply your changes, restart Payara Server. +
+See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 
