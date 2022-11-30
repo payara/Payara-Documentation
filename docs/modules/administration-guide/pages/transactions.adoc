@@ -8,7 +8,7 @@ Instructions for accomplishing the tasks in this chapter by using the Administra
 For more information about the Java Transaction API (JTA) and Java
 Transaction Service (JTS), see the following sites:
 `http://www.oracle.com/technetwork/java/javaee/tech/jta-138684.html` and
-#fix#`http://www.oracle.com/technetwork/java/javaee/tech/jts-140022.html`.
+`https://docs.oracle.com/cd/E19920-01/820-5584/ahsbo/index.html`.
 
 You might also want to read https://javaee.github.io/tutorial/transactions.html[Transactions] in The Jakarta EE 8 Tutorial.
 
@@ -53,8 +53,7 @@ The application might use declarative transaction attribute settings for enterpr
 There are three types of transaction resource managers:
 
 * *Databases* - Use of transactions prevents databases from being left in inconsistent states due to incomplete updates. For information about JDBC transaction isolation levels, see xref:docs:application-development-guide:transaction-service.adoc#using-jdbc-transaction-isolation-levels[Using JDBC Transaction Isolation Levels]" in Payara Server Open Source Edition Application Development Guide. +
-The Payara Server supports a variety of JDBC XA drivers. For a list of the JDBC drivers currently supported by the Payara Server, see the
-xref:docs:release-notes:toc.html[Payara Server Open Source Edition Release Notes]. For configurations of supported and other drivers, see xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
+The Payara Server supports a variety of JDBC XA drivers. For configurations of supported and other drivers, see xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 
 * *Java Message Service (JMS) Providers* - Use of transactions ensures that messages are reliably delivered. The Payara Server is integrated with Open Message Queue, a fully capable JMS provider.
 For more information about transactions and the JMS API, see xref:docs:administration-guide:jms.adoc#administering-the-java-message-service-jms[Administering the Java Message Service (JMS)].
@@ -136,8 +135,7 @@ Default property values are shown where they exist. For `db-logging-resource` an
 ** The `db-logging-resource` property does not have a default value. It is unset by default. However, if you set `db-logging-resource` to an empty value, the value used is `jdbc/TxnDS`.
 
 ** The `xa-servername` property does not have a default value. Use this property to override server names that can cause errors. +
-You can use the xref:docs:reference-manual:get.adoc[`get`] subcommand to list all the transaction service attributes and the properties that have been set.
-For details, see the xref:docs:reference-manual:toc.html[Payara Server Open Source Edition Reference Manual]. +
+You can use the xref:docs:reference-manual:get.adoc[`get`] subcommand to list all the transaction service attributes and the properties that have been set. +
 Changing `keypoint-interval`, `retry-timeout-in-seconds`, or `timeout-in-seconds` does not require a server restart. Changing other attributes or properties requires a server restart.
 * You can also set the following system properties: +
 [source,shell]
@@ -277,12 +275,12 @@ For manual transaction recovery to work properly, transaction logs must be store
 When you execute `recover-transactions` in non-delegated mode, you can recover transactions that didn't complete two-phase commit because of a resource crash. To use manual transaction recovery in this way, the following conditions must be met:
 
 * The `recover-transactions` command should be executed after the resource is restarted.
-* Connection validation should be enabled so the connection pool is refreshed when the resource is accessed after the recovery. For more information, see #fix# xref:docs:performance-tuning-guide:tuning-glassfish.adoc#connection-validation-settings[Connection Validation Settings] in Payara Server Open Source Edition Performance Tuning Guide.
+* Connection validation should be enabled so the connection pool is refreshed when the resource is accessed after the recovery. For more information, see xref:docs:performance-tuning-guide:tuning-glassfish.adoc#connection-validation-settings[Connection Validation Settings] in Payara Server Open Source Edition Performance Tuning Guide.
 
 If commit fails during recovery, a message is written to the server log.
 
 NOTE: A JMS resource crash is handled the same way as any other resource. +
-You can list in-doubt Open Message Queue transactions using the `imqcmd list txn` subcommand. For more information, see #fix#[Managing Transactions] in Open Message Queue Administration Guide.
+You can list in-doubt Open Message Queue transactions using the `imqcmd list txn` subcommand.
 
 . Ensure that the server is running. Remote subcommands require a running server.
 . Manually recover transactions by using the xref:docs:reference-manual:recover-transactions.adoc[`recover-transactions`] subcommand.
@@ -463,11 +461,3 @@ You can also set JVM options in the Administration Console. Select the JVM Setti
 These flags and their statements must also be quoted in the Administration Console. For example:
 
 `'-Dcom.sun.jts.dblogging.deletequery=delete from txn_log_table where gtrid = ?'`
-
-
-For information about JDBC connection pools and resources, see
-xref:docs:administration-guide:jdbc.adoc#administering-database-connectivity[Administering Database Connectivity]. For more
-information about the `asadmin set` and `asadmin create-jvm-options`
-commands, see the xref:docs:reference-manual:toc.adoc[Payra Server Open Source Edition Reference Manual]. For databases with which transaction logging has been tested, see the Payara Server Open Source Edition Release Notes.
-
-

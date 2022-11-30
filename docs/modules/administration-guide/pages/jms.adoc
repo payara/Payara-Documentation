@@ -31,7 +31,7 @@ JMS Physical Destinations::
 [[jms-service-high-availability]]
 === JMS Service High Availability
 
-Just as Payara Server supports clusters of instances to provide high availability, Message Queue supports clusters of brokers to provide service availability or service and data availability, depending on the type of broker cluster, as described in #broken link#[Broker Clusters]" in Open Message Queue Technical Overview.
+Just as Payara Server supports clusters of instances to provide high availability, Message Queue supports clusters of brokers to provide service availability or service and data availability, depending on the type of broker cluster, as described in [Broker Clusters] in Open Message Queue Technical Overview.
 
 The JMS service takes advantage of this Message Queue capability and automatically creates and manages a Message Queue broker cluster when a Payara cluster's configuration specifies Embedded or Local type JMS hosts. Additionally, both Payara clusters and standalone instances can use Message Queue broker clusters as Remote type JMS hosts.
 
@@ -55,7 +55,7 @@ The attributes you can set are:
 `init-timeout-in-seconds`::
   The number of seconds Payara Server waits for the JMS service to start before aborting the startup.
 `start-args`::
-  A list of arguments the JMS service passes to Embedded and Local type JMS hosts on startup. Permissible arguments are the options supported by the Message Queue `imqbrokerd` command, as described in #fix# "link:../../openmq/mq-admin-guide/command-line-reference.html#GMADG00280[Broker Utility]" in Open Message Queue Administration Guide.
+  A list of arguments the JMS service passes to Embedded and Local type JMS hosts on startup. Permissible arguments are the options supported by the Message Queue `imqbrokerd` command, as described in "link:../../openmq/mq-admin-guide/command-line-reference.html#GMADG00280[Broker Utility]" in Open Message Queue Administration Guide.
 `default-jms-host`::
   The name of the default JMS host.
 `reconnect-enabled`::
@@ -74,7 +74,7 @@ The attributes you can set are:
   The number of times the JMS service iterates through the AddressList in an effort to establish (or reestablish) a connection. A value of -1 indicates that the number of attempts is unlimited.
 `mq-scheme`::
 `mq-service`::
-  The Message Queue address scheme name and connection service name to use for the AddressList if a non-default scheme or service is to be used. See  #fix# "link:../../openmq/mq-admin-guide/administered-object-attributes.html#GMADG00622[Connection Handling]" in Open Message Queue Administration Guide for syntax information.
+  The Message Queue address scheme name and connection service name to use for the AddressList if a non-default scheme or service is to be used. See "link:../../openmq/mq-admin-guide/administered-object-attributes.html#GMADG00622[Connection Handling]" in Open Message Queue Administration Guide for syntax information.
 
 NOTE: After making changes to the JMS service configuration, Payara Server instances that use the configuration must be restarted in order for the changes to be propagated.
 
@@ -114,7 +114,7 @@ Embedded Type::
 Local Type::
   When the JMS service configuration's `type` attribute is `LOCAL`, the JMS service starts the MQ broker specified in the configuration as the default JMS host in a separate process on the same host as the Payara server instance. The JMS service manages its configuration and lifecycle. For this type, the JMS service starts the broker immediately when the Payara instance is started. The JMS service provides the Message Queue broker an additional port to start the RMI registry. This port number is equal to the broker's JMS port plus 100. For example, if the JMS port number is 37676, then the additional port's number will be 37776. Additionally, the `start-args` property of the JMS service configuration can be used to specify Message Queue broker startup options.
 Remote Type::
-  When the JMS service configuration's `type` attribute is `REMOTE`, the JMS service uses the information defined by the default JMS host to communicate with an MQ broker or broker cluster that has been configured and started using Message Queue tools, as described in the #fix#[Open Message Queue Administration Guide]. Ongoing administration and tuning of the broker or broker cluster are also performed using Message Queue tools.
+  When the JMS service configuration's `type` attribute is `REMOTE`, the JMS service uses the information defined by the default JMS host to communicate with an MQ broker or broker cluster that has been configured and started using Message Queue tools. Ongoing administration and tuning of the broker or broker cluster are also performed using Message Queue tools.
 
 [[configuring-embedded-and-local-jms-hosts]]
 === Configuring Embedded and Local JMS Hosts
@@ -310,7 +310,7 @@ For each JMS connection factory that you create, Payara Server creates a connect
 
 Use the `create-jms-resource` command in remote `asadmin` mode to create a JMS connection factory resource or a destination resource.
 
-TIP: To specify the `addresslist` property (in the format `host:mqport,host2:mqport,host3:mqport`) for the `asadmin create-jms-resource` command, escape the : by using `\\`. For example, `host1\\:mqport,host2\\:mqport,host3\\:mpqport`. For more information about using escape characters, see the #fix# olink:GSRFM00263[`asadmin`(1M)] help page.
+TIP: To specify the `addresslist` property (in the format `host:mqport,host2:mqport,host3:mqport`) for the `asadmin create-jms-resource` command, escape the : by using `\\`. For example, `host1\\:mqport,host2\\:mqport,host3\\:mpqport`.
 
 To update a JMS connection factory, use the `set` subcommand for the underlying connector connection pool, See xref:docs:administration-guide:connectors.adoc#to-update-a-connector-connection-pool[To Update a Connector Connection Pool].
 
@@ -419,7 +419,7 @@ If a message-driven bean is deployed and the physical destination it listens to 
 
 For production purposes, always create physical destinations. During the development and testing phase, however, this step is not required. Use the `create-jmsdest` subcommand in remote `asadmin` mode to create a physical destination.
 
-Because a physical destination is actually a Message Queue object rather than a server object, you use Message Queue broker commands to update properties. For information on Message Queue properties, see the #fix# [Open Message Queue Administration Guide].
+Because a physical destination is actually a Message Queue object rather than a server object, you use Message Queue broker commands to update properties.
 
 . Ensure that the server is running. Remote `asadmin` subcommands require a running server.
 . Create a JMS physical destination by using the xref:docs:reference-manual:create-jmsdest.adoc[`create-jmsdest`] subcommand. +
@@ -531,7 +531,7 @@ asadmin set domain1.jms-service.reconnect-interval-in-seconds=5
 [[using-the-generic-resource-adapter-for-jms-to-integrate-supported-external-jms-providers]]
 == Using the Generic Resource Adapter for JMS to Integrate Supported External JMS Providers
 
-Payara Server supports the integration and use of Oracle WebLogic JMS and IBM WebSphere MQ JMS providers through the use of the Generic Resource Adapter for JMS (GenericJMSRA). This Java EE connector 1.5 resource adapter can wrap the JMS client library of Oracle WebLogic JMS and IBM WebSphere MQ and make it available for use by GlassFish. The adapter is a `.rar` archive that can be deployed and configured using Payara Server administration tools.
+Payara Server supports the integration and use of Oracle WebLogic JMS and IBM WebSphere MQ JMS providers through the use of the Generic Resource Adapter for JMS (GenericJMSRA). This Java EE connector 1.5 resource adapter can wrap the JMS client library of Oracle WebLogic JMS and IBM WebSphere MQ and make it available for use by Payara. The adapter is a `.rar` archive that can be deployed and configured using Payara Server administration tools.
 
 [[configuring-genericjmsra-for-supported-external-jms-providers]]
 === Configuring GenericJMSRA for Supported External JMS Providers
@@ -718,7 +718,7 @@ There are a couple of methods to deploy the WebLogic Thin T3 client in Payara Se
 ==== *Configure WebLogic JMS Resources for Integration*
 
 If you need to configure the necessary WebLogic JMS resources on the
-WebLogic Server from which you want to access messages using GlassFish
+WebLogic Server from which you want to access messages using Payara
 Server, then follow the instructions in the WebLogic Server
 documentation for configuring the necessary resources, such as
 destinations, and connection factories.
@@ -1278,8 +1278,7 @@ Therefore, you will need to change the administered object names to suit your in
 Before You Begin, If WebSphere MQ created a user and a group named `mqm` during the installation, then you must specify a password for the `mqm` user using the `$ passwd mqm` command.
 
 #fix# image:img/websphere-mq.png[
-"This graphic represents all of the administered objects created in this
-example configuration."]
+"This graphic represents all of the administered objects created in this example configuration."]
 
 . Switch to the `mqm` user: `$ su mqm`
 . For Linux, set the following kernel version: `$ export LD_ASSUME_KERNEL=2.2.5`
