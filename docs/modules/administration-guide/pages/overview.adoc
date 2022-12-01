@@ -1,14 +1,14 @@
-=== Overview of GlassFish Server Administration
+=== Overview of Payara Server Administration
 
-GlassFish Server Open Source Edition provides a server for developing
+Payara Server provides a server for developing
 and deploying Java Platform Enterprise Edition (Java EE) applications
 and web Java Web Services.
-
-As an administrator ofGlassFish Server, your main responsibilities are
-to establish a secure GlassFish Server environment and to oversee the
+ 
+As an administrator of Payara Server, your main responsibilities are
+to establish a secure Payara Server environment and to oversee the
 services, resources, and users that participate in that environment.
 Your key tasks include configuring resources and services, managing
-GlassFish Server at runtime, and fixing problems that are associated
+Payara Server at runtime, and fixing problems that are associated
 with the server. You might also be involved in installing software,
 integrating add-on components, and deploying applications.
 
@@ -18,7 +18,7 @@ integrating add-on components, and deploying applications.
 After installation, you might need to perform some immediate
 configuration tasks to make your installation function as intended. If
 configuration defaults have been accepted, some features are enabled and
-some not. For an overview of initial configuration tasks for GlassFish
+some not. For an overview of initial configuration tasks for Payara
 Server services and resources, see xref:docs:administration-guide:overview.adoc#initial-configuration-tasks[Initial Configuration Tasks].
 
 In addition, you might want to reset default passwords, change names or
@@ -28,7 +28,7 @@ administration values.
 [NOTE]
 =======================================================================
 
-For the zip bundle of GlassFish Server 5.0, the default administrator
+For the zip bundle of Payara Server 5, the default administrator
 login is `admin`, with no password, which means that no login is
 required.
 
@@ -76,8 +76,8 @@ xref:docs:administration-guide:preface.adoc#default-path-and-file-names[Default 
 === Configuration Tasks
 
 Some configuration tasks must be performed directly after installation
-for your GlassFish Server environment to work as intended. For example,
-if you are using a database with GlassFish Server, you need to set up
+for your Payara Server environment to work as intended. For example,
+if you are using a database with Payara Server, you need to set up
 database connectivity right away.
 
 Some configuration situations are ongoing and will require you to make
@@ -122,24 +122,24 @@ Life Cycle Modules::
 Security::
   * System Security. Initial configuration tasks might include setting
   up passwords, audit modules, and certificates. See
-  "xref:docs:security-guide:system-security.adoc#administering-system-security[Administering System Security]" in GlassFish Server
+  "xref:docs:security-guide:system-security.adoc#administering-system-security[Administering System Security]" in Payara Server
   Open Source Edition Security Guide.
   * User Security. Initial configuration tasks might include creating
   authentication realms and file users. See
-  "xref:docs:security-guide:user-security.adoc#administering-user-security[Administering User Security]" in GlassFish Server
+  "xref:docs:security-guide:user-security.adoc#administering-user-security[Administering User Security]" in Payara Server
   Open Source Edition Security Guide.
   * Message Security. Initial configuration tasks might include
   configuring a Java Cryptography Extension (JCE) provider, enabling
   default and non-default security providers, and configuring message
   protection policies. See "xref:docs:security-guide:message-security.adoc#administering-message-security[Administering Message Security]" 
-  in GlassFish Server Open Source Edition Security Guide.
+  in Payara Server Open Source Edition Security Guide.
 Database Connectivity::
-  The initial tasks involved in configuring GlassFish Server to connect
+  The initial tasks involved in configuring Payara Server to connect
   to the Apache Derby database include creating a Java Database
   Connectivity (JDBC) connection pool, creating a JDBC resource, and
   integrating a JDBC driver. See xref:docs:administration-guide:jdbc.adoc#administering-database-connectivity[Administering Database Connectivity].
 EIS Connectivity::
-  The initial tasks involved in configuring GlassFish Server to connect
+  The initial tasks involved in configuring Payara Server to connect
   to an enterprise information system (EIS) include creating a connector
   connection pool, creating a connector resource, editing a resource
   adapter configuration, creating a connector security map, creating a
@@ -174,7 +174,7 @@ online help.
 === How Dotted Names Work for Configuration
 
 After the initial configuration is working, you will continue to manage
-ongoing configuration for the life of your GlassFish Server
+ongoing configuration for the life of your Payara Server
 installation. You might need to adjust resources to improve
 productivity, or issues might arise that require settings to be modified
 or defaults to be reset. In some situations, an `asadmin` subcommand is
@@ -188,7 +188,7 @@ dotted names, see the xref:docs:reference-manual:dotted-names.adoc[`dotted-names
 
 Dotted names also apply to monitoring, but the method is different. For
 information on using dotted names for monitoring, see
-link:monitoring.html#ghbaz[How the Monitoring Tree Structure Works].
+xref:docs:administration-guide:monitoring.adochow-the-monitoring-tree-structure-works[How the Monitoring Tree Structure Works].
 
 =======================================================================
 
@@ -252,19 +252,19 @@ asadmin> set server.http-service.http-listener.http-listener-1.security-enabled 
 [[configuration-files]]
 === Configuration Files
 
-The bulk of the configuration information about GlassFish Server
+The bulk of the configuration information about Payara Server
 resources, applications, and instances is stored in the `domain.xml`
 configuration file. This file is the central repository for a given
 administrative domain and contains an XML representation of the
-GlassFish Server domain model. The default location for the `domain.xml`
+Payara Server domain model. The default location for the `domain.xml`
 file is domain-dir`/config`.
 
 [NOTE]
 =======================================================================
 
-GlassFish Server maintains a backup of the `domain.xml` file that is
+Payara Server maintains a backup of the `domain.xml` file that is
 named `domain.xml.bak`. The purpose of this file is solely to enable
-GlassFish Server to start a domain if the `domain.xml` file cannot be
+Payara Server to start a domain if the `domain.xml` file cannot be
 read. Do not modify or delete the `domain.xml.bak` file and do not use
 this file for any other purpose.
 
@@ -273,11 +273,10 @@ this file for any other purpose.
 The `logging.properties` file is used to configure logging levels for
 individual modules. The default `logging.properties` file is located in
 the same directory as the `domain.xml` file. For further information on
-the `logging.properties` file, see link:logging.html#gkkit[Logging
-Properties].
+the `logging.properties` file, see xref:docs:administration=guide:logging.adoc#logging-properties[Logging Properties].
 
 The `asenv.conf` file is located in the as-install`/config` directory.
-Its purpose is to store the GlassFish Server environment variables, such
+Its purpose is to store the Payara Server environment variables, such
 as the installation location of the database, Message Queue, and so on.
 
 
@@ -293,11 +292,11 @@ error and can have unexpected results.
 [[impact-of-configuration-changes]]
 === Impact of Configuration Changes
 
-Some configuration changes require that you restart the DAS or GlassFish
+Some configuration changes require that you restart the DAS or Payara
 Server instances for the changes to take effect. Other changes are
 applied dynamically without requiring that the DAS or instances be
 restarted. The procedures in this guide indicate when a restart is
-required. GlassFish Server enables you to determine whether the DAS or
+required. Payara Server enables you to determine whether the DAS or
 an instance must be restarted to apply configuration changes.
 
 Some changes to resources or connection pools affect the applications
@@ -314,7 +313,7 @@ To obtain information about the DAS or an instance, a running server is
 required.
 2.  Do one of the following:
 * To determine if the DAS requires restart, list the domains in your
-GlassFish Server installation. +
+Payara Server installation. +
 Use the xref:docs:reference-manual:list-domains.adoc[`list-domains`] subcommand for this purpose. +
 [source,shell]
 ----
@@ -323,7 +322,7 @@ asadmin> list-domains [--domaindir domain-root-dir]
 The domain-root-dir is the directory that contains the directories in
 which individual domains' configuration is stored. The default is
 as-install`/domains`, where as-install is the base installation
-directory of the GlassFish Server software. +
+directory of the Payara Server software. +
 If the DAS requires restart, a statement that restart is required is
 displayed.
 * To determine if an instance requires restart, list information about
@@ -394,8 +393,7 @@ require restart.
 * Configuring certificates
 * Managing HTTP, JMS, IIOP, JNDI services
 * Enabling or disabling secure administration as explained in
-"xref:docs:security-guide:administrative-security.html#running-secure-admin[Running Secure Admin]" in GlassFish Server Open Source
-Edition Security Guide
+"xref:docs:security-guide:administrative-security.html#running-secure-admin[Running Secure Admin]" in Payara Server Security Guide
 
 [[dynamic-configuration-changes]]
 ==== Dynamic Configuration Changes
@@ -432,7 +430,7 @@ take effect.
 
 If you do not know which applications use the changed resources or
 connection pools, you can apply these changes by restarting the clusters
-orGlassFish Server instances to which applications are deployed.
+or Payara Server instances to which applications are deployed.
 However, to minimize the disruption to the services that your
 applications provide, avoid restarting clusters or instances to apply
 these changes if possible.
@@ -487,7 +485,7 @@ for the administrative tasks.
 
 To use the Administration Console, the domain administration server
 (DAS) must be running. Each domain has its own DAS, which has a unique
-port number. When GlassFish Server was installed, you chose a port
+port number. When Payara Server was installed, you chose a port
 number for the DAS, or used the default port of 4848. You also specified
 a user name and password if you did not accept the default login
 (`admin` with no password).
@@ -502,7 +500,7 @@ example:
 http://kindness.example.com:4848
 ----
 
-If the Administration Console is running on the host where GlassFish
+If the Administration Console is running on the host where Payara
 Server was installed, specify `localhost` for the host name. For
 example:
 
@@ -512,12 +510,12 @@ http://localhost:4848
 ----
 
 If the Administration Console is run on a host different from the host
-where GlassFish Server was installed, a secure connection (`https`
+where Payara Server was installed, a secure connection (`https`
 instead of `http`) is used. Some browsers do not display pages on secure
 connections by default and must be configured to permit secure protocols
 (SSL and TLS).
 
-For Microsoft Windows, an alternate way to start the GlassFish Server
+For Microsoft Windows, an alternate way to start the Payara Server
 Administration Console is by using the Start menu.
 
 You can display the help material for a page in the Administration
@@ -541,11 +539,11 @@ To avoid this situation, do one of the following:
 
 * Do not use a proxy server.
 * Use `localhost` or `127.0.0.1` as the host name.
-* Enable secure admin so that what GlassFish Server interprets as a
+* Enable secure admin so that what Payara Server interprets as a
 remote request is accepted as such.
 
 To enable secure admin, see "xref:docs:administration-guide:overview.adoc#managing-administrative-security[Managing Administrative Security]" 
-in GlassFish Server Open Source Edition Security Guide.
+in Payara Server Open Source Edition Security Guide.
 
 =======================================================================
 
@@ -602,28 +600,28 @@ format in the xref:docs:reference-manual:toc.adoc[Payara Server Reference Manual
 [[rest-interfaces]]
 === REST Interfaces
 
-GlassFish Server provides representational state transfer (REST)
+Payara Server provides representational state transfer (REST)
 interfaces to enable you to access monitoring and configuration data for
-GlassFish Server, including data that is provided by newly installed
+Payara Server, including data that is provided by newly installed
 add-on components. For more information, see
 xref:docs:administration-guide:general-administration.adoc#using-rest-interfaces-to-administer-payara-server[Using REST Interfaces to Administer Payara Server].
 
 [[osgi-module-management-subsystem]]
 === OSGi Module Management Subsystem
 
-The OSGi module management subsystem that is provided with GlassFish
+The OSGi module management subsystem that is provided with Payara
 Server is the http://felix.apache.org/[Apache Felix OSGi framework] . To
 administer this framework, use the either of the following tools:
 
 * http://felix.apache.org/documentation/subprojects/apache-felix-remote-shell.html[Apache
-Felix Gogo] remote shell. This shell is provided with GlassFish Server.
+Felix Gogo] remote shell. This shell is provided with Payara Server.
 The shell uses the Felix Gogo shell service to interact with the OSGi
 module management subsystem.
-* GlassFish OSGi Administration Console. This console is distributed as
-an add-on component for GlassFish Server or as a set of files from the
-Maven GlassFish repository. In both distributions, the GlassFish OSGi
+* Payara OSGi Administration Console. This console is distributed as
+an add-on component for Payara Server or as a set of files from the
+Maven Payara repository. In both distributions, the Payara OSGi
 Web Console is provided as an extension to the Administration Console
-and as a standalone web application. The GlassFish OSGi Administration
+and as a standalone web application. The Payara OSGi Administration
 Console is a customized version of the
 http://felix.apache.org/documentation/subprojects/apache-felix-web-console.html[Apache
 Felix Web Console].
@@ -639,14 +637,14 @@ such as:
 [[to-enable-the-apache-felix-gogo-remote-shell]]
 ==== To Enable the Apache Felix Gogo Remote Shell
 
-By default, the Apache Felix Gogo remote shell in GlassFish Server is
-disabled. Before using the shell to administer OSGi bundles in GlassFish
+By default, the Apache Felix Gogo remote shell in Payara Server is
+disabled. Before using the shell to administer OSGi bundles in Payara
 Server, you must enable the shell.
 
-Enabling the Apache Felix Gogo remote shell in GlassFish Server involves
+Enabling the Apache Felix Gogo remote shell in Payara Server involves
 changing the value of the property `glassfish.osgi.start.level.final`.
 This property controls whether the OSGi start level service enables the
-shell when the DAS or a GlassFish Server instance is started.
+shell when the DAS or a Payara Server instance is started.
 
 1.  Ensure that the DAS is running.
 2.  [[CEGDBDBH]] +
@@ -680,7 +678,7 @@ For instructions, see xref:docs:administration-guide:domains.adoc#to-restart-a-d
 [[to-run-apache-felix-gogo-remote-shell-commands]]
 ==== To Run Apache Felix Gogo Remote Shell Commands
 
-The Apache Felix Gogo remote shell is integrated with the GlassFish
+The Apache Felix Gogo remote shell is integrated with the Payara
 Server `asadmin` command line utility. You can use the `asadmin`
 subcommands `osgi` and `osgi-shell` to access the remote shell and run
 OSGi shell commands.
@@ -780,7 +778,7 @@ this example for readability.
 [source,shell]
 ----
 asadmin> osgi inspect service capability 251
-GlassFish EJB Container for OSGi Enabled EJB Applications (251) provides services:
+Payara EJB Container for OSGi Enabled EJB Applications (251) provides services:
 ---------------------------------------------------------------------------
 objectClass = org.glassfish.osgijavaeebase.Extender
 service.id = 68
@@ -793,7 +791,7 @@ Command osgi executed successfully.
 asadmin> osgi -shell
 Use "exit" to exit and "help" for online help.
 gogo$ inspect service capability 251
-GlassFish EJB Container for OSGi Enabled EJB Applications (251) provides services:
+Payara EJB Container for OSGi Enabled EJB Applications (251) provides services:
 ---------------------------------------------------------------------------
 objectClass = org.glassfish.osgijavaeebase.Extender
 service.id = 68
@@ -801,62 +799,49 @@ service.id = 68
 gogo$ 
 ----
 
-[[to-download-and-install-the-glassfish-osgi-web-console]]
-==== To Download and Install the GlassFish OSGi Web Console
+[[to-download-and-install-the-Payara-osgi-web-console]]
+==== To Download and Install the Payara OSGi Web Console
 
-The GlassFish OSGi Web Console is distributed as follows:
+The Payara OSGi Web Console is distributed as follows:
 
-* As an add-on component for GlassFish Server
-* As a set of files from the https://maven.java.net[GlassFish Maven
+* As an add-on component for Payara Server
+* As a set of files from the https://maven.java.net[Payara Maven
 repository]
 
-In both distributions, the GlassFish OSGi Web Console is provided as an
+In both distributions, the Payara OSGi Web Console is provided as an
 extension to the Administration Console and as a standalone web
 application.
 
 Perform one of the following sets of steps, depending on how you are
-obtaining the GlassFish OSGi Web Console.
+obtaining the Payara OSGi Web Console.
 * If you are obtaining the console as an add-on component, install the
-GlassFish OSGi Admin Console component.
+Payara OSGi Admin Console component.
 * If you are obtaining the console from the Maven repository, download
 and unzip the required files.
 
 .  Download the following files to the parent of the `glassfish3`
-directory of your GlassFish Server installation. +
+directory of your Payara Server installation. +
 http://maven.glassfish.org/content/groups/glassfish/org/glassfish/packager/glassfish-osgi-http/3.1.2/glassfish-osgi-http-3.1.2.zip[`glassfish-osgi-http-3.1.2.zip`] +
 http://maven.glassfish.org/content/groups/glassfish/org/glassfish/packager/glassfish-osgi-gui/3.1.2/glassfish-osgi-gui-3.1.2.zip[`glassfish-osgi-gui-3.1.2.zip`]
 .  Unzip the files that you downloaded. +
 The contents of the files are added to the
-as-install`/modules/autostart` directory of your GlassFish Server
+as-install`/modules/autostart` directory of your Payara Server
 installation.
 .  Restart the DAS. + For instructions, see xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
-[[GSADG797]]
 
-Next Steps
+[[to-access-the-payara-osgi-web-console-through-the-payara-server-administration-console]]
+==== To Access the Payara OSGi Web Console Through the Payara Server Administration Console
 
-After downloading and installing the GlassFish OSGi Web Console, you can
-access the console as explained in the following sections:
+A tab for the Payara OSGi Web Console is provided for the DAS and for
+every Payara Server instance in a domain.
 
-* link:#BABIDJHF[To Access the GlassFish OSGi Web Console Through the
-GlassFish Server Administration Console]
-* link:#BABDJHAF[To Access the GlassFish OSGi Web Console as a
-Standalone Web Application]
-
-[[BABIDJHF]][[GSADG798]][[to-access-the-glassfish-osgi-web-console-through-the-glassfish-server-administration-console]]
-
-To Access the GlassFish OSGi Web Console Through the GlassFish Server Administration Console
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-A tab for the GlassFish OSGi Web Console is provided for the DAS and for
-every GlassFish Server instance in a domain.
-
-1.  Ensure that the DAS and the instance for which you want to access
-the GlassFish OSGi Web Console are running.
-2.  Start the GlassFish Server Administration Console. +
-For instructions, see link:#ablav[Administration Console].
-3.  Open the Administration Console page for the DAS or instance for
-which you are accessing the GlassFish OSGi Web Console.
+.  Ensure that the DAS and the instance for which you want to access
+the Payara OSGi Web Console are running.
+. Start the Payara Server Administration Console. +
+For instructions, see xref:docs:administration-guide:overview.adoc#administration-console[Administration Console].
+. Open the Administration Console page for the DAS or instance for
+which you are accessing the Payara OSGi Web Console.
 * For the DAS, in the navigation tree, select the server (Admin Server)
 node.
 * For a standalone instance, perform these steps:
@@ -872,75 +857,64 @@ tab. +
 The Clustered Server Instances page for the cluster opens.
 4.  In the Server Instances table on the Clustered Server Instances
 page, select the instance.
-4.  On the Administration Console page for the DAS or instance, click
+5.  On the Administration Console page for the DAS or instance, click
 the OSGi Console tab. +
 You are prompted for the user name and password of the administrative
-user of the GlassFish OSGi Web Console.
-5.  In response to the prompt, provide the user name and password of the
-administrative user of the GlassFish OSGi Web Console. +
+user of the Payara OSGi Web Console.
+6.  In response to the prompt, provide the user name and password of the
+administrative user of the Payara OSGi Web Console. +
 The user name and password of this user are both preset to `admin`. +
-The GlassFish OSGi Web Console page opens.
+The Payara OSGi Web Console page opens.
 
-[[BABDJHAF]][[GSADG799]][[to-access-the-glassfish-osgi-web-console-as-a-standalone-web-application]]
+[[to-access-the-payara-osgi-web-console-as-a-standalone-web-application]]
+==== To Access the Payara OSGi Web Console as a Standalone Web Application
 
-To Access the GlassFish OSGi Web Console as a Standalone Web Application
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-1.  Ensure that the DAS or the instance for which you want to access the
-GlassFish OSGi Web Console is running.
-2.  In a web browser, open the following location: +
-[source,oac_no_warn]
+* Ensure that the DAS or the instance for which you want to access the
+Payara OSGi Web Console is running.
+*  In a web browser, open the following location: +
+[source,shell]
 ----
 http://host:http-port/osgi/system/console/
 ----
 host::
   The host where the DAS or instance is running.
 http-port::
-  The port on which GlassFish Server listens for HTTP requests. The
+  The port on which Payara Server listens for HTTP requests. The
   default is 8080. +
-For example, if the DAS is running on the local host and GlassFish
+For example, if the DAS is running on the local host and Payara
 Server listens for HTTP requests on the default port, open the following
 location: +
-[source,oac_no_warn]
+[source,shell]
 ----
 http://localhost:8080/osgi/system/console/
 ----
-3.  When prompted, provide the user name and password of the
-administrative user of the GlassFish OSGi Web Console. +
+*  When prompted, provide the user name and password of the
+administrative user of the Payara OSGi Web Console. +
 The user name and password of this user are both preset to `admin`.
 
-[[ghcjl]][[GSADG00703]][[keytool-utility]]
-
-`keytool` Utility
-^^^^^^^^^^^^^^^^^
+[[keytool-utility]]
+=== `keytool` Utility
 
 The `keytool` utility is used to set up and work with Java Security
 Socket Extension (JSSE) digital certificates. See
-"link:../security-guide/system-security.html#GSSCG00147[Administering JSSE Certificates]" in GlassFish Server
-Open Source Edition Security Guide for instructions on using `keytool`.
+"xref:docs:security-guide:system-security.adoc#administering-jsse-certificates[Administering JSSE Certificates]" in Payara Server Security Guide for instructions on using `keytool`.
 
-[[ghrfm]][[GSADG00704]][[java-monitoring-and-management-console-jconsole]]
-
-Java Monitoring and Management Console (JConsole)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[java-monitoring-and-management-console-jconsole]]
+=== Java Monitoring and Management Console (JConsole)
 
 Java SE provides tools to connect to an MBean server and view the MBeans
 that are registered with the server. JConsole is one such popular JMX
 Connector Client and is available as part of the standard Java SE
-distribution. For instructions on implementing JConsole in the GlassFish
-Server environment, see link:monitoring.html#giwqm[Configuring JConsole
-to View GlassFish Server Monitoring Data].
+distribution. For instructions on implementing JConsole in the Payara
+Server environment, see xref:docs:monitoring.adoc#configuring-jconsole-to-view-oayara-server-monitoring-data[Configuring JConsole to View Payara Server Monitoring Data].
 
-[[giudo]][[GSADG00529]][[instructions-for-administering-glassfish-server]]
-
-Instructions for Administering GlassFish Server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[[instructions-for-administering-payara-server]]
+== Instructions for Administering Payara Server
 
 Information and instructions on performing most of the administration
 tasks from the command line are provided in this document and in the
 `asadmin` utility help pages. For instructions on accessing `asadmin`
-online help, see link:general-administration.html#givlw[To Display Help
-Information for the `asadmin` Utility or a Subcommand].
+online help, see xref:docs:administration-guide:general-administration.adoc#to-display-help-information-for-the-asadmin-utility-or-a-subcommand[To Display Help Information for the `asadmin` Utility or a Subcommand].
 
 Information and instructions for accomplishing the tasks by using the
 Administration Console are contained in the Administration Console
@@ -950,9 +924,9 @@ online help.
 [NOTE]
 =======================================================================
 
-Instructions written for the GlassFish Server tools use standard UNIX
+Instructions written for the Payara Server tools use standard UNIX
 forward slashes (/) for directory path separators in commands and file
-names. If you are running GlassFish Server on a Microsoft Windows
+names. If you are running Payara Server on a Microsoft Windows
 system, use backslashes (\) instead. For example:
 
 * UNIX: as-install`/bin/asadmin`
@@ -965,7 +939,4 @@ The following additional documents address specific administration
 areas:
 
 * Verifying and deploying applications +
-link:../application-deployment-guide/toc.html#GSDPG[GlassFish Server Open Source Edition Application Deployment
-Guide]
-
-
+xref:docs:application-deployment-guide:toc.adoc[Payara Server Application Deployment Guide]
