@@ -1,142 +1,60 @@
 [[configuring-java-message-service-high-availability]]
 = Configuring Java Message Service High Availability
 
-This chapter describes how to configure the high availability features
-of the Java Message Service (JMS). It covers how to configure Message
-Queue broker clusters and how to use them to provide connection failover
-and load balancing, as described in the following topics:
+This chapter describes how to configure the high availability features of the Java Message Service (JMS). It covers how to configure Message
+Queue broker clusters and how to use them to provide connection failover and load balancing, as described in the following topics:
 
-* link:#abdbx[Using Message Queue Broker Clusters With GlassFish Server]
-* link:#abdbv[Connection Failover]
-* link:#abdbw[Load-Balanced Delivery to MDBs]
+[[using-message-queue-broker-clusters-with-glassfish-server]]
+== Using Message Queue Broker Clusters With GlassFish Server
 
-[[abdbx]][[GSHAG00212]][[using-message-queue-broker-clusters-with-glassfish-server]]
+This section describes how the JMS service uses Message Queue broker clusters to support high-availability JMS messaging in GlassFish Server clusters. It describes the different cluster and broker types that are supported and how to configure them.
 
-Using Message Queue Broker Clusters With GlassFish Server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[[about-message-queue-broker-clusters]]
+=== About Message Queue Broker Clusters
 
-This section describes how the JMS service uses Message Queue broker
-clusters to support high-availability JMS messaging in GlassFish Server
-clusters. It describes the different cluster and broker types that are
-supported and how to configure them.
+The following discussion provides a brief overview of Message Queue broker clusters.
 
-The following topics are addressed here:
+Message Queue supports two clustering models both of which provide a scalable message service, but with each providing a different level of message service availability:
 
-* link:#gktgs[About Message Queue Broker Clusters]
-* link:#gktft[Configuring GlassFish Clusters to Use Message Queue Broker
-Clusters]
-* link:#gktge[To Configure a GlassFish Cluster to Use an Embedded or
-Local Conventional Broker Cluster With Master Broker]
-* link:#gktfr[To Configure a GlassFish Cluster to Use an Embedded or
-Local Conventional Broker Cluster of Peer Brokers]
-* link:#gkthc[To Change the Master Broker in an Embedded or Local Broker
-Cluster]
-* link:#gktgj[To Migrate Between Types of Embedded or Local Conventional
-Broker Clusters]
-* link:#gktfl[To Configure a GlassFish Cluster to Use a Local Enhanced
-Broker Cluster]
-* link:#abdby[To Configure a GlassFish Cluster to Use a Remote Broker
-Cluster]
+* Conventional broker clusters. A conventional broker cluster provides for service availability. When a broker fails, clients connected to the failed broker reconnect to another broker in the cluster.
+However, messages and state information stored in the failed broker cannot be recovered until the failed broker is brought back online.
+The broker failure can therefore result in a significant delay and in JMS message order semantics not being preserved. +
+Message Queue supports two types of conventional cluster, based on where the cluster configuration change record is stored:
 
-[[gktgs]][[GSHAG00311]][[about-message-queue-broker-clusters]]
-
-About Message Queue Broker Clusters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The following discussion provides a brief overview of Message Queue
-broker clusters. For complete information, see "link:../../openmq/mq-tech-over/broker-clusters.html#GMTOV00028[Broker
-Clusters]" in Open Message Queue Technical Overview.
-
-Message Queue supports two clustering models both of which provide a
-scalable message service, but with each providing a different level of
-message service availability:
-
-* Conventional broker clusters. A conventional broker cluster provides
-for service availability. When a broker fails, clients connected to the
-failed broker reconnect to another broker in the cluster. However,
-messages and state information stored in the failed broker cannot be
-recovered until the failed broker is brought back online. The broker
-failure can therefore result in a significant delay and in JMS message
-order semantics not being preserved. +
-Message Queue supports two types of conventional cluster, based on where
-the cluster configuration change record is stored:
-
-** Conventional cluster with master broker. In a conventional cluster
-with a master broker, one of the brokers, designated as the master
-broker, stores and maintains the cluster configuration change record.
-The other brokers in the cluster must communicate with the master broker
-to keep abreast of changes to the cluster configuration. This is the
-simplest broker cluster to configure, and is the type of broker cluster
-that GlassFish Server uses by default to support GlassFish clusters.
+** Conventional cluster with master broker. In a conventional cluster with a master broker, one of the brokers, designated as the master broker, stores and maintains the cluster configuration change record.
+The other brokers in the cluster must communicate with the master broker to keep abreast of changes to the cluster configuration.
+This is the simplest broker cluster to configure, and is the type of broker cluster that GlassFish Server uses by default to support GlassFish clusters.
 
 ** Conventional cluster of peer brokers. In a conventional cluster of
 peer brokers, the cluster configuration change record is stored in a
 JDBC data store accessible to all the brokers. Thus, brokers can access
 cluster configuration information whether any other brokers in the
 cluster are running or not.
-* Enhanced broker clusters. An enhanced broker cluster provides for data
-availability in addition to service availability. When a broker fails,
-another broker takes over the pending work of the failed broker. The
-failover broker has access to the failed broker's messages and state
-information. Clients connected to the failed broker reconnect to the
-failover broker. In an enhanced cluster, as compared to a conventional
-cluster, messages owned by the failed broker are delivered by the
-failover broker as soon as it takes over, and JMS message order
-semantics are preserved. +
-By its very nature, an enhanced broker cluster is a cluster of peer
-brokers.
+* Enhanced broker clusters. An enhanced broker cluster provides for data availability in addition to service availability.
+When a broker fails, another broker takes over the pending work of the failed broker.
+The failover broker has access to the failed broker's messages and state information. Clients connected to the failed broker reconnect to the failover broker.
+In an enhanced cluster, as compared to a conventional cluster, messages owned by the failed broker are delivered by the failover broker as soon as it takes over, and JMS message order semantics are preserved. +
+By its very nature, an enhanced broker cluster is a cluster of peer brokers.
 
+NOTE: Despite the message service availability offered by both conventional and enhanced broker clusters, they do not provide a guarantee against
+failure and the possibility that certain failures, for example in the middle of a transaction, could require that some operations be repeated.
+It is the responsibility of the messaging application (both producers and consumers) to respond to JMS exceptions appropriately.
 
-[width="100%",cols="<100%",]
-|=======================================================================
-a|
-Note:
+[[configuring-glassfish-clusters-to-use-message-queue-broker-clusters]]
+=== Configuring GlassFish Clusters to Use Message Queue Broker Clusters
 
-Despite the message service availability offered by both conventional
-and enhanced broker clusters, they do not provide a guarantee against
-failure and the possibility that certain failures, for example in the
-middle of a transaction, could require that some operations be repeated.
-It is the responsibility of the messaging application (both producers
-and consumers) to respond to JMS exceptions appropriately. For
-information about the kinds of exceptions that can occur and how to
-respond to them, see "link:../../openmq/mq-dev-guide-java/client-design-and-features.html#GMJVG00229[Handling Exceptions When Failover
-Occurs]" in Open Message Queue Developer's Guide for Java Clients.
+When a GlassFish Server cluster is created, the JMS service automatically configures a Message Queue conventional broker cluster with master broker for the cluster, provided that the JMS host type in the GlassFish Server cluster's configuration is Embedded or Local.
+The JMS service configures one Message Queue broker for each instance in the GlassFish Server cluster, and designates as master broker the broker associated with the first instance created in the cluster.
+In the case of Local JMS hosts, the JMS service configures each broker to run on the same host as the instance with which it is associated.
+In the case of Embedded JMS hosts, the each broker inherently runs on the same host as the instance with which it is associated because it runs in the same JVM as the instance.
 
-|=======================================================================
+The JMS service manages the lifecycle of Embedded and Local JMS hosts, and this management extends to the management of Message Queue broker clusters as Embedded and Local JMS hosts.
+For a GlassFish cluster whose configuration specifies Embedded or Local JMS host type, the JMS service:
 
+* Creates and manages one Message Queue broker for each instance in the GlassFish cluster, using this broker as the primary JMS host for the instance.
+* Maintains the JMS host list for each instance in the GlassFish cluster such that its primary JMS host appears first in its JMS host list.
 
-[[gktft]][[GSHAG00312]][[configuring-glassfish-clusters-to-use-message-queue-broker-clusters]]
-
-Configuring GlassFish Clusters to Use Message Queue Broker Clusters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-When a GlassFish Server cluster is created, the JMS service
-automatically configures a Message Queue conventional broker cluster
-with master broker for the cluster, provided that the JMS host type in
-the GlassFish Server cluster's configuration is Embedded or Local. The
-JMS service configures one Message Queue broker for each instance in the
-GlassFish Server cluster, and designates as master broker the broker
-associated with the first instance created in the cluster. In the case
-of Local JMS hosts, the JMS service configures each broker to run on the
-same host as the instance with which it is associated. In the case of
-Embedded JMS hosts, the each broker inherently runs on the same host as
-the instance with which it is associated because it runs in the same JVM
-as the instance.
-
-The JMS service manages the lifecycle of Embedded and Local JMS hosts,
-and this management extends to the management of Message Queue broker
-clusters as Embedded and Local JMS hosts. For a GlassFish cluster whose
-configuration specifies Embedded or Local JMS host type, the JMS
-service:
-
-* Creates and manages one Message Queue broker for each instance in the
-GlassFish cluster, using this broker as the primary JMS host for the
-instance.
-* Maintains the JMS host list for each instance in the GlassFish cluster
-such that its primary JMS host appears first in its JMS host list.
-
-The JMS service supports the following types of Message Queue broker
-clusters with GlassFish Server clusters, based on the JMS host type:
+The JMS service supports the following types of Message Queue broker clusters with GlassFish Server clusters, based on the JMS host type:
 
 Embedded::
   * Conventional broker cluster with master broker (default)
@@ -146,53 +64,24 @@ Local::
   * Conventional broker cluster of peer brokers
   * Enhanced broker cluster
 Remote::
-  * Conventional broker cluster with master broker; brokers can differ
-  in number from GlassFish instances and can be located on other hosts
-  * Conventional broker cluster of peer brokers; brokers can differ in
-  number from GlassFish instances and can be located on other hosts
-  * Enhanced broker cluster; brokers can differ in number from GlassFish
-  instances and can be located on other hosts
+  * Conventional broker cluster with master broker; brokers can differ in number from GlassFish instances and can be located on other hosts
+  * Conventional broker cluster of peer brokers; brokers can differ in number from GlassFish instances and can be located on other hosts
+  * Enhanced broker cluster; brokers can differ in number from GlassFish instances and can be located on other hosts
 
-The following topics provide instructions for configuring broker
-clusters in all these contexts.
+The following topics provide instructions for configuring broker clusters in all these contexts.
 
-[[gktge]][[GSHAG00155]][[to-configure-a-glassfish-cluster-to-use-an-embedded-or-local-conventional-broker-cluster-with-master-broker]]
+[[to-configure-a-glassfish-cluster-to-use-an-embedded-or-local-conventional-broker-cluster-with-master-broker]]
 
-To Configure a GlassFish Cluster to Use an Embedded or Local
-Conventional Broker Cluster With Master Broker
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To Configure a GlassFish Cluster to Use an Embedded or Local Conventional Broker Cluster With Master Broker
 
-Use the `configure-jms-cluster` subcommand in remote `asadmin` mode to
-configure a conventional broker cluster with master broker to service a
-GlassFish Server cluster that uses either Embedded or Local JMS hosts.
+Use the `configure-jms-cluster` subcommand in remote `asadmin` mode to configure a conventional broker cluster with master broker to service a GlassFish Server cluster that uses either Embedded or Local JMS hosts.
 
-Note that this configuration, with Embedded brokers, is the default for
-GlassFish Server clusters.
+Note that this configuration, with Embedded brokers, is the default for GlassFish Server clusters.
 
-[[GSHAG431]]
+Before You Begin, Perform the following steps after you have created the GlassFish Server cluster, but before you have added instances to the cluster or started the cluster.
 
-Before You Begin
-
-Perform the following steps after you have created the GlassFish Server
-cluster, but before you have added instances to the cluster or started
-the cluster.
-
-
-[width="100%",cols="<100%",]
-|=======================================================================
-a|
-Caution:
-
-Before using this procedure to reconfigure an existing cluster, you must
-follow the special procedures to migrate to another type of broker
-cluster, as described in link:#gktgj[To Migrate Between Types of
-Embedded or Local Conventional Broker Clusters]. Failing to perform
-these special procedures could lead to data loss or corruption and even
-render your setup unusable, depending on the JMS operations performed on
-the existing cluster.
-
-|=======================================================================
-
+CAUTION: Before using this procedure to reconfigure an existing cluster, you must follow the special procedures to migrate to another type of broker cluster, as described in xref:jms.adoc#to-migrate-between-types-of-embedded-or-local-conventional-broker-clusters[To Migrate Between Types of Embedded or Local Conventional Broker Clusters].
+Failing to perform these special procedures could lead to data loss or corruption and even render your setup unusable, depending on the JMS operations performed on the existing cluster.
 
 1.  Ensure that the server is running. +
 Remote `asadmin` subcommands require a running server.
