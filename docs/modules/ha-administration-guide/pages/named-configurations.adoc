@@ -1,17 +1,17 @@
 [[administering-named-configurations]]
 = Administering Named Configurations
 
-A named configuration is a set of configuration information for GlassFish Server instances and clusters.
+A named configuration is a set of configuration information for Payara Server instances and clusters.
 A configuration sets port numbers for listeners that an instance or a cluster uses and defines settings for items such as the EJB container,
 security, logging, and monitoring. Applications and resources are not defined in named configurations.
 
-GlassFish Server enables you to create configurations for use by clusters and instances. GlassFish Server creates configurations
+Payara Server enables you to create configurations for use by clusters and instances. Payara Server creates configurations
 automatically for clusters and instances that do not reference an existing configuration. You can modify any existing named configuration regardless of how the configuration was created.
 
 [[about-named-configurations]]
 == About Named Configurations
 
-Configurations exist in a domain. Multiple GlassFish Server instances orclusters in the domain can reference the same configuration, or they can have separate configurations.
+Configurations exist in a domain. Multiple Payara Server instances orclusters in the domain can reference the same configuration, or they can have separate configurations.
 To ensure that the environment in a cluster's instances is homogenous, all instances in the cluster inherit the cluster's configuration.
 
 [[types-of-named-configurations]]
@@ -40,23 +40,23 @@ Clusters and instances cannot refer to the `default-config` configuration. The `
 === Automatically Created Configurations
 
 When you create a cluster or an instance, you can choose whether to specify an existing configuration that the new cluster or instance will reference.
-If you choose to create a cluster or an instance without specifying an existing configuration, GlassFish Server automatically creates a configuration for the cluster or instance. For more information, see the following sections:
+If you choose to create a cluster or an instance without specifying an existing configuration, Payara Server automatically creates a configuration for the cluster or instance. For more information, see the following sections:
 
 * xref:clusters.adoc#to-create-a-cluster[To Create a Cluster]
 * xref:instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
 * xref:instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
 
-GlassFish Server automatically creates a configuration by copying the `default-config` configuration.
+Payara Server automatically creates a configuration by copying the `default-config` configuration.
 If you require an instance or cluster to reference a copy of a different configuration, copy the configuration and specify the copy when you create the instance or cluster.
 For information about how to copy a configuration, see xref:named-configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
 
-GlassFish Server assigns the name cluster-or-instance`-config` to an automatically created configuration. cluster-or-instance is the name of the cluster or instance for which the configuration is created.
+Payara Server assigns the name cluster-or-instance`-config` to an automatically created configuration. cluster-or-instance is the name of the cluster or instance for which the configuration is created.
 The `server-config` configuration is automatically created for the domain administration server (DAS) when the domain is created.
 
 [[directory-for-configuration-synchronization]]
 === Directory for Configuration Synchronization
 
-When a named configuration is created, GlassFish Server creates a configuration directory on the domain administration server (DAS) at domain-dir`/config/`config-name.
+When a named configuration is created, Payara Server creates a configuration directory on the domain administration server (DAS) at domain-dir`/config/`config-name.
 
 domain-dir::
   The directory in which the domain's configuration is stored.
@@ -68,19 +68,19 @@ This contents of this directory are synchronized to all instances that inherit o
 [[creating-listing-and-deleting-named-configurations]]
 == Creating, Listing, and Deleting Named Configurations
 
-GlassFish Server enables you to create configurations for use by clusters and instances, obtain information about configurations, and delete configurations that are no longer required.
+Payara Server enables you to create configurations for use by clusters and instances, obtain information about configurations, and delete configurations that are no longer required.
 
 [[to-create-a-named-configuration]]
 === To Create a Named Configuration
 
 Use the `copy-config` subcommand in remote mode to create a named configuration by copying an existing configuration.
 
-GlassFish Server requires you to create a configuration by copying a configuration because a configuration contains many required settings.
+Payara Server requires you to create a configuration by copying a configuration because a configuration contains many required settings.
 The newly created configuration is identical to the configuration that you copy until you change its configuration settings.
 
 TIP: Create a named configuration only if you plan to share the configuration among multiple unclustered instances or clusters, or if you are using a configuration to preconfigure GMS settings.
 Otherwise, create clusters and instances without specifying an existing configuration.
-If no configuration is specified, GlassFish Server creates a copy of the default configuration for the cluster or instance. +
+If no configuration is specified, Payara Server creates a copy of the default configuration for the cluster or instance. +
 For more information, see the following sections: +
 xref:clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings] +
 xref:clusters.adoc#to-create-a-cluster[To Create a Cluster] +
@@ -161,7 +161,7 @@ You can also view the full syntax and options of the subcommand by typing `asadm
 
 Use the `list-clusters` subcommand and the `list-instances` subcommand in remote mode to list the targets of a named configuration.
 
-The targets of a named configuration are the clusters and GlassFish Server instances that reference the configuration.
+The targets of a named configuration are the clusters and Payara Server instances that reference the configuration.
 
 . Ensure that the DAS is running. Remote subcommands require a running server.
 . List the clusters that refer to the configuration. +
@@ -212,7 +212,7 @@ Use the `delete-config` subcommand in remote mode to delete an existing named co
 
 You cannot delete the `default-config` configuration.
 
-NOTE: A standalone configuration that was created automatically for a cluster or a GlassFish Server instance is deleted when the cluster or instance is deleted.
+NOTE: A standalone configuration that was created automatically for a cluster or a Payara Server instance is deleted when the cluster or instance is deleted.
 
 Before You Begin
 
@@ -410,7 +410,7 @@ To avoid port conflicts, modify the port numbers on which individual instances l
 If you modify an instance's port number and later modify the port number in the instance's configuration, the instance's port number remains unchanged.
 
 The port numbers of an instance are stored as Java system properties.
-When GlassFish Server is started, it treats these properties in the same way as properties that are passed through the `-D` option of the Java application launcher.
+When Payara Server is started, it treats these properties in the same way as properties that are passed through the `-D` option of the Java application launcher.
 
 . Ensure that the DAS is running. Remote subcommands require a running server.
 . For each port number that you are modifying, determine the current value and set the new value.
@@ -460,7 +460,7 @@ See Also
 * xref:docs:reference-manual:get.adoc[`get`]
 * xref:docs:reference-manual:set.adoc[`set`]
 
-You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+You can also view the full syntax and options of the subcommands by ftyping the following commands at the command line:
 
 * `asadmin help get`
 * `asadmin help set`
