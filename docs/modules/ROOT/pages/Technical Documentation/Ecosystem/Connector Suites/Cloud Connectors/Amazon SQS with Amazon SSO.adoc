@@ -2,7 +2,7 @@
 
 The Amazon Single Sign-On (AWS SSO) is now AWS IAM Identity Center. From here is where you create, or connect, your workfoce users once and centrally manage their access to multiple AWS accounts and applications. To view more information please check https://aws.amazon.com/about-aws/whats-new/2022/07/aws-single-sign-on-aws-sso-now-aws-iam-identity-center/?nc1=h_ls[AWS IAM Identity Center]
 
-This kind of accounts can be used to consume SQS queues from Payara. To configure this you must need to follow the next steps:
+AWS accounts can be used to configure SQS queues to be consumed by applications deployed in the Payara Platform. To configure this you must need to follow the next steps:
 
 * Configure AWS IAM Identity Center Accounts
 * Configure SQS Queue
@@ -45,7 +45,7 @@ To install Amazon CLI tool on you local environment, please check https://docs.a
 
 You can verify the cli tool with the following command:
 
-[source,text]
+[source,shell]
 ----
 >aws --version
 aws-cli/2.8.11 Python/3.9.11 Windows/10 exe/AMD64 prompt/off
@@ -67,19 +67,19 @@ sso_account_id = set some account id
 sso_role_name = set available privilege to access service
 ----
 
-NOTE: The sso_start_url, sso_region and sso_role_name are associated with the sso credential you created previously, and to get the sso_account_id please check https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html[Account ID]
+NOTE: The `sso_start_url`, `sso_region` and `sso_role_name` are associated with the sso credential you created previously, and to get the `sso_account_id` please check https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html[Account ID]
 
 Also it is needed to set the URL of the SQS queue and the region as an environment variables:
 
-[source,text]
+[source,shell]
 ----
 >set queueURL=https://sqs.us-east-1.amazonaws.com/845692786875/MyTestQueue
 >set region=us-east-1
 ----
 
-Then it is needed to do the SSO login from the CLI command line:
+Next, execute the SSO login from the CLI:
 
-[source,text]
+[source,shell]
 ----
 >aws sso login --profile default
 Attempting to automatically open the SSO authorization page in your default browser.
@@ -119,12 +119,13 @@ Installing a connector section]  to execute the example application but in this 
 
 Example of the command using last version of the connector:
 
+[source,shell]
 ----
->java -jar "path for payara micro jar"\payara-micro.jar --deploy "path for amazon sqs rar"\amazon-sqs-rar-1.0.0.rar "path for example"\amazon-sqs-example-1.0.0.jar
+>java -jar payara-micro.jar --deploy amazon-sqs-rar-1.0.0.rar amazon-sqs-example-1.0.0.jar
 ----
 
 image::cloud-connectors/sqs-connector/aws-sqs-example-result.png[Amazon SQS example]
 
 
-NOTE: This kind of accounts are used just on development environments and not recommended to production environment.
+IMPORTANT: Using AWS SSO credentials is a recommended practice for development environment only. Please refrain from using this setup on production environments.
 
