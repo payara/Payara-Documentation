@@ -1,64 +1,40 @@
 = Amazon SQS Cloud Connector
 
-Amazon SQS (Simple Queue Service) is a hosted and highly scalable distributed
-message queue.
+Amazon SQS (Simple Queue Service) is a hosted and highly scalable distributed message queue service.
 
-In order to connect to Amazon SQS, the `AmazonSQSRAR-0.1.0-SNAPSHOT.rar` has to
-be deployed as shown in the xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Overview.adoc#Installing-a-connector[
-Installing a connector section] of the Cloud Connectors overview.
+To get the correct version of the artifact to use in your application (since it depends on a specific version of the Amazon Web Services Java SDK), please follow the instructions detailed in xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Amazon SQS/Versioning.adoc[Versioning].
 
-Once deployed, something like the following should be printed to the startup log of Payara Micro:
+Once deployed, a message similar to this one should be printed out to the server's output:
 
 [source, log]
 ----
 [fish.payara.cloud.connectors.amazonsqs.api.inbound.AmazonSQSResourceAdapter] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: 1495398495490] [levelValue: 800] Amazon SQS Resource Adapter Started..
 ----
 
-In order to make use of this connector in an application, the following two Maven dependencies are needed:
-
-[source, xml]
-----
-<dependency>
-  <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
-  <artifactId>AmazonSQSJCAAPI</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
-  <type>jar</type>
-  <scope>provided</scope>
-</dependency>
-
-<dependency>
-  <groupId>com.amazonaws</groupId>
-  <artifactId>aws-java-sdk-sqs</artifactId>
-  <version>1.11.118</version>
-  <type>jar</type>
-  <scope>provided</scope>
-</dependency>
-----
-
-Note that these dependencies have scope provided since the types within this dependency are globally available to every application deployed to Payara Micro after the `AmazonSQSRAR-0.1.0-SNAPSHOT.rar` was deployed.
-
+[[sending-messages]]
 == Sending messages
+
 Sending messages to Amazon SQS can be done via the JCA and an Amazon specific API. In order to start using this API to send messages, a resource has to be defined via the JCA API; a connection factory.
 
-The connection factory has to be given a name, which can be any name that is valid for JNDI. The `java:app` namespace is typically recommended to be used. The type of the connection factory to be used for Amazon SQS is  `fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory`, and we have to specify the resource adapter name which is here `AmazonSQSRAR-0.1.0-SNAPSHOT.rar`.
+The connection factory has to be given a name, which can be any name that is valid for JNDI. The `java:app` namespace is typically recommended to be used. The type of the connection factory to be used for Amazon SQS is `fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory`, and we have to specify the resource adapter name which is here `AmazonSQSRAR-0.1.0-SNAPSHOT.rar`.
 
-Finally the AWS account details have to be specified.
+Finally the AWS account details have to be specified in the properties of the corresponding JMS resource definitions.
 
 The following gives an example:
 
 [source, java]
 ----
 @ConnectionFactoryDefinition ( 
- name = "java:app/amazonsqs/factory",
- interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
- resourceAdapter = "AmazonSQSRAR-0.1.0-SNAPSHOT"
- properties = {"awsAccessKeyId=<your amazon access key>", "awsSecretKey=<your amazon secret key>", "region=eu-west-2"}
+  name = "java:app/amazonsqs/factory",
+  interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
+  resourceAdapter = "AmazonSQSRAR-0.1.0-SNAPSHOT"
+  properties = {"awsAccessKeyId=<accessKeyID>", "awsSecretKey=<secretKey>", "region=eu-west-2"}
 )
 ----
 
-With the above shown definition in place the following code shows an example of sending a message:
+With the above definition in place the following code shows an example of sending a message:
 
-[source,Java]
+[source, java]
 ----
 @Singleton
 @Startup
@@ -70,7 +46,7 @@ public class SendSQSMessage {
  @PostConstruct
  public void init() {
     try (AmazonSQSConnection connection = factory.createConnection()) {
-        connection.sendMessage(new SendMessageRequest("queueURL", "Hello World"));
+        connection.sendMessage(new SendMessageRequest("<queueURL>", "Hello World"));
     }
     catch (Exception ex) {
     }
@@ -78,7 +54,9 @@ public class SendSQSMessage {
 }
 ----
 
+[[receiving-messages]]
 == Receiving messages
+
 Messages can be received from Amazon SQS by creating an MDB (Message Driven Bean) that implements the `fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener` marker interface and has a single method annotated with `@OnSQSMessage` and the method signature `void method(Message message)`.
 
 The following gives an example:
@@ -111,48 +89,48 @@ The full list of config properties is given below:
 |Default
 |Notes
 
-|awsAccessKeyId
+|`awsAccessKeyId`
 |String
 |None
 |Must be set to the access key of your AWS account
 
-|awsSecretKey
+|`awsSecretKey`
 |String
 |None
 |Must be set to the secret key of your AWS account
 
-|queueURL
+|`queueURL`
 |String
 |None
 |Must be set to the URL for an SQS queue
 
-|region
+|`region`
 |String
 |None
 |Must be set to the AWS region name of your queue
 
-|maxMessages
+|`maxMessages`
 |Integer
 |10
 |The maximum number of messages to download on a poll
 
-|initialPollDelay
+|`initialPollDelay`
 |Integer
 |1
 |The delay (in seconds) before polling the queue after MDB activation (MDB only)
 
-|pollInterval
+|`pollInterval`
 |Integer
 |3
 |How often should the adapter poll for messages (in seconds) (MDB Only)
 
-|messageAttributeNames
+|`messageAttributeNames`
 |String
 |All
 |The list of message attribute names that should be fetched with the message
 (MDB Only)
 
-|attributeNames
+|`attributeNames`
 |String
 |All
 |The list of attribute names that should be fetched with the message (MDB Only)
