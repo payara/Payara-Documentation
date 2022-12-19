@@ -1,59 +1,34 @@
-type=page
-status=published
-title=add-resources
-next=apply-http-lb-changes.html
-prev=add-library.html
-~~~~~~
-add-resources
-=============
-
-[[add-resources-1]][[GSRFM00001]][[add-resources]]
-
-add-resources
--------------
+[[add-resources]]
+= add-resources
 
 creates the resources specified in an XML file
 
-[[sthref15]]
-
+[[synopsis]]
 Synopsis
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] add-resources [--help] 
 [--target target] 
 [--upload={false|true}] xml-file-name
 ----
 
-[[sthref16]]
+[[description]]
+== Description
 
-Description
+The `add-resources` subcommand creates the resources named in the specified XML file. The resources that can be created with this subcommand are listed in See Also in this help page.
 
-The `add-resources` subcommand creates the resources named in the
-specified XML file. The resources that can be created with this
-subcommand are listed in See Also in this help page.
+The `--target` option specifies the target for which you are creating the resources. If this option specifies the domain, the resources are added only to the configuration of the domain administration server (DAS). If this option specifies any other target, the resources are added to the configuration of the DAS and references are added to the resources from the specified target.
 
-The `--target` option specifies the target for which you are creating
-the resources. If this option specifies the domain, the resources are
-added only to the configuration of the domain administration server
-(DAS). If this option specifies any other target, the resources are
-added to the configuration of the DAS and references are added to the
-resources from the specified target.
-
-The xml-file-name operand is the path to the XML file that contains the
-resources to be created. The `DOCTYPE` must be specified as
-`http://glassfish.org/dtds/glassfish-resources_1_5.dtd` in the
-`resources.xml` file.
+The xml-file-name operand is the path to the XML file that contains the resources to be created. The `DOCTYPE` must be specified as `http://glassfish.org/dtds/glassfish-resources_1_5.dtd` in the `resources.xml` file.
 
 This subcommand is supported in remote mode only.
 
-[[sthref17]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
@@ -61,8 +36,7 @@ asadmin-options::
   Specifies the target for which you are creating the resources. +
   Valid values are as follows: +
   `server`;;
-    Creates the resources for the default server instance `server` and
-    is the default value.
+    Creates the resources for the default server instance `server` and is the default value.
   `domain`;;
     Creates the resources for the domain.
   cluster-name;;
@@ -70,29 +44,19 @@ asadmin-options::
   instance-name;;
     Creates the resources for a particular \{product---name} instance.
 `--upload`::
-  Specifies whether the subcommand uploads the file to the DAS. In most
-  situations, this option can be omitted. +
+  Specifies whether the subcommand uploads the file to the DAS. In most situations, this option can be omitted. +
   Valid values are as follows: +
   `false`;;
-    The subcommand does not upload the file and attempts to access the
-    file through the specified file name. If the DAS cannot access the
-    file, the subcommand fails. +
-    For example, the DAS might be running as a different user than the
-    administration user and does not have read access to the file. In
-    this situation, the subcommand fails if the `--upload` option is
-    `false`.
+    The subcommand does not upload the file and attempts to access the file through the specified file name. If the DAS cannot access the file, the subcommand fails. +
+    For example, the DAS might be running as a different user than the administration user and does not have read access to the file. In this situation, the subcommand fails if the `--upload` option is `false`.
   `true`;;
-    The subcommand uploads the file to the DAS over the network
-    connection. +
-  The default value depends on whether the DAS is on the host where the
-  subcommand is run or is on a remote host. +
-  * If the DAS is on the host where the subcommand is run, the default
-  is `false`.
+    The subcommand uploads the file to the DAS over the network connection. +
+  The default value depends on whether the DAS is on the host where the subcommand is run or is on a remote host. +
+  * If the DAS is on the host where the subcommand is run, the default is `false`.
   * If the DAS is on a remote host, the default is `true`.
 
-[[sthref18]]
-
-Operands
+[[operands]]
+== Operands
 
 xml-file-name::
   The path to the XML file that contains the resources that are to be
@@ -132,18 +96,14 @@ xml-file-name::
 </resources>
 ----
 
-[[sthref19]]
+[[examples]]
+== Examples
 
-Examples
+=== Example 1 Adding Resources
 
-[[GSRFM445]][[sthref20]]
+This example creates resources using the contents of the XML file `resource.xml`.
 
-Example 1   Adding Resources
-
-This example creates resources using the contents of the XML file
-`resource.xml`.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> add-resources resource.xml
 Command : Connector connection pool jms/testQFactoryPool created.
@@ -155,8 +115,6 @@ Command : JDBC resource jdbc/__defaultA created successfully.
 Command add-resources executed successfully.
 ----
 
-[[sthref21]]
-
 Exit Status
 
 0::
@@ -164,20 +122,19 @@ Exit Status
 1::
   error in executing the subcommand
 
-[[sthref22]]
 
-See Also
+*See Also*
 
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
+xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)]
 
-link:create-jdbc-connection-pool.html#create-jdbc-connection-pool-1[`create-jdbc-connection-pool`(1)],link:create-jdbc-resource.html#create-jdbc-resource-1[`create-jdbc-resource`(1)],
-link:create-jms-resource.html#create-jms-resource-1[`create-jms-resource`(1)],
-link:create-jndi-resource.html#create-jndi-resource-1[`create-jndi-resource`(1)],
-link:create-javamail-resource.html#create-javamail-resource-1[`create-javamail-resource`(1)],
-link:create-custom-resource.html#create-custom-resource-1[`create-custom-resource`(1)],
-link:create-connector-resource.html#create-connector-resource-1[`create-connector-resource`(1)],
-link:create-connector-work-security-map.html#create-connector-work-security-map-1[`create-connector-work-security-map`(1)],
-link:create-admin-object.html#create-admin-object-1[`create-admin-object`(1)],
-link:create-resource-adapter-config.html#create-resource-adapter-config-1[`create-resource-adapter-config`(1)]
+xref:create-jdbc-connection-pool.adoc#create-jdbc-connection-pool[`create-jdbc-connection-pool`],xref:create-jdbc-resource.adoc#create-jdbc-resource[`create-jdbc-resource`],
+xref:create-jms-resource.adoc#create-jms-resource[`create-jms-resource`],
+xref:create-jndi-resource.adoc#create-jndi-resource[`create-jndi-resource`],
+xref:create-javamail-resource.adoc#create-javamail-resource[`create-javamail-resource`],
+xref:create-custom-resource.adoc#create-custom-resource[`create-custom-resource`],
+xref:create-connector-resource.adoc#create-connector-resource[`create-connector-resource`],
+xref:create-connector-work-security-map.adoc#create-connector-work-security-map[`create-connector-work-security-map`],
+xref:create-admin-object.adoc#create-admin-object[`create-admin-object`],
+xref:create-resource-adapter-config.adoc#create-resource-adapter-config[`create-resource-adapter-config`]
 
 
