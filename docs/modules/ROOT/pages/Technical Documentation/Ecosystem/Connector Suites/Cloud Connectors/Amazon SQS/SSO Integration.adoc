@@ -1,0 +1,163 @@
+:ordinal: 2
+= Amazon Web Services SSO Integration
+
+If you are using version 2 of the Amazon Web Services Java SDK, then it is possible to configure the SQS connector use Amazon SSO authentication instead of a `secretKey` and `keyID` set of credentials.
+
+The Amazon Single Sign-On (AWS SSO) is also known as the AWS IAM Identity Center. This center is used by AWS administrators to centrally manage the data and access permissions of all user identities. To view more information about it please read here: https://aws.amazon.com/about-aws/whats-new/2022/07/aws-single-sign-on-aws-sso-now-aws-iam-identity-center/?nc1=h_ls[AWS IAM Identity Center]
+
+In this case, instead of using a traditional "Service Account" to allow a deployed application to connect to a SQS Queue, instead you can allow individual AWS accounts to log in via SSO first and then make the calls as long as they have been configured with the right permissions. To configure this you must follow these steps:
+
+. Configure AWS IAM Identity Center Accounts
+. Configure SQS Queue
+. Download and install the Amazon SQS Connector v2
+. Install the Amazon CLI locally
+. Configure the user credentials
+. Execute the SSO login
+
+IMPORTANT: Using AWS SSO credentials is a recommended practice for development environment only. Please refrain from using this setup on production environments.
+
+[[configure-aws-iam-identity-center]]
+== Configure AWS IAM Identity Center Accounts
+
+To configure AWS IAM Identity Center Accounts, please read the instructions detailed in https://aws.amazon.com/blogs/security/how-to-create-and-manage-users-within-aws-sso/[Create Users with AWS IAM Identity Center].
+
+Here's an example identity that is ready to be used for SSO login:
+
+image::cloud-connectors/sqs-connector/amazon-iam-settings.png[Amazon IAM Settings]
+
+This account is also setup with full privileges so that it can access SQS resources:
+
+image::cloud-connectors/sqs-connector/amazon-iam-account-with-full-privilegies.png[Amazon IAM Account with Privileges]
+
+[[configure-sqs-queue]]
+== Configure a SQS Queue
+
+To configure an SQS Queue, please follow the instructions detailed in https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/step-create-queue.html[Create Amazon SQS Queue]
+
+Here's an example of a SQS Queue:
+
+image::cloud-connectors/sqs-connector/amazon-sqs-settings.png[Amazon SQS Settings]
+
+[[download-install-amazon-sqs-connector-v2]]
+== Download and install Amazon SQS Connector version 2 from Payara
+
+To download and install Amazon SQS Connector V2, please check xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Amazon SQS Versioning.adoc#how-to-use[How to use] of the Amazon SQS Versioning.
+
+[[install-amazon-cli-local-environment]]
+== Install Amazon CLI Locally
+
+To install the Amazon CLI toolset on you local environment, please check https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html[Amazon CLI getting started]
+
+You can verify that the CLI has been correctly installed with the following command:
+
+[source,shell]
+----
+>aws --version
+aws-cli/2.8.11 Python/3.9.11 Windows/10 exe/AMD64 prompt/off
+----
+
+[[setup-local-configuration]]
+== Setup Local Configuration
+
+Next, you'll have to setup the Amazon IAM configuration file on your local machine to enable SSO authentication. Read detailed instructions on how to setup this configuration file on https://docs.aws.amazon.com/sdkref/latest/guide/feature-sso-credentials.html[AWS SSO Credentials].
+
+Here's a sample configuration file:
+
+[source,text]
+----
+[default]
+sso_start_url = https://d-9067bf6e6d.awsapps.com/start
+sso_region = us-east-1
+sso_account_id = <ACCOUNT_ID>
+sso_role_name = <ROLE_NAME>
+----
+
+IMPORTANT: The `sso_start_url`, `sso_region` and `sso_role_name` are parameters associated with the SSO credentials for the user account identity. To get the `sso_account_id` find the instructions in https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html[Account ID].
+
+Before proceeding, you'll have to set the URL of the SQS Queue and its corresponding region as Environment Variables:
+
+[source,shell]
+----
+>set queueURL=https://sqs.us-east-1.amazonaws.com/845692786875/MyTestQueue
+>set region=us-east-1
+----
+
+[[sso-login]]
+== AWS SSO Login
+
+Next, execute the AWS SSO login from the command line:
+
+[source,shell]
+----
+>aws sso login --profile default
+
+Attempting to automatically open the SSO authorization page in your default browser.
+If the browser does not open or you wish to use a different device to authorize this request, open the following URL:
+
+https://device.sso.us-east-1.amazonaws.com/
+
+Then enter the code:
+
+XXXX-XXXX
+
+Successfully logged into Start URL: https://d-9067bf6e6d.awsapps.com/start
+----
+
+This process will open a local browser window so that the current user can provide its credentials using this simple process:
+
+. Start the session 
++
+image::cloud-connectors/sqs-connector/aws-login-page-1.png[Amazon Web Services Session Start]
+
+. Set user password
++
+image::cloud-connectors/sqs-connector/aws-login-page-2.png[Amazon Web Services Set user password]
+
+. Authorize the request
++
+image::cloud-connectors/sqs-connector/aws-login-page-3.png[Amazon Web Services Authorize request]
+
+. Receive login approval
++
+image::cloud-connectors/sqs-connector/aws-login-page-4.png[Amazon Web Services Receive approval]
+
+[[deploy-and-test-application]]
+== Deploy and Test application
+
+Before deploying and testing a sample application, remember to install the JCA adapter and configuring the API dependencies as described in xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Amazon SQS/Versioning.adoc[Versioning].
+
+Since the internal SSO credentials resolver will look for the required credentials on the local environment's configuration file, then you don't have to supply the AWS identity credentials on the configuration properties of your application's messaging components.
+
+To send messages, here's how the connection factory definition looks like:
+
+[source, java]
+----
+@ConnectionFactoryDefinition ( 
+  name = "java:app/amazonsqs/factory",
+  interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
+  resourceAdapter = "AmazonSQSRAR-1.0.0-SNAPSHOT"
+  properties = {"region=us-east-1"}
+)
+----
+
+And for receiving messages, here's how the MDB definition looks like:
+
+[source, java]
+----
+@MessageDriven(activationConfig = {
+    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "ENV={queueURL}"), 
+    @ActivationConfigProperty(propertyName = "region", propertyValue = "ENV={region}"),
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1") 
+})
+public class ReceiveSQSMessage implements AmazonSQSListener {
+
+    @OnSQSMessage
+    public void receiveMessage(Message message) {
+        // Handle message
+    }
+}
+----
+
+A simple log output of message processing would look like this:
+
+image::cloud-connectors/sqs-connector/aws-sqs-example-result.png[Amazon SQS example]
