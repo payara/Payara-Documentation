@@ -1,105 +1,73 @@
-type=page
-status=published
-title=collect-log-files
-next=configure-jms-cluster.html
-prev=change-master-password.html
-~~~~~~
-collect-log-files
-=================
-
-[[collect-log-files-1]][[GSRFM00007]][[collect-log-files]]
-
-collect-log-files
------------------
+[[collect-log-files]]
+= collect-log-files
 
 creates a ZIP archive of all available log files
 
-[[sthref69]]
+[[synopsis]]
+== Synopsis
 
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] collect-log-files [--help] 
 [--target target] 
 [--retrieve={false|true}] [retrievefilepath]]
 ----
 
-[[sthref70]]
-
-Description
+[[description]]
+== Description
 
 The `collect-log-files` subcommand collects all available log files for
-the domain administration server (DAS), the specified cluster, or the
-specified \{product---name} instance and creates a single ZIP archive of
-the log files. If a cluster is specified, the ZIP archive also contains
-the log file for the DAS.
+the domain administration server (DAS), the specified cluster, or the specified \{product---name} instance and creates a single ZIP archive of the log files.
+If a cluster is specified, the ZIP archive also contains the log file for the DAS.
 
 This subcommand is supported in remote mode only.
 
-[[sthref71]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 `--retrieve`::
-  Specifies whether the ZIP archive is created in a directory other than
-  the default directory. +
-  By default the ZIP archive is created in the
-  domain-dir`/collected-logs` directory. The ZIP file names are
-  constructed from the specified target and timestamp, as follows: +
-[source,oac_no_warn]
+  Specifies whether the ZIP archive is created in a directory other than the default directory. +
+  By default the ZIP archive is created in the domain-dir`/collected-logs` directory. The ZIP file names are constructed from the specified target and timestamp, as follows:
++
+[source,shell]
 ----
 log_yyyy-mm-dd_hh-min-sec.zip
 ----
-::
   Possible values are as follows: +
-  `false`;;
-    The ZIP archive will be created in the default directory. If
-    omitted, the `--retrieve` option defaults to `false`.
-  `true`;;
-    The ZIP archive will be created in the directory that the
-    retrievefilepath operand specifies. If retrievefilepath is omitted,
-    the ZIP archive will be created in the default directory.
+`false`;;
+    The ZIP archive will be created in the default directory. If omitted, the `--retrieve` option defaults to `false`.
+`true`;;
+    The ZIP archive will be created in the directory that the retrievefilepath operand specifies. If retrievefilepath is omitted, the ZIP archive will be created in the default directory.
 `--target`::
   Specifies the target for which log files will be collected. +
   Possible values are as follows: +
-  `server`;;
+`server`;;
     The log files will be collected for the DAS (default).
-  instance-name;;
-    The log files will be collected for the specified \{product---name}
-    instance.
-  cluster-name;;
-    The log files will be collected for the specified cluster and the
-    DAS.
+`instance-name`;;
+    The log files will be collected for the specified \{product---name} instance.
+`cluster-name`;;
+    The log files will be collected for the specified cluster and the DAS.
 
-[[sthref72]]
-
-Operands
+[[operands]]
+== Operands
 
 retrievefilepath::
-  The name of the directory in which the ZIP archive will be created. If
-  this operand is omitted, the ZIP archive will be created in the
-  default directory. If the `--retrieve` option is `false`, this operand
-  is ignored.
+  The name of the directory in which the ZIP archive will be created. If this operand is omitted, the ZIP archive will be created in the
+  default directory. If the `--retrieve` option is `false`, this operand is ignored.
 
-[[sthref73]]
+[[examples]]
+== Examples
 
-Examples
+Example 1 Collecting Log Files for the Default Server
 
-[[GSRFM451]][[sthref74]]
+This example generates a ZIP archive from the log files for the default server.
 
-Example 1   Collecting Log Files for the Default Server
-
-This example generates a ZIP archive from the log files for the default
-server.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> collect-log-files
 Created Zip file under /space/gfv3/v3setup/glassfish3/glassfish/domains/domain1/\
@@ -107,14 +75,11 @@ collected-logs/log_2010-12-15_15-46-23.zip.
 Command collect-log-files executed successfully.
 ----
 
-[[GSRFM452]][[sthref75]]
+Example 2 Collecting Log Files for a Cluster
 
-Example 2   Collecting Log Files for a Cluster
+This example generates a ZIP archive from the log files for a cluster named `cluster1` and the two server instances running in the cluster.
 
-This example generates a ZIP archive from the log files for a cluster
-named `cluster1` and the two server instances running in the cluster.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> collect-log-files --target cluster1
 Log files are downloaded for instance1.
@@ -124,16 +89,11 @@ collected-logs/log_2010-12-15_15-54-06.zip.
 Command collect-log-files executed successfully.
 ----
 
-[[GSRFM453]][[sthref76]]
+Example 3 Collecting Log Files in a Directory Other Than the Default for a Cluster
 
-Example 3   Collecting Log Files in a Directory Other Than the Default
-for a Cluster
+This example generates a ZIP archive from the log files for a cluster named `cluster1` and its two server instances, and saves the archive in a directory named `/space/output`.
 
-This example generates a ZIP archive from the log files for a cluster
-named `cluster1` and its two server instances, and saves the archive in
-a directory named `/space/output`.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> collect-log-files --target cluster1 --retrieve true /space/output
 Log files are downloaded for instance1.
@@ -142,28 +102,23 @@ Created Zip file under /space/output/log_2010-12-15_15-55-54.zip.
 Command collect-log-files executed successfully.
 ----
 
-[[sthref77]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   subcommand executed successfully
 1::
   error in executing the subcommand
 
-[[sthref78]]
-
 See Also
 
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
-
-link:list-log-attributes.html#list-log-attributes-1[`list-log-attributes`(1)],
-link:list-log-levels.html#list-log-levels-1[`list-log-levels`(1)],
-link:rotate-log.html#rotate-log-1[`rotate-log`(1)],
-link:set-log-attributes.html#set-log-attributes-1[`set-log-attributes`(1)],
-link:set-log-levels.html#set-log-levels-1[`set-log-levels`(1)]
-
-"link:../administration-guide/logging.html#GSADG00010[Administering the Logging Service]" in GlassFish
+* xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)]
+* xref:list-log-attributes.adoc#list-log-attributes-1[`list-log-attributes`(1)],
+* xref:list-log-levels.adoc#list-log-levels-1[`list-log-levels`(1)],
+* xref:rotate-log.adoc#rotate-log-1[`rotate-log`(1)],
+* xref:set-log-attributes.adoc#set-log-attributes-1[`set-log-attributes`(1)],
+* xref:set-log-levels.adoc#set-log-levels-1[`set-log-levels`(1)]
+* "xref:docs:administration-guide/logging.adoc#GSADG00010[Administering the Logging Service]" in Payara
 Server Open Source Edition Administration Guide
 
 

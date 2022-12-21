@@ -1,24 +1,12 @@
-type=page
-status=published
-title=create-lifecycle-module
-next=create-local-instance.html
-prev=create-jvm-options.html
-~~~~~~
-create-lifecycle-module
-=======================
-
-[[create-lifecycle-module-1]][[GSRFM00043]][[create-lifecycle-module]]
-
-create-lifecycle-module
------------------------
+[[create-lifecycle-module]]
+= create-lifecycle-module
 
 creates a lifecycle module
 
-[[sthref380]]
+[[synopsis]]
+== Synopsis
 
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] create-lifecycle-module [--help] 
 --classname classname
@@ -29,83 +17,58 @@ asadmin [asadmin-options] create-lifecycle-module [--help]
 module_name
 ----
 
-[[sthref381]]
+[[description]]
+== Description
 
-Description
+The `create-lifecycle-module` subcommand creates a lifecycle module.
+A lifecycle module provides a means of running a short or long duration Java-based task at a specific stage in the server life cycle. This subcommand is supported in remote mode only.
 
-The `create-lifecycle-module` subcommand creates a lifecycle module. A
-lifecycle module provides a means of running a short or long duration
-Java-based task at a specific stage in the server life cycle. This
-subcommand is supported in remote mode only.
-
-[[sthref382]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 `--classname`::
   This is the fully qualified name of the startup class.
 `--target`::
-  Indicates the location where the lifecycle module is to be created.
-  Valid values are +
+  Indicates the location where the lifecycle module is to be created. Valid values are +
   * `server`- Specifies the default server instance as the target for
-  creating the lifecycle module. `server` is the name of the default
-  server instance and is the default value for this option.
-  * cluster_name- Specifies a particular cluster as the target for
-  creating the lifecycle module.
-  * instance_name- Specifies a particular stand-alone server instance as
-  the target for creating the lifecycle module.
+  creating the lifecycle module. `server` is the name of the default server instance and is the default value for this option.
+  * cluster_name- Specifies a particular cluster as the target for creating the lifecycle module.
+  * instance_name- Specifies a particular stand-alone server instance as the target for creating the lifecycle module.
 `--classpath`::
-  This option indicates where the lifecycle module is located. It is a
-  classpath with the standard format: either colon-separated (Unix) or
-  semicolon-separated (Windows) JAR files and directories. The
-  referenced JAR files and directories are not uploaded to the server
-  instance.
+  This option indicates where the lifecycle module is located. It is a classpath with the standard format: either colon-separated (Unix) or semicolon-separated (Windows) JAR files and directories.
+  The referenced JAR files and directories are not uploaded to the server instance.
 `--loadorder`::
-  This option represents an integer value that can be used to force the
-  order in which deployed lifecycle modules are loaded at server
-  startup. Smaller numbered modules are loaded sooner. Order is
-  unspecified if two or more lifecycle modules have the same load-order
-  value. The default is `Integer.MAX_VALUE`, which means the lifecycle
-  module is loaded last.
+  This option represents an integer value that can be used to force the order in which deployed lifecycle modules are loaded at server startup. Smaller numbered modules are loaded sooner.
+  Order is unspecified if two or more lifecycle modules have the same load-order value. The default is `Integer.MAX_VALUE`, which means the lifecycle module is loaded last.
 `--failurefatal`::
-  This option tells the system what to do if the lifecycle module does
-  not load correctly. When this option is set to true, the system aborts
-  the server startup if this module does not load properly. The default
-  value is false.
+  This option tells the system what to do if the lifecycle module does not load correctly. When this option is set to true, the system aborts
+  the server startup if this module does not load properly. The default value is false.
 `--enabled`::
-  This option determines whether the lifecycle module is enabled at
-  runtime. The default value is true.
+  This option determines whether the lifecycle module is enabled at runtime. The default value is true.
 `--description`::
   This is the text description of the lifecycle module.
 `--property`::
-  This is an optional attribute containing name/value pairs used to
-  configure the lifecycle module.
+  This is an optional attribute containing name/value pairs used to configure the lifecycle module.
 
-[[sthref383]]
-
-Operands
+[[operands]]
+== Operands
 
 module_name::
-  This operand is a unique identifier for the deployed server lifecycle
-  event listener module.
+  This operand is a unique identifier for the deployed server lifecycle event listener module.
 
-[[sthref384]]
+[[examples]]
+== Examples
 
-Examples
-
-[[GSRFM504]][[sthref385]]
-
-Example 1   Creating a Lifecycle Module
+Example 1 Creating a Lifecycle Module
 
 The following example creates a lifecycle module named `customSetup`.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> create-lifecycle-module --classname "com.acme.CustomSetup" 
 --classpath "/export/customSetup" --loadorder 1 --failurefatal=true 
@@ -114,28 +77,21 @@ asadmin> create-lifecycle-module --classname "com.acme.CustomSetup"
 Command create-lifecycle-module executed successfully
 ----
 
-The escape character `\` is used in the property option to specify that
-the equal sign (=) and colon (:) are part of the `rmi` property value.
+The escape character `\` is used in the property option to specify that the equal sign (=) and colon (:) are part of the `rmi` property value.
 
-[[sthref386]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   command executed successfully
 1::
   error in executing the command
 
-[[sthref387]]
-
 See Also
 
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
-
-link:delete-lifecycle-module.html#delete-lifecycle-module-1[`delete-lifecycle-module`(1)],
-link:list-lifecycle-modules.html#list-lifecycle-modules-1[`list-lifecycle-modules`(1)]
-
-"link:../application-development-guide/lifecycle-listeners.html#GSDVG00014[Developing Lifecycle Listeners]" in GlassFish Server
-Open Source Edition Application Development Guide
+* xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)]
+* xref:delete-lifecycle-module.adoc#delete-lifecycle-module-1[`delete-lifecycle-module`(1)],
+* xref:list-lifecycle-modules.adoc#list-lifecycle-modules-1[`list-lifecycle-modules`(1)]
+* "xref:application-development-guide:lifecycle-listeners.adoc#developing-lifecycle-listeners[Developing Lifecycle Listeners]" in GlassFish Server Open Source Edition Application Development Guide
 
 
