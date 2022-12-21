@@ -38,10 +38,10 @@ MicroProfile OpenAPI specifies several ways of configuring the data in the produ
 [[sources-config]]
 === Config Properties
 
-The OpenAPI can be configured through the xref:Technical Documentation/MicroProfile/Config/Overview.adoc[Config API]. For example, these configuration properties can be put in the `microprofile-config.properties`.
+The OpenAPI document generation process can be configured through the xref:Technical Documentation/MicroProfile/Config/Overview.adoc[Config API]. The following are the standard configuration properties as presented by the specification:
 
 |===
-| Config key | Value description
+| Property key | Description
 
 | `mp.openapi.model.reader` | Configuration property to specify the fully qualified name of the <<sources-model-reader, OASModelReader>> implementation.
 | `mp.openapi.filter` | Configuration property to specify the fully qualified name of the <<sources-filter, OASFilter>> implementation.
@@ -54,7 +54,6 @@ The OpenAPI can be configured through the xref:Technical Documentation/MicroProf
 `mp.openapi.scan.exclude.packages=com.xyz.PackageC,com.xyz.PackageD`
 | `mp.openapi.scan.exclude.classes`  |  Configuration property to specify the list of classes to exclude from scans. For example,
 `mp.openapi.scan.exclude.classes=com.xyz.MyClassC,com.xyz.MyClassD`
-| `mp.openapi.scan.lib`  |  Configuration property to scan the packaged jar files inside the WAR (WEB-INF\lib). Default value is `false`.
 | `mp.openapi.servers`  |  Configuration property to specify the list of global servers that provide connectivity information. For example,
 `mp.openapi.servers=https://xyz.com/v1,https://abc.com/v1`
 | `mp.openapi.servers.path.`   |  Prefix of the configuration property to specify an alternative list of servers to service all operations in a path. For example,
@@ -78,6 +77,13 @@ mp.openapi.schema.java.util.Date = { \
   "description": "Milliseconds since January 1, 1970, 00:00:00 GMT" \
 }
 ----
+|===
+
+In addition to the standard properties, the following properties have been added as extensions within the Payara Platform:
+
+|===
+| Property key | Description
+| `mp.openapi.scan.lib`  |  Configuration property that allows the server to scan packaged JAR files inside the WAR's library directory (`WEB-INF/lib`). Default value is `false`.
 |===
 
 [[sources-model-reader]]
@@ -368,6 +374,6 @@ Gets the status of the OpenAPI service.
 
 [[security-configuration]]
 === Security Configuration
-By default, the OpenAPI endpoint binds to the root context application which is the `__default-web-module` (also known as *docroot*) system application and the `__default-web-module` application, which is secured under the default realm (`file`) of the server. 
+By default, the OpenAPI endpoint binds to the root context application which is the `__default-web-module` (also known as `docroot`) system application and the `__default-web-module` application, which is secured under the default realm (`file`) of the server. 
 
 If a user application is deployed in the empty context-root, then the security configuration of this application will be shared by the OpenAPI endpoint, so exert extreme caution when making these changes.
