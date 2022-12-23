@@ -1,69 +1,38 @@
-type=page
-status=published
-title=generate-jvm-report
-next=get.html
-prev=freeze-transaction-service.html
-~~~~~~
-generate-jvm-report
-===================
-
-The script content on this page is for navigation purposes only and does
-not alter the content in any way.
-
-[[generate-jvm-report-1]][[GSRFM00138]][[generate-jvm-report]]
-
-generate-jvm-report
--------------------
+[[generate-jvm-report]]
+= generate-jvm-report
 
 shows the JVM machine statistics for a given target instance
 
-[[sthref1200]]
+[[synopsis]]
+== Synopsis
 
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 generate-jvm-report [--help] [--type=jvm-statistic-type] [--target target]
 ----
 
-[[sthref1201]]
+[[description]]
+== Description
 
-Description
+The `generate-jvm-report` subcommand creates a report that shows the threads (dump of stack trace), classes, memory, or loggers for a given target instance, including the domain administration server (DAS). If a type is not specified, a summary report is generated. This subcommand only provides statistics for the \{product---name} instance processes. This subcommand provides an alternative to sending Ctrl+Break or `kill -3` signals to \{product---name} processes to obtain a stack trace for processes that are hanging.
 
-The `generate-jvm-report` subcommand creates a report that shows the
-threads (dump of stack trace), classes, memory, or loggers for a given
-target instance, including the domain administration server (DAS). If a
-type is not specified, a summary report is generated. This subcommand
-only provides statistics for the \{product---name} instance processes.
-This subcommand provides an alternative to sending Ctrl+Break or
-`kill -3` signals to \{product---name} processes to obtain a stack trace
-for processes that are hanging.
+The information in the report is obtained from managed beans (MBeans) and MXBeans that are provided in the Java Platform, Standard Edition (Java SE ) or JDK software with which \{product---name} is being used.
 
-The information in the report is obtained from managed beans (MBeans)
-and MXBeans that are provided in the Java Platform, Standard Edition
-(Java SE ) or JDK software with which \{product---name} is being used.
-
-If \{product---name} is running in the Java Runtime Environment (JRE)
-software from JDK release 6 or Java SE 6, additional information is
-provided. For example:
+If \{product---name} is running in the Java Runtime Environment (JRE) software from JDK release 6 or Java SE 6, additional information is provided. For example:
 
 * System load on the available processors
 * Object monitors that are currently held or requested by a thread
-* Lock objects that a thread is holding, for example, `ReentrantLock`
-objects and `ReentrantReadWriteLock` objects
+* Lock objects that a thread is holding, for example, `ReentrantLock` objects and `ReentrantReadWriteLock` objects
 
-If the JRE software cannot provide this information, the report contains
-the text `NOT_AVAILABLE`.
+If the JRE software cannot provide this information, the report contains the text `NOT_AVAILABLE`.
 
 This subcommand is supported in remote mode only.
 
-[[sthref1202]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin[`asadmin`] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
@@ -81,36 +50,26 @@ asadmin-options::
 `--type`::
   The type of report that is to be generated. Default is `summary`. +
   `summary`;;
-    Displays summary information about the threads, classes, and memory
-    (default).
+    Displays summary information about the threads, classes, and memory (default).
   `memory`;;
-    Provides information about heap and non-heap memory consumption,
-    memory pools, and garbage collection statistics for a given target
+    Provides information about heap and non-heap memory consumption, memory pools, and garbage collection statistics for a given target
     instance.
   `class`;;
-    Provides information about the class loader for a given target
-    instance.
+    Provides information about the class loader for a given target instance.
   `thread`;;
-    Provides information about threads running and the thread dump
-    (stack trace) for a given target instance.
+    Provides information about threads running and the thread dump (stack trace) for a given target instance.
   `log`;;
-    Provides information about the loggers that are registered in the
-    Virtual Machine for the Java platform (Java Virtual Machine or JVM
-    machine).link:#sthref1203[^Foot 1 ^]
+    Provides information about the loggers that are registered in the Virtual Machine for the Java platform (Java Virtual Machine or JVM machine).xref:footnote-1[^Foot1^]
 
-[[sthref1204]]
+[[examples]]
+== Examples
 
-Examples
+[[example-1]]
+=== Example 1 Obtaining Summary Information for the JVM Machine
 
-[[GSRFM617]][[sthref1205]]
+This example shows a partial listing of a report that is generated if no type is specified. This same report is generated if the `summary` type is specified.
 
-Example 1   Obtaining Summary Information for the JVM Machine
-
-This example shows a partial listing of a report that is generated if no
-type is specified. This same report is generated if the `summary` type
-is specified.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> generate-jvm-report
 Operating System Information:
@@ -135,14 +94,12 @@ user.timezone = US/Pacific
 Command generate-jvm-report executed successfully
 ----
 
-[[GSRFM618]][[sthref1206]]
+[[example-2]]
+=== Example 2 Obtaining Information for a Particular JVM Machine Type
 
-Example 2   Obtaining Information for a Particular JVM Machine Type
+This example generates a report that shows information on the class loader.
 
-This example generates a report that shows information on the class
-loader.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> generate-jvm-report --type=class
 Class loading and unloading in the Java Virtual Machine:
@@ -156,31 +113,25 @@ Total time spent in compilation: 0 Hours 0 Minutes 4 Seconds
 Command generate-jvm-report executed successfully.
 ----
 
-[[sthref1207]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   subcommand executed successfully
 1::
   error in executing the subcommand
 
-[[sthref1208]]
+*See Also*
 
-See Also
+xref:asadmin.adoc#asadmin[`asadmin`]
 
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
-
-link:create-jvm-options.html#create-jvm-options-1[`create-jvm-options`(1)],
-link:delete-jvm-options.html#delete-jvm-options-1[`delete-jvm-options`(1)],
-link:list-jvm-options.html#list-jvm-options-1[`list-jvm-options`(1)]
+xref:create-jvm-options.adoc#create-jvm-options[`create-jvm-options`],
+xref:delete-jvm-options.adoc#delete-jvm-options[`delete-jvm-options`],
+xref:list-jvm-options.adoc#list-jvm-options[`list-jvm-options`]
 
 '''''
 
-
-Footnote Legend
-
-Footnote 1: The terms "Java Virtual Machine" and "JVM" mean a Virtual
-Machine for the Java platform. +
+[[footnote-1]]
+Footnote 1: The terms "Java Virtual Machine" and "JVM" mean a Virtual Machine for the Java platform. +
 
 

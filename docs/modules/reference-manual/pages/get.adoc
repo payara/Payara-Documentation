@@ -1,24 +1,12 @@
-type=page
-status=published
-title=get
-next=get-active-module-config.html
-prev=generate-jvm-report.html
-~~~~~~
-get
-===
-
-[[get-1]][[GSRFM00139]][[get]]
-
-get
----
+[[get]]
+= get
 
 gets the values of configurable or monitorable attributes
 
-[[sthref1209]]
+[[synopsis]]
+== Synopsis
 
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] get [--help] 
 [--monitor={true|false}]
@@ -26,37 +14,21 @@ asadmin [asadmin-options] get [--help]
 (dotted-attribute--name)+
 ----
 
-[[sthref1210]]
+[[description]]
+== Description
 
-Description
+The `get` subcommand uses dotted names to get the names and values of configurable or monitorable attributes for \{product---name} elements.
 
-The `get` subcommand uses dotted names to get the names and values of
-configurable or monitorable attributes for \{product---name} elements.
-
-You can use the link:list.html#list-1[`list`(1)] subcommand to display
-the dotted names that represent individual server components and
-subsystems. For example, a dotted name might be
-`server.applications.web-module`. Attributes from the monitoring
-hierarchy are read-only, but configuration attributes can be modified
-using the link:set.html#set-1[`set`(1)] subcommand. For more detailed
-information on dotted names, see the
-link:dotted-names.html#dotted-names-5asc[`dotted-names`(5ASC)] help page.
+You can use the xref:list.adoc#list[`list`] subcommand to display the dotted names that represent individual server components and subsystems. For example, a dotted name might be `server.applications.web-module`. Attributes from the monitoring hierarchy are read-only, but configuration attributes can be modified using the xref:set.adoc#set[`set`] subcommand. For more detailed information on dotted names, see the xref:dotted-names.adoc#dotted-names[`dotted-names`] help page.
 
 
 [NOTE]
-=======================================================================
-
-Characters that have special meaning to the shell or command
-interpreter, such as * (asterisk), should be quoted or escaped as
-appropriate to the shell, for example, by enclosing the argument in
-quotes. In multimode, quotes are needed only for arguments that include
-spaces, quotes, or backslash.
-
-=======================================================================
+====
+Characters that have special meaning to the shell or command interpreter, such as * (asterisk), should be quoted or escaped as appropriate to the shell, for example, by enclosing the argument in quotes. In multimode, quotes are needed only for arguments that include spaces, quotes, or backslash.
+====
 
 
-The following list shows common usage of the `get` subcommand with the *
-(asterisk):
+The following list shows common usage of the `get` subcommand with the * (asterisk):
 
 `get *` or `get *.*`::
   Gets all values on all dotted name prefixes.
@@ -67,51 +39,41 @@ The following list shows common usage of the `get` subcommand with the *
 `get domain.j2ee-applications.*.ejb-module.*.*`::
   Gets all values on all EJB modules of all applications.
 `get *web-modules.*.*`::
-  Gets all values on all web modules whether in an application or
-  standalone.
+  Gets all values on all web modules whether in an application or standalone.
 `get *.*.*.*`::
   Gets all values on all dotted names that have four parts.
 
-[[sthref1211]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin[`asadmin`] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 `--monitor`::
 `-m`::
-  Defaults to `false`. If set to false, the configurable attribute
-  values are returned. If set to `true`, the monitorable attribute
-  values are returned.
+  Defaults to `false`. If set to false, the configurable attribute values are returned. If set to `true`, the monitorable attribute values are returned.
 `--aggregatedataonly`::
 `-c`::
-  Aggregates monitoring data for all \{product---name} instances in a
-  cluster. The default value is `false`.
+  Aggregates monitoring data for all \{product---name} instances in a cluster. The default value is `false`.
 
 [[sthref1212]]
 
 Operands
 
 dotted-attribute-name::
-  Identifies the attribute name in the dotted notation. At least one
-  dotted name attribute is required. The dotted notation is the syntax
-  used to access attributes of configurable entities.
+  Identifies the attribute name in the dotted notation. At least one dotted name attribute is required. The dotted notation is the syntax used to access attributes of configurable entities.
 
-[[sthref1213]]
+[[examples]]
+== Examples
 
-Examples
-
-[[GSRFM619]][[sthref1214]]
-
-Example 1   Getting the Attributes of a Configurable Element
+[[example-1]]
+=== Example 1 Getting the Attributes of a Configurable Element
 
 This example gets the attributes of `listener.http-listener-1`.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> get server.http-service.http-listener.http-listener-1.*
 server.http-service.http-listener.http-listener-1.acceptor-threads = 1
@@ -130,15 +92,12 @@ server.http-service.http-listener.http-listener-1.xpowered-by = true
 Command get executed successfully.
 ----
 
-[[GSRFM620]][[sthref1215]]
+[[example-2]]
+=== Example 2 Getting Monitorable Objects
 
-Example 2   Getting Monitorable Objects
+This example gets the configuration attributes for setting the monitoring level and shows whether they are enabled (LOW or HIGH) or disabled (OFF). The `jvm` component is enabled for monitoring.
 
-This example gets the configuration attributes for setting the
-monitoring level and shows whether they are enabled (LOW or HIGH) or
-disabled (OFF). The `jvm` component is enabled for monitoring.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> get server.monitoring-service.module-monitoring-levels.*
 server.monitoring-service.module-monitoring-levels.connector-connection-pool=OFF
@@ -156,14 +115,12 @@ server.monitoring-service.module-monitoring-levels.web-container=OFF
 Command get executed successfully.
 ----
 
-[[GSRFM621]][[sthref1216]]
+[[example-3]]
+=== Example 3 Getting Attributes and Values for a Monitorable Object
 
-Example 3   Getting Attributes and Values for a Monitorable Object
+This example gets all attributes and values of the `jvm` monitorable object.
 
-This example gets all attributes and values of the `jvm` monitorable
-object.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> get --monitor server.jvm.*
 server.jvm.HeapSize_Current = 45490176
@@ -185,25 +142,22 @@ server.jvm.UpTime_Unit = milliseconds
 Command get executed successfully.
 ----
 
-[[sthref1217]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   subcommand executed successfully
 1::
   error in executing the subcommand
 
-[[sthref1218]]
+*See Also*
 
-See Also
+xref:asadmin.adoc#asadmin[`asadmin`]
 
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
+xref:list.adoc#list[`list`], xref:set.adoc#set[`set`]
 
-link:list.html#list-1[`list`(1)], link:set.html#set-1[`set`(1)]
+xref:dotted-names.adoc#dotted-names[`dotted-names`]
 
-link:dotted-names.html#dotted-names-5asc[`dotted-names`(5ASC)]
-
-link:../administration-guide/toc.html#GSADG[GlassFish Server Open Source Edition Administration Guide]
+xref:docs:administration-guide:overview.adoc[Payara Server Administration Guide]
 
 
