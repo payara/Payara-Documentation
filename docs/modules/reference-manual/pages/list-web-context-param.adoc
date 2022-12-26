@@ -1,95 +1,65 @@
-type=page
-status=published
-title=list-web-context-param
-next=list-web-env-entry.html
-prev=list-virtual-servers.html
-~~~~~~
-list-web-context-param
-======================
+[[list-web-context-param]]
+= list-web-context-param
 
-[[list-web-context-param-1]][[GSRFM00208]][[list-web-context-param]]
+lists servlet context-initialization parameters of a deployed web application or module
 
-list-web-context-param
-----------------------
+[[synopsis]]
+== Synopsis
 
-lists servlet context-initialization parameters of a deployed web
-application or module
-
-[[sthref1858]]
-
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] list-web-context-param [--help] 
 [--name=context-param-name] application-name[/module]
 ----
 
-[[sthref1859]]
+[[description]]
+== Description
 
-Description
-
-The `list-web-context-param` subcommand lists the servlet
-context-initialization parameters of one of the following items:
+The `list-web-context-param` subcommand lists the servlet context-initialization parameters of one of the following items:
 
 * A deployed web application
-* A web module in a deployed Java Platform, Enterprise Edition (Java EE)
-application
+* A web module in a deployed Java Platform, Enterprise Edition (Java EE) application
 
 The application must already be deployed. Otherwise, an error occurs.
 
-The `list-web-context-param` subcommand lists only parameters that have
-previously been set by using the
-link:set-web-context-param.html#set-web-context-param-1[`set-web-context-param`(1)]
-subcommand. The subcommand does not list parameters that are set only in
+The `list-web-context-param` subcommand lists only parameters that have previously been set by using the
+xref:set-web-context-param.adoc#set-web-context-param-1[`set-web-context-param`(1)]subcommand. The subcommand does not list parameters that are set only in
 the application's deployment descriptor.
 
 For each parameter, the following information is displayed:
 
 * The name of the parameter
 * The value to which the parameter is set
-* The value of the `--ignoreDescriptorItem` option of the
-`set-web-context-param` subcommand that was specified when the parameter
-was set
-* The description of the parameter or `null` if no description was
-specified when the parameter was set
+* The value of the `--ignoreDescriptorItem` option of the `set-web-context-param` subcommand that was specified when the parameter was set
+* The description of the parameter or `null` if no description was specified when the parameter was set
 
-[[sthref1860]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 `--name`::
-  The name of the servlet context-initialization parameter that is to be
-  listed. If this option is omitted, all parameters of the application
+  The name of the servlet context-initialization parameter that is to be listed. If this option is omitted, all parameters of the application
   that have previously been set are listed.
 
-[[sthref1861]]
-
-Operands
+[[operands]]
+== Operands
 
 application-name::
-  The name of the application. This name can be obtained from the
-  Administration Console or by using the
-  link:list-applications.html#list-applications-1[`list-applications`(1)]
-  subcommand. +
+  The name of the application. This name can be obtained from the Administration Console or by using the
+  xref:list-applications.adoc#list-applications-1[`list-applications`(1)] subcommand. +
   The application must already be deployed. Otherwise, an error occurs.
 module::
-  The relative path to the module within the application's enterprise
-  archive (EAR) file. The path to the module is specified in the
+  The relative path to the module within the application's enterprise archive (EAR) file. The path to the module is specified in the
   `module` element of the application's `application.xml` file. +
-  module is required only if the servlet context-initialization
-  parameter applies to a web module of a Java EE application. If
-  specified, module must follow application-name, separated by a slash
-  (/). +
-  For example, the `application.xml` file for the `myApp` application
-  might specify the following web module: +
-[source,oac_no_warn]
+  module is required only if the servlet context-initialization parameter applies to a web module of a Java EE application. If
+  specified, module must follow application-name, separated by a slash (/). +
+  For example, the `application.xml` file for the `myApp` application might specify the following web module:
++
+[source,shell]
 ----
 <module>
     <web>
@@ -97,26 +67,18 @@ module::
     </web>
 </module> 
 ----
-::
-  The module would be specified as the operand of this command as
-  `myApp/myWebModule.war`.
+  The module would be specified as the operand of this command as `myApp/myWebModule.war`.
 
-[[sthref1862]]
+[[examples]]
+== Examples
 
-Examples
+Example 1 Listing Servlet Context-Initialization Parameters for a Web Application
 
-[[GSRFM718]][[sthref1863]]
-
-Example 1   Listing Servlet Context-Initialization Parameters for a Web
-Application
-
-This example lists all servlet context-initialization parameters of the
-web application `basic-ezcomp` that have been set by using the
-`set-web-context-param` subcommand. Because no description was specified
-when the `javax.faces.PROJECT_STAGE` parameter was set, `null` is
+This example lists all servlet context-initialization parameters of the web application `basic-ezcomp` that have been set by using the
+`set-web-context-param` subcommand. Because no description was specified when the `javax.faces.PROJECT_STAGE` parameter was set, `null` is
 displayed instead of a description for this parameter.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> list-web-context-param basic-ezcomp
 javax.faces.STATE_SAVING_METHOD = client ignoreDescriptorItem=false 
@@ -126,23 +88,19 @@ javax.faces.PROJECT_STAGE = null ignoreDescriptorItem=true //null
 Command list-web-context-param executed successfully.
 ----
 
-[[sthref1864]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   command executed successfully
 1::
   error in executing the command
 
-[[sthref1865]]
+*See Also*
 
-See Also
-
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
-
-link:list-applications.html#list-applications-1[`list-applications`(1)],
-link:set-web-context-param.html#set-web-context-param-1[`set-web-context-param`(1)],
-link:unset-web-context-param.html#unset-web-context-param-1[`unset-web-context-param`(1)]
+* xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)]
+* xref:list-applications.adoc#list-applications[`list-applications`(1)],
+* xref:set-web-context-param.adoc#set-web-context-param-1[`set-web-context-param`(1)],
+* xref:unset-web-context-param.adoc#unset-web-context-param-1[`unset-web-context-param`(1)]
 
 

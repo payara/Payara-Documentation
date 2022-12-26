@@ -1,139 +1,103 @@
-type=page
-status=published
-title=enable-secure-admin-internal-user
-next=enable-secure-admin-principal.html
-prev=enable-secure-admin.html
-~~~~~~
-enable-secure-admin-internal-user
-=================================
+[[enable-secure-admin-internal-user]]
+= enable-secure-admin-internal-user
 
-[[enable-secure-admin-internal-user-1]][[GSRFM00130]][[enable-secure-admin-internal-user]]
+Instructs the \{product---name} DAS and instances to use the specified admin user and the password associated with the password alias to authenticate with each other and to authorize admin operations.
 
-enable-secure-admin-internal-user
----------------------------------
+[[synopsis]]
+== Synopsis
 
-Instructs the \{product---name} DAS and instances to use the specified
-admin user and the password associated with the password alias to
-authenticate with each other and to authorize admin operations.
-
-[[sthref1135]]
-
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] enable-secure-admin-internal-user [--help] 
 [--passwordalias pwdaliasname]
 admin-username
 ----
 
-[[sthref1136]]
+[[description]]
+== Description
 
-Description
+The `enable-secure-admin-internal-user` subcommand instructs all servers in the domain to authenticate to each other, and to authorize admin
+operations submitted to each other, using an existing admin username and password rather than SSL certificates. This generally means that you must:
 
-The `enable-secure-admin-internal-user` subcommand instructs all servers
-in the domain to authenticate to each other, and to authorize admin
-operations submitted to each other, using an existing admin username and
-password rather than SSL certificates. This generally means that you
-must:
-
-1.  Create a valid admin user. +
-[source,oac_no_warn]
+. Create a valid admin user.
++
+[source,shell]
 ----
 asadmin> create-file-user --authrealmname admin-realm --groups 
 asadmin newAdminUsername
 ----
-2.  Create a password alias for the just-created password. +
-[source,oac_no_warn]
+. Create a password alias for the just-created password.
++
+[source,shell]
 ----
 asadmin> create-password-alias passwordAliasName
 ----
-3.  Use that user name and password for inter-process authentication and
-admin authorization. +
-[source,oac_no_warn]
+. Use that user name and password for inter-process authentication and admin authorization.
++
+[source,shell]
 ----
 asadmin> enable-secure-admin-internal-user 
 --passwordalias passwordAliasName
 newAdminUsername
 ----
 
-If \{product---name} finds at least one secure admin internal user, then
-if secure admin is enabled \{product---name} processes will not use SSL
-authentication and authorization with each other and will instead use
-username password pairs.
+If \{product---name} finds at least one secure admin internal user, then if secure admin is enabled \{product---name} processes will not use SSL
+authentication and authorization with each other and will instead use username password pairs.
 
-If secure admin is enabled, all \{product---name} processes continue to
-use SSL encryption to secure the content of the admin messages,
+If secure admin is enabled, all \{product---name} processes continue to use SSL encryption to secure the content of the admin messages,
 regardless of how they authenticate to each other.
 
-Most users who use this subcommand will need to set up only one secure
-admin internal user. As a general practice, you should not use the same
-user name and password pair for internal admin communication and for
-admin user login.
+Most users who use this subcommand will need to set up only one secure admin internal user. As a general practice, you should not use the same
+user name and password pair for internal admin communication and for admin user login.
 
-If you set up more than one secure admin internal user, you should not
-make any assumptions about which user name and password pair
+If you set up more than one secure admin internal user, you should not make any assumptions about which user name and password pair
 \{product---name} will choose to use for any given admin request.
 
-[[sthref1137]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 `--passwordalias`::
-  The password alias for the user that \{product---name} should use for
-  internally authenticating and authorizing the DAS to instances and the
+  The password alias for the user that \{product---name} should use for internally authenticating and authorizing the DAS to instances and the
   instances to the DAS.
 
-[[sthref1138]]
-
-Operands
+[[operands]]
+== Operands
 
 admin-username::
-  The admin user name that \{product---name} should use for internally
-  authenticating and authorizing the DAS to instances and the instances
-  to the DAS.
+  The admin user name that \{product---name} should use for internally authenticating and authorizing the DAS to instances and the instances to the DAS.
 
-[[sthref1139]]
+[[examples]]
+== Examples
 
-Examples
+Example 1 Specifying a user name and password for secure admin
 
-[[GSRFM607]][[sthref1140]]
-
-Example 1   Specifying a user name and password for secure admin
-
-The following example allows secure admin to use a user name and
-password alias for authentication and authorization between the DAS and
+The following example allows secure admin to use a user name and password alias for authentication and authorization between the DAS and
 instances, instead of certificates.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> enable-secure-admin-internal-user 
 --passwordalias passwordAliasName
 newAdminUsername
 ----
 
-[[sthref1141]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   subcommand executed successfully
 1::
   error in executing the subcommand
 
-[[sthref1142]]
+*See Also*
 
-See Also
-
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
-
-link:disable-secure-admin-internal-user.html#disable-secure-admin-internal-user-1[`disable-secure-admin-internal-user`(1)],
-link:enable-secure-admin.html#enable-secure-admin-1[`enable-secure-admin`(1)]
+* xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)]
+* xref:disable-secure-admin-internal-user.adoc#disable-secure-admin-internal-user[`disable-secure-admin-internal-user`(1)],
+* xref:enable-secure-admin.adoc#enable-secure-admin[`enable-secure-admin`(1)]
 
 

@@ -1,117 +1,77 @@
-type=page
-status=published
-title=list
-next=list-admin-objects.html
-prev=jms-ping.html
-~~~~~~
-list
-====
-
-[[list-1]][[GSRFM00145]][[list]]
-
-list
-----
+[[list]]
+= list
 
 lists configurable or monitorable elements
 
-[[sthref1282]]
+[[synopsis]]
+== Synopsis
 
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] list [--help] 
 [--monitor={false|true}]
 [dotted-parent-attribute-name]
 ----
 
-[[sthref1283]]
+[[description]]
+== Description
 
-Description
+The `list` subcommand lists configurable and monitorable attributes of \{product---name}.
 
-The `list` subcommand lists configurable and monitorable attributes of
-\{product---name}.
-
-The output of the `list` subcommand is a list of the dotted names that
-represent individual server components and subsystems. For example,
-`server.applications.web-module`. After you know the particular
-component or subsystem, you can then use the `get` subcommand to access
-any attributes, and the `set` subcommand to modify configurable
-attributes.
+The output of the `list` subcommand is a list of the dotted names that represent individual server components and subsystems. For example,
+`server.applications.web-module`. After you know the particular component or subsystem, you can then use the `get` subcommand to access
+any attributes, and the `set` subcommand to modify configurable attributes.
 
 The following rules apply to dotted names in a `list` subcommand:
 
+NOTE: Characters that have special meaning to the shell or command interpreter, such as * (asterisk), should be quoted or escaped as
+appropriate to the shell, for example, by enclosing the argument in quotes. In multimode, quotes are needed only for arguments that include spaces, quotes, or backslash.
 
-[NOTE]
-=======================================================================
-
-Characters that have special meaning to the shell or command
-interpreter, such as * (asterisk), should be quoted or escaped as
-appropriate to the shell, for example, by enclosing the argument in
-quotes. In multimode, quotes are needed only for arguments that include
-spaces, quotes, or backslash.
-
-=======================================================================
-
-
-* Any `list` subcommand that has a dotted name that is not followed by a
-wildcard (*) lists the current node's immediate children. For example,
-the following command lists all immediate children belonging to the
-server node: +
-[source,oac_no_warn]
+* Any `list` subcommand that has a dotted name that is not followed by a wildcard (*) lists the current node's immediate children. For example,
+the following command lists all immediate children belonging to the server node:
++
+[source,shell]
 ----
 asadmin> list server
 ----
-* Any `list` subcommand that has a dotted name followed by a wildcard(*)
-lists a hierarchical tree of child nodes from the current node. For
-example, the following command lists all child nodes of applications and
-their subsequent child nodes, and so on: +
-[source,oac_no_warn]
+* Any `list` subcommand that has a dotted name followed by a wildcard(*) lists a hierarchical tree of child nodes from the current node. For
+example, the following command lists all child nodes of applications and their subsequent child nodes, and so on:
++
+[source,shell]
 ----
 asadmin> list server.applications.*
 ----
-* Any `list` subcommand that has a dotted name preceded or followed by a
-wildcard (*) of the form *dotted name or dottedname* lists all nodes and
-their child nodes that match the regular expression created by the
-provided matching pattern.
+* Any `list` subcommand that has a dotted name preceded or followed by a wildcard (*) of the form *dotted name or dottedname* lists all nodes and
+their child nodes that match the regular expression created by the provided matching pattern.
 
-For detailed information about dotted names, see the
-link:dotted-names.html#dotted-names-5asc[`dotted-names`(5ASC)] help page.
+For detailed information about dotted names, see the xref:dotted-names.adoc#dotted-names[`dotted-names`(5ASC)] help page.
 
-[[sthref1284]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 `--monitor`::
 `-m`::
-  Defaults to false. If set to false, the configurable attribute values
-  are returned. If set to true, the monitorable attribute values are
-  returned.
+  Defaults to false. If set to false, the configurable attribute values are returned. If set to true, the monitorable attribute values are returned.
 
-[[sthref1285]]
-
-Operands
+[[operands]]
+== Operands
 
 dotted-parent-element-name::
   Configurable or monitorable element name
 
-[[sthref1286]]
+[[examples]]
+== Examples
 
-Examples
-
-[[GSRFM631]][[sthref1287]]
-
-Example 1   Listing Dotted Names of Configurable Elements
+Example 1 Listing Dotted Names of Configurable Elements
 
 This example lists the elements that can be configured.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> list *
 applications
@@ -162,13 +122,11 @@ system-applications
 Command list executed successfully.
 ----
 
-[[GSRFM632]][[sthref1288]]
-
-Example 2   Listing Attributes of a Configurable Element
+Example 2 Listing Attributes of a Configurable Element
 
 This example lists the attributes of the web container.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> list configs.config.server-config.web-container
 configs.config.server-config.web-container
@@ -176,14 +134,11 @@ configs.config.server-config.web-container.session-config
 Command list executed successfully.
 ----
 
-[[GSRFM633]][[sthref1289]]
+Example 3 Listing Dotted Names of Monitorable Objects
 
-Example 3   Listing Dotted Names of Monitorable Objects
+This example lists the names of the monitorable objects that are enabled for monitoring.
 
-This example lists the names of the monitorable objects that are enabled
-for monitoring.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> list --monitor *
 server.jvm
@@ -210,25 +165,20 @@ server.transaction-service
 Command list executed successfully.
 ----
 
-[[sthref1290]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   subcommand executed successfully
 1::
   error in executing the subcommand
 
-[[sthref1291]]
+*See Also*
 
-See Also
-
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
-
-link:get.html#get-1[`get`(1)], link:set.html#set-1[`set`(1)]
-
-link:dotted-names.html#dotted-names-5asc[`dotted-names`(5ASC)]
-
-link:../administration-guide/toc.html#GSADG[GlassFish Server Open Source Edition Administration Guide]
+* xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)]
+* xref:get.adoc#get[`get`(1)]
+* xref:set.adoc#set-1[`set`(1)]
+* xref:dotted-names.adoc#dotted-names[`dotted-names`(5ASC)]
+* xref:docs:administration-guide:toc.adoc#GSADG[GlassFish Server Open Source Edition Administration Guide]
 
 

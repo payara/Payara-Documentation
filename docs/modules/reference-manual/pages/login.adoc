@@ -1,88 +1,55 @@
-type=page
-status=published
-title=login
-next=migrate-timers.html
-prev=list-web-env-entry.html
-~~~~~~
-login
-=====
-
-[[login-1]][[GSRFM00210]][[login]]
-
-login
------
+[[login]]
+= login
 
 logs you into a domain
 
-[[sthref1874]]
+[[synopsis]]
+== Synopsis
 
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] login [--help]
 ----
 
-[[sthref1875]]
+[[description]]
+== Description
 
-Description
+The purpose of the `login` subcommand is to ease domain administration by letting you log into a particular domain. If \{product---name}
+domains are created on various machines (locally), you can run the `asadmin` utility from any of these machines and manage domains located
+elsewhere (remotely). This is especially useful when a particular machine is chosen as an administration client that manages multiple domains and servers.
 
-The purpose of the `login` subcommand is to ease domain administration
-by letting you log into a particular domain. If \{product---name}
-domains are created on various machines (locally), you can run the
-`asadmin` utility from any of these machines and manage domains located
-elsewhere (remotely). This is especially useful when a particular
-machine is chosen as an administration client that manages multiple
-domains and servers.
+The `login` subcommand prompts you for the administrator user name and password. After successful login, the `.asadminpass` file is created in
+your home directory. (This is the same file that is modified when you run the `create-domain` subcommand with the `--savelogin` option.) The
+literal host name is stored, and no resolution with the DNS is attempted. If a domain is being administered from other machines, it is
+sufficient to run the `login` subcommand once. You do not need to specify the `asadmin` utility options `--user` and `--passwordfile` when
+you run additional remote subcommands on that domain. After you have logged into a domain, you still need to provide the host and port for
+any subsequent remote subcommands unless you chose the default values for `--host` (localhost) and `--port` (4848) options.
 
-The `login` subcommand prompts you for the administrator user name and
-password. After successful login, the `.asadminpass` file is created in
-your home directory. (This is the same file that is modified when you
-run the `create-domain` subcommand with the `--savelogin` option.) The
-literal host name is stored, and no resolution with the DNS is
-attempted. If a domain is being administered from other machines, it is
-sufficient to run the `login` subcommand once. You do not need to
-specify the `asadmin` utility options `--user` and `--passwordfile` when
-you run additional remote subcommands on that domain. After you have
-logged into a domain, you still need to provide the host and port for
-any subsequent remote subcommands unless you chose the default values
-for `--host` (localhost) and `--port` (4848) options.
+Subsequent use of same subcommand with the same parameters will result in overwriting the contents of the `.asadminpass` file for the given
+administration host and port. You can decide to overwrite the file or to reject such a login.
 
-Subsequent use of same subcommand with the same parameters will result
-in overwriting the contents of the `.asadminpass` file for the given
-administration host and port. You can decide to overwrite the file or to
-reject such a login.
+Login information is saved permanently and can be used across multiple domain restarts.
 
-Login information is saved permanently and can be used across multiple
-domain restarts.
-
-There is no `logout` subcommand. If you want to log in to another
-domain, run the `login` subcommand and specify new values for the
+There is no `logout` subcommand. If you want to log in to another domain, run the `login` subcommand and specify new values for the
 `asadmin` utility options `--host` and `--port`.
 
-[[sthref1876]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 
-[[sthref1877]]
+[[examples]]
+== Examples
 
-Examples
+Example 1 Logging Into a Domain on a Remote Machine
 
-[[GSRFM720]][[sthref1878]]
+This example logs into a domain located on another machine. Options are specified before the `login` subcommand.
 
-Example 1   Logging Into a Domain on a Remote Machine
-
-This example logs into a domain located on another machine. Options are
-specified before the `login` subcommand.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin --host foo --port 8282 login 
 Please enter the admin user name>admin
@@ -96,14 +63,11 @@ Make sure that this file remains protected. Information stored in this
 file will be used by asadmin commands to manage associated domain.
 ----
 
-[[GSRFM721]][[sthref1879]]
+Example 2 Logging Into a Domain on the Default Port of Localhost
 
-Example 2   Logging Into a Domain on the Default Port of Localhost
+This example logs into a domain on `mylhost` on the default port. Options are specified before the `login` subcommand.
 
-This example logs into a domain on `mylhost` on the default port.
-Options are specified before the `login` subcommand.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin --host myhost login 
 Please enter the admin user name>admin
@@ -119,22 +83,18 @@ Make sure that this file remains protected. Information stored in this
 file will be used by asadmin commands to manage associated domain.
 ----
 
-[[sthref1880]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   subcommand executed successfully
 1::
   error in executing the subcommand
 
-[[sthref1881]]
+*See Also*
 
-See Also
-
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
-
-link:create-domain.html#create-domain-1[`create-domain`(1)],
-link:delete-domain.html#delete-domain-1[`delete-domain`(1)]
+* xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)]
+* xref:create-domain.html#create-domain[`create-domain`(1)],
+* xref:delete-domain.html#delete-domain-1[`delete-domain`(1)]
 
 
