@@ -1,0 +1,84 @@
+:ordinal: 1
+= Amazon SQS Versioning
+
+The SQS connector's behavior and features are affected by the exact version of the Amazon Web Services Java SDK version being planned to use. For each version, there are separate versions of the connector's JCA adapter and its API.
+
+[[amazon-sqs-connector-version-1]]
+== Amazon SQS Connector version 1
+
+This is the first version of the connector that is based on https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/welcome.html[Amazon Web Services Java SDK v1].
+
+[[v1-usage]]
+=== Usage
+
+The `AmazonSQSRAR-0.8.0.rar` JCA adapter has to be deployed as shown in the xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Overview.adoc#Installing-a-connector[Installing a connector section] of the Cloud Connectors overview.
+
+Additionally, to use the connector API add the following Maven dependencies to your application's project:
+
+[source, xml,subs=attributes+]
+----
+<dependency>
+  <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
+  <artifactId>AmazonSQSJCAAPI</artifactId>
+  <version>[,1.0.0)</version>  
+  <type>jar</type>
+  <scope>provided</scope>
+</dependency>
+
+<dependency>
+  <groupId>com.amazonaws</groupId>
+  <artifactId>aws-java-sdk-sqs</artifactId>
+  <version>1.11.118</version>
+  <type>jar</type>
+  <scope>provided</scope>
+</dependency>
+----
+
+NOTE: These dependencies have a provided `scope` since the types within this dependency are globally available to every application deployed to Payara Micro after the `AmazonSQSRAR-0.8.0.rar` has been deployed.
+
+WARNING: It can be confusing, but disregard the version of the artifact, as it constitutes a sequential development of the "first version" of the connector's artifact.
+
+[[amazon-sqs-connector-version-2]]
+== Amazon SQS Connector version 2
+
+This is the second version of the connector that is based on https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/home.html[Amazon Web Services SDK v2].
+
+[[v2-usage]]
+=== Usage
+
+To get this version's JCA adapter, clone the https://github.com/payara/Cloud-Connectors/tree/cloud-connectors-v2[Cloud Connectors V2] Git branch of the Cloud Connectors official repository and then build the project to install the artifacts:
+
+[source, shell]
+----
+cd Cloud-Connectors/
+mvn clean install
+----
+
+The connector's RAR artifact can be found in the following location:
+
+----
+./AmazonSQS/AmazonSQSRAR/target/amazon-sqs-rar-1.0.0.rar
+----
+
+Additionally, to use the connector API add the following Maven dependencies to your application's project:
+
+[source, xml]
+----
+<dependency>
+    <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
+    <artifactId>amazon-sqs-jca-api</artifactId>
+    <version>1.0.0</version>
+    <type>jar</type>
+    <scope>provided</scope>
+</dependency>
+
+<dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>sqs</artifactId>
+    <version>2.18.17</version>
+    <type>jar</type>
+    <scope>provided</scope>
+</dependency>
+----
+
+NOTE: The `amazon-sqs-jca-api` artifact has to be installed to your local Maven repository first.
