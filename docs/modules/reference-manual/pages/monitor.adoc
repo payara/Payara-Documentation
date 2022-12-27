@@ -1,27 +1,12 @@
-type=page
-status=published
-title=monitor
-next=multimode.html
-prev=migrate-timers.html
-~~~~~~
-monitor
-=======
-
-The script content on this page is for navigation purposes only and does
-not alter the content in any way.
-
-[[monitor-1]][[GSRFM00212]][[monitor]]
-
-monitor
--------
+[[monitor]]
+= monitor
 
 displays monitoring data for commonly used components and services
 
-[[sthref1890]]
+[[synopsis]]
+== Synopsis
 
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] monitor [--help] 
 --type type 
@@ -31,147 +16,104 @@ asadmin [asadmin-options] monitor [--help]
 instance-name
 ----
 
-[[sthref1891]]
+[[description]]
+== Description
 
-Description
+The `monitor` subcommand displays statistics for commonly monitored \{product---name} components and services. The `--type` option must be
+used to specify the object for which statistics are to be displayed.Data is displayed continuously in a tabular form, or the data can be
+displayed at a particular time interval by using the `--interval` option.
 
-The `monitor` subcommand displays statistics for commonly monitored
-\{product---name} components and services. The `--type` option must be
-used to specify the object for which statistics are to be displayed.
-Data is displayed continuously in a tabular form, or the data can be
-displayed at a particular time interval by using the `--interval`
-option.
+Before a given component or service can be monitored, monitoring must be enabled (set to HIGH or LOW) for the component or service by using the
+Administration Console, the enable-monitoring subcommand, or the set subcommand.
 
-Before a given component or service can be monitored, monitoring must be
-enabled (set to HIGH or LOW) for the component or service by using the
-Administration Console, the enable-monitoring subcommand, or the set
-subcommand.
-
-The monitor subcommand has options for filtering the results and
-capturing the output in a Comma Separated Values (CSV) file. The output
-appears in a table format. To view the legend of the table header, type
-`h`.
+The monitor subcommand has options for filtering the results and capturing the output in a Comma Separated Values (CSV) file. The output
+appears in a table format. To view the legend of the table header, type `h`.
 
 This subcommand is supported in local mode only.
 
-[[sthref1892]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 `--type`::
-  The component or service to monitor. This option is required. No
-  default value is defined. +
+  The component or service to monitor. This option is required. No default value is defined. +
   `httplistener`;;
-    For this type, the attribute
-    `server.monitoring-service.module-monitoring-levels.http-service`
-    must be set to LOW or HIGH. +
+    For this type, the attribute `server.monitoring-service.module-monitoring-levels.http-service` must be set to LOW or HIGH. +
     Displays the following statistics for the HTTP listener service:::
     `ec`::
       The total number errors in the processing of HTTP requests.
     `mt`::
-      The longest response time (in milliseconds) for the processing of
-      a single HTTP request.
+      The longest response time (in milliseconds) for the processing of a single HTTP request.
     `pt`::
-      The total amount of time (in milliseconds) that the HTTP listener
-      service has spent in processing HTTP requests.
+      The total amount of time (in milliseconds) that the HTTP listener service has spent in processing HTTP requests.
     `rc`::
-      The total number of requests that the HTTP listener service has
-      processed.
+      The total number of requests that the HTTP listener service has processed.
   `jvm`;;
-    For this type, the attribute
-    `server.server-config.monitoring-service.module-monitoring-levels.jvm`
-    must be set to LOW or HIGH. +
-    Displays the following statistics for the Virtual Machine for the
-    Java platform (Java Virtual Machine or JVM
-    machine):link:#sthref1893[^Foot 2 ^]::
+    For this type, the attribute `server.server-config.monitoring-service.module-monitoring-levels.jvm` must be set to LOW or HIGH. +
+    Displays the following statistics for the Virtual Machine for the Java platform (Java Virtual Machine or JVM machine)::
     `UpTime`::
-      The number of milliseconds that the JVM machine has been running
-      since it was last started.
+      The number of milliseconds that the JVM machine has been running since it was last started.
     `min`::
-      The initial amount of memory (in bytes) that the JVM machine
-      requests from the operating system for memory management during
-      startup.
+      The initial amount of memory (in bytes) that the JVM machine requests from the operating system for memory management during startup.
     `max`::
-      The maximum amount of memory that can be used for memory
-      management.
+      The maximum amount of memory that can be used for memory management.
     `low`::
       Retained for compatibility with other releases.
     `high`::
       Retained for compatibility with other releases.
     `count`::
-      The amount of memory (in bytes) that is guaranteed to be available
-      for use by the JVM machine.
+      The amount of memory (in bytes) that is guaranteed to be available for use by the JVM machine.
   `webmodule`;;
-    For this type, the attribute
-    `server.server-config.monitoring-service.module-monitoring-levels.web-container`
-    must be set to LOW or HIGH. +
+    For this type, the attribute `server.server-config.monitoring-service.module-monitoring-levels.web-container` must be set to LOW or HIGH. +
     Displays the following statistics for all deployed web modules:::
     `asc`::
       The number of currently active sessions.
     `ast`::
-      The total number of sessions that are currently active or have
-      been active previously.
+      The total number of sessions that are currently active or have been active previously.
     `rst`::
       The total number of rejected sessions.
     `st`::
       The total number of sessions that have been created.
     `ajlc`::
-      The number of currently active JavaServer Pages ( JSP) technology
-      pages that are loaded.
+      The number of currently active JavaServer Pages ( JSP) technology pages that are loaded.
     `mjlc`::
-      The maximum number of JSP technology pages that were active at any
-      time simultaneously.
+      The maximum number of JSP technology pages that were active at any time simultaneously.
     `tjlc`::
       Total number of JSP technology pages that have been loaded.
     `aslc`::
       The number of currently active Java servlets that are loaded.
     `mslc`::
-      The maximum number of Java servlets that were active at any time
-      simultaneously.
+      The maximum number of Java servlets that were active at any time simultaneously.
     `tslc`::
       The total number of Java servlets that have been loaded.
 `--filename`::
-  Do not specify this option. This option is retained for compatibility
-  with earlier releases. If you specify this option, a syntax error does
-  not occur. Instead, the subcommand runs successfully and displays a
-  warning message that the option is ignored.
+  Do not specify this option. This option is retained for compatibility with earlier releases. If you specify this option, a syntax error does
+  not occur. Instead, the subcommand runs successfully and displays a warning message that the option is ignored.
 `--interval`::
-  The interval in seconds before capturing monitoring attributes. The
-  interval must be greater than 0. The monitoring attributes are
-  displayed on `stdout` until you type Control-C or `q`. The default
-  value is 30.
+  The interval in seconds before capturing monitoring attributes. The interval must be greater than 0. The monitoring attributes are
+  displayed on `stdout` until you type Control-C or `q`. The default value is 30.
 `--filter`::
-  Do not specify this option. This option is retained for compatibility
-  with earlier releases. If you specify this option, a syntax error does
-  not occur. Instead, the subcommand runs successfully and displays a
-  warning message that the option is ignored.
+  Do not specify this option. This option is retained for compatibility with earlier releases. If you specify this option, a syntax error does
+  not occur. Instead, the subcommand runs successfully and displays a warning message that the option is ignored.
 
-[[sthref1894]]
-
-Operands
+[[operands]]
+== Operands
 
 instance-name::
-  The server instance for which to view monitoring data. The default
-  value is `server`.
+  The server instance for which to view monitoring data. The default value is `server`.
 
-[[sthref1895]]
+[[examples]]
+== Examples
 
-Examples
+Example 1 Displaying Monitoring Statistics by Interval
 
-[[GSRFM723]][[sthref1896]]
+This example displays monitoring data for the JVM machine every 2000 seconds.
 
-Example 1   Displaying Monitoring Statistics by Interval
-
-This example displays monitoring data for the JVM machine every 2000
-seconds.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> monitor --type=jvm --interval 2000 server
                                JVM Monitoring
@@ -183,14 +125,11 @@ q
 Command monitor executed successfully.
 ----
 
-[[GSRFM724]][[sthref1897]]
+Example 2 Filtering the Monitoring Data
 
-Example 2   Filtering the Monitoring Data
+This example uses the filter option to show `http-listener-1` statistics.
 
-This example uses the filter option to show `http-listener-1`
-statistics.
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> monitor --type httplistener --filter http-listener-1 server
 
@@ -203,7 +142,7 @@ ctc  ctb  ec   moc  mst  mt   mtm  mst  pt   rc
 
 To see the legend for the table headings, type `h`.
 
-[source,oac_no_warn]
+[source,shell]
 ----
 ******************************************************************************************
 * br   = Cumulative value of the Bytes received by each of the Request Processors        *
@@ -238,36 +177,24 @@ To see the legend for the table headings, type `h`.
 ******************************************************************************************
 ----
 
-[[sthref1898]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   subcommand executed successfully
 1::
   error in executing the subcommand
 
-[[sthref1899]]
+*See Also*
 
-See Also
-
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
-
-link:enable-monitoring.html#enable-monitoring-1[`enable-monitoring`(1)],
-link:disable-monitoring.html#disable-monitoring-1[`disable-monitoring`(1)],
-link:set.html#set-1[`set`(1)]
-
-link:monitoring.html#monitoring-5asc[`monitoring`(5ASC)]
-
-"link:../administration-guide/monitoring.html#GSADG00011[Administering the Monitoring Service]" in GlassFish
+* xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)]
+* xref:enable-monitoring.adoc#enable-monitoring[`enable-monitoring`(1)],
+* xref:disable-monitoring.adoc#disable-monitoring[`disable-monitoring`(1)],
+* xref:set.adoc#set-1[`set`(1)]
+* xref:monitoring.adoc#monitoring[`monitoring`(5ASC)]
+* "xref:docs:administration-guide:monitoring.adoc#administering-the-monitoring-service[Administering the Monitoring Service]" in GlassFish
 Server Open Source Edition Administration Guide
 
-'''''
 
-
-Footnote Legend
-
-Footnote 2: The terms "Java Virtual Machine" and "JVM" mean a Virtual
-Machine for the Java platform. +
 
 

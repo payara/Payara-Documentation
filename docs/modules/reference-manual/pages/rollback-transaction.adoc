@@ -1,113 +1,86 @@
-type=page
-status=published
-title=rollback-transaction
-next=rotate-log.html
-prev=restore-domain.html
-~~~~~~
-rollback-transaction
-====================
-
-[[rollback-transaction-1]][[GSRFM00223]][[rollback-transaction]]
-
-rollback-transaction
---------------------
+[[rollback-transaction]]
+= rollback-transaction
 
 rolls back the named transaction
 
-[[sthref2008]]
+[[synopsis]]
+== Synopsis
 
-Synopsis
-
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin [asadmin-options] rollback-transaction [--help] 
 [--target target]
 transaction_id
 ----
 
-[[sthref2009]]
-
-Description
+[[description]]
+== Description
 
 The `rollback-transaction` subcommand rolls back the named transaction.
 
 Before you can roll back a transaction, you must do the following:
 
-1.  Enable monitoring using the `set` subcommand. For example: +
-[source,oac_no_warn]
+. Enable monitoring using the `set` subcommand. For example:
++
+[source,shell]
 ----
 asadmin> set clstr1-config.monitoring-service.module-monitoring-levels.transaction-service=HIGH
 ----
-2.  Use the `freeze-transaction-service` subcommand to halt in-process
-transactions.
-3.  Look up the active transactions using the `get` subcommand with the
-`--monitor` option. For example: +
-[source,oac_no_warn]
+. Use the `freeze-transaction-service` subcommand to halt in-process transactions.
+. Look up the active transactions using the `get` subcommand with the `--monitor` option. For example:
++
+[source,shell]
 ----
 asadmin> get --monitor inst1.server.transaction-service.activeids-current
 ----
 
 This subcommand is supported in remote mode only.
 
-[[sthref2010]]
-
-Options
+[[options]]
+== Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the link:asadmin.html#asadmin-1m[`asadmin`(1M)] help page.
+  Options for the `asadmin` utility. For information about these options, see the xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 `--target`::
-  This option specifies the target on which you are rolling back the
-  transactions. Valid values are `server` or any other clustered or
-  stand-alone instance.
+  This option specifies the target on which you are rolling back the transactions. Valid values are `server` or any other clustered or stand-alone instance.
 
-[[sthref2011]]
-
-Operands
+[[operands]]
+== Operands
 
 transaction_id::
   Identifier for the transaction to be rolled back.
 
-[[sthref2012]]
+[[examples]]
+== Examples
 
-Examples
+Example 1 Using rollback-transaction command
 
-[[GSRFM741]][[sthref2013]]
-
-Example 1   Using rollback-transaction command
-
-[source,oac_no_warn]
+[source,shell]
 ----
 % asadmin rollback-transaction 0000000000000001_00
 Command rollback-transaction executed succeessfully
 ----
 
-[[sthref2014]]
-
-Exit Status
+[[exit-status]]
+== Exit Status
 
 0::
   command executed successfully
 1::
   error in executing the command
 
-[[sthref2015]]
+*See Also*
 
-See Also
+* xref:asadmin.adoc#asadmin-1m[`asadmin`(1M)]
 
-link:asadmin.html#asadmin-1m[`asadmin`(1M)]
-
-link:freeze-transaction-service.html#freeze-transaction-service-1[`freeze-transaction-service`(1)],
-link:recover-transactions.html#recover-transactions-1[`recover-transactions`(1)],
-link:unfreeze-transaction-service.html#unfreeze-transaction-service-1[`unfreeze-transaction-service`(1)],
-
-"link:../administration-guide/transactions.html#GSADG00022[Administering Transactions]" in GlassFish Server Open
+* xref:freeze-transaction-service.adoc#freeze-transaction-service[`freeze-transaction-service`(1)],
+* xref:recover-transactions.adoc#recover-transactions[`recover-transactions`(1)],
+* xref:unfreeze-transaction-service.adoc#unfreeze-transaction-service-1[`unfreeze-transaction-service`(1)],
+* "xref:docs:administration-guide:transactions.adoc#administering-transactions[Administering Transactions]" in GlassFish Server Open
 Source Edition Administration Guide
-
-"http://docs.oracle.com/javaee/7/tutorial/doc/transactions.html[Transactions]"
-in The Java EE 8 Tutorial
+* "http://docs.oracle.com/javaee/7/tutorial/doc/transactions.html[Transactions]" in The Java EE 8 Tutorial
 
 
