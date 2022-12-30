@@ -1,7 +1,8 @@
 [[deploying-applications]]
 = Deploying Applications
 
-This chapter provides procedures and guidelines for deploying applications and modules in the Payara Server Open Source Edition environment by using the `asadmin` command-line utility.
+This chapter provides procedures and guidelines for deploying applications and modules in the Payara Server Open Source Edition environment by using the `asadmin`
+command-line utility.
 
 Instructions for accomplishing these tasks by using the Administration Console are contained in the Administration Console online help.
 
@@ -9,30 +10,35 @@ Instructions for accomplishing these tasks by using the Administration Console a
 == Deploying Applications and Modules
 
 Application deployment is a dynamic process, which means that deployed applications and modules become available without requiring you to restart the server instance.
-Dynamic deployment can be useful in production environments to bring new applications and modules online easily. If you do restart the server, all deployed components are still deployed and available.
+Dynamic deployment can be useful in production environments to bring new applications and modules online easily. If you do restart the server, all deployed components
+are still deployed and available.
 
 Instructions for accomplishing these tasks by using the Administration Console are contained in the Administration Console online help.
 
 [[to-deploy-an-application-or-module]]
 ===  To Deploy an Application or Module
 
-Use the `deploy` subcommand in remote mode to deploy an assembled application or module to Payara Server. If an error occurs during deployment, the application or module is not deployed.
-If a module within an application contains an error, the entire application is not deployed. These failures prevent a partial deployment that could leave the server in an inconsistent state.
+Use the `deploy` subcommand in remote mode to deploy an assembled application or module to Payara Server. If an error occurs during deployment, the application or module
+is not deployed. If a module within an application contains an error, the entire application is not deployed. These failures prevent a partial deployment
+that could leave the server in an inconsistent state.
 
 By default, the deployment target is the default server instance, `server`. To deploy only to the default server instance, specify no target.
-If you deploy the application or module only to the domain target, it exists in the domain central repository, but no server instances or clusters can reference the component unless you add references.
+If you deploy the application or module only to the domain target, it exists in the domain central repository, but no server instances or clusters
+can reference the component unless you add references.
 
 You can also deploy a component to a specific stand-alone server instance or cluster.
-When you deploy to server instances or clusters, the application or module exists in the domain's central repository and is referenced by any clusters or server instances that you deployed to.
-For a cluster, the preselected deployment target is `server`.
+When you deploy to server instances or clusters, the application or module exists in the domain's central repository and is referenced by any clusters or
+server instances that you deployed to. For a cluster, the preselected deployment target is `server`.
 
-If the component is already deployed or already exists, you can forcefully redeploy if you set the `--force` option of the `deploy` subcommand to true. The `redeploy` subcommand also accomplishes this.
-See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2-10[Example 2-10]. You can see the enabled or disabled status of an application or module by using the xref:docs:reference-manual:show-component-status.adoc[`show-component-status`] subcommand.
+If the component is already deployed or already exists, you can forcefully redeploy if you set the `--force` option of the `deploy` subcommand to true.
+The `redeploy` subcommand also accomplishes this. See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2-10[Example 2-10].
+You can see the enabled or disabled status of an application or module by using the xref:docs:reference-manual:show-component-status.adoc[`show-component-status`] subcommand.
 
 For information about how the application or module name is derived, see xref:docs:application-deployment-guide:overview.adoc#naming-standards[Naming Standards].
 
-Use the `--altdd` or `--runtimealtdd` options of the `deploy` (and `redeploy`) subcommand to deploy an application or module using a top-level alternate deployment descriptor. The `--altdd` option specifies a top-level alternate Java EE standard deployment descriptor.
-The `--runtimealtdd` option specifies a top-level alternate Payara Server runtime deployment descriptor. See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2-3[Example 2-3].
+Use the `--altdd` or `--runtimealtdd` options of the `deploy` (and `redeploy`) subcommand to deploy an application or module using a top-level alternate deployment descriptor.
+The `--altdd` option specifies a top-level alternate Java EE standard deployment descriptor. The `--runtimealtdd` option specifies a top-level alternate Payara Server runtime deployment descriptor.
+See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2-3[Example 2-3].
 For more information about deployment descriptors associated with Payara Server, see xref:docs:application-deployment-guide:overview.adoc#deployment-descriptors-and-annotations[Deployment Descriptors and Annotations].
 
 You can also specify the deployment order of an application by using the `--deploymentorder` option of the `deploy` (and `redeploy`) subcommand.
@@ -121,14 +127,16 @@ TIP: You can also view the full syntax and options of the subcommand by typing`a
 There are a number of commands that can be used to list deployed applications or modules and their subcomponents. Use the commands in this section in remote mode.
 
 . Ensure that the server is running. Remote commands require a running server.
-. List the desired applications by using the xref:docs:reference-manual:list-applications.adoc[`list-applications`] subcommand or the xref:docs:reference-manual:list-sub-components.adoc[`list-sub-components`] subcommand. +
+. List the desired applications by using the xref:docs:reference-manual:list-applications.adoc[`list-applications`] subcommand or
+the xref:docs:reference-manual:list-sub-components.adoc[`list-sub-components`] subcommand. +
 Information about these commands is included in these help pages.
 . Show the status of a deployed component by using the xref:docs:reference-manual:show-component-status.adoc[`show-component-status`] subcommand.
 
 [[example-2-5]]
 ==== *Example 2-5* Listing Applications
 
-The `list-applications` subcommand lists all deployed Jakarta EE applications or modules. If the `--type` option is not specified, all components are listed. This example lists deployed applications.
+The `list-applications` subcommand lists all deployed Jakarta EE applications or modules. If the `--type` option is not specified, all components are listed.
+This example lists deployed applications.
 
 [source,shell]
 ----
@@ -167,8 +175,9 @@ Command show-component-status executed successfully
 [[to-redeploy-an-application-or-module]]
 === To Redeploy an Application or Module
 
-Use the `redeploy` subcommand in remote mode to overwrite a previously-deployed application or module. You can also accomplish this task by using the `--force` option of the `deploy` subcommand.
-Whenever a redeployment is done, the HTTP and SFSB sessions in transit at that time, and the EJB timers, become invalid unless you use the `--keepstate=true` option of the `redeploy` subcommand.
+Use the `redeploy` subcommand in remote mode to overwrite a previously-deployed application or module. You can also accomplish this task by using the `--force`
+option of the `deploy` subcommand. Whenever a redeployment is done, the HTTP and SFSB sessions in transit at that time, and the EJB timers,
+become invalid unless you use the `--keepstate=true` option of the `redeploy` subcommand.
 
 Before You Begin, You must remove a preconfigured resource before it can be updated.
 
@@ -229,7 +238,8 @@ An application or module is enabled by default.
 
 . Ensure that the server is running. Remote commands require a running server.
 . Obtain the exact name of the application or module that you are disabling. +
-To list deployed applications or modules, use the xref:docs:reference-manual:list-applications.adoc[`list-applications`] subcommand. If you do not specify a type, all deployed applications and modules are listed.
+To list deployed applications or modules, use the xref:docs:reference-manual:list-applications.adoc[`list-applications`] subcommand.
+If you do not specify a type, all deployed applications and modules are listed.
 For example, valid types can be `web`, `ejb`, `connector`, `application`, and `webservice`. +
 To see the status of deployed components, use the xef:docs:reference-manual:show-component-status.adoc[`show-component-status`] subcommand.
 . Deactivate the application or module by using the xref:docs:reference-manual:disable.adoc[`disable`] subcommand. +
@@ -263,7 +273,8 @@ TIP: You can also view the full syntax and options of the subcommand by typing `
 [[to-enable-an-application-or-module]]
 === To Enable an Application or Module
 
-An enabled application or module is runnable and can be accessed by clients if it has been deployed to an accessible server instance or cluster. An application or module is enabled by default.
+An enabled application or module is runnable and can be accessed by clients if it has been deployed to an accessible server instance or cluster.
+An application or module is enabled by default.
 Use the `enable` subcommand in remote mode to enable an application or module that has been disabled.
 
 An application or module that is deployed to more than one target can be enabled on one target and disabled on another.
@@ -271,7 +282,8 @@ If a component is referenced by a target, it is not available to users unless it
 
 . Ensure that the server is running. Remote commands require a running server.
 . Enable the application or module by using the xref:docs:reference-manual:enable.adoc[`enable`] subcommand. +
-If the component has not been deployed, an error message is displayed. If the component is already enabled, it is re-enabled. To see the status of deployed components, use the
+If the component has not been deployed, an error message is displayed. If the component is already enabled,
+it is re-enabled. To see the status of deployed components, use the
 xref:docs:reference-manual:show-component-status.adoc[`show-component-status`] subcommand. +
 Information about the options and properties of the subcommand is included in this help page.
 
@@ -333,17 +345,20 @@ TIP: You can also view the full syntax and options of the subcommand by typing `
 
 Dynamic reloading enables you to change the code or deployment descriptors of an application or module without needing to perform an explicit redeployment.
 Instead, you can copy the changed class files or descriptors into the deployment directory for the application or module.
-The server checks for changes periodically and automatically redeploys the changes if the timestamp of the `.reload` file in the root directory for the application or module has changed.
+The server checks for changes periodically and automatically redeploys the changes if the timestamp of the `.reload` file in the root directory
+for the application or module has changed.
 
 Dynamic reloading is enabled by default, and is available only on the default server instance.
 
 . Go to the root directory of the deployed application or module. +
-For an application: +
+For an application:
++
 [source,shell]
 ----
 domain-dir/applications/app-name
 ----
-For an individually deployed module: +
+For an individually deployed module:
++
 [source,shell]
 ----
 domain-dir/applications/module-name
@@ -361,7 +376,8 @@ If the `.reload` file doesn't exist, the `touch` or `echo` command creates it.
 
 NOTE: This task is best suited for use in a development environment.
 
-Automatic deployment involves copying an archive file into a special auto-deploy directory where the archive is automatically deployed by Payara Server at predefined intervals.
+Automatic deployment involves copying an archive file into a special auto-deploy directory where the archive is automatically
+deployed by Payara Server at predefined intervals.
 This method is useful in a development environment because it allows new code to be tested quickly.
 Automatic deployment is enabled by default, and is available only on the default server instance.
 
@@ -410,6 +426,7 @@ Each `/` (forward slash) is replaced by a `#` (pound sign).
 . Ensure that the server is running. Remote commands require a running server.
 . Deploy the application or module by using the xref:docs:reference-manual:deploy.adoc[`deploy`] subcommand with the `--deploymentplan`
 option. +
+
 NOTE: Deployment directories might change between Payara Server releases.
 
 [[example-2-18]]
@@ -456,7 +473,8 @@ $ jar r -tvf myotherplan.jar
 84805 Thu Mar 13 15:24:20 PST 2003 RosterSchema.dbschema
 ----
 
-The deployment plan is part of the implementation of JSR 88. For more information about JSR 88, see xref:docs:application-deployment-guide:overview.adoc#jsr-88-naming[JSR 88 Naming] and the JSR 88 page at `http://jcp.org/en/jsr/detail?id=88`.
+The deployment plan is part of the implementation of JSR 88. For more information about JSR 88, see
+xref:overview.adoc#jsr-88-client[JSR 88 Client] and the JSR 88 page at `http://jcp.org/en/jsr/detail?id=88`.
 
 [[to-deploy-an-application-or-module-in-a-directory-format]]
 === To Deploy an Application or Module in a Directory Format
@@ -472,7 +490,8 @@ The expanded application directory contains expanded directories for the modules
 
 You can change deployment descriptor files directly in the expanded directory.
 
-If your environment is configured to use dynamic reloading, you can also dynamically reload applications or modules that are deployed from the directory. For instructions, see xref:docs:application-deployment-guide:deploying-applications.adoc#to-reload-changes-to-applications-or-modules-dynamically[To Reload Changes to Applications or Modules Dynamically].
+If your environment is configured to use dynamic reloading, you can also dynamically reload applications or modules that are deployed from the directory. For instructions,
+see xref:docs:application-deployment-guide:deploying-applications.adoc#to-reload-changes-to-applications-or-modules-dynamically[To Reload Changes to Applications or Modules Dynamically].
 
 Unlike archive file deployment, directory deployment does not copy the directory contents to the remote hosts.
 This means that for deployment to a cluster, the directory path may exist for both the DAS and the remote server instances but may not actually correspond to the same physical location.
@@ -511,14 +530,16 @@ TIP: You can also view the full syntax and options of the subcommand by typing `
 
 You can modify the configuration of a web application or a module by modifying the deployment descriptors and then repackaging and redeploying the application.
 
-The instructions in this section enable you to change the configuration of a deployed application without the need to modify the application's deployment descriptors and repackage and redeploy the application.
-If the application or module entry is unset, its value reverts to the value, if any, that is set in the application's deployment descriptor.
+The instructions in this section enable you to change the configuration of a deployed application without the need to modify the application's deployment
+descriptors and repackage and redeploy the application. If the application or module entry is unset, its value reverts to the value, if any,
+that is set in the application's deployment descriptor.
 
 [[to-set-a-web-context-parameter]]
 === To Set a Web Context Parameter
 
-Use the `set-web-context-param` subcommand in remote mode to change the configuration of a deployed application without the need to modify the application's deployment descriptors and repackage and redeploy the application.
-By using this subcommand, you are either adding a new parameter that did not appear in the original web module's descriptor, or overriding the descriptor's setting of the parameter.
+Use the `set-web-context-param` subcommand in remote mode to change the configuration of a deployed application without the need to modify the application's deployment
+descriptors and repackage and redeploy the application. By using this subcommand, you are either adding a new parameter that did not appear in the original web module's descriptor,
+or overriding the descriptor's setting of the parameter.
 
 If the `--ignoreDescriptorItem` option is set to `true`, then the server ignores any setting for that context parameter in the descriptor, which means you do not need to specify an overriding value on the `set-web-context-param` subcommand.
 The server behaves as if the descriptor had never contained a setting for that context parameter.
@@ -709,15 +730,19 @@ The web module context root must be unique within the server instance. +
 The domain administration server (DAS) in Payara Server versions 2.1.1 and later supports the deployment of multiple web applications
 using the same web context root as long as those applications are deployed to different Payara Server stand-alone instances.
 Deploying multiple applications using the same context root within a single instance produces an error.
-* *Data Source*. If a web application accesses a `DataSource` that is not specified in a `resource-ref` in `glassfish-web.xml`, or there is no `glassfish-web.xml` file, the `resource-ref-name` defined in `web.xml` is used.
+* *Data Source*. If a web application accesses a `DataSource` that is not specified in a `resource-ref` in `glassfish-web.xml`, or there is no `glassfish-web.xml` file,
+the `resource-ref-name` defined in `web.xml` is used.
 A warning message is logged, recording the JNDI name that was used to look up the resource.
-* *Virtual Servers*. If you deploy a web application and do not specify any assigned virtual servers, the web application is assigned to all currently-defined virtual servers with the exception of the virtual server with ID `__asadmin`, which is reserved for administrative purposes.
+* *Virtual Servers*. If you deploy a web application and do not specify any assigned virtual servers, the web application is assigned to all currently-defined virtual servers
+with the exception of the virtual server with ID `__asadmin`, which is reserved for administrative purposes.
 If you then create additional virtual servers and want to assign existing web applications to them, you must redeploy the web applications.
 * *HTTP Sessions*. If a web application is undeployed, all its HTTP sessions will be invalidated and removed,
-unless the application is being undeployed as part of a redeployment and the `--keepstate` deployment option was set to true. This option is not supported and ignored in a clustered environment.
+unless the application is being undeployed as part of a redeployment and the `--keepstate` deployment option was set to true. This option is not supported and
+ignored in a clustered environment.
 See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2-8[Example 2-8].
 * *Load Balancing*.
-* *JSP Precompilation*. You can precompile JSP files during deployment by checking the appropriate box in the Administration Console, or by using the `--precompilejsp` option of the `deploy` subcommand. +
+* *JSP Precompilation*. You can precompile JSP files during deployment by checking the appropriate box in the Administration Console, or by using the `--precompilejsp`
+option of the `deploy` subcommand. +
 You can keep the generated source for JSP files by adding the `keepgenerated` flag to the `jsp-config` element in `glassfish-web.xml`.
 For example: +
 [source,shell]
@@ -757,13 +782,15 @@ The Payara Server Full Platform Profile supports the entire EJB 3.1 specificatio
 
 The following guidelines apply to deploying an EJB module in Payara Server:
 
-* *JNDI Name*. — If no JNDI name for the EJB JAR module is specified in the `jndi-name` element immediately under the `ejb` element in `glassfish-ejb-jar.xml`, or there is no `glassfish-ejb-jar.xml` file, a default, non-clashing JNDI name is derived. A warning message is logged, recording the JNDI name used to look up the EJB JAR module. +
-Because the EJB 3.1 specification defines portable EJB JNDI names, there is less need for Payara Server specific JNDI names. By default, Payara Server specific default JNDI names are applied automatically for backward compatibility.
-To disable Payara Server specific JNDI names for an EJB module, set the value of the `<disable-nonportable-jndi-names>` element in the `glassfish-ejb-jar.xml` file to `true`. The default is `false`.
-* *Stateful Session Bean and Timer State*. — Use the `--keepstate` option of the xref:docs:reference-manual:redeploy.adoc[`redeploy`] subcommand or the `<keepstate>` element in the `glassfish-ejb-jar.xml` file to retain stateful session
-bean instances and persistently created EJB timers across redeployments.
-The `--keepstate` option of the `redeploy` subcommand takes precedence.
-The default for both is `false`. This option is not supported and ignored in a clustered environment. +
+* *JNDI Name*. — If no JNDI name for the EJB JAR module is specified in the `jndi-name` element immediately under the `ejb` element in `glassfish-ejb-jar.xml`, or there is no `glassfish-ejb-jar.xml`
+file, a default, non-clashing JNDI name is derived. A warning message is logged, recording the JNDI name used to look up the EJB JAR module. +
+Because the EJB 3.1 specification defines portable EJB JNDI names, there is less need for Payara Server specific JNDI names. By default, Payara Server specific default
+JNDI names are applied automatically for backward compatibility.
+To disable Payara Server specific JNDI names for an EJB module, set the value of the `<disable-nonportable-jndi-names>` element in the `glassfish-ejb-jar.xml` file to `true`.
+The default is `false`.
+* *Stateful Session Bean and Timer State*. — Use the `--keepstate` option of the xref:docs:reference-manual:redeploy.adoc[`redeploy`] subcommand or the `<keepstate>` element
+in the `glassfish-ejb-jar.xml` file to retain stateful session bean instances and persistently created EJB timers across redeployments.
+The `--keepstate` option of the `redeploy` subcommand takes precedence. The default for both is `false`. This option is not supported and ignored in a clustered environment. +
 Some changes to an application between redeployments can prevent this feature from working properly. For example, do not change the set of instance variables in the SFSB bean class.
 Other examples would be changes to EJB names, or adding or removing EJBs to or from an application.
 * *EJB Singletons*. — EJB Singletons are created for each server instance in a cluster, and not once per cluster.
@@ -955,7 +982,7 @@ The following guidelines apply when deploying a web service in Payara Server:
 * Web Service Endpoint. Deploy a web service endpoint to Payara Server as you would any servlet or stateless session bean.
 If the deployed application or module has a web service endpoint, the endpoint is detected automatically during deployment.
 The Payara Server -specific deployment descriptor files, `glassfish-web.xml` and
-`glassfish-ejb-jar.xml`, provide optional web service enhancements in their xref:docs:application-deployment-guide:dd-elements.adoc#webservice-enpoint[`webservice-endpoint`] and
+`glassfish-ejb-jar.xml`, provide optional web service enhancements in their xref:docs:application-deployment-guide:dd-elements.adoc#webservice-endpoint[`webservice-endpoint`] and
 xref:docs:application-deployment-guide:dd-elements.adoc#webservice-description[`webservice-description`] elements.
 
 * Web Service Management. Web service management is fully supported in the Administration Console. After the application or module is deployed, click the Web Service component. The table in the right frame lists deployed web service endpoints.
