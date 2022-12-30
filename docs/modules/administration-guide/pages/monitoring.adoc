@@ -1,52 +1,36 @@
+[[administering-the-monitoring-service]]
 = Administering the Monitoring Service
 
-This chapter explains how to monitor the Payara Server
-components and services by using the `asadmin` command-line
-utility. Instructions for configuring JConsole to monitor Payara
-Server resources are also provided.
+This chapter explains how to monitor the Payara Server components and services by using the `asadmin` command-line
+utility. Instructions for configuring JConsole to monitor Payara Server resources are also provided.
 
-Instructions for monitoring by using the Administration Console are
-contained in the Administration Console online help.
+Instructions for monitoring by using the Administration Console are contained in the Administration Console online help.
 
 For information on using REST interfaces for monitoring, see
-xref:docs:administration-guide:general-administration.adoc#using-rest-interfaces-to-administer-payara-server[Using REST Interfaces to
-Administer Payara Server].
+xref:docs:administration-guide:general-administration.adoc#using-rest-interfaces-to-administer-payara-server[Using REST Interfaces to Administer Payara Server].
 
 [[about-monitoring]]
 == About Monitoring
 
-Monitoring is the process of reviewing the statistics of a system to
-improve performance or solve problems. The monitoring service can track
-and display operational statistics, such as the number of requests per
-second, the average response time, and the throughput. By monitoring the
-state of various components and services deployed in Payara Server,
-you can identify performance bottlenecks, predict failures, perform root
-cause analysis, and ensure that everything is functioning as expected.
-Data gathered by monitoring can also be useful in performance tuning and
-capacity planning.
+Monitoring is the process of reviewing the statistics of a system to improve performance or solve problems. The monitoring service can track
+and display operational statistics, such as the number of requests per second, the average response time, and the throughput. By monitoring the
+state of various components and services deployed in Payara Server, you can identify performance bottlenecks, predict failures, perform root
+cause analysis, and ensure that everything is functioning as expected.Data gathered by monitoring can also be useful in performance tuning and capacity planning.
 
-For this release of Payara Server, monitoring is exposed in a modular
-way so that many client modules can access and display the monitoring
-statistics. These clients include the Administration Console, the
-`asadmin` utility, AMX, and REST interfaces.
+For this release of Payara Server, monitoring is exposed in a modular way so that many client modules can access and display the monitoring
+statistics. These clients include the Administration Console, the `asadmin` utility, AMX, and REST interfaces.
 
 [[how-the-monitoring-tree-structure-works]]
 === How the Monitoring Tree Structure Works
 
-A monitorable object is a component, subcomponent, or service that can
-be monitored. Payara Server uses a tree structure to track
-monitorable objects. Because the tree is dynamic, the tree changes as
-Payara Server components are added or removed.
+A monitorable object is a component, subcomponent, or service that can be monitored. Payara Server uses a tree structure to track
+monitorable objects. Because the tree is dynamic, the tree changes as Payara Server components are added or removed.
 
-In the tree, a monitorable object can have child objects (nodes) that
-represent exactly what can be monitored for that object. All child
-objects are addressed using the dot (.) character as a separator. These
-constructed names are referred to as dotted names. Detailed information
-on dotted names is available in the
-xref:docs:administration-guide:dotted-names.adoc[`dotted-names`(5ASC)] help page.
+In the tree, a monitorable object can have child objects (nodes) that represent exactly what can be monitored for that object. All child
+objects are addressed using the dot (.) character as a separator. These constructed names are referred to as dotted names. Detailed information
+on dotted names is available in the xref:reference-manual:dotted-names.adoc[`dotted-names`(5ASC)] help page.
 
-The following command lists the monitorable child objects of the
-instance `server`:
+The following command lists the monitorable child objects of the instance `server`:
 
 [source,shell]
 ----
@@ -66,30 +50,25 @@ server.transaction-service
 server.web
 ----
 
-Each object is represented by a dotted name. Dotted names can also
-address specific attributes in monitorable objects. For example, the
-`jvm` object has a `memory` attribute with a statistic called
-`maxheapsize`. The following dotted name addresses the attribute:
+Each object is represented by a dotted name. Dotted names can also address specific attributes in monitorable objects. For example, the
+`jvm` object has a `memory` attribute with a statistic called `maxheapsize`. The following dotted name addresses the attribute:
 
 [source,shell]
 ----
 server.jvm.memory.maxheapsize
 ----
 
-Although an object is monitorable, it is not necessarily being actively
-monitored. For instructions on activating monitoring, see
-xref:docs:administrationg-guide:monitoring.adoc#configuring-monitoring[Configuring Monitoring].
+Although an object is monitorable, it is not necessarily being actively monitored. For instructions on activating monitoring, see
+xref:docs:administration-guide:monitoring.adoc#configuring-monitoring[Configuring Monitoring].
 
 [[tree-structure-of-monitorable-objects]]
 === Tree Structure of Monitorable Objects
 
-Each monitorable object has a hierarchical tree structure. In the tree,
-a replaceable such as *statistics represents the name of the attribute
-that you can show statistics for.
+Each monitorable object has a hierarchical tree structure. In the tree, a replaceable such as *statistics represents the name of the attribute that you can show statistics for.
 
 
 [[applications-tree-hierarchy]]
-==== Applications Tree Hierarchy
+==== *Applications Tree Hierarchy*
 
 The `applications` tree contains the following nodes:
 
@@ -159,11 +138,9 @@ xref:docs:administration-guide:monitoring.adoc#jersey-statistics[Jersey Statisti
 xref:docs:administration-guide:monitoring.adoc#web-statistics[Web Statistics].
 
 [[connector-service-tree-hierarchy]]
-==== Connector Service Tree Hierarchy
+==== *Connector Service Tree Hierarchy*
 
-The `connector-service` tree holds monitorable attributes for pools such
-as the connector connection pool. The `connector-service` tree contains
-the following nodes:
+The `connector-service` tree holds monitorable attributes for pools such as the connector connection pool. The `connector-service` tree contains the following nodes:
 
 [source,shell]
 ----
@@ -174,12 +151,11 @@ server.connector-service
              work-management
 ----
 
-An example dotted name might be
-`server.connector-service.resource-adapter-1.connection-pools.pool-1`.
+An example dotted name might be `server.connector-service.resource-adapter-1.connection-pools.pool-1`.
 For available statistics, see xref:docs:administration-guide:monitoring.adoc#jmsconnector-service-statistics[JMS/Connector Service Statistics].
 
 [[http-service-tree-hierarchy]]
-==== HTTP Service Tree Hierarchy
+==== *HTTP Service Tree Hierarchy*
 
 The `http-service` tree contains the following nodes:
 
@@ -194,17 +170,14 @@ server.http-service
                *statistic
 ----
 
-An example dotted name under the virutal-server node might be
-`server.http-service.virtual-server1.request.requestcount`. For
+An example dotted name under the virutal-server node might be `server.http-service.virtual-server1.request.requestcount`. For
 available statistics, see xref:docs:administration-guide:monitoring.adoc#http-service-statistics[HTTP Service Statistics].
 
 [[jmscontainer-service-tree-hierarchy]]
-==== JMS/Container Service Tree Hierarchy
+==== *JMS/Container Service Tree Hierarchy*
 
-The `jms-service` tree holds monitorable attributes for connection
-factories (connection pools for resource adapters) and work management
-(for Message Queue resource adapters). The `jms-service` tree contains
-the following nodes:
+The `jms-service` tree holds monitorable attributes for connection factories (connection pools for resource adapters) and work management
+(for Message Queue resource adapters). The `jms-service` tree contains the following nodes:
 
 [source,shell]
 ----
@@ -214,13 +187,12 @@ server.jms-service
         work-management
 ----
 
-An example dotted name under the `connection-factories` node might be
-`server.jms-service.connection-factories.connection-factory-1` which
-shows all the statistics for this connection factory. For available
-statistics, see xref:docs:administration-guide:monitoring.adoc#jmsconnector-service-statistics[JMS/Connector Service Statistics].
+An example dotted name under the `connection-factories` node might be `server.jms-service.connection-factories.connection-factory-1` which
+shows all the statistics for this connection factory. For available statistics, see
+xref:docs:administration-guide:monitoring.adoc#jmsconnector-service-statistics[JMS/Connector Service Statistics].
 
 [[jvm-tree-hierarchy]]
-==== JVM Tree Hierarchy
+==== *JVM Tree Hierarchy*
 
 The `jvm` tree contains the following nodes:
 
@@ -235,14 +207,13 @@ server.jvm
            runtime 
 ----
 
-An example dotted name under the `memory` node might be
-`server.jvm.memory.maxheapsize`. For available statistics, see
+An example dotted name under the `memory` node might be `server.jvm.memory.maxheapsize`. For available statistics, see
 xref:docs:administration-guide:monitoring.adoc#jvm-statistics[JVM Statistics].
-[[network-tree-hierarchy]]
-==== Network Tree Hierarchy
 
-The network statistics apply to the network listener, such as
-`admin-listener`, `http-listener-1`, `ttp-listener-2`. The `network`
+[[network-tree-hierarchy]]
+==== *Network Tree Hierarchy*
+
+The network statistics apply to the network listener, such as `admin-listener`, `http-listener-1`, `ttp-listener-2`. The `network`
 tree contains the following nodes:
 
 [source,shell]
@@ -259,15 +230,13 @@ server.network
                      *statistic
 ----
 
-An example dotted name under the `network` node might be
-`server.network.admin-listener.keep-alive.maxrequests-count`. For
+An example dotted name under the `network` node might be `server.network.admin-listener.keep-alive.maxrequests-count`. For
 available statistics, see xref:docs:administration-guide:monitoring.adoc#network-statistics[Network Statistics].
 
 [[orb-tree-hierarchy]]
-==== ORB Tree Hierarchy
+==== *ORB Tree Hierarchy*
 
-The `orb` tree holds monitorable attributes for connection managers. The
-`orb` tree contains the following nodes:
+The `orb` tree holds monitorable attributes for connection managers. The `orb` tree contains the following nodes:
 
 [source,shell]
 ----
@@ -280,15 +249,13 @@ server.orb
                 *statistic
 ----
 
-An example dotted name might be
-`server.orb.transport.connectioncache.inbound.connectionsidle-count`.
+An example dotted name might be `server.orb.transport.connectioncache.inbound.connectionsidle-count`.
 For available statistics, see xref:docs:administration-guide:monitoring.adoc#orb-statistics-connection-manager[ORB Statistics (Connection Manager)].
 
 [[resources-tree-hierarchy]]
-==== Resources Tree Hierarchy
+==== *Resources Tree Hierarchy*
 
-The `resources` tree holds monitorable attributes for pools such as the
-JDBC connection pool and connector connection pool. The `resources` tree
+The `resources` tree holds monitorable attributes for pools such as the JDBC connection pool and connector connection pool. The `resources` tree
 contains the following nodes:
 
 [source,shell]
@@ -299,12 +266,11 @@ server.resources
                *statistic
 ----
 
-An example dotted name might be
-`server.resources.jdbc-connection-pool1.numconnfree.count`. For
+An example dotted name might be `server.resources.jdbc-connection-pool1.numconnfree.count`. For
 available statistics, see xref:docs:administration-guide:monitoring.adoc#resource-statistics-connection-pool[Resource Statistics (Connection Pool)].
 
 [[security-tree-hierarchy]]
-==== Security Tree Hierarchy
+==== *Security Tree Hierarchy*
 
 The security tree contains the following nodes:
 
@@ -319,15 +285,13 @@ server.security
           *statistic
 ----
 
-An example dotted name might be
-`server.security.realm.realmcount-starttime`. For available statistics,
+An example dotted name might be `server.security.realm.realmcount-starttime`. For available statistics,
 see xref:docs:administration-guide:monitoring.adoc#security-statistics[Security Statistics].
 
 [[thread-pool-tree-hierarchy]]
-==== Thread Pool Tree Hierarchy
+==== *Thread Pool Tree Hierarchy*
 
-The `thread-pool` tree holds monitorable attributes for connection
-managers, and contains the following nodes:
+The `thread-pool` tree holds monitorable attributes for connection managers, and contains the following nodes:
 
 [source,shell]
 ----
@@ -338,15 +302,13 @@ server.thread-pool
                                 *statistic
 ----
 
-An example dotted name might be
-`server.thread-pool.orb.threadpool.thread-pool-1.averagetimeinqueue-current`.
+An example dotted name might be `server.thread-pool.orb.threadpool.thread-pool-1.averagetimeinqueue-current`.
 For available statistics, see xref:docs:administration-guide:monitoring.adoc#thread-pool-statistics[Thread Pool Statistics].
 
 [[transactions-service-tree-hierarchy]]
-==== Transactions Service Tree Hierarchy
+==== *Transactions Service Tree Hierarchy*
 
-The `transaction-service` tree holds monitorable attributes for the
-transaction subsystem for the purpose of rolling back transactions. The
+The `transaction-service` tree holds monitorable attributes for the transaction subsystem for the purpose of rolling back transactions. The
 `transaction-service` tree contains the following nodes:
 
 [source,shell]
@@ -376,71 +338,56 @@ server.web
               *statistic
 ----
 
-An example dotted name for the `servlet` node might be
-`server.web.servlet.activeservletsloadedcount`. For available
+An example dotted name for the `servlet` node might be `server.web.servlet.activeservletsloadedcount`. For available
 statistics, see xref:docs:administration-guide:monitoring.adoc#web-module-common-statistics[Web Module Common Statistics].
 
 [[about-monitoring-for-add-on-components]]
 ==== About Monitoring for Add-on Components
 
-An add-on component typically generates statistics that Payara Server
-can gather at runtime. Adding monitoring capabilities enables an add-on
-component to provide statistics to Payara Server in the same way as
-components that are supplied in the Payara Server distributions. As a
-result, you can use the same administrative interfaces to monitor
-statistics from any installed Payara Server component, regardless of
+An add-on component typically generates statistics that Payara Server can gather at runtime. Adding monitoring capabilities enables an add-on
+component to provide statistics to Payara Server in the same way as components that are supplied in the Payara Server distributions. As a
+result, you can use the same administrative interfaces to monitor statistics from any installed Payara Server component, regardless of
 the origin of the component.
 
 [[tools-for-monitoring-payara-server]]
 === Tools for Monitoring Payara Server
 
-The following `asadmin` subcommands are provided for monitoring the
-services and components of Payara Server:
+The following `asadmin` subcommands are provided for monitoring the ervices and components of Payara Server:
 
-* The `enable-monitoring`, `disable-monitoring`, or the `get` and `set`
-subcommands are used to turn monitoring on or off. For instructions, see
+* The `enable-monitoring`, `disable-monitoring`, or the `get` and `set`subcommands are used to turn monitoring on or off. For instructions, see
 xref:docs:administration-guide:monitoring.adoc#configuring-monitoring[Configuring Monitoring].
 * The `monitor` `type` subcommand is used to display basic data for a
 particular type of monitorable object. For instructions, see
 xref:docs:administration-guide:monitoring.adoc#viewing-common-monitoring-data[Viewing Common Monitoring Data].
 * The `list` `--monitor` subcommand is used to display the objects that
-can be monitored with the `monitor` subcommand. For guidelines and
-instructions, see 
+can be monitored with the `monitor` subcommand. For guidelines and instructions, see
 xref:docs:administration-guide:monitoring.adoc#guidelines-for-using-the-list-and-get-subcommands-for-monitoring[Guidelines for Using the `list` and `get` Subcommands for Monitoring].
-* The `get` subcommand is used to display comprehensive data, such as
-the attributes and values for a dotted name. The `get` subcommand used
-with a wildcard parameter displays all available attributes for any
-monitorable object. For additional information, see
+* The `get` subcommand is used to display comprehensive data, such as the attributes and values for a dotted name. The `get` subcommand used
+with a wildcard parameter displays all available attributes for any monitorable object. For additional information, see
 xref:docs:administration-guide:monitoring.adoc#guidelines-for-using-the-list-and-get-subcommands-for-monitoring[Guidelines for Using the `list` and `get` Subcommands for Monitoring].
 
 [[configuring-monitoring]]
 == Configuring Monitoring
 
-By default, the monitoring service is enabled for Payara Server, but
-monitoring for the individual modules is not. To enable monitoring for a
-module, you change the monitoring level for that module to LOW or HIGH,
-You can choose to leave monitoring OFF for objects that do not need to
+By default, the monitoring service is enabled for Payara Server, but monitoring for the individual modules is not. To enable monitoring for a
+module, you change the monitoring level for that module to LOW or HIGH, You can choose to leave monitoring OFF for objects that do not need to
 be monitored.
 
 * LOW. Simple statistics, such as create count, byte count, and so on
-* HIGH. Simple statistics plus method statistics, such as method count,
-duration, and so on
+* HIGH. Simple statistics plus method statistics, such as method count, duration, and so on
 * OFF. No monitoring, no impact on performance
 
 [[to-enable-monitoring]]
 === To Enable Monitoring
 
-Use the `enable-monitoring` subcommand to enable the monitoring service
-itself, or to enable monitoring for individual modules. Monitoring is
+Use the `enable-monitoring` subcommand to enable the monitoring service itself, or to enable monitoring for individual modules. Monitoring is
 immediately activated, without restarting Payara Server.
 
-You can also use the xref:docs:reference-manual:set.adoc#set[`set`] subcommand to enable
-monitoring for a module. Using the `set` command is not a dynamic
-procedure, so you need to restart Payara Server for your changes to
-take effect.
+You can also use the xref:docs:reference-manual:set.adoc#set[`set`] subcommand to enable monitoring for a module. Using the `set` command is not a dynamic
+procedure, so you need to restart Payara Server for your changes to take effect.
 
-*  Determine which services and components are currently enabled for
-monitoring. +
+*  Determine which services and components are currently enabled for monitoring.
++
 [source,shell]
 ----
 asadmin> get server.monitoring-service.module-monitoring-levels.*
@@ -453,13 +400,12 @@ configs.config.server-config.monitoring-service.module-monitoring-levels.web-con
        configs.config.server-config.monitoring-service.module-monitoring-levels.http-service=OFF
            configs.config.server-config.monitoring-service.module-monitoring-levels.jvm=HIGH 
 ----
-*  Enable monitoring by using the xref:docs:reference-manual:enable-monitoring.adoc[`enable-monitoring`]
-subcommand. Server restart is not required.
+*  Enable monitoring by using the xref:docs:reference-manual:enable-monitoring.adoc[`enable-monitoring`] subcommand. Server restart is not required.
 
 [[example-to-enable-monitoring]]
-=== Example
-This example enables the monitoring service without affecting monitoring
-for individual modules.
+.Example
+
+This example enables the monitoring service without affecting monitoring for individual modules.
 
 [source,shell]
 ----
@@ -468,7 +414,7 @@ Command enable-monitoring executed successfully
 ----
 
 [[example-to-enable-monitoring-2]]
-=== Example
+.Example
 
 This example enables monitoring for the `ejb-container` module.
 
@@ -479,11 +425,9 @@ Command enable-monitoring executed successfully
 ----
 
 [[example-to-enable-monitoring-3]]
-=== Example
+.Example
 
-This example enables monitoring for the HTTP service by setting the
-monitoring level to HIGH (you must restart the server for changes to
-take effect).
+This example enables monitoring for the HTTP service by setting the monitoring level to HIGH (you must restart the server for changes to take effect).
 
 [source,shell]
 ----
@@ -491,44 +435,38 @@ asadmin> set server.monitoring-service.module-monitoring-levels.http-service=HIG
 Command set executed successfully
 ----
 
-You can also view the full syntax and options of the subcommand by
-typing `asadmin help enable-monitoring` at the command line.
+You can also view the full syntax and options of the subcommand by typing `asadmin help enable-monitoring` at the command line.
 
 [[to-disable-monitoring]]
 === To Disable Monitoring
 
-Use the `disable-monitoring` subcommand to disable the monitoring
-service itself, or to disable monitoring for individual modules.
+Use the `disable-monitoring` subcommand to disable the monitoring service itself, or to disable monitoring for individual modules.
 Monitoring is immediately stopped, without restarting Payara Server.
 
-You can also use the xref:docs:reference-manual:set.adoc#set[`set`] subcommand to disable
-monitoring for a module. Using the `set` command is not a dynamic
-procedure, so you need to restart Payara Server for your changes to
-take effect.
+You can also use the xref:docs:reference-manual:set.adoc#set[`set`] subcommand to disable monitoring for a module. Using the `set` command is not a dynamic
+procedure, so you need to restart Payara Server for your changes to take effect.
 
-*  Determine which services and components currently are enabled for
-monitoring. +
+*  Determine which services and components currently are enabled for monitoring.
++
 [source,shell]
 ----
 asadmin get server.monitoring-service.module-monitoring-levels.*
 ----
-This example output shows that monitoring is enabled for
-`web-container`, `http-service`, and `jvm`: +
+This example output shows that monitoring is enabled for `web-container`, `http-service`, and `jvm`:
++
 [source,shell]
 ----
 configs.config.server-config.monitoring-service.module-monitoring-levels.web-container=HIGH
        configs.config.server-config.monitoring-service.module-monitoring-levels.http-service=HIGH
               configs.config.server-config.monitoring-service.module-monitoring-levels.jvm=HIGH 
 ----
-*  Disable monitoring for a service or module by using the
-xref:docs:reference-manual:disable-monitoring.adoc[`disable-monitoring`] subcommand. +
+*  Disable monitoring for a service or module by using the xref:docs:reference-manual:disable-monitoring.adoc[`disable-monitoring`] subcommand. +
 Server restart is not required.
 
 [[example-to-disable-monitoring]]
-=== Example 
+.Example
 
-This example disables the monitoring service without changing the
-monitoring levels for individual modules.
+This example disables the monitoring service without changing the monitoring levels for individual modules.
 
 [source,shell]
 ----
@@ -537,10 +475,9 @@ Command disable-monitoring executed successfully
 ----
 
 [[example-to-disable-monitoring-2]]
-=== Example
+.Example
 
-This example disables monitoring for specific modules. Their monitoring
-levels are set to OFF.
+This example disables monitoring for specific modules. Their monitoring levels are set to OFF.
 
 [source,shell]
 ----
@@ -550,9 +487,9 @@ Command disable-monitoring executed successfully
 
 
 [[example-to-disable-monitoring-3]]
-=== Example
-This example disables monitoring for the HTTP service (you must restart
-the server for changes to take effect).
+.Example
+
+This example disables monitoring for the HTTP service (you must restart the server for changes to take effect).
 
 [source,shell]
 ----
@@ -560,39 +497,33 @@ asadmin> set server.monitoring-service.module-monitoring-levels.http-service=OFF
 Command set executed successfully
 ----
 
-You can also view the full syntax and options of the subcommand by
-typing `asadmin help disable-monitoring` at the command line.
+You can also view the full syntax and options of the subcommand by typing `asadmin help disable-monitoring` at the command line.
 
 [[viewing-common-monitoring-data]]
 == Viewing Common Monitoring Data
 
-Use the `monitor` subcommand to display basic data on commonly-monitored
-objects.
+Use the `monitor` subcommand to display basic data on commonly-monitored objects.
 
 [[to-view-common-monitoring-data]]
 === To View Common Monitoring Data
 
-Use the `--type` option of the `monitor` subcommand to specify the
-object for which you want to display data, such as `httplistener`,
-`jvm`, `webmodule`. If you use the `monitor` subcommand without
-specifying a type, an error message is displayed.
+Use the `--type` option of the `monitor` subcommand to specify the object for which you want to display data, such as `httplistener`,
+`jvm`, `webmodule`. If you use the `monitor` subcommand without specifying a type, an error message is displayed.
 
-Output from the subcommand is displayed continuously in a tabular
-format. The `--interval` option can be used to display output at a
+Output from the subcommand is displayed continuously in a tabular format. The `--interval` option can be used to display output at a
 particular interval (the default is 30 seconds).
 
 *Before You Begin*
 
 A monitorable object must be configured for monitoring before you can
-display data on the object. See xref:docs:reference-manual:monitoring.adoc#to-enable-monitoring[To Enable Monitoring].
+display data on the object. See xref:docs:administration-guide:monitoring.adoc#to-enable-monitoring[To Enable Monitoring].
 
 . Determine which type of monitorable object you want to monitor. +
 Your choices for 5.0 are `jvm`, `httplistener`, and `webmodule`.
-. Request the monitoring data by using the xref:docs:reference-manual:monitor.adoc[`monitor`]
-subcommand.
+. Request the monitoring data by using the xref:docs:reference-manual:monitor.adoc[`monitor`] subcommand.
 
 [[example-to-view-common-monitoring-data]]
-=== Example
+.Example
 
 This example requests common data for type `jvm` on instance `server`.
 
@@ -607,27 +538,18 @@ current                   min        max        low        high       count
 9467250                   8585216    619642880  0          0          93093888
 ----
 
-You can also view the full syntax and options of the subcommand by
-typing `asadmin help monitor` at the command line.
+You can also view the full syntax and options of the subcommand by typing `asadmin help monitor` at the command line.
 
 [[common-monitoring-statistics]]
 === Common Monitoring Statistics
 
-
-Common monitoring statistics are described in the following sections:
-
-* xref:docs:administration-guide:monitoring.adoc#http-listener-common-statistics[HTTP Listener Common Statistics]
-* xref:docs:administration-guide:monitoring.adoc#jvm-common-statistics[JVM Common Statistics]
-* xref:docs:administration-guide:monitoring.adoc#web-module-common-statistics[Web Module Common Statistics]
-
 [[http-listener-common-statistics]]
-==== HTTP Listener Common Statistics
+==== *HTTP Listener Common Statistics*
 
-The statistics available for the `httplistener` type are shown in the
-following table.
+The statistics available for the `httplistener` type are shown in the following table.
 
 [[table-http-listener-common-statistics]]
-==== Table 8-1 HTTP Listener Common Monitoring Statistics
+.Table 8-1 HTTP Listener Common Monitoring Statistics
 
 [width="100%",cols="17%,83%",options="header",]
 |=======================================================================
@@ -647,13 +569,12 @@ processing times over request
 
 
 [[jvm-common-statistics]]
-==== JVM Common Statistics
+==== *JVM Common Statistics*
 
-The statistics available for the `jvm` type are shown in the following
-table.
+The statistics available for the `jvm` type are shown in the following table.
 
 [[table-jvm-common-statistics]]
-Table 8-2 JVM Common Monitoring Statistics
+.Table 8-2 JVM Common Monitoring Statistics
 
 [width="100%",cols="19%,81%",options="header",]
 |=======================================================================
@@ -677,13 +598,12 @@ since it was last started
 
 
 [[web-module-common-statistics]]
-==== Web Module Common Statistics
+==== *Web Module Common Statistics*
 
-The statistics available for the `webmodule` type are shown in the
-following table.
+The statistics available for the `webmodule` type are shown in the following table.
 
 [[table-web-module-common-statistics]]
-Table 8-3 Web Module Common Monitoring Statistics
+.Table 8-3 Web Module Common Monitoring Statistics
 
 [width="100%",cols="18%,82%",options="header",]
 |=======================================================================
@@ -714,46 +634,36 @@ are loaded
 [[viewing-comprehensive-monitoring-data]]
 == Viewing Comprehensive Monitoring Data
 
-By applying the `list` and `get` subcommands against the tree structure
-using dotted names, you can display more comprehensive monitoring data,
-such as a description of each of the statistics and its unit of
-measurement.
+By applying the `list` and `get` subcommands against the tree structure using dotted names, you can display more comprehensive monitoring data,
+such as a description of each of the statistics and its unit of measurement.
 
 [[guidelines-for-using-the-list-and-get-subcommands-for-monitoring]]
 === Guidelines for Using the `list` and `get` Subcommands for Monitoring
 
-The underlying assumptions for using the `list` and `get` subcommands
-with dotted names are:
+The underlying assumptions for using the `list` and `get` subcommands with dotted names are:
 
-* A `list` subcommand that specifies a dotted name that is not followed
-by a wildcard (`*`) lists the current node's immediate children. For
-example, the following subcommand lists all immediate children belonging
-to the `server` node: +
+* A `list` subcommand that specifies a dotted name that is not followed by a wildcard (`*`) lists the current node's immediate children. For
+example, the following subcommand lists all immediate children belonging to the `server` node:
++
 [source,shell]
 ----
 list --monitor server
 ----
-* A `list` subcommand that specifies a dotted name followed by a
-wildcard of the form `.*` lists a hierarchical tree of child nodes from
-the specified node. For example, the following subcommand lists all
-children of the `applications` node, their subsequent child nodes, and
-so on: +
+* A `list` subcommand that specifies a dotted name followed by a wildcard of the form `.*` lists a hierarchical tree of child nodes from
+the specified node. For example, the following subcommand lists all children of the `applications` node, their subsequent child nodes, and so on:
++
 [source,shell]
 ----
 list --monitor server.applications.*
 ----
-* A `list` subcommand that specifies a dotted name preceded or followed
-by a wildcard of the form *dottedname or dotted * name or dottedname *
-lists all nodes and their children that match the regular expression
-created by the specified matching pattern.
-* A `get` subcommand followed by a `.*` or a `*` gets the set of
-attributes and their values that belong to the node specified.
+* A `list` subcommand that specifies a dotted name preceded or followed by a wildcard of the form *dottedname or dotted * name or dottedname *
+lists all nodes and their children that match the regular expression created by the specified matching pattern.
+* A `get` subcommand followed by a `.*` or a `*` gets the set of attributes and their values that belong to the node specified.
 
-For example, the following table explains the output of the `list` and
-`get` subcommands used with the dotted name for the `resources` node.
+For example, the following table explains the output of the `list` and `get` subcommands used with the dotted name for the `resources` node.
 
 [[table-example-resources-level]]
-Table 8-4 Example Resources Level Dotted Names
+.Table 8-4 Example Resources Level Dotted Names
 
 [width="100%",cols="23%,41%,36%",options="header",]
 |=======================================================================
@@ -769,28 +679,23 @@ attributes and values corresponding to connection pool attributes.
 |=======================================================================
 
 
-For detailed information on dotted names, see the
-xref:docs:reference-manual:dotted-names.adoc[`dotted-names`(5ASC)] help page.
+For detailed information on dotted names, see the xref:docs:reference-manual:dotted-names.adoc[`dotted-names`(5ASC)] help page.
 
 [[to-view-comprehensive-monitoring-data]]
 === To View Comprehensive Monitoring Data
 
-Although the `monitor` subcommand is useful in many situations, it does
-not offer the complete list of all monitorable objects. To work with
-comprehensive data for an object type, use the `list` `monitor` and the
-`get` `monitor` subcommands followed by the dotted name of a monitorable
-object.
+Although the `monitor` subcommand is useful in many situations, it does not offer the complete list of all monitorable objects. To work with
+comprehensive data for an object type, use the `list` `monitor` and the`get` `monitor` subcommands followed by the dotted name of a monitorable object.
 
 *Before You Begin*
 
-A monitorable object must be configured for monitoring before you can
-display information about the object. See xref:docs:administration-guide:monitoring.adoc#to-enable-monitoring[To Enable Monitoring] +
+A monitorable object must be configured for monitoring before you can display information about the object.
+See xref:docs:administration-guide:monitoring.adoc#to-enable-monitoring[To Enable Monitoring] +
 if needed.
 
-*  List the objects that are enabled for monitoring by using the
-xref:docs:reference-manual:list.adoc[`list`] subcommand. +
-For example, the following subcommand lists all components and services
-that have monitoring enabled for instance `server`. +
+*  List the objects that are enabled for monitoring by using the xref:docs:reference-manual:list.adoc[`list`] subcommand. +
+For example, the following subcommand lists all components and services that have monitoring enabled for instance `server`.
++
 [source,shell]
 ----
 asadmin> list --monitor "*"
@@ -802,14 +707,12 @@ server.applications
 server.http-service
 server.thread-pools
 ----
-*  Get data for a monitored component or service by using the
-xref:docs:reference-manual:get.adoc[`get`] subcommand.
+*  Get data for a monitored component or service by using the xref:docs:reference-manual:get.adoc[`get`] subcommand.
 
 [[example-to-view-comprehensive-monitoring-data]]
-=== Example 8-8 Viewing Attributes for a Specific Type
+.Example 8-8 Viewing Attributes for a Specific Type
 
-This example gets information about all the attributes for object type
-`jvm` on instance `server`.
+This example gets information about all the attributes for object type `jvm` on instance `server`.
 
 [source,shell]
 ----
@@ -850,10 +753,9 @@ server.jvm.runtime.vmversion-current = 1.5.0_11-b03
 ----
 
 [[example-to-view-comprehensive-monitoring-data-2]]
-=== Example 8-9 Viewing Monitorable Applications
+.Example 8-9 Viewing Monitorable Applications
 
-This example lists all the monitorable applications for instance
-`server`.
+This example lists all the monitorable applications for instance `server`.
 
 [source,shell]
 ----
@@ -865,10 +767,9 @@ server.applications.app2.virtual-server1
 ----
 
 [[example-to-view-comprehensive-monitoring-data-3]]
-=== Example 8-10 Viewing Attributes for an Application
+.Example 8-10 Viewing Attributes for an Application
 
-This example gets information about all the attributes for application
-`hello`.
+This example gets information about all the attributes for application `hello`.
 
 [source,shell]
 ----
@@ -894,10 +795,9 @@ server.applications.hello.server.totalservletsloadedcount = 0
 ----
 
 [[example-to-view-comprehensive-monitoring-data-4]]
-=== Example 8-11 Viewing a Specific Attribute
+.Example 8-11 Viewing a Specific Attribute
 
-This example gets information about the `jvm` attribute
-`runtime.vmversion-current` on instance `server`.
+This example gets information about the `jvm` attribute `runtime.vmversion-current` on instance `server`.
 
 [source,shell]
 ----
@@ -908,10 +808,8 @@ server.jvm.runtime.vmversion-current = 10.0-b23
 [[comprehensive-monitoring-statistics]]
 === Comprehensive Monitoring Statistics
 
-You can get comprehensive monitoring statistics by forming a dotted name
-that specifies the statistic you are looking for. For example, the
-following dotted name will display the cumulative number of requests for
-the HTTP service on `virtual-server1`:
+You can get comprehensive monitoring statistics by forming a dotted name that specifies the statistic you are looking for. For example, the
+following dotted name will display the cumulative number of requests for the HTTP service on `virtual-server1`:
 
 `server.http-service.virtual-server1.request.requestcount`
 
@@ -927,19 +825,11 @@ Use the following dotted name pattern to get EJB statistics for an application:
 server.applications.appname.ejbmodulename.ejbname.bean-cache.statistic
 ----
 
-
-[NOTE]
-=======================================================================
-
-EJB statistics for an application are available after the application is
-executed. If the application is deployed but has not yet been executed,
-all counts will show default values. When the application is undeployed,
-all its monitoring data is lost.
-
-=======================================================================
+NOTE: EJB statistics for an application are available after the application is executed. If the application is deployed but has not yet been executed,
+all counts will show default values. When the application is undeployed, all its monitoring data is lost.
 
 [[ejb-cache-statistics]]
-*EJB Cache Statistics*
+=== *EJB Cache Statistics*
 
 Use the following dotted name pattern for EJB cache statistics:
 
@@ -952,7 +842,7 @@ The statistics available for EJB caches are listed in the following
 table.
 
 [[table-ejb-cache-statistics]]
-==== Table 8-5 EJB Cache Monitoring Statistics
+.Table 8-5 EJB Cache Monitoring Statistics
 
 [width="100%",cols="37%,16%,47%",options="header",]
 |=======================================================================
@@ -989,11 +879,10 @@ Use the following dotted name pattern for EJB container statistics:
 server.applications.appname.ejbmodulename.container.ejbname
 ----
 
-The statistics available for EJB containers are listed in the following
-table.
+The statistics available for EJB containers are listed in the following table.
 
 [[table-ejb-container-statistics]]
-==== Table 8-6 EJB Container Monitoring Statistics
+.Table 8-6 EJB Container Monitoring Statistics
 
 [width="100%",cols="24%,16%,60%",options="header",]
 |=======================================================================
@@ -1020,7 +909,7 @@ is called.
 
 
 [[ejb-method-statistics]]
-==== EJB Method Statistics
+==== *EJB Method Statistics*
 
 Use the following dotted name pattern for EJB method statistics:
 
@@ -1029,11 +918,10 @@ Use the following dotted name pattern for EJB method statistics:
 server.applications.appname.ejbmodulename.bean-methods.ejbname.statistic
 ----
 
-The statistics available for EJB method invocations are listed in the
-following table.
+The statistics available for EJB method invocations are listed in the following table.
 
 [[table-ejb-method-statistics]]
-==== Table 8-7 EJB Method Monitoring Statistics
+.Table 8-7 EJB Method Monitoring Statistics
 
 [width="100%",cols="23%,16%,61%",options="header",]
 |=======================================================================
@@ -1059,7 +947,7 @@ container.
 
 
 [[ejb-pool-statistics]]
-==== EJB Pool Statistics
+==== *EJB Pool Statistics*
 
 Use the following dotted name pattern for EJB pool statistics:
 
@@ -1072,7 +960,7 @@ The statistics available for EJB pools are listed in the following
 table.
 
 [[table-ejb-pool-statistics]]
-==== Table 8-8 EJB Pool Monitoring Statistics
+.Table 8-8 EJB Pool Monitoring Statistics
 
 [width="100%",cols="28%,16%,56%",options="header",]
 |=======================================================================
@@ -1096,7 +984,7 @@ associated pool since the gathering of data started.
 
 
 [[timer-statistics]]
-==== Timer Statistics
+==== *Timer Statistics*
 
 Use the following dotted name pattern for timer statistics:
 
@@ -1108,7 +996,7 @@ server.applications.appname.ejbmodulename.timers.ejbname.statistic
 The statistics available for timers are listed in the following table.
 
 [[table-timer-statistics]]
-==== Table 8-9 Timer Monitoring Statistics
+.Table 8-9 Timer Monitoring Statistics
 
 [width="100%",cols="28%,16%,56%",options="header",]
 |=======================================================================
@@ -1126,13 +1014,12 @@ system.
 
 [[http-service-statistics]]
 
-==== HTTP Service Statistics
+==== *HTTP Service Statistics*
 
-The HTTP service fits into the tree of objects as shown in
-xref:docs:administration-guide:monitoring.adoc#http-service-tree-hierarchy[HTTP Service Tree Hierarchy].
+The HTTP service fits into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc#http-service-tree-hierarchy[HTTP Service Tree Hierarchy].
 
 [[http-service-virtual-server-statistics]]
-==== HTTP Service Virtual Server Statistics
+==== *HTTP Service Virtual Server Statistics*
 
 Use the following dotted name pattern for HTTP service virtual server
 statistics:
@@ -1145,8 +1032,8 @@ server.http-service.virtual-server.request.statistic
 The HTTP service statistics for virtual servers are shown in the
 following table.
 
-[[table- http-service-virtual-server-statistics]]
-==== Table 8-10 HTTP Service Virtual Server Monitoring Statistics
+[[table-http-service-virtual-server-statistics]]
+.Table 8-10 HTTP Service Virtual Server Monitoring Statistics
 
 [width="100%",cols="21%,16%,63%",options="header",]
 |=======================================================================
@@ -1212,10 +1099,9 @@ so far
 
 
 [[jersey-statistics]]
-==== Jersey Statistics
+==== *Jersey Statistics*
 
-Jersey fits into the tree of objects as shown in
-xref:docs:administration-guide:monitoring.adoc#application-tree-hierachy[Applications Tree Hierarchy].
+Jersey fits into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc#applications-tree-hierarchy[Applications Tree Hierarchy].
 
 Use the following dotted name pattern for Jersey statistics:
 
@@ -1227,7 +1113,7 @@ server.applications.jersey-application.jersey.resources.resource-0.hitcount.stat
 The statistics available for Jersey are shown in the following table.
 
 [[table-jersey-statistics]]
-==== Table 8-11 Jersey Statistics
+.Table 8-11 Jersey Statistics
 
 [width="100%",cols="33%,21%,46%",options="header",]
 |=======================================================================
@@ -1241,38 +1127,27 @@ resource class
 
 
 [[jmsconnector-service-statistics]]
-==== JMS/Connector Service Statistics
+==== *JMS/Connector Service Statistics*
 
-The JMS/Connector Service fits into the tree of objects as shown in
-xref:docs:administration-guide:monitoring.adoc#jmscontainer-service-tree-hierarchy[JMS/Container Service Tree Hierarchy].
+The JMS/Connector Service fits into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc#jmscontainer-service-tree-hierarchy[JMS/Container Service Tree Hierarchy].
 
 [[connector-connection-pool-statistics-jms]]
-==== Connector Connection Pool Statistics (JMS)
+==== *Connector Connection Pool Statistics (JMS)*
 
-Use the following dotted name pattern for JMS/Connector Service
-connection pool statistics:
+Use the following dotted name pattern for JMS/Connector Service connection pool statistics:
 
 [source,shell]
 ----
 server.connector-service.resource-adapter-1.connection-pool.statistic
 ----
 
-JMS/Connector Service statistics available for the connector connection
-pools are shown in the following table.
+JMS/Connector Service statistics available for the connector connection pools are shown in the following table.
 
-[NOTE]
-=======================================================================
-
-In order to improve system performance, connection pools are initialized
-lazily; that is, a pool is not initialized until an application first
-uses the pool or the pool is explicitly pinged. Monitoring statistics
-for a connection pool are not available until the pool is initialized.
-
-=======================================================================
-
+NOTE: In order to improve system performance, connection pools are initialized lazily; that is, a pool is not initialized until an application first
+uses the pool or the pool is explicitly pinged. Monitoring statistics for a connection pool are not available until the pool is initialized.
 
 [[table-connector-connection-pool-statistics-jms]]
-==== Table 8-12 Connector Connection Pool Monitoring Statistics (JMS)
+.Table 8-12 Connector Connection Pool Monitoring Statistics (JMS)
 
 [width="100%",cols="37%,16%,47%",options="header",]
 |=======================================================================
@@ -1316,21 +1191,19 @@ queue waiting to be serviced.
 
 
 [[connector-work-management-statistics-jms]]
-==== Connector Work Management Statistics (JMS)
+==== *Connector Work Management Statistics (JMS)*
 
-Use the following dotted name pattern for JMS/Connector Service work
-management statistics:
+Use the following dotted name pattern for JMS/Connector Service work management statistics:
 
 [source,shell]
 ----
 server.connector-service.resource-adapter-1.work-management.statistic
 ----
 
-JMS/Connector Service statistics available for connector work management
-are listed in the following table.
+JMS/Connector Service statistics available for connector work management are listed in the following table.
 
 [[table-connector-work-management-statistics-jms]]
-==== Table 8-13 Connector Work Management Monitoring Statistics (JMS)
+.Table 8-13 Connector Work Management Monitoring Statistics (JMS)
 
 [width="100%",cols="28%,16%,56%",options="header",]
 |=======================================================================
@@ -1356,38 +1229,31 @@ work object before it gets executed.
 
 
 [[jvm-statistics]]
-==== JVM Statistics
+==== *JVM Statistics*
 
 The JVM fits into the tree of objects as show in xref:docs:administration-guide:monitoring.adoc#jvm-tree-hierarchy[JVM Tree Hierarchy].
 
 [[jvm-class-loading-system-statistics]]
-==== JVM Class Loading System Statistics
+==== *JVM Class Loading System Statistics*
 
-Use the following dotted name pattern for JVM class loading system
-statistics:
+Use the following dotted name pattern for JVM class loading system statistics:
 
 [source,shell]
 ----
 server.jvm.class-loading-system.statistic
 ----
 
-With Java SE, additional monitoring information can be obtained from the
-JVM. Set the monitoring level to LOW to enable the display of this
-additional information. Set the monitoring level to HIGH to also view
-information pertaining to each live thread in the system. More
-information about the additional monitoring features for Java SE is
-available in
-http://download.oracle.com/docs/cd/E17409_01/javase/6/docs/technotes/guides/management/[Monitoring
-and Management for the Java Platform] .
+With Java SE, additional monitoring information can be obtained from the JVM. Set the monitoring level to LOW to enable the display of this
+additional information. Set the monitoring level to HIGH to also view information pertaining to each live thread in the system. More
+information about the additional monitoring features for Java SE is available in
+http://download.oracle.com/docs/cd/E17409_01/javase/6/docs/technotes/guides/management/[Monitoring and Management for the Java Platform] .
 
-The Java SE monitoring tools are discussed at
-`http://docs.oracle.com/javase/8/docs/technotes/tools/`.
+The Java SE monitoring tools are discussed at `http://docs.oracle.com/javase/8/docs/technotes/tools/`.
 
-The statistics that are available for class loading in the JVM for Java
-SE are shown in the following table.
+The statistics that are available for class loading in the JVM for Java SE are shown in the following table.
 
 [[table-jvm-class-loading-system-statistics]]
-==== Table 8-14 JVM Monitoring Statistics for Java SE Class Loading
+.Table 8-14 JVM Monitoring Statistics for Java SE Class Loading
 
 [width="100%",cols="31%,16%,53%",options="header",]
 |=======================================================================
@@ -1402,12 +1268,10 @@ have been loaded since the JVM began execution
 unloaded from the JVM since the JVM began execution
 |=======================================================================
 
-
-The statistics available for threads in the JVM in Java SE are shown in
-the following table.
+The statistics available for threads in the JVM in Java SE are shown in the following table.
 
 [[table-jvm-class-loading-system-statistics-2]]
-==== Table 8-15 JVM Monitoring Statistics for Java SE - Threads
+.Table 8-15 JVM Monitoring Statistics for Java SE - Threads
 
 [width="100%",cols="35%,16%,49%",options="header",]
 |=======================================================================
@@ -1436,21 +1300,19 @@ created and/or started since the JVM started.
 
 
 [[jvm-compilation-system-statistics]]
-==== JVM Compilation System Statistics
+==== *JVM Compilation System Statistics*
 
-Use the following dotted name pattern for JVM compilation system
-statistics:
+Use the following dotted name pattern for JVM compilation system statistics:
 
 [source,shell]
 ----
 server.jvm.compilation-system.statistic
 ----
 
-The statistics that are available for compilation in the JVM for Java SE
-are shown in the following table.
+The statistics that are available for compilation in the JVM for Java SE are shown in the following table.
 
 [[table-jvm-compilation-system-statistics]]
-==== Table 8-16 JVM Monitoring Statistics for Java SE Compilation
+.Table 8-16 JVM Monitoring Statistics for Java SE Compilation
 
 [width="100%",cols="34%,20%,46%",options="header",]
 |=======================================================================
@@ -1463,21 +1325,19 @@ milliseconds) spent in compilation
 
 
 [[jvm-garbage-collectors-statistics]]
-==== JVM Garbage Collectors Statistics
+==== *JVM Garbage Collectors Statistics*
 
-Use the following dotted name pattern for JVM garbage collectors
-statistics:
+Use the following dotted name pattern for JVM garbage collectors statistics:
 
 [source,shell]
 ----
 server.jvm.garbage-collectors.statistic
 ----
 
-The statistics that are available for garbage collection in the JVM for
-Java SE are shown in the following table.
+The statistics that are available for garbage collection in the JVM for Java SE are shown in the following table.
 
 [[table-jvm-garbage-collectors-statistics]]
-==== Table 8-17 JVM Monitoring Statistics for Java SE Garbage Collectors
+.Table 8-17 JVM Monitoring Statistics for Java SE Garbage Collectors
 
 [width="100%",cols="23%,16%,61%",options="header",]
 |=======================================================================
@@ -1490,7 +1350,7 @@ spent in collection
 |=======================================================================
 
 [[jvm-memory-statistics]]
-==== JVM Memory Statistics
+==== *JVM Memory Statistics*
 
 Use the following dotted name pattern for JVM memory statistics:
 
@@ -1499,11 +1359,10 @@ Use the following dotted name pattern for JVM memory statistics:
 server.jvm.memory.statistic
 ----
 
-The statistics that are available for memory in the JVM for Java SE are
-shown in the following table.
+The statistics that are available for memory in the JVM for Java SE are shown in the following table.
 
 [[table-jvm-memory-statistics]]
-==== Table 8-18 JVM Monitoring Statistics for Java SE Memory
+.Table 8-18 JVM Monitoring Statistics for Java SE Memory
 
 [width="100%",cols="44%,16%,40%",options="header",]
 |=======================================================================
@@ -1537,21 +1396,19 @@ in use
 
 
 [[jvm-operating-system-statistics]]
-==== JVM Operating System Statistics
+==== *JVM Operating System Statistics*
 
-Use the following dotted name pattern for JVM operating system
-statistics:
+Use the following dotted name pattern for JVM operating system statistics:
 
 [source,shell]
 ----
 server.jvm.operating-system.statistic
 ----
 
-The statistics that are available for the operating system for the JVM
-machine in Java SE are shown in the following table.
+The statistics that are available for the operating system for the JVM machine in Java SE are shown in the following table.
 
 [[table-jvm-operating-system-statistics]]
-==== Table 8-19 JVM Statistics for the Java SE Operating System
+.Table 8-19 JVM Statistics for the Java SE Operating System
 
 [width="100%",cols="28%,16%,56%",options="header",]
 |=======================================================================
@@ -1568,7 +1425,7 @@ to the JVM
 
 
 [[jvm-runtime-statistics]]
-==== JVM Runtime Statistics
+==== *JVM Runtime Statistics*
 
 Use the following dotted name pattern for JVM runtime statistics:
 
@@ -1577,11 +1434,10 @@ Use the following dotted name pattern for JVM runtime statistics:
 server.jvm.runtime.statistic
 ----
 
-The statistics that are available for the runtime in the JVM runtime for
-Java SE are shown in the following table.
+The statistics that are available for the runtime in the JVM runtime for Java SE are shown in the following table.
 
 [[jtable-vm-runtime-statistics]]
-==== Table 8-20 JVM Monitoring Statistics for Java SE Runtime
+.Table 8-20 JVM Monitoring Statistics for Java SE Runtime
 
 [width="100%",cols="42%,16%,42%",options="header",]
 |=======================================================================
@@ -1611,9 +1467,6 @@ specification version implemented by the JVM
 
 |`vmversion-current` |StringStatistic |JVM implementation version
 
-| | |
-
-| | |
 |=======================================================================
 
 
@@ -1623,7 +1476,7 @@ specification version implemented by the JVM
 Network fits into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc#network-tree-hierarchy[Network Tree Hierarchy].
 
 [[network-keep-alive-statistics]]
-==== Network Keep Alive Statistics
+==== *Network Keep Alive Statistics*
 
 Use the following dotted name pattern for network keep alive statistics:
 
@@ -1636,7 +1489,7 @@ Statistics available for network keep alive are shown in the following
 table.
 
 [[table-network-keep-alive-statistics]]
-==== Table 8-21 Network Keep Alive Statistics
+.Table 8-21 Network Keep Alive Statistics
 
 [width="100%",cols="25%,16%,59%",options="header",]
 |=======================================================================
@@ -1664,21 +1517,19 @@ were rejected.
 
 
 [[network-connection-queue-statistics]]
-==== Network Connection Queue Statistics
+==== *Network Connection Queue Statistics*
 
-Use the following dotted name pattern for network connection queue
-statistics:
+Use the following dotted name pattern for network connection queue statistics:
 
 [source,shell]
 ----
 server.network.type-of-listener.connection-queue.statistic
 ----
 
-Statistics available for network connection queue are shown in the
-following table.
+Statistics available for network connection queue are shown in the following table.
 
 [[table-network-connection-queue-statistics]]
-==== Table 8-22 Network Connection Queue Statistics
+.Table 8-22 Network Connection Queue Statistics
 
 [width="100%",cols="40%,16%,44%",options="header",]
 |=======================================================================
@@ -1718,7 +1569,7 @@ that connections have spent in the queue
 
 
 [[network-file-cache-statistics]]
-==== Network File Cache Statistics
+==== *Network File Cache Statistics*
 
 Use the following dotted name pattern for network file cache statistics:
 
@@ -1727,11 +1578,10 @@ Use the following dotted name pattern for network file cache statistics:
 server.network.type-of-listener.file-cache.statistic
 ----
 
-Statistics available for network file cache are shown in the following
-table.
+Statistics available for network file cache are shown in the following table.
 
 [[table-network-file-cache-statistics]]
-==== Table 8-23 Network File Cache Statistics
+.Table 8-23 Network File Cache Statistics
 
 [width="100%",cols="28%,16%,56%",options="header",]
 |=======================================================================
@@ -1766,21 +1616,19 @@ entries
 
 
 [[network-thread-pool-statistics]]
-==== Network Thread Pool Statistics
+==== *Network Thread Pool Statistics*
 
-Use the following dotted name pattern for network thread pool
-statistics:
+Use the following dotted name pattern for network thread pool statistics:
 
 [source,shell]
 ----
 server.network.type-of-listener.thread-pool.statistic
 ----
 
-Statistics available for network thread pool are shown in the following
-table.
+Statistics available for network thread pool are shown in the following table.
 
 [[table-network-thread-pool-statistics]]
-==== Table 8-24 Network Thread Pool Statistics
+.Table 8-24 Network Thread Pool Statistics
 
 [width="100%",cols="28%,16%,56%",options="header",]
 |=======================================================================
@@ -1804,7 +1652,7 @@ tasks, which were executed by the thread pool
 
 
 [[orb-statistics-connection-manager]]
-==== ORB Statistics (Connection Manager)
+==== *ORB Statistics (Connection Manager)*
 
 The ORB fits into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc#orb-tree-hierarchy[ORB Tree Hierarchy].
 
@@ -1820,7 +1668,7 @@ The statistics available for the connection manager in an ORB are listed
 in the following table.
 
 [[table-orb-statistics-connection-manager]]
-==== Table 8-25 ORB Monitoring Statistics (Connection Manager)
+.Table 8-25 ORB Monitoring Statistics (Connection Manager)
 
 [width="100%",cols="24%,26%,50%",options="header",]
 |=======================================================================
@@ -1837,28 +1685,22 @@ to the ORB
 
 
 [[resource-statistics-connection-pool]]
-==== Resource Statistics (Connection Pool)
+==== *Resource Statistics (Connection Pool)*
 
-By monitoring connection pool resources you can measure performance and
-capture resource usage at runtime. Connections are expensive and
-frequently cause performance bottlenecks in applications. It is
-important to monitor how a connection pool is releasing and creating new
-connections and how many threads are waiting to retrieve a connection
-from a particular pool.
+By monitoring connection pool resources you can measure performance and capture resource usage at runtime. Connections are expensive and
+frequently cause performance bottlenecks in applications. It is important to monitor how a connection pool is releasing and creating new
+connections and how many threads are waiting to retrieve a connection from a particular pool.
 
-The connection pool resources fit into the tree of objects as shown in
-xref:docs:administration-guide:monitoring.adoc#resources-tree-hierarchy[Resources Tree Hierarchy].
+The connection pool resources fit into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc#resources-tree-hierarchy[Resources Tree Hierarchy].
 
-Use the following dotted name pattern for general connection pool
-statistics:
+Use the following dotted name pattern for general connection pool statistics:
 
 [source,shell]
 ----
 server.resources.pool-name.statistic
 ----
 
-Use the following dotted name pattern for application-scoped connection
-pool statistics:
+Use the following dotted name pattern for application-scoped connection pool statistics:
 
 [source,shell]
 ----
@@ -1875,19 +1717,11 @@ server.applications.application-name.module-name.resources.pool-name.statistic
 
 The connection pool statistics are shown in the following tables.
 
-
-[NOTE]
-=======================================================================
-
-In order to improve system performance, connection pools are initialized
-lazily; that is, a pool is not initialized until an application first
-uses the pool or the pool is explicitly pinged. Monitoring statistics
-for a connection pool are not available until the pool is initialized.
-
-=======================================================================
+NOTE: In order to improve system performance, connection pools are initialized lazily; that is, a pool is not initialized until an application first
+uses the pool or the pool is explicitly pinged. Monitoring statistics for a connection pool are not available until the pool is initialized.
 
 [[table-resource-statistics-connection-pool]]
-Table 8-26 General Resource Monitoring Statistics (Connection Pool)
+.Table 8-26 General Resource Monitoring Statistics (Connection Pool)
 
 [width="100%",cols="43%,16%,41%",options="header",]
 |=======================================================================
@@ -1956,7 +1790,7 @@ queue waiting to be serviced
 
 
 [[table-resource-statistics-connection-pool-2]]
-==== Table 8-27 Application Specific Resource Monitoring Statistics (Connection Pool)
+.Table 8-27 Application Specific Resource Monitoring Statistics (Connection Pool)
 
 [width="100%",cols="23%,16%,61%",options="header",]
 |=======================================================================
@@ -1974,12 +1808,12 @@ connections that were used (high water mark)
 
 
 [[security-statistics]]
-==== Security Statistics
+==== *Security Statistics*
 
 Security fits into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc#security-tree-hierarchy[Security Tree Hierarchy].
 
 [[ejb-security-statistics]]
-==== EJB Security Statistics
+==== *EJB Security Statistics*
 
 Use the following dotted name pattern for EJB security statistics:
 
@@ -1988,11 +1822,10 @@ Use the following dotted name pattern for EJB security statistics:
 server.security.ejb.statistic
 ----
 
-The statistics available for EJB security are listed in the following
-table.
+The statistics available for EJB security are listed in the following table.
 
 [[table-ejb-security-statistics]]
-==== Table 8-28 EJB Security Monitoring Statistics
+.Table 8-28 EJB Security Monitoring Statistics
 
 [width="100%",cols="40%,18%,42%",options="header",]
 |=======================================================================
@@ -2005,7 +1838,7 @@ configuration
 
 
 [[web-security-statistics]]
-==== Web Security Statistics
+==== *Web Security Statistics*
 
 Use the following dotted name pattern for web security statistics:
 
@@ -2014,11 +1847,10 @@ Use the following dotted name pattern for web security statistics:
 server.security.web.statistic
 ----
 
-The statistics available for web security are listed in the following
-table.
+The statistics available for web security are listed in the following table.
 
 [[table-web-security-statistics]]
-==== Table 8-29 Web Security Monitoring Statistics
+.Table 8-29 Web Security Monitoring Statistics
 
 [width="100%",cols="40%,16%,44%",options="header",]
 |=======================================================================
@@ -2031,7 +1863,7 @@ configuration objects
 
 
 [[realm-security-statistics]]
-==== Realm Security Statistics
+==== *Realm Security Statistics*
 
 Use the following dotted name pattern for realm security statistics:
 
@@ -2040,11 +1872,10 @@ Use the following dotted name pattern for realm security statistics:
 server.security.realm.statistic
 ----
 
-The statistics available for realm security are listed in the following
-table.
+The statistics available for realm security are listed in the following table.
 
 [[table-realm-security-statistics]]
-Table 8-30 Realm Security Monitoring Statistics
+.Table 8-30 Realm Security Monitoring Statistics
 
 [width="100%",cols="32%,22%,46%",options="header",]
 |==============================================
@@ -2054,13 +1885,12 @@ Table 8-30 Realm Security Monitoring Statistics
 
 
 [[thread-pool-statistics]]
-==== Thread Pool Statistics
+==== *Thread Pool Statistics*
 
-The thread pool fits into the tree of objects as shown in
-xref:docs:administration-guide:monitoring.adoc#thread-pool-tree-hierarchy[Thread Pool Tree Hierarchy].
+The thread pool fits into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc#thread-pool-tree-hierarchy[Thread Pool Tree Hierarchy].
 
 [[thread-pool-monitoring-statistics]]
-==== Thread Pool Monitoring Statistics
+==== *Thread Pool Monitoring Statistics*
 
 Use the following dotted name pattern for thread pool statistics:
 
@@ -2073,7 +1903,7 @@ The statistics available for the thread pool are shown in the following
 table.
 
 [[table-thread-pool-monitoring-statistics]]
-==== Table 8-31 Thread Pool Monitoring Statistics
+.Table 8-31 Thread Pool Monitoring Statistics
 
 [width="100%",cols="37%,26%,37%",options="header",]
 |=======================================================================
@@ -2102,11 +1932,10 @@ to the work queue as of last sampling
 [[jvm-statistics-for-java-se-thread-information]]
 === JVM Statistics for Java SE-Thread Information
 
-The statistics available for `ThreadInfo` in the JVM in Java SE are
-shown in the following table.
+The statistics available for `ThreadInfo` in the JVM in Java SE are shown in the following table.
 
 [[table-jvm-statistics-for-java-se-thread-information]]
-Table 8-32 JVM Monitoring Statistics for Java SE - Thread Info
+.Table 8-32 JVM Monitoring Statistics for Java SE - Thread Info
 
 [width="100%",cols="20%,16%,64%",options="header",]
 |=======================================================================
@@ -2144,29 +1973,24 @@ monitoring is disabled.
 `WAITING` or `TIMED_WAITING` states.
 |=======================================================================
 
-
 [[transaction-service-statistics]]
-==== Transaction Service Statistics
+==== *Transaction Service Statistics*
 
-The transaction service allows the client to freeze the transaction
-subsystem in order to roll back transactions and determine which
-transactions are in process at the time of the freeze. The transaction
-service fits into the tree of objects as shown in
-xref:docs:administration-guide:monitoring.adoc#transaction-service-tree-hierarchy[Transactions Service Tree Hierarchy].
+The transaction service allows the client to freeze the transaction subsystem in order to roll back transactions and determine which
+transactions are in process at the time of the freeze. The transaction service fits into the tree of objects as shown in
+xref:docs:administration-guide:monitoring.adoc#transactions-service-tree-hierarchy[Transactions Service Tree Hierarchy].
 
-Use the following dotted name pattern for transaction service
-statistics:
+Use the following dotted name pattern for transaction service statistics:
 
 [source,shell]
 ----
 server.transaction-service.statistic
 ----
 
-The statistics available for the transaction service are shown in the
-following table.
+The statistics available for the transaction service are shown in the following table.
 
 [[table-transaction-service-statistics]]
-==== Table 8-33 Transaction Service Monitoring Statistics
+.Table 8-33 Transaction Service Monitoring Statistics
 
 [width="100%",cols="23%,16%,61%",options="header",]
 |=======================================================================
@@ -2189,12 +2013,12 @@ been frozen.
 
 
 [[web-statistics]]
-==== Web Statistics
+==== *Web Statistics*
 
-The web module fits into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc[Web Tree Hierarchy].
+The web module fits into the tree of objects as shown in xref:docs:administration-guide:monitoring.adoc#web-tree-hierarchy[Web Tree Hierarchy].
 
 [[web-module-servlet-statistics]]
-==== Web Module Servlet Statistics
+==== *Web Module Servlet Statistics*
 
 Use the following dotted name pattern for web module servlet statistics:
 
@@ -2208,7 +2032,7 @@ The available web module servlet statistics are shown in the following
 table.
 
 [[tweb-module-servlet-statistics]]
-==== Table 8-34 Web Module Servlet Statistics
+.Table 8-34 Web Module Servlet Statistics
 
 [width="100%",cols="21%,16%,63%",options="header",]
 |=======================================================================
@@ -2231,7 +2055,7 @@ so far.
 
 
 [[web-jsp-statistics]]
-==== Web JSP Statistics
+==== *Web JSP Statistics*
 
 Use the following dotted name pattern for web JSP statistics:
 
@@ -2244,7 +2068,7 @@ server.applications.application.web-module.virtual-server.statistic
 The available web JSP statistics are shown in the following table.
 
 [[table-web-jsp-statistics]]
-==== Table 8-35 Web JSP Monitoring Statistics
+.Table 8-35 Web JSP Monitoring Statistics
 
 [width="100%",cols="24%,16%,60%",options="header",]
 |=======================================================================
@@ -2262,7 +2086,7 @@ reloaded
 
 
 [[web-request-statistics]]
-==== Web Request Statistics
+==== *Web Request Statistics*
 
 Use the following dotted name pattern for web request statistics:
 
@@ -2275,7 +2099,7 @@ server.applications.application.web-module.virtual-server.statistic
 The available web request statistics are shown in the following table.
 
 [[table-web-request-statistics]]
-==== Table 8-36 Web Request Monitoring Statistics
+.Table 8-36 Web Request Monitoring Statistics
 
 [width="100%",cols="21%,16%,63%",options="header",]
 |=======================================================================
@@ -2296,7 +2120,7 @@ processed so far
 |=======================================================================
 
 [[web-servlet-statistics]]
-==== Web Servlet Statistics
+==== *Web Servlet Statistics*
 
 Use the following dotted name pattern for web servlet statistics:
 
@@ -2309,7 +2133,7 @@ server.applications.application.web-module.virtual-server.statistic
 The available web servlet statistics are shown in the following table.
 
 [[table-web-servlet-statistics]]
-==== Table 8-37 Web Servlet Monitoring Statistics
+.Table 8-37 Web Servlet Monitoring Statistics
 
 [width="100%",cols="37%,16%,47%",options="header",]
 |=======================================================================
@@ -2326,7 +2150,7 @@ servlets that have been loaded into the web module
 
 
 [[web-session-statistics]]
-==== Web Session Statistics
+==== *Web Session Statistics*
 
 Use the following dotted name pattern for web session statistics:
 
@@ -2338,10 +2162,8 @@ server.applications.application.web-module.virtual-server.statistic
 
 The available web session statistics are shown in the following table.
 
-[[GSADG920]][[sthref65]][[gellc]]
-
 [[table-web-session-statistics]]
-==== Table 8-38 Web Session Monitoring Statistics
+.Table 8-38 Web Session Monitoring Statistics
 
 [width="100%",cols="34%,16%,50%",options="header",]
 |=======================================================================
@@ -2374,33 +2196,26 @@ sessions
 [[configuring-jconsole-to-view-payara-server-monitoring-data]]
 == Configuring JConsole to View Payara Server Monitoring Data
 
-Java SE provides tools to connect to an MBean Server and view the MBeans
-registered with the server. JConsole is one such popular JMX Connector
-Client and is available as part of the standard Java SE distribution.
-When you configure JConsole for use with Payara Server, Payara
-Server becomes the JMX Connector's server end and JConsole becomes the
-JMX connector's client end.
+Java SE provides tools to connect to an MBean Server and view the MBeans registered with the server. JConsole is one such popular JMX Connector
+Client and is available as part of the standard Java SE distribution.When you configure JConsole for use with Payara Server, Payara
+Server becomes the JMX Connector's server end and JConsole becomes the JMX connector's client end.
 
 [[to-connect-jconsole-to-payara-server]]
 === To Connect JConsole to Payara Server
 
-Java SE 6 enhances management and monitoring of the virtual machine by
-including a Platform MBean Server and by including managed beans
+Java SE 6 enhances management and monitoring of the virtual machine by including a Platform MBean Server and by including managed beans
 (MBeans) to configure the virtual machine.
 
-To view all MBeans, Payara Server provides a configuration of the
-standard JMX connector server called System JMX Connector Server. As
-part of Payara Server startup, an instance of this JMX Connector
-Server is started. Any compliant JMX connector client can connect to the
+To view all MBeans, Payara Server provides a configuration of the standard JMX connector server called System JMX Connector Server. As
+part of Payara Server startup, an instance of this JMX Connector Server is started. Any compliant JMX connector client can connect to the
 server using the JMX Connector Server.
 
-By default, Payara Server is configured with a non-secure System JMX
-Connector Server. If this is an issue, the JMX connector can be removed.
-However, access can be restricted to a specific IP address (for example,
-the loopback address) by setting `address` to `locahost`.
+By default, Payara Server is configured with a non-secure System JMX Connector Server. If this is an issue, the JMX connector can be removed.
+However, access can be restricted to a specific IP address (for example, the loopback address) by setting `address` to `locahost`.
 
 *  Start the domain. For instructions, see xref:docs:administration-guide:domains.adoc#to-start-a-domain[To Start a Domain].
-*  Start JConsole using this format: JDK_HOME`/bin/jconsole`. For example: +
+*  Start JConsole using this format: JDK_HOME`/bin/jconsole`. For example:
++
 [source,shell]
 ----
 /usr/java/bin/jconsole
@@ -2418,7 +2233,7 @@ service:jmx:rmi:///jndi/rmi://localhost:8686/jmxrmi
 ----
 The JMX Service URL is emitted by the server at startup, looking
 something like this: +
-[source,oac_no_warn]
+[source,shell]
 ----
 [#|2009-12-03T10:25:17.737-0800|INFO|glassfishv3.0|
 x..system.tools.admin.org.glassfish.server|_ThreadID=20;
@@ -2428,19 +2243,11 @@ URL = service:jmx:rmi://localhost:8686/jndi/rmi://localhost:8686/jmxrmi|#]
 However, in most cases, simply entering `host:port` is fine, such as,
 192.168.1.150:8686. The long Service URL is not needed. +
 
-[NOTE]
-=======================================================================
-
-Another host name can be substituted for `localhost`. The default port
-number (8686) could change if the `jmx-connector` configuration has been
-modified.
-
-=======================================================================
+NOTE: Another host name can be substituted for `localhost`. The default port
+number (8686) could change if the `jmx-connector` configuration has been modified.
 
 *  Click Connect. +
-In the JConsole window you will see all your MBeans, JVM information,
-and so on, in various tabs. Most of the useful MBeans are to be found in
+In the JConsole window you will see all your MBeans, JVM information, and so on, in various tabs. Most of the useful MBeans are to be found in
 the `amx` and `java.lang` domains.
 
-For more information about JConsole, see
-`http://docs.oracle.com/javase/8/docs/technotes/guides/management/jconsole.html`.
+For more information about JConsole, see `http://docs.oracle.com/javase/8/docs/technotes/guides/management/jconsole.html`.

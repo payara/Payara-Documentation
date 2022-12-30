@@ -18,7 +18,7 @@ The key elements of EIS connectivity are the following:
 
 * *Connector Module*. A connector module also called a resource adapter, is a Jakarta EE component that enables applications to interact with EIS software. A connector module is used by Payara Server to implement Java Message Service (JMS). Like other Jakarta EE modules, a connector module is installed when it is deployed. For instructions on creating a connector module, see xref:docs:application-development-guide:connectors.adoc[Developing Connectors] in Payara Server Open Source Edition Application Development Guide.
 
-* *Connector Connection Pool*. A connector connection pool is a group of reusable connections for a particular EIS. A connector connection pool is created when you specify the connector module that is associated with the pool. For administration procedures, see xref:docs:administration-guide:connectors.adoc[Administering Connector Connection Pools].
+* *Connector Connection Pool*. A connector connection pool is a group of reusable connections for a particular EIS. A connector connection pool is created when you specify the connector module that is associated with the pool. For administration procedures, see xref:docs:administration-guide:connectors.adoc#administering-connector-connection-pools[Administering Connector Connection Pools].
 
 * *Connector Resource*. A connector resource is a program object that provides an application with a connection to an EIS. A connector resource is created when you specify its JNDI name and its associated connection pool. The JNDI name of a connector resource for an EIS is usually in the `java:comp/env/`eis-specific` subcontext. For administration procedures, see xref:docs:administration-guide:connectors.adoc#administering-connector-resources[Administering Connector Resources].
 
@@ -144,7 +144,7 @@ Use the `delete-connector-connection-pool` subcommand in remote mode to remove a
 
 . If necessary, notify users that the connector connection pool is being deleted.
 
-. Delete the connector connection pool by using the xref:docs:reference-manual:delete-connector-connection-pools.adoc[`delete-connector-connection-pool`] subcommand.
+. Delete the connector connection pool by using the xref:docs:reference-manual:delete-connector-connection-pool.adoc[`delete-connector-connection-pool`] subcommand.
 
 .Example 12-3 Deleting a Connector Connection Pool
 [source,shell]
@@ -208,7 +208,7 @@ Use the `get` and `set` subcommands to view and change the values of the connect
 . View the properties of the connector resource by using the xref:docs:reference-manual:get.adoc[`get`] subcommand. +
 +
 .For example +
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> get domain.resources.connector-resource.jms/qConnFactory
 ----
@@ -235,7 +235,7 @@ Before deleting a resource, all associations with the resource must be removed.
 
 . If necessary, notify users that the connector resource is being deleted.
 
-. Delete the connector resource by using the xref:docs:reference-manual:delete-connector-resources.adoc[`delete-connector-resource`] subcommand.
+. Delete the connector resource by using the xref:docs:reference-manual:delete-connector-resource.adoc[`delete-connector-resource`] subcommand.
 
 .Example 12-6 Deleting a Connector Resource
 [source,shell]
@@ -287,7 +287,7 @@ Command list-resource-adapter-configs executed successfully
 
 Use the `get` and `set` subcommands to view and change the values of the resource adapter configuration properties.
 
-. List the configurations for a resource adapter by using the xref:docs:reference-manual:list-resource-adapter-config.adoc[`list-resource-adapter-configs`] subcommand.
+. List the configurations for a resource adapter by using the xref:docs:reference-manual:list-resource-adapter-configs.adoc[`list-resource-adapter-configs`] subcommand.
 
 . View the properties of the connector resource by using the xref:docs:reference-manual:get.adoc[`get`] subcommand. +
 +
@@ -312,7 +312,7 @@ Use the `delete-resource-adapter-config` subcommand in remote mode to delete the
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
-. List the configurations for a resource adapter by using the xref:docs:reference-manual:list-resource-adapter-config.adoc[`list-resource-adapter-configs`] subcommand.
+. List the configurations for a resource adapter by using the xref:docs:reference-manual:list-resource-adapter-configs.adoc[`list-resource-adapter-configs`] subcommand.
 
 . Delete the configuration for a resource adapter by using the xref:docs:reference-manual:delete-resource-adapter-config.adoc[`delete-resource-adapter-config`] subcommand.
 +
@@ -337,7 +337,7 @@ Use the `create-connector-security-map` subcommand in remote mode to create a se
 
 You can also use this subcommand to map the caller identity of the application (principal or user group) to a suitable EIS principal in container-managed authentication scenarios.
 
-For this subcommand to succeed, you must have first created a connector connection pool. For instructions, see xref:docs:administration-guide:connectors[To Create a Connector Connection Pool].
+For this subcommand to succeed, you must have first created a connector connection pool. For instructions, see xref:docs:administration-guide:connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
@@ -409,7 +409,7 @@ Remote subcommands require a running server.
 Some properties require server restart. See xref:docs:administration-guide:overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see  xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 .Example 12-14 Updating a Connector Security Map
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> update-connector-security-map --poolname connector-pool1
 --addprincipals principal1, principal2 securityMap1
@@ -448,7 +448,7 @@ Use the `create-connector-work-security-map` subcommand in remote mode to map th
 
 The connector security map configuration supports the use of the wild card asterisk (*) to indicate all users or all user groups.
 
-Before creating a connector work security map, you must first create a connector connection pool. For instructions, see xref:docs:administration-guide:connectors.adoc[To Create a Connector Connection Pool].
+Before creating a connector work security map, you must first create a connector connection pool. For instructions, see xref:docs:administration-guide:connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
@@ -479,11 +479,11 @@ Use the `list-connector-work-security-maps` subcommand in remote mode to list th
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
-. List the connector work security maps by using the xref:docs:reference-manual:list-connector-work-security-map.adoc[`list-connector-work-security-maps`] subcommand.
+. List the connector work security maps by using the xref:docs:reference-manual:list-connector-work-security-maps.adoc[`list-connector-work-security-maps`] subcommand.
 
 
 .Example 12-17 Listing the Connector Work Security Maps
-[source,oac_no_warn]
+[source,shell]
 ----
 asadmin> list-connector-work-security-maps generic-ra
 generic-ra-groups-map: EIS group=eis-group, mapped group=payara-group
@@ -499,7 +499,7 @@ Use the `update-connector-work-security-map` subcommand in remote to modify a wo
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
-. List the connector work security maps by using the xref:docs:reference-manual:list-connector-work-security-map.adoc[`list-connector-work-security-maps`] subcommand.
+. List the connector work security maps by using the xref:docs:reference-manual:list-connector-work-security-maps.adoc[`list-connector-work-security-maps`] subcommand.
 
 . If necessary, notify users that the connector work security map is being modified.
 
@@ -520,7 +520,7 @@ Use the `delete-connector-work-security-map` subcommand in remote mode to delete
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
-. List the connector work security maps by using the xref:docs:reference-manual:list-connector-work-security-map.adoc[`list-connector-work-security-maps`] subcommand.
+. List the connector work security maps by using the xref:docs:reference-manual:list-connector-work-security-maps.adoc[`list-connector-work-security-maps`] subcommand.
 
 . Delete a connector work security map by using the xref:docs:reference-manual:delete-connector-work-security-map.adoc[`delete-connector-work-security-map`] subcommand.
 
