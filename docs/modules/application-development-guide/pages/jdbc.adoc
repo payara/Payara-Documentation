@@ -46,7 +46,8 @@ You can specify a statement timeout in the following ways:
 === Statement Leak Detection and Leaked Statement Reclamation
 
 If statements are not closed by an application after use, it is possible for the application to run out of cursors.
-Enabling statement leak detection causes statements to be considered as leaked if they are not closed within a specified period. Additionally, leaked statements can reclaimed automatically.
+Enabling statement leak detection causes statements to be considered as leaked if they are not closed within a specified period. Additionally, leaked statements can
+reclaimed automatically.
 
 To enable statement leak detection, set Statement Leak Timeout In Seconds for the JDBC connection pool to a positive, nonzero value in one of the following ways:
 
@@ -99,7 +100,8 @@ When a connection pool is flushed, the connections in the statement cache are re
 [[statement-tracing]]
 === Statement Tracing
 
-You can trace the SQL statements executed by applications that use a JDBC connection pool. Set the SQL Trace Listeners attribute to a comma-separated list of trace listener implementation classes in one of the following ways:
+You can trace the SQL statements executed by applications that use a JDBC connection pool. Set the SQL Trace Listeners attribute to a comma-separated list of trace listener
+implementation classes in one of the following ways:
 
 * Enter an SQL Trace Listeners value in the Edit Connection Pool Advanced Attributes page in the Administration Console. For more information, click the Help button in the Administration Console.
 * Specify the `--sqltracelisteners` option in the `asadmin create-jdbc-connection-pool` command.
@@ -154,15 +156,18 @@ asadmin set resources.jdbc-connection-pool.pool-name.property.time-to-keep-queri
 [[transparent-pool-reconfiguration]]
 === Transparent Pool Reconfiguration
 
-When the properties or attributes of a JDBC connection pool are changed, the connection pool is destroyed and re-created. Normally, applications using the connection pool must be redeployed as a consequence.
-This restriction can be avoided by enabling transparent JDBC connection pool reconfiguration. When this feature is enabled, applications do not need to be redeployed.
-Instead, requests for a new connections are blocked until the reconfiguration operation completes. Connection requests from any in-flight transactions are served using the old pool configuration so as to complete the transaction.
-Then, connections are created using the pool's new configuration, and any blocked connection requests are served with connections from the re-created pool.
+When the properties or attributes of a JDBC connection pool are changed, the connection pool is destroyed and re-created. Normally, applications using the connection pool
+must be redeployed as a consequence. This restriction can be avoided by enabling transparent JDBC connection pool reconfiguration. When this feature is enabled, applications
+do not need to be redeployed. Instead, requests for a new connections are blocked until the reconfiguration operation completes. Connection requests from any
+in-flight transactions are served using the old pool configuration so as to complete the transaction. Then, connections are created using the pool's new configuration,
+and any blocked connection requests are served with connections from the re-created pool.
 
-To enable transparent JDBC connection pool reconfiguration, set the `dynamic-reconfiguration-wait-timeout-in-seconds` property of the JDBC connection pool to a positive, nonzero value in one of the following ways:
+To enable transparent JDBC connection pool reconfiguration, set the `dynamic-reconfiguration-wait-timeout-in-seconds` property of the JDBC connection pool to a positive,
+nonzero value in one of the following ways:
 
 * Add it as a property in the Edit JDBC Connection Pool Properties page in the Administration Console. For more information, click the Help button in the Administration Console.
-* Specify it using the `--property` option in the `create-jdbc-connection-pool` subcommand. For more information, see xref:docs:reference-manual:create-jdbc-connection-pool.adoc[`create-jdbc-connection-pool`].
+* Specify it using the `--property` option in the `create-jdbc-connection-pool` subcommand. For more information,
+see xref:docs:reference-manual:create-jdbc-connection-pool.adoc[`create-jdbc-connection-pool`].
 * Set it using the `set` subcommand. For example:
 +
 [source,shell]
@@ -188,8 +193,8 @@ asadmin set domain1.resources.jdbc-connection-pool.DerbyPool.pooling=false
 
 The `pooling` option and the system property `com.sun.enterprise.connectors.SwitchoffACCConnectionPooling`, which turns off connection pooling in the Application Client Container, do not affect each other.
 
-An exception is thrown if `associate-with-thread` is set to `true` and pooling is disabled. An exception is thrown if you attempt to flush a connection pool when pooling is disabled.
-A warning is logged if the following attributes are used, because they are useful only in a pooled environment:
+An exception is thrown if `associate-with-thread` is set to `true` and pooling is disabled. An exception is thrown if you attempt to flush a connection pool when pooling is
+disabled. A warning is logged if the following attributes are used, because they are useful only in a pooled environment:
 
 * `connection-validation`
 * `validate-atmost-once-period`
@@ -207,8 +212,8 @@ If the setting is `false`, the thread must obtain a connection from the pool eac
 The Associate With Thread attribute associates connections with a thread such that when the same thread is in need of connections,
 it can reuse the connections already associated with that thread. In this case, the overhead of getting connections from the pool is avoided.
 However, when this value is set to `true`, you should verify that the value of the Max Pool Size attribute is comparable to the Max Thread Pool Size attribute of the thread pool.
-If the Max Thread Pool Size value is much higher than the Max Pool Size value, a lot of time is spent associating connections with a new thread after dissociating them from an older one.
-Use this attribute in cases where the thread pool should reuse connections to avoid this overhead.
+If the Max Thread Pool Size value is much higher than the Max Pool Size value, a lot of time is spent associating connections with a new thread after dissociating them from an
+older one. Use this attribute in cases where the thread pool should reuse connections to avoid this overhead.
 
 You can set the Associate With Thread attribute in the following ways:
 
@@ -255,7 +260,8 @@ For example, suppose Bean A starts a transaction and obtains a connection, then 
 If Bean B acquires a connection to the same JDBC resource with the same sign-on information, and if Bean A completes the transaction, the connection can be shared.
 
 Connections obtained through a resource are shared only if the resource reference declared by the Jakarta EE component allows it to be shareable.
-This is specified in a component's deployment descriptor by setting the `res-sharing-scope` element to `Shareable` for the particular resource reference. To turn off connection sharing, set `res-sharing-scope` to `Unshareable`.
+This is specified in a component's deployment descriptor by setting the `res-sharing-scope` element to `Shareable` for the particular resource reference.
+To turn off connection sharing, set `res-sharing-scope` to `Unshareable`.
 
 For general information about connections and JDBC URLs, see "xref:docs:administration-guide:jdbc.adoc#administering-database-connectivity[Administering Database Connectivity]" in Payara Server Open Source Edition Administration Guide.
 
@@ -328,7 +334,8 @@ The Payara Server checks if the JDBC driver implements this interface, and if it
 
 If the Wrap JDBC Objects option is `true` (the default), wrapped JDBC objects are returned for `Statement`, `PreparedStatement`, `CallableStatement`, `ResultSet`, and `DatabaseMetaData`.
 
-This option ensures that `Statement.getConnection()` is the same as `DataSource.getConnection()`. Therefore, this option should be `true` when both `Statement.getConnection()` and `DataSource.getConnection()` are done.
+This option ensures that `Statement.getConnection()` is the same as `DataSource.getConnection()`. Therefore, this option should be `true` when both `Statement.getConnection()` and
+`DataSource.getConnection()` are done.
 
 You can specify the Wrap JDBC Objects option in the following ways:
 
@@ -338,7 +345,8 @@ You can specify the Wrap JDBC Objects option in the following ways:
 [[obtaining-a-physical-connection-from-a-wrapped-connection]]
 === Obtaining a Physical Connection From a Wrapped Connection
 
-The `DataSource` implementation in the Payara Server provides a `getConnection` method that retrieves the JDBC driver's `SQLConnection` from the Payara Server's `Connection` wrapper. The method signature is as follows:
+The `DataSource` implementation in the Payara Server provides a `getConnection` method that retrieves the JDBC driver's `SQLConnection` from the Payara Server's `Connection` wrapper.
+The method signature is as follows:
 
 [source,shell]
 ----
@@ -364,8 +372,8 @@ con.close(); // return wrapped connection to pool.
 === Using the `Connection.unwrap()` Method
 
 Using the `Connection.unwrap()` method on a vendor-provided interface returns an object or a wrapper object implementing the vendor-provided
-interface, which the application can make use of to do vendor-specific database operations. Use the `Connection.isWrapperFor()` method on a vendor-provided interface to check whether the connection can provide an implementation of the vendor-provided interface.
-Check the JDBC driver vendor's documentation for information on these interfaces.
+interface, which the application can make use of to do vendor-specific database operations. Use the `Connection.isWrapperFor()` method on a vendor-provided interface
+to check whether the connection can provide an implementation of the vendor-provided interface. Check the JDBC driver vendor's documentation for information on these interfaces.
 
 [[allowing-non-component-callers]]
 == Allowing Non-Component Callers
@@ -377,7 +385,8 @@ Connections obtained by non-component callers are not automatically closed at th
 
 You can enable non-component callers in the following ways:
 
-* Check the Allow Non Component Callers box on the Edit Connection Pool Advanced Attributes page in the Administration Console. The default is `false`. For more information, click the Help button in the Administration Console.
+* Check the Allow Non Component Callers box on the Edit Connection Pool Advanced Attributes page in the Administration Console. The default is `false`. For more information,
+click the Help button in the Administration Console.
 * Specify the `--allownoncomponentcallers` option in the `asadmin create-jdbc-connection-pool` command.
 * Specify the `allow-non-component-callers` option in the `asadmin set` command. For example:
 +
@@ -394,7 +403,7 @@ information about the Transaction Synchronization Registry, see xref:docs:applic
 == Using Application-Scoped Resources
 
 You can define an application-scoped database or other resource for an enterprise application, web module, EJB module, connector module, or application client module by supplying a `glassfish-resources.xml` deployment descriptor file.
-For details, see "xref:docs:application-deployment-guide:deploying-applications.adoc#application-scope-resources[Application-Scoped Resources]" in Payara Server Open Source Edition Application Deployment Guide.
+For details, see "xref:docs:application-deployment-guide:deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources]" in Payara Server Open Source Edition Application Deployment Guide.
 
 [[restrictions-and-optimizations]]
 == Restrictions and Optimizations

@@ -1,3 +1,4 @@
+[[debugging-applications]]
 = Debugging Applications
 
 This chapter gives guidelines for debugging applications in the Payara Server.
@@ -52,6 +53,7 @@ For details, click the Help button in the Administration Console from the JVM Se
 
 [[jpda-options]]
 == JPDA Options
+
 The default JPDA options in Payara Server are as follows:
 
 [source,shell]
@@ -70,46 +72,45 @@ You can include additional options. A list of JPDA debugging options is availabl
 [[generating-a-stack-trace-for-debugging]]
 == Generating a Stack Trace for Debugging
 
-To generate a Java stack trace for debugging, use the `asadmin generate-jvm-report --type=thread` command. The stack trace goes to the domain-dir`/logs/server.log` file and also appears on the command prompt screen. For more information about the `asadmin generate-jvm-report` command, see the xref:docs:reference-manual:generate-jvm-report.adoc[Payara Server Reference Manual].
+To generate a Java stack trace for debugging, use the `asadmin generate-jvm-report --type=thread` command. The stack trace goes to the domain-dir`/logs/server.log` file and
+also appears on the command prompt screen. For more information about the `asadmin generate-jvm-report` command, see the
+xref:docs:reference-manual:generate-jvm-report.adoc[generate-jvm-report].
 
 [[application-client-debugging]]
 == Application Client Debugging
 
-When the `appclient` script executes the `java` command to run the Application Client Container (ACC), which in turn runs the client, it includes on the command line the value of the VMARGS` environment variable. You can set this variable to any suitable value. For example:
+When the `appclient` script executes the `java` command to run the Application Client Container (ACC), which in turn runs the client, it includes on the command line the value
+of the VMARGS` environment variable. You can set this variable to any suitable value. For example:
 
 [source,shell]
 ----
 VMARGS=-agentlib:transport=dt_socket,server=y,suspend=y,address=8118
 ----
 
-For debugging an application client, you should set suspend to `y` so you can connect the debugger to the client before any code has actually executed. Otherwise, the client may start running and execute past the point you want to examine.
+For debugging an application client, you should set suspend to `y` so you can connect the debugger to the client before any code has actually executed. Otherwise,
+the client may start running and execute past the point you want to examine.
 
-You should use different ports for the server and client if you are debugging both concurrently. For details about setting the port, see xref:docs:application-development-guide:debugging-apps.adoc#jpda-options[JPDA Options].
+You should use different ports for the server and client if you are debugging both concurrently. For details about setting the port, see
+xref:docs:application-development-guide:debugging-apps.adoc#jpda-options[JPDA Options].
 
-You can also include JVM options in the `appclient` script directly. For information about the `appclient` script, see the xref:docs:reference-manual:appclient.adoc[Payara Server Reference Manual].
+You can also include JVM options in the `appclient` script directly. For information about the `appclient` script, see the
+xref:docs:reference-manual:appclient.adoc[appclient].
 
-
-[NOTE]
-====
-The Application Client Container is supported only in the full Payara Server, not in the Web Profile. See xref:docs:application-development-guide:java-clients.adoc#developing-java-clients[Developing Java Clients].
-====
-
+NOTE: The Application Client Container is supported only in the full Payara Server, not in the Web Profile. See xref:docs:application-development-guide:java-clients.adoc#developing-java-clients[Developing Java Clients].
 
 [[open-message-queue-debugging]]
 == Open Message Queue Debugging
 
-Open Message Queue has a broker logger, which can be useful for debugging Java Message Service (JMS) applications, including message-driven bean applications. You can adjust the logger's verbosity, and you can send the logger output to the broker's console using the broker's `-tty` option. 
+Open Message Queue has a broker logger, which can be useful for debugging Java Message Service (JMS) applications, including message-driven bean applications.
+You can adjust the logger's verbosity, and you can send the logger output to the broker's console using the broker's `-tty` option.
 
-
-[NOTE]
-====
-JMS resources are supported only in the full Payara Server, not in the Web Profile. See xref:docs:application-development-guide:jms.adoc#using-the-java-message-service[Using the Java Message Service].
-====
+NOTE: JMS resources are supported only in the full Payara Server, not in the Web Profile. See xref:docs:application-development-guide:jms.adoc#using-the-java-message-service[Using the Java Message Service].
 
 [[enabling-verbose-mode]]
 == Enabling Verbose Mode
 
-To have the server logs and messages printed to `System.out` on your command prompt screen, you can start the server in verbose mode. This makes it easy to do simple debugging using print statements, without having to view the `server.log` file every time. 
+To have the server logs and messages printed to `System.out` on your command prompt screen, you can start the server in verbose mode.
+This makes it easy to do simple debugging using print statements, without having to view the `server.log` file every time.
 
 To start the server in verbose mode, use the `--verbose` option as follows:
 
@@ -118,7 +119,9 @@ To start the server in verbose mode, use the `--verbose` option as follows:
 asadmin start-domain --verbose [domain-name]
 ----
 
-When the server is in verbose mode, messages are logged to the console or terminal window in addition to the log file. In addition, pressing Ctrl-C stops the server and pressing Ctrl-\ (on UNIX platforms) or Ctrl-Break (on Windows platforms) prints a thread dump. On UNIX platforms, you can also print a thread dump using the `jstack` command (see `http://docs.oracle.com/javase/8/docs/technotes/tools/share/jstack.html`) or the command `kill -QUIT` process_id.
+When the server is in verbose mode, messages are logged to the console or terminal window in addition to the log file. In addition, pressing Ctrl-C stops
+the server and pressing Ctrl-\ (on UNIX platforms) or Ctrl-Break (on Windows platforms) prints a thread dump. On UNIX platforms, you can also print a thread dump
+using the `jstack` command (see `http://docs.oracle.com/javase/8/docs/technotes/tools/share/jstack.html`) or the command `kill -QUIT` process_id.
 
 [[class-loader-debugging]]
 == Class Loader Debugging
@@ -138,18 +141,16 @@ asadmin create-jvm-options -XX\:+LogVMOutput
 asadmin create-jvm-options -XX\:LogFile=${com.sun.aas.instanceRoot}/logs/jvm.log
 ----
 
-
-[NOTE]
-====
-These `-XX` options are specific to the OpenJDK (or Hotspot) JVM and do not work with the JRockit JVM.
-====
+NOTE: These `-XX` options are specific to the OpenJDK (or Hotspot) JVM and do not work with the JRockit JVM.
 
 To send the Payara Server messages to the Administration Console instead of `stderr`, start the domain in verbose mode as described in xref:docs:application-development-guide:debugging-apps.adoc#enabling-verbose-mode[Enabling Verbose Mode].
 
 [[payara-server-logging]]
 == Payara Server Logging
 
-You can use the Payara Server's log files to help debug your applications. Use the Administration Console. Select the Stand-Alone Instances component, select the instance from the table, then click the View Log Files button in the General Information page. Or select the Cluster component, select the cluster from the table, select the Instances tab, select the instance from the table, then click the View Log Files button in the General Information page.
+You can use the Payara Server's log files to help debug your applications. Use the Administration Console. Select the Stand-Alone Instances component,
+select the instance from the table, then click the View Log Files button in the General Information page. Or select the Cluster component, select the cluster from the table,
+select the Instances tab, select the instance from the table, then click the View Log Files button in the General Information page.
 
 To change logging settings, select Logger Settings under the relevant configuration.
 
@@ -170,9 +171,12 @@ For information on how to use the NetBeans profiler, see `http://profiler.netbea
 [[the-hprof-profiler]]
 === The HPROF Profiler
 
-The Heap and CPU Profiling Agent (HPROF) is a simple profiler agent shipped with the Java 2 SDK. It is a dynamically linked library that interacts with the Java Virtual Machine Profiler Interface (JVMPI) and writes out profiling information either to a file or to a socket in ASCII or binary format.
+The Heap and CPU Profiling Agent (HPROF) is a simple profiler agent shipped with the Java 2 SDK. It is a dynamically linked library that interacts with the
+Java Virtual Machine Profiler Interface (JVMPI) and writes out profiling information either to a file or to a socket in ASCII or binary format.
 
-HPROF can monitor CPU usage, heap allocation statistics, and contention profiles. In addition, it can also report complete heap dumps and states of all the monitors and threads in the Java virtual machine. For more details on the HPROF profiler, see the technical article at `http://java.sun.com/developer/technicalArticles/Programming/HPROF.html`.
+HPROF can monitor CPU usage, heap allocation statistics, and contention profiles. In addition, it can also report complete heap dumps and states of all the
+monitors and threads in the Java virtual machine. For more details on the HPROF profiler, see the technical article at
+`http://java.sun.com/developer/technicalArticles/Programming/HPROF.html`.
 
 After HPROF is enabled using the following instructions, its libraries are loaded into the server process.
 
@@ -222,14 +226,8 @@ thread=y|n              thread in traces?       n
 doe=y|n                 dump on exit?           y
 ----
 
-[NOTE]
-====
-Do not use help in the JVM Option field. This parameter prints text to the standard output and then exits.
-
+NOTE: Do not use help in the JVM Option field. This parameter prints text to the standard output and then exits. +
 The help output refers to the parameters as options, but they are not the same thing as JVM options.
-====
-
-
 
 [[the-jprobe-profiler]]
 === The JProbe Profiler
@@ -247,32 +245,29 @@ After JProbe is installed using the following instructions, its libraries are lo
 .  Edit the following fields before selecting Save and restarting the server: +
 Profiler Name - `jprobe` +
 Profiler Enabled - `true` +
-Classpath - (leave blank) +
+Classpath - (leave blank)  +
 Native Library Path - JProbe-dir`/profiler` +
-JVM Option - For each of these options, select Add, type the option in
-the Value field, then check its box: +
+JVM Option - For each of these options, select Add, type the option in the Value field, then check its box:
++
 [source,shell]
 ----
     -Xbootclasspath/p:JProbe-dir/profiler/jpagent.jar
     -Xrunjprobeagent
     -Xnoclassgc
 ----
++
+NOTE: If any of the configuration options are missing or incorrect, the profiler might experience problems that affect the performance of the Payara Server.
++
+When the server starts up with this configuration, you can attach the profiler.
 
-[NOTE]
-====
-
-If any of the configuration options are missing or incorrect, the profiler might experience problems that affect the performance of the Payara Server.
-
-====
-
-When the server starts up with this configuration, you can attach the profiler. +
-5.  Set the following environment variable:
-
-[source,oac_no_warn]
+. Set the following environment variable:
++
+[source,shell]
 ----
 JPROBE_ARGS_0=-jp_input=JPL-file-path
 ----
-See Step xref:docs:application-development-guide:debugging-apps.adoc#jprbstp3[3] for instructions on how to create the JPL file. +
+See Step *3* for instructions on how to create the JPL file.
++
 
 .  Start the server instance.
 .  Launch the `jprofiler` and attach to Remote Session. The default

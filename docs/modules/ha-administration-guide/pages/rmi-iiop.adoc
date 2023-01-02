@@ -6,8 +6,8 @@ This chapter describes using high-availability features for remote EJB reference
 [[overview]]
 == Overview
 
-With RMI-IIOP load balancing, IIOP client requests are distributed to different server instances or name servers. The goal is to spread the load evenly across the cluster, thus providing scalability.
-IIOP load balancing combined with EJB clustering and availability also provides EJB failover.
+With RMI-IIOP load balancing, IIOP client requests are distributed to different server instances or name servers. The goal is to spread the load evenly across the cluster,,
+thus providing scalability. IIOP load balancing combined with EJB clustering and availability also provides EJB failover.
 
 [[general-requirements-for-configuring-load-balancing]]
 === General Requirements for Configuring Load Balancing
@@ -18,7 +18,8 @@ Oracle Payara Server provides high availability of remote EJB references and `Na
 * Java EE applications are deployed to all instances and clusters that participate in load balancing.
 * RMI-IIOP client applications are enabled for load balancing.
 
-Payara Server supports load balancing for Java applications executing in the Application Client Container (ACC). See xref:rmi-iiop.adoc#enabling-rmi-iiop-hardware-load-balancing-and-failover[Enabling RMI-IIOP Hardware Load Balancing and Failover].
+Payara Server supports load balancing for Java applications executing in the Application Client Container (ACC).
+See xref:rmi-iiop.adoc#enabling-rmi-iiop-hardware-load-balancing-and-failover[Enabling RMI-IIOP Hardware Load Balancing and Failover].
 
 NOTE: Payara Server does not support RMI-IIOP load balancing and failover over secure sockets layer (SSL).
 
@@ -29,7 +30,8 @@ Payara Server supports two general models for load balancing:
 
 xref:rmi-iiop.adoc#initialcontext-load-balancing[`InitialContext` Load Balancing]::
   When a client performs a JNDI lookup for an object, the Naming Service creates a `InitialContext` (IC) object associated with a particular server instance.
-  From then on, all lookup requests made using that IC object are sent to the same server instance. `InitialContext` load balancing can be configured automatically across an entire cluster.
+  From then on, all lookup requests made using that IC object are sent to the same server instance. `InitialContext` load balancing can be configured automatically
+  across an entire cluster.
 xref:rmi-iiop.adoc#per-request-load-balancing-prlb[Per-Request Load Balancing (PRLB)]::
   Per Request Load Balancing (PRLB) is a method for load balancing stateless EJBs that enables load-balancing for each request to an EJB instance.
   PRLB chooses the first node in a cluster to use on each request. PRLB is configured on a per-EJB basis.
@@ -40,16 +42,18 @@ xref:rmi-iiop.adoc#per-request-load-balancing-prlb[Per-Request Load Balancing (P
 [[initialcontext-summary]]
 === `InitialContext` Summary
 
-When `InitialContext` load balancing is used, the client calls the `InitialContext()` method to create a new `InitialContext` (IC) object that is associated with a particular server instance.
-JNDI lookups are then performed on that IC object, and all lookup requests made using that IC object are sent to the same server instance.
-All `EJBHome` objects looked up with that `InitialContext` are hosted on the same target server. Any bean references obtained henceforth are also created on the same target host.
-This effectively provides load balancing, since all clients randomize the list of live target servers when creating `InitialContext` objects.
-If the target server instance goes down, the lookup or EJB method invocation will failover to another server instance. All objects derived from same `InitialContext` will failover to the same server instance.
+When `InitialContext` load balancing is used, the client calls the `InitialContext()` method to create a new `InitialContext` (IC) object that is associated with a
+particular server instance. JNDI lookups are then performed on that IC object, and all lookup requests made using that IC object are sent to the same server instance.
+All `EJBHome` objects looked up with that `InitialContext` are hosted on the same target server. Any bean references obtained henceforth are also created on the same
+target host. This effectively provides load balancing, since all clients randomize the list of live target servers when creating `InitialContext` objects.
+If the target server instance goes down, the lookup or EJB method invocation will failover to another server instance. All objects derived from same `InitialContext`
+will failover to the same server instance.
 
-IIOP load balancing and failover happens transparently. No special steps are needed during application deployment. IIOP load balancing and failover for the Payara Server supports dynamically reconfigured clusters.
-If the Payara Server instance on which the application client is deployed participates in a cluster, the Payara Server finds all currently active IIOP endpoints in the cluster automatically.
-Therefore, you are not required to manually update the list of endpoints if a new instance is added to the cluster or deleted from the cluster.
-However, a client should have at least two endpoints specified for bootstrapping purposes, in case one of the endpoints has failed.
+IIOP load balancing and failover happens transparently. No special steps are needed during application deployment. IIOP load balancing and failover for the Payara Server
+supports dynamically reconfigured clusters. If the Payara Server instance on which the application client is deployed participates in a cluster, the Payara Server
+finds all currently active IIOP endpoints in the cluster automatically. Therefore, you are not required to manually update the list of endpoints if a new instance
+is added to the cluster or deleted from the cluster. However, a client should have at least two endpoints specified for bootstrapping purposes, in case one of the endpoints
+has failed.
 
 [[initialcontext-algorithm]]
 === `InitialContext` Algorithm
@@ -63,8 +67,8 @@ If that endpoint is not available then a different random endpoint in the list i
 Each time the client subsequently creates a new `InitialContext` object, the endpoint list is rotated so that a different IIOP endpoint is used for `InitialContext` operations.
 The rotation is randomized, so the rotation is not to the next endpoint in the list, but instead to a random endpoint in the list.
 
-When you obtain or create beans from references obtained by an `InitialContext` object, those beans are created on the Payara Server instance serving the IIOP endpoint assigned to the `InitialContext` object.
-The references to those beans contain the IIOP endpoint addresses of all Payara Server instances in the cluster.
+When you obtain or create beans from references obtained by an `InitialContext` object, those beans are created on the Payara Server instance serving the IIOP endpoint assigned
+to the `InitialContext` object. The references to those beans contain the IIOP endpoint addresses of all Payara Server instances in the cluster.
 
 The primary endpoint is the bean endpoint corresponding to the `InitialContext` endpoint used to look up or create the bean.
 The other IIOP endpoints in the cluster are designated as alternate endpoints.
@@ -74,25 +78,26 @@ You can configure RMI-IIOP load balancing and failover to work with applications
 
 [[enabling-rmi-iiop-hardware-load-balancing-and-failover]]
 === Enabling RMI-IIOP Hardware Load Balancing and Failover
-^^^^x^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can enable RMI-IIOP load balancing and failover for applications running in the application client container (ACC). Weighted round-robin load balancing is also supported.
 
 [[to-enable-rmi-iiop-hardware-load-balancing-for-the-application-client-container]]
 ==== *To Enable RMI-IIOP Hardware Load Balancing for the Application Client Container*
 
-This procedure provides an overview of the steps necessary to enable RMI-IIOP load balancing and failover with the application client container (ACC). For additional information on the ACC, see
-"xref:docs:application-development-guide:java-clients.adoc#developing-clients-using-the-acc[Developing Clients Using the ACC]" in Payara Server Open Source Edition Application Development Guide.
+This procedure provides an overview of the steps necessary to enable RMI-IIOP load balancing and failover with the application client container (ACC). For additional
+information on the ACC, see "xref:docs:application-development-guide:java-clients.adoc#developing-clients-using-the-acc[Developing Clients Using the ACC]" in Payara Server Open Source Edition Application Development Guide.
 
-Before You Begin
+*Before You Begin*
 
 The first five steps in this procedure are only necessary if you are enabling RMI-IIOP load balancing on a system other than the DAS.
 This is common in production environment, but less common in a development environment.
-For example, a developer who wants to experiment with a cluster and load balancing might create two instances on the same system on which the DAS is running. In such cases, these steps are unnecessary.
+For example, a developer who wants to experiment with a cluster and load balancing might create two instances on the same system on which the DAS is running.
+In such cases, these steps are unnecessary.
 
 . Go to the install_dir `/bin` directory.
 . Run `package-appclient`. +
-This utility produces an `appclient.jar` file. For more information on `package-appclient`, see xref:reference-manual:package-appclient.adoc#package-appclient[`package-appclient`].
+This utility produces an `appclient.jar` file. For more information on `package-appclient`,
+see xref:reference-manual:package-appclient.adoc#package-appclient[`package-appclient`].
 . Copy the `appclient.jar` file to the machine where you want your client and extract it.
 . Edit the `asenv.conf` or `asenv.bat` path variables to refer to the correct directory values on that machine. +
 The file is at appclient-install-dir `/config/`. +
@@ -126,13 +131,14 @@ asadmin> get servers.server.in1.system-property.*.value
 ----
 . [[add-at-least-two-target-server-elements-in-the-sun-acc.xml-file]] Add at least two `target-server` elements in the `sun-acc.xml` file.
 
-Use the endpoints that you obtained in xref:rmi-iiop.adoc#find-the-iiop-listener-port-number-for-at-least-two-instances-in-the-cluster[Find the IIOP listener port number for at least two instances in the cluster.].
+Use the endpoints that you obtained in xref:rmi-iiop.adoc#find-the-iiop-listener-port-number-for-at-least-two-instances-in-the-cluster[Find the IIOP listener port number for at least two instances in the cluster].
 
-If the Payara Server instance on which the application client is deployed participates in a cluster, the ACC finds all currently active IIOP endpoints in the cluster automatically.
-However, a client should have at least two endpoints specified for bootstrapping purposes, in case one of the endpoints has failed.
+If the Payara Server instance on which the application client is deployed participates in a cluster, the ACC finds all currently active IIOP endpoints in the cluster
+automatically. However, a client should have at least two endpoints specified for bootstrapping purposes, in case one of the endpoints has failed.
 
 The `target-server` element specifies one or more IIOP endpoints used for load balancing. The `address` attribute is an IPv4 address or host
-name, and the `port` attribute specifies the port number. See "xref:docs:application-deployment-guide:dd-elements.adoc#client-container[client-container]" in Payara Server Open Source Edition Application Deployment Guide.
+name, and the `port` attribute specifies the port number. See "xref:docs:application-deployment-guide:dd-elements.adoc#client-container[client-container]" in
+Payara Server Open Source Edition Application Deployment Guide.
 
 As an alternative to using `target-server` elements, you can use the `endpoints` property as follows:
 
@@ -172,7 +178,7 @@ appclient --client my_dir/myapp.jar
 ----
 
 [[example-11-1]]
-Example 11-1 Setting Load-Balancing Weights for RMI-IIOP Weighted Round-Robin Load Balancing
+.Example 11-1 Setting Load-Balancing Weights for RMI-IIOP Weighted Round-Robin Load Balancing
 
 In this example, the load-balancing weights in a cluster of three instances are to be set as shown in the following table.
 
@@ -184,7 +190,6 @@ In this example, the load-balancing weights in a cluster of three instances are 
 |`i3` |300
 |====================================
 
-
 The sequence of commands to set these load balancing weights is as follows:
 
 [source,shell]
@@ -194,15 +199,16 @@ asadmin set i2.lb-weight=200
 asadmin set i3.lb-weight=300
 ----
 
-Next Steps
+*Next Steps*
 
 To test failover, stop one instance in the cluster and see that the application functions normally. You can also have breakpoints (or sleeps) in your client application.
 
 To test load balancing, use multiple clients and see how the load gets distributed among all endpoints.
 
-See Also
+*See Also*
 
-See xref:session-persistence-and-failover.adoc#enabling-the-high-availability-session-persistence-service[Enabling the High Availability Session Persistence Service] for instructions on enabling the session availability service for a cluster or for a Web, EJB, or JMS container running in a cluster.
+See xref:session-persistence-and-failover.adoc#enabling-the-high-availability-session-persistence-service[Enabling the High Availability Session Persistence Service]
+for instructions on enabling the session availability service for a cluster or for a Web, EJB, or JMS container running in a cluster.
 
 [[per-request-load-balancing-prlb]]
 == Per-Request Load Balancing (PRLB)
@@ -210,8 +216,9 @@ See xref:session-persistence-and-failover.adoc#enabling-the-high-availability-se
 [[prlb-summary]]
 === PRLB Summary
 
-Per Request Load Balancing (PRLB) is a method for load balancing stateless EJBs that enables load-balancing for each request to an EJB instance. PRLB chooses the first node in a cluster to use on each request.
-By contrast, `InitialContext` (hardware) load balancing chooses the first node to use when the `InitialContext` is created, and each request thereafter uses the same node unless a failure occurred.
+Per Request Load Balancing (PRLB) is a method for load balancing stateless EJBs that enables load-balancing for each request to an EJB instance. PRLB chooses the first
+node in a cluster to use on each request. By contrast, `InitialContext` (hardware) load balancing chooses the first node to use when the `InitialContext`
+is created, and each request thereafter uses the same node unless a failure occurred.
 
 PRLB is enabled by means of the boolean `per-request-load-balancing` property in the `glassfish-ejb-jar.xml` deployment descriptor file for
 the EJB. If this property is not set, the original load balancing behavior is preserved.
@@ -221,8 +228,8 @@ NOTE: PRLB is only supported for stateless session beans. Using PRLB with any ot
 [[enabling-per-request-load-balancing]]
 === Enabling Per-Request Load Balancing
 
-You can enable Per-Request Load Balancing (PRLB) by setting the boolean `per-request-load-balancing` property to `true` in the `glassfish-ejb-jar.xml` deployment descriptor file for the EJB.
-On the client side, the `initContext.lookup` method is used to access the stateless EJB.
+You can enable Per-Request Load Balancing (PRLB) by setting the boolean `per-request-load-balancing` property to `true` in the `glassfish-ejb-jar.xml`
+deployment descriptor file for the EJB. On the client side, the `initContext.lookup` method is used to access the stateless EJB.
 
 [[to-enable-rmi-iiop-per-request-load-balancing-for-a-stateless-ejb]]
 ==== *To Enable RMI-IIOP Per-Request Load Balancing for a Stateless EJB*
@@ -236,7 +243,8 @@ For instructions on developing and assembling an EJB for deployment to Payara Se
 * "xref:docs:application-deployment-guide:deploying-applications.adoc#ejb-module-deployment-guidelines[EJB Module Deployment Guidelines]" in Payara Server Open Source Edition Application Deployment Guide
 * "xref:docs:application-deployment-guide:deploying-applications.adoc#assembling-and-deploying-an-application-client-module[Assembling and Deploying an Application Client Module]" in Payara Server Open Source Edition Application Deployment Guide
 . Set the `per-request-load-balancing` property to `true` in the `glassfish-ejb-jar.xml` deployment descriptor file for the EJB. +
-For more information about the `glassfish-ejb-jar.xml` deployment descriptor file, refer to "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in Payara Server Open Source Edition Application Deployment Guide +
+For more information about the `glassfish-ejb-jar.xml` deployment descriptor file, refer to "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in
+Payara Server Open Source Edition Application Deployment Guide +
 For example, the `glassfish-ejb-jar.xml` file for a sample EJB named `TheGreeter` is listed below.
 +
 [source,shell]
@@ -294,6 +302,7 @@ public class EJBClient {
 }
 ----
 
-See Also
+*See Also*
 
-See xref:session-persistence-and-failover.adoc#enabling-the-high-availability-session-persistence-service[Enabling the High Availability Session Persistence Service] for instructions on enabling the session availability service for a cluster or for a Web, EJB, or JMS container running in a cluster.
+See xref:session-persistence-and-failover.adoc#enabling-the-high-availability-session-persistence-service[Enabling the High Availability Session Persistence Service]
+for instructions on enabling the session availability service for a cluster or for a Web, EJB, or JMS container running in a cluster.

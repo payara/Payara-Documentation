@@ -74,20 +74,22 @@ The following GMS configuration settings are used in GMS for group discovery and
   If the maximum number of missed heartbeats is exceeded and peer-to-peer connection fails, the member is marked as a suspected failure. The default is 3.
 `heartbeat-frequency-in-millis`::
   Indicates the frequency (in milliseconds) at which a heartbeat is sent by each server instance to the cluster. +
-  The failure detection interval is the `max-missed-heartbeats` multiplied by the `heartbeat-frequency-in-millis`. Therefore, the combination of defaults, 3 multiplied by 2000 milliseconds, results in a failure detection interval of 6 seconds. +
+  The failure detection interval is the `max-missed-heartbeats` multiplied by the `heartbeat-frequency-in-millis`. Therefore, the combination of defaults, 3 multiplied by 2000
+  milliseconds, results in a failure detection interval of 6 seconds. +
   Lowering the value of `heartbeat-frequency-in-millis` below the default would result in more frequent heartbeat messages being sent out from each member.
   This could potentially result in more heartbeat messages in the network than a system needs for triggering failure detection protocols.
   The effect of this varies depending on how   quickly the deployment environment needs to have failure detection performed.
   That is, the (lower) number of retries with a lower heartbeat interval would make it quicker to detect failures. +
-  However, lowering this value could result in false positives because you could potentially detect a member as failed when, in fact, the member's heartbeat is reflecting the network load from other parts of the server.
-  Conversely, a higher timeout interval results in fewer heartbeats in the system because the time interval between heartbeats is longer. As a result, failure detection would take a longer.
-  In addition, a startup by a failed member during this time results in a new join notification but no failure notification, because failure detection and verification were not completed. +
+  However, lowering this value could result in false positives because you could potentially detect a member as failed when, in fact, the member's heartbeat is reflecting the
+  network load from other parts of the server. Conversely, a higher timeout interval results in fewer heartbeats in the system because the time interval between heartbeats is longer.
+  As a result, failure detection would take a longer. In addition, a startup by a failed member during this time results in a new join notification but no failure notification, because failure detection and verification
+  were not completed. +
   The default is 2000.
 `verify-failure-waittime-in-millis`::
   Indicates the verify suspect protocol's timeout used by the health monitor.
   After a member is marked as suspect based on missed heartbeats and a failed peer-to-peer connection check, the verify suspect protocol is activated
-  and waits for the specified timeout to check for any further health state messages received in that time, and to see if a peer-to-peer connection can be made with the suspect member.
-  If not, then the member is marked as failed and a failure notification is sent. The default is 1500.
+  and waits for the specified timeout to check for any further health state messages received in that time, and to see if a peer-to-peer connection can be made with the suspect
+  member. If not, then the member is marked as failed and a failure notification is sent. The default is 1500.
 `verify-failure-connect-timeout-in-millis`::
   Indicates the time it takes for the GMS to detect a hardware or network failure of a server instance. Be careful not to set this value too low.
   The smaller this timeout value is, the greater the chance of detecting false failures. That is, the instance has not failed but doesn't respond within the short window of time. The default is 10000.
@@ -238,7 +240,8 @@ The `get-health` subcommand only works when GMS is enabled. This is the quickest
 if cluster is properly operating; that is, all members of the cluster are running and visible to DAS.
 
 If multicast is not enabled for the network, all instances could be running (as shown by the xref:docs:reference-manual:list-instances.adoc[`list-instances`] subcommand), yet isolated from each other.
-The `get-health` subcommand does not show the instances if they are running but cannot discover each other due to multicast not being configured properly. See xref:clusters.adoc#to-validate-that-multicast-transport-is-available-for-a-cluster[To Validate That Multicast Transport Is Available for a Cluster].
+The `get-health` subcommand does not show the instances if they are running but cannot discover each other due to multicast not being configured properly.
+See xref:clusters.adoc#to-validate-that-multicast-transport-is-available-for-a-cluster[To Validate That Multicast Transport Is Available for a Cluster].
 
 . Ensure that the DAS and cluster are running. Remote subcommands require a running server.
 . Check whether server instances in a cluster are running by using the xref:docs:reference-manual:get-health.adoc[`get-health`] subcommand.
@@ -334,7 +337,7 @@ Exiting after 20 seconds. To change this timeout, use the --timeout command line
 Command validate-multicast executed successfully.
 ----
 
-Next Steps
+*Next Steps*
 
 As long as all machines see each other, multicast is validated to be working properly across the machines. If the machines are not seeing each other,
 set the `--bindaddress` option explicitly to ensure that all machines are using interface on same subnet, or increase the `--timetolive` option from the default of `4`.
@@ -488,7 +491,7 @@ IIOP_SSL_MUTUALAUTH_PORT=23921
 Command create-local-instance executed successfully.
 ----
 
-See Also
+*See Also*
 
 * xref:docs:reference-manual:create-system-properties.adoc[`create-system-properties`(1)]
 * xref:clusters.adoc#to-create-a-cluster[To Create a Cluster]
@@ -568,7 +571,7 @@ GMS_LISTENER_PORT=9090' gencluster
 Command create-cluster executed successfully.
 ----
 
-Next Steps
+*Next Steps*
 
 After creating the cluster, add instances to the cluster as explained in the following sections:
 
@@ -577,7 +580,7 @@ After creating the cluster, add instances to the cluster as explained in the fol
 
 [[GSHAG493]]
 
-See Also
+*See Also*
 
 * xref:clusters.adoc#to-create-a-cluster[To Create a Cluster]
 * xref:instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
@@ -610,7 +613,7 @@ To configure multi-homed machines for GMS without traffic separation, skip the s
 
 To avoid having to restart the DAS or cluster, perform the following steps in the specified order.
 
-To set up traffic separation, follow these steps:
+*To set up traffic separation, follow these steps:*
 
 . Create the system properties `EXTERNAL-ADDR` and `GMS-BIND-INTERFACE-ADDRESS-c1` for the DAS.
 * `asadmin create-system-properties` `target` `server EXTERNAL-ADDR=192.155.35.4`
@@ -651,7 +654,7 @@ If you change GMS settings for an existing cluster, the DAS and the cluster must
 When you create a cluster, Payara Server automatically creates a Message Queue cluster for the Payara Server cluster.
 For more information about Message Queue clusters, see xref:jms.adoc#using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server].
 
-Before You Begin
+*Before You Begin*
 
 If the cluster is to reference an existing named configuration, ensure that the configuration exists. For more information, see xref:named-configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
 If you are using a named configuration to preconfigure GMS settings, ensure that these settings have the required values in the named configuration.
@@ -760,14 +763,14 @@ GMS_TCPSTARTPORT=10000:GMS_TCPENDPORT=10100 pmdcluster
 Command create-cluster executed successfully.
 ----
 
-Next Steps
+*Next Steps*
 
 After creating a cluster, you can add Payara Server instances to the cluster as explained in the following sections:
 
 * xref:instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
 * xref:instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
 
-See Also
+*See Also*
 
 * xref:named-configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration]
 * xref:clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings]
@@ -818,7 +821,7 @@ ymlclust not running
 Command list-clusters executed successfully.
 ----
 
-See Also
+*See Also*
 
 xref:docs:reference-manual:list-clusters.adoc[`list-clusters`]
 
@@ -831,7 +834,7 @@ Use the `delete-cluster` subcommand in remote mode to remove a cluster from the 
 
 If the cluster's named configuration was created automatically for the cluster and no other clusters or unclustered instances refer to the configuration, the configuration is deleted when the cluster is deleted.
 
-Before You Begin
+*Before You Begin*
 
 Ensure that following prerequisites are met:
 
@@ -885,7 +888,7 @@ asadmin> delete-cluster adccluster
 Command delete-cluster executed successfully.
 ----
 
-See Also
+*See Also*
 
 * xref:instances.adoc#to-stop-a-cluster[To Stop a Cluster]
 * xref:instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]

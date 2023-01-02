@@ -40,7 +40,8 @@ Clusters and instances cannot refer to the `default-config` configuration. The `
 === Automatically Created Configurations
 
 When you create a cluster or an instance, you can choose whether to specify an existing configuration that the new cluster or instance will reference.
-If you choose to create a cluster or an instance without specifying an existing configuration, Payara Server automatically creates a configuration for the cluster or instance. For more information, see the following sections:
+If you choose to create a cluster or an instance without specifying an existing configuration, Payara Server automatically creates a configuration for the cluster or instance.
+For more information, see the following sections:
 
 * xref:clusters.adoc#to-create-a-cluster[To Create a Cluster]
 * xref:instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
@@ -104,7 +105,7 @@ destination-config-name::
   Your choice of name for the configuration that you are creating by copying the source configuration.
 
 [[example-6-1]]
-Example 6-1 Creating a Named Configuration
+.Example 6-1 Creating a Named Configuration
 
 This example creates the named configuration `clusterpresets-config` by copying the default configuration.
 
@@ -114,7 +115,7 @@ asadmin> copy-config default-config clusterpresets-config
 Command copy-config executed successfully.
 ----
 
-See Also
+*See Also*
 
 * xref:clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings]
 * xref:clusters.adoc#to-create-a-cluster[To Create a Cluster]
@@ -137,7 +138,7 @@ asadmin> list-configs
 ----
 
 [[example-6-2]]
-Example 6-2 Listing All Named Configurations in a Domain
+.Example 6-2 Listing All Named Configurations in a Domain
 
 This example lists all named configurations in the current domain.
 
@@ -150,7 +151,8 @@ ymlcluster-config
 clusterpresets-config
 Command list-configs executed successfully.
 ----
-See Also
+
+*See Also*
 
 xref:docs:reference-manual:list-configs.adoc[`list-configs`]
 
@@ -164,14 +166,16 @@ Use the `list-clusters` subcommand and the `list-instances` subcommand in remote
 The targets of a named configuration are the clusters and Payara Server instances that reference the configuration.
 
 . Ensure that the DAS is running. Remote subcommands require a running server.
-. List the clusters that refer to the configuration. +
+. List the clusters that refer to the configuration.
++
 [source,shell]
 ----
 asadmin> list-clusters config-name
 ----
 config-name::
   The name of the configuration whose targets you are listing.
-. List the instances that refer to the configuration. +
+. List the instances that refer to the configuration.
++
 [source,shell]
 ----
 asadmin> list-instances config-name
@@ -180,7 +184,7 @@ config-name::
   The name of the configuration whose targets you are listing.
 
 [[example-6-3]]
-Example 6-3 Listing the Targets of a Named Configuration
+.Example 6-3 Listing the Targets of a Named Configuration
 
 This example shows that the cluster `ymlcluster` and the instances `yml-i1` and `yml-i2` reference the named configuration `ymlcluster-config`.
 
@@ -195,7 +199,7 @@ yml-i2   not running
 Command list-instances executed successfully.
 ----
 
-See Also
+*See Also*
 
 * xref:docs:reference-manual:list-clusters.adoc[`list-clusters`]
 * xref:docs:reference-manual:list-instances.adoc[`list-instances`]
@@ -214,7 +218,7 @@ You cannot delete the `default-config` configuration.
 
 NOTE: A standalone configuration that was created automatically for a cluster or a Payara Server instance is deleted when the cluster or instance is deleted.
 
-Before You Begin
+*Before You Begin*
 
 Ensure that no clusters or instances refer to the configuration. If a cluster or instance refers to the configuration and is no longer required, delete the cluster or instance.
 For information about how to delete an instance and how to delete a cluster, see the following sections:
@@ -224,21 +228,26 @@ For information about how to delete an instance and how to delete a cluster, see
 * xref:clusters.adoc#to-delete-a-cluster[To Delete a Cluster]
 
 . Ensure that the DAS is running. Remote subcommands require a running server.
-. Confirm that no clusters refer to the configuration that you are deleting. +
+. Confirm that no clusters refer to the configuration that you are deleting.
++
 [source,shell]
 ----
 asadmin> list-clusters config-name
 ----
 config-name::
   The name of the configuration that you are deleting.
-. Confirm that no instances refer to the configuration that you are deleting. +
+
+. Confirm that no instances refer to the configuration that you are deleting.
++
 [source,shell]
 ----
 asadmin> list-instances config-name
 ----
++
 config-name::
   The name of the configuration that you are deleting.
-. Run the xref:docs:reference-manual:delete-config.adoc[`delete-config`] subcommand. +
+. Run the xref:docs:reference-manual:delete-config.adoc[`delete-config`] subcommand.
++
 [source,shell]
 ----
 asadmin> delete-config config-name
@@ -247,7 +256,7 @@ config-name::
   The name of the configuration that you are deleting.
 
 [[example-6-4]]
-Example 6-4 Deleting a Named Configuration
+.Example 6-4 Deleting a Named Configuration
 
 This example confirms that no clusters or instances refer to the configuration `clusterpresets-config` and then deletes the configuration.
 
@@ -263,7 +272,7 @@ asadmin> delete-config clusterpresets-config
 Command delete-config executed successfully.
 ----
 
-See Also
+*See Also*
 
 * xref:instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
 * xref:instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
@@ -347,7 +356,8 @@ If you change the port number in a configuration, the port number is changed for
 
 . Ensure that the DAS is running. Remote subcommands require a running server.
 . For each property that you are modifying, determine the current value and set the new value.
-. Determine the current value of the property. +
+. Determine the current value of the property.
++
 [source,shell]
 ----
 asadmin> get configs.config.config-name.system-property.property-name.value
@@ -357,7 +367,8 @@ config-name::
 property-name::
   The name of the property that you are modifying. For a list of
   available properties, see xref:named-configurations.adoc#properties-for-port-numbers-in-a-named-configuration[Properties for Port Numbers in a Named Configuration].
-  . Set the property to its new value. +
+  . Set the property to its new value.
++
 [source,shell]
 ----
 asadmin> set
@@ -371,7 +382,7 @@ new-value::
   The value to which you are setting the property.
 
 [[example-6-5]]
-Example 6-5 Modifying a Property of a Named Configuration
+.Example 6-5 Modifying a Property of a Named Configuration
 
 This example changes the value of the `JMS_PROVIDER_PORT` property in the `clusterpresets-config` configuration from 27676 to 27678.
 
@@ -387,7 +398,7 @@ configs.config.clusterpresets-config.system-property.JMS_PROVIDER_PORT.value=276
 Command set executed successfully.
 ----
 
-See Also
+*See Also*
 
 * xref:docs:reference-manual:get.adoc[`get`]
 * xref:docs:reference-manual:set.adoc[`set`]
@@ -425,7 +436,8 @@ instance-name::
 port-property::
   The name of the property that corresponds to the port number that you
   are modifying. For a list of available properties, see xref:named-configurations.adoc#properties-for-port-numbers-in-a-named-configuration[Properties for Port Numbers in a Named Configuration].
-. Set the port number to its new value. +
+. Set the port number to its new value.
++
 [source,shell]
 ----
 asadmin> get
@@ -439,7 +451,7 @@ new-value::
   The value to which you are setting the port number.
 
 [[example-6-6]]
-Example 6-6 Modifying a Port Number for an Instance
+.Example 6-6 Modifying a Port Number for an Instance
 
 This example changes the port number of the HTTP port or the HTTPS port for administration of the `pmdsainst` instance from 24849 to 24859.
 
@@ -455,7 +467,7 @@ servers.server.pmdsainst.system-property.ASADMIN_LISTENER_PORT.value=24859
 Command set executed successfully.
 ----
 
-See Also
+*See Also*
 
 * xref:docs:reference-manual:get.adoc[`get`]
 * xref:docs:reference-manual:set.adoc[`set`]

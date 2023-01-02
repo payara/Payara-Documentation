@@ -66,13 +66,15 @@ Pooling and caching parameters for the `glassfish-ejb-jar.xml` file are describe
 ==== *Pooling Parameters*
 
 One of the most important parameters for Payara Server pooling is `steady-pool-size`.
-When `steady-pool-size` is set to a value greater than 0, the container not only pre-populates the bean pool with the specified number of beans, but also attempts to ensure that this number of beans is always available in the free pool.
+When `steady-pool-size` is set to a value greater than 0, the container not only pre-populates the bean pool with the specified number of beans, but also attempts to ensure
+that this number of beans is always available in the free pool.
 This ensures that there are enough beans in the ready-to-serve state to process user requests.
 
 Note that the `steady-pool-size` and `max-pool-size` parameters only govern the number of instances that are pooled over a long period of time.
 They do not necessarily guarantee that the number of instances that may exist in the JVM at a given time will not exceed the value specified by `max-pool-size`.
 For example, suppose an idle stateless session container has a fully-populated pool with a `steady-pool-size` of 10.
-If 20 concurrent requests arrive for the EJB component, the container creates 10 additional instances to satisfy the burst of requests. The advantage of this is that it prevents the container from blocking any of the incoming requests.
+If 20 concurrent requests arrive for the EJB component, the container creates 10 additional instances to satisfy the burst of requests. The advantage of this is
+that it prevents the container from blocking any of the incoming requests.
 However, if the activity dies down to 10 or fewer concurrent requests, the additional 10 instances are discarded.
 
 Another parameter, `pool-idle-timeout-in-seconds`, allows the administrator to specify the amount of time a bean instance can be idle in the pool.
@@ -119,7 +121,8 @@ All normal end-of-transaction database synchronization steps occur regardless of
 
 The EJB Timer Service uses a database to store persistent information about EJB timers. The EJB Timer Service in Payara Server is preconfigured to use an embedded version of the Apache Derby database.
 
-The EJB Timer Service configuration can store persistent timer information in any database supported by the Payara Server for persistence. For configurations of supported and other drivers, see "xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in Payara Server Open Source Edition Administration Guide.
+The EJB Timer Service configuration can store persistent timer information in any database supported by the Payara Server for persistence. For configurations of supported and other drivers, see
+"xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in Payara Server Open Source Edition Administration Guide.
 
 The timer service is automatically enabled when you deploy an application or module that uses it. You can verify that the timer service is running by accessing the following URL:
 
@@ -147,8 +150,8 @@ Timer DataSource::
   Specifies the database used by the EJB Timer Service. The default is `jdbc/__TimerPool`. +
 
 caution: Do not use the `jdbc/__TimerPool` resource for timers in clustered Payara Server environments.
-You must instead use a custom JDBC resource or the `jdbc/__default` resource. See the instructions below, in xref:ejb.adoc#to-deploy-an-ejb-timer-to-a-cluster[To Deploy an EJB Timer to a Cluster]. Also refer to "xref:docs:administration-guide:jdbc.adoc#enabling-the-jdbc__default-resource-in-a-clustered-environment[Enabling the jdbc/__default Resource in a Clustered
-Environment]" in Payara Server Open Source Edition Administration Guide.
+You must instead use a custom JDBC resource or the `jdbc/__default` resource. See the instructions below, in xref:ejb.adoc#to-deploy-an-ejb-timer-to-a-cluster[To Deploy an EJB Timer to a Cluster].
+Also refer to "xref:docs:administration-guide:jdbc.adoc#enabling-the-jdbc__default-resource-in-a-clustered-environment[Enabling the jdbc/__default Resource in a Clustered Environment]" in Payara Server Open Source Edition Administration Guide.
 
 For information about migrating EJB timers, see "xref:docs:ha-administration-guide:instances.adoc#migrating-ejb-timers[Migrating EJB Timers]" in Payara Server Open Source Edition High Availability Administration Guide.
 
@@ -157,7 +160,8 @@ You can use the `--keepstate` option of the `asadmin redeploy` command to retain
 The default for `--keepstate` is false. This option is supported only on the default server instance, named `server`. It is not supported and ignored for any other target.
 
 When the `--keepstate` is set to true, each application that uses an EJB timer is assigned an ID in the timer database.
-The EJB object that is associated with a given application is assigned an ID that is constructed from the application ID and a numerical suffix. To preserve active timer data, Payara Server stores the application ID and the EJB ID in the timer database.
+The EJB object that is associated with a given application is assigned an ID that is constructed from the application ID and a numerical suffix. To preserve active timer data,
+Payara Server stores the application ID and the EJB ID in the timer database.
 To restore the data, the class loader of the newly redeployed application retrieves the EJB timers that correspond to these IDs from the timer database.
 
 [[to-deploy-an-ejb-timer-to-a-cluster]]
@@ -167,7 +171,8 @@ This procedure explains how to deploy an EJB timer to a cluster.
 
 By default, the Payara Server 5.0 timer service points to the preconfigured `jdbc/__TimerPool` resource, which uses an embedded Apache Derby database configuration that will not work in clustered environments.
 
-The problem is that embedded Apache Derby database runs in the Payara Server Java VM, so when you use the `jdbc/__TimerPool` resource, each DAS and each clustered server instance will have its own database table.
+The problem is that embedded Apache Derby database runs in the Payara Server Java VM, so when you use the `jdbc/__TimerPool` resource, each DAS and each clustered server
+instance will have its own database table.
 Because of this, clustered server instances will not be able to find the database table on the DAS, and the DAS will not be able to find the tables on the clustered server instances.
 
 The solution is to use either a custom JDBC resource or the
@@ -175,12 +180,11 @@ The solution is to use either a custom JDBC resource or the
 
 Before You Begin, if creating a new timer resource, the resource should be created before deploying applications that will use the timer.
 
-
 CAUTION: Do not use the `jdbc/__TimerPool` resource for timers in clustered Payara Server environments. You must instead use a custom JDBC resource or the `jdbc/__default` resource.
-See "xref:docs:administration-guide:jdbc.adoc#enabling-the-jdbc__default-resource-in-a-clustered-environment[Enabling the jdbc/__default Resource in a Clustered
-Environment]" in Payara Server Open Source Edition Administration Guide.
+See "xref:docs:administration-guide:jdbc.adoc#enabling-the-jdbc__default-resource-in-a-clustered-environment[Enabling the jdbc/__default Resource in a Clustered Environment]" in Payara Server Open Source Edition Administration Guide.
 
-. Execute the following command: +
+. Execute the following command:
++
 [source,shell]
 ----
 asadmin set configs.config.cluster_name-config.ejb-container.ejb-timer-service.timer-
@@ -323,13 +327,13 @@ about transaction recovery, see xref:application-development-guide:transaction-s
 Objects, see "xref:docs:administration-guide:jms.adoc#administering-jms-physical-destinations[Administering JMS Physical Destinations]" in Payara Server Open Source Edition Administration Guide.
 
 NOTE: Idempotent URLs are supported along the HTTP path, but not the RMI-IIOP path. For more information, see xref:application-development-guide:webapps.adoc#configuring-idempotent-url-requests[Configuring Idempotent URL Requests]. +
-
 If a server instance to which an RMI-IIOP client request is sent crashes during the request processing (before the response is prepared and sent back to the client), an error is sent to the client.
 The client must retry the request explicitly.
 When the client retries the request, the request is sent to another server instance in the cluster, which retrieves session state information for this client. +
 
 HTTP sessions can also be saved in a persistent store in case a server instance fails.
-In addition, if a distributable web application references an SFSB, and the web application's session fails over, the EJB reference is also failed over. For more information, see xref:application-development-guide:webapps.adoc#distributed-sessions-and-persistence[Distributed Sessions and Persistence]. +
+In addition, if a distributable web application references an SFSB, and the web application's session fails over, the EJB reference is also failed over.
+For more information, see xref:application-development-guide:webapps.adoc#distributed-sessions-and-persistence[Distributed Sessions and Persistence]. +
 
 If an SFSB that uses session persistence is undeployed while the Payara Server instance is stopped, the session data in the persistence store might not be cleared.
 To prevent this, undeploy the SFSB while the Payara Server instance is running.
@@ -364,7 +368,7 @@ All instances in an Payara Server cluster should have the same availability sett
 
 
 [[using-the---keepstate-option]]
-==== Using the `--keepstate` Option
+==== *Using the `--keepstate` Option*
 
 If you are using the file system for persistence, you can use the `--keepstate` option of the `asadmin redeploy` command to retain the SFSB state between redeployments.
 
@@ -377,7 +381,7 @@ If any active SFSB instance fails to be preserved or restored, none of the SFSB 
 To preserve active state data, Payara Server serializes the data and saves it in memory. To restore the data, the class loader of the newly redeployed application deserializes the data that was previously saved.
 
 [[using-the---asyncreplication-option]]
-==== Using the `--asyncreplication` Option
+==== *Using the `--asyncreplication` Option*
 
 If you are using replication on other servers for persistence, you can use the `--asyncreplication` option of the `asadmin deploy` command to specify that SFSB states are first buffered and then replicated using a separate asynchronous thread.
 If `--asyncreplication` is set to true (default), performance is improved but availability is reduced. If the instance where states are buffered but not yet replicated fails, the states are lost.
@@ -392,7 +396,7 @@ If set to false, performance is reduced but availability is guaranteed. States a
 To enable SFSB checkpointing at the server instance or EJB container level, see xref:ejb.adoc#choosing-a-persistence-store[Choosing a Persistence Store].
 
 [[application-and-ejb-module-levels]]
-==== Application and EJB Module Levels
+==== *Application and EJB Module Levels*
 
 To enable SFSB checkpointing at the application or EJB module level during deployment, use the `asadmin deploy` or `asadmin deploydir` command with the `--availabilityenabled` option set to `true`.
 
@@ -453,7 +457,8 @@ The non-transactional methods in the `checkpoint-at-end-of-method` element can b
 
 Any other methods mentioned in this list are ignored. At the end of invocation of each of these methods, the EJB container saves the state of the SFSB to persistent store.
 
-NOTE: If an SFSB does not participate in any transaction, and if none of its methods are explicitly specified in the `checkpoint-at-end-of-method` element, the bean's state is not checkpointed at all even if `availability-enabled="true"` for this bean.
+NOTE: If an SFSB does not participate in any transaction, and if none of its methods are explicitly specified in the `checkpoint-at-end-of-method` element, the bean's state is not
+checkpointed at all even if `availability-enabled="true"` for this bean.
 
 For better performance, specify a small subset of methods. The methods chosen should accomplish a significant amount of work in the context of the Jakarta EE application or should result in some important modification to the bean's state.
 
