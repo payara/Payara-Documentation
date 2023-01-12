@@ -34,7 +34,7 @@ For more information, see the Jakarta EE 8 Platform Specification, section EE.5.
 If the `disable-nonportable-jndi-names` property is set to false (the
 default), a Payara Server V2-specific JNDI name is assigned in
 addition to a portable global JNDI name. For more information, see
-xref:jndi.adoc#payara-server-v2-vendor-specific-global-jndi-names[Payara Server V2 Vendor-Specific Global JNDI Names] and xref:jndi.adoc#disabling-glassfish-server-v2-jndi-names[Disabling GlassFish Server V2 JNDI Names].
+xref:jndi.adoc#payara-server-v2-vendor-specific-global-jndi-names[Payara Server V2 Vendor-Specific Global JNDI Names] and xref:jndi.adoc#disabling-payara-server-v2-jndi-names[Disabling Payara Server V2 JNDI Names].
 
 [[payara-server-v2-vendor-specific-global-jndi-names]]
 === Payara Server V2 Vendor-Specific Global JNDI Names
@@ -65,13 +65,13 @@ For an entity bean, a global JNDI name must be assigned.
 * For all other component dependencies that must be mapped to global JNDI names, the default is the name of the dependency relative to `java:comp/env`.
 For example, in the `@Resource(name="jdbc/Foo") DataSource ds;` annotation, the global JNDI name is `jdbc/Foo`.
 
-[[disabling-glassfish-server-v2-jndi-names]]
-=== Disabling GlassFish Server V2 JNDI Names
+[[disabling-payara-server-v2-jndi-names]]
+=== Disabling Payara Server V2 JNDI Names
 
 The EJB 3.1 specification supported by Payara Server 5.0 defines portable EJB JNDI names for session beans. Because of this, there is less need to continue to use older
 vendor-specific JNDI names.
 
-By default, Payara Server V2-specific JNDI names are applied automatically by GlassFish Server 5.0 for backward compatibility. However, this can lead to some ease-of-use issues.
+By default, Payara Server V2-specific JNDI names are applied automatically by Payara Server 5.0 for backward compatibility. However, this can lead to some ease-of-use issues.
 For example, deploying two different applications containing a remote EJB component that exposes the same remote interface causes a conflict between the default JNDI names.
 
 The default handling of V2-specific JNDI names in Payara Server 5.0 can be managed by using the `asadmin` command:
@@ -286,7 +286,7 @@ For each property found in more than one `jndi.properties` file, the Jakarta EE 
 [[mapping-references]]
 == Mapping References
 
-The following XML elements in the GlassFish Server deployment descriptors map resource references in application client, EJB, and web application components to JNDI names configured in Payara Server:
+The following XML elements in the Payara Server deployment descriptors map resource references in application client, EJB, and web application components to JNDI names configured in Payara Server:
 
 * `resource-env-ref` - Maps the `@Resource` or `@Resources` annotation (or the `resource-env-ref` element in the corresponding Jakarta EE XML file) to the absolute JNDI name configured in Payara Server.
 * `resource-ref` - Maps the `@Resource` or `@Resources` annotation (or the `resource-ref` element in the corresponding Jakarta EE XML file) to the absolute JNDI name configured in Payara Server.
@@ -311,7 +311,7 @@ The `@Resource` annotation in the application code looks like this:
 
 This references a resource with the JNDI name of `java:jdbc/helloDbDs`. If this is the JNDI name of the JDBC resource configured in the Payara Server, the annotation alone is enough to reference the resource.
 
-However, you can use a GlassFish Server specific deployment descriptor to override the annotation. For example, the `resource-ref` element in
+However, you can use a Payara Server specific deployment descriptor to override the annotation. For example, the `resource-ref` element in
 the `glassfish-web.xml` file maps the `res-ref-name` (the name specified in the annotation) to the JNDI name of another JDBC resource configured in Payara Server.
 
 [source,shell]
