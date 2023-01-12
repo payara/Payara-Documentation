@@ -2,7 +2,7 @@
 
 MQTT (Message Queue Telemetry Transport) is a lightweight publish-subscribe messaging protocol.
 
-In order to connect to a MQTT broker, the `MQTTRAR-0.1.0-SNAPSHOT.rar` has to be deployed as shown in the xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Overview.adoc#Installing-a-connector[Installing a connector section] of the Cloud Connectors overview.
+In order to connect to a MQTT broker, the `mqtt-rar-0.8.0.rar` has to be deployed as shown in the xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Overview.adoc#Installing-a-connector[Installing a connector section] of the Cloud Connectors overview.
 
 In order to make use of this connector in an application, the following Maven dependency is needed:
 
@@ -10,19 +10,19 @@ In order to make use of this connector in an application, the following Maven de
 ----
 <dependency>
   <groupId>fish.payara.cloud.connectors.MQTT</groupId>
-  <artifactId>MQTT-JCA-API</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <artifactId>mqtt-jca-api</artifactId>
+  <version>0.8.0</version>
   <type>jar</type>
   <scope>provided</scope>
 </dependency>
 ----
 
-Note that this dependency have scope provided since the types within this dependency are globally available to every application deployed to Payara Micro after the `MQTTRAR-0.1.0-SNAPSHOT.rar` was deployed.
+Note that this dependency have scope provided since the types within this dependency are globally available to every application deployed to Payara Micro after the `mqtt-rar-0.8.0.rar` was deployed.
 
 == Sending messages
 Sending messages to a MQTT broker can be done via the JCA and an MQTT specific API. In order to start using this API to send messages, a resource has to be defined via the JCA API; a connection factory.
 
-The connection factory has to be given a name, which can be any name that is valid for JNDI. The `java:app` namespace is typically recommended to be used. The type of the connection factory to be used for MQTT is  `fish.payara.cloud.connectors.MQTT.api.MQTTConnectionFactory`, and we have to specify the resource adapter name which is here `MQTTRAR-0.1.0-SNAPSHOT.rar`.
+The connection factory has to be given a name, which can be any name that is valid for JNDI. The `java:app` namespace is typically recommended to be used. The type of the connection factory to be used for MQTT is  `fish.payara.cloud.connectors.MQTT.api.MQTTConnectionFactory`, and we have to specify the resource adapter name which is here `mqtt-rar-0.8.0.rar`.
 
 The following gives an example:
 
@@ -31,7 +31,7 @@ The following gives an example:
 @ConnectionFactoryDefinition ( 
  name = "java:app/MQTT/factory",
  interfaceName = "fish.payara.cloud.connectors.MQTT.api.MQTTConnectionFactory",
- resourceAdapter = "MQTTRAR-0.1.0-SNAPSHOT"
+ resourceAdapter = "mqtt-rar-0.8.0"
  properties = "cleanSession=true"
 )
 ----

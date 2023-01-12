@@ -2,7 +2,7 @@
 
 Apache Kafka is an open-source stream processing platform. It is based on a massively scalable publish/subscribe message queue architected as a distributed transaction log.
 
-In order to connect to Apache Kafka, the `KafkaRAR-0.1.0-SNAPSHOT.rar` has to be deployed as shown in the xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Overview.adoc#Installing-a-connector[Installing a connector section] of the Cloud Connectors overview.
+In order to connect to Apache Kafka, the `kafka-rar-0.8.0.rar` has to be deployed as shown in the xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Overview.adoc#Installing-a-connector[Installing a connector section] of the Cloud Connectors overview.
 
 Once deployed, something like the following should be printed to the startup log of Payara Micro:
 
@@ -17,19 +17,19 @@ In order to make use of this connector in an application, the following Maven de
 ----
 <dependency>
   <groupId>fish.payara.cloud.connectors.kafka</groupId>
-  <artifactId>KafkaRARAPI</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <artifactId>kafka-jca-api</artifactId>
+  <version>0.8.0</version>
   <type>jar</type>
   <scope>provided</scope>
 </dependency>
 ----
 
-Note that this dependency has scope `provided` since the types within this dependency are globally available to every application deployed to Payara Micro after the `KafkaRAR-0.1.0-SNAPSHOT.rar` was deployed.
+Note that this dependency has scope `provided` since the types within this dependency are globally available to every application deployed to Payara Micro after the `kafka-rar-0.8.0.rar` was deployed.
 
 == Sending messages
 Sending messages to Apache Kafka can be done via the JCA and a Kafka specific API. In order to start using this API to send messages, a resource has to be defined via the JCA API; a connection factory.
 
-The connection factory has to be given a name, which can be any name that is valid for JNDI. The java:app namespace is typically recommended to be used. The type of the connection factory to be used for Kafka is `fish.payara.cloud.connectors.kafka.KafkaConnectionFactory`, and we have to specify the resource adapter name which is here `KafkaRAR-0.1.0-SNAPSHOT`.
+The connection factory has to be given a name, which can be any name that is valid for JNDI. The java:app namespace is typically recommended to be used. The type of the connection factory to be used for Kafka is `fish.payara.cloud.connectors.kafka.KafkaConnectionFactory`, and we have to specify the resource adapter name which is here `kafka-rar-0.8.0`.
 
 The following gives an example:
 
@@ -38,7 +38,7 @@ The following gives an example:
 @ConnectionFactoryDefinition ( 
     name = "java:app/kafka/factory",
     interfaceName = "fish.payara.cloud.connectors.kafka.KafkaConnectionFactory",
-    resourceAdapter = "KafkaRAR-0.1.0-SNAPSHOT"
+    resourceAdapter = "kafka-rar-0.8.0"
 )
 ----
 
