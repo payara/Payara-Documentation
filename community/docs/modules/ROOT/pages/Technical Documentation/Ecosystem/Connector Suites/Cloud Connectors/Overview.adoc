@@ -21,20 +21,27 @@ Clone the https://github.com/payara/Cloud-Connectors[Cloud-Connectors] git repos
 git clone git@github.com:payara/Cloud-Connectors.git
 ----
 
-Build and install the connectors:
+Checkout the 0.8.0 tag:
 
 [source, shell]
 ----
 cd Cloud-Connectors/
+git checkout tags/0.8.0 -b 0.8.0
+----
+
+Build and install the connectors:
+
+[source, shell]
+----
 mvn clean install
 ----
 
 The connectors can be found in the following locations as JCA RARs:
 
-* Kafka -  ./Kafka/KafkaRARPackaging/target/KafkaRAR-0.1.0-SNAPSHOT.rar
-* Amazon SQS - ./AmazonSQS/AmazonSQSRAR/target/AmazonSQSRAR-0.1.0-SNAPSHOT.rar
-* MQTT - ./MQTT/MQTTRAR/target/MQTTRAR-0.1.0-SNAPSHOT.rar
-* Azure Service Bus - ./AzureServiceBus/AzureSBRAR/target/AzureSBRAR-0.1.0-SNAPSHOT.rar
+* Kafka -  ./Kafka/KafkaRAR/target/kafka-rar-0.8.0.rar
+* Amazon SQS - ./AmazonSQS/AmazonSQSRAR/target/amazon-sqs-rar-0.8.0.rar
+* MQTT - ./MQTT/MQTTRAR/target/mqtt-rar-0.8.0.rar
+* Azure Service Bus - ./AzureServiceBus/AzureSBRAR/target/azure-sb-rar-0.8.0.rar
 
 [[Installing-a-connector]]
 == Installing a connector
@@ -64,7 +71,7 @@ This allows the classes from the cloud connector to be globally available in the
 Deploy the application with the CLI;
 
 ----
-asadmin> deploy --target=server amazon-sqs-rar.rar
+asadmin> deploy --target=server amazon-sqs-rar-0.8.0.rar
 ----
 
 Configure the classloading policy;
@@ -76,13 +83,13 @@ asadmin> set configs.config.server-config.connector-service.class-loading-policy
 === Payara Micro
 
 ----
-java -jar payara-micro.jar --autobindhttp --deploy KafkaRAR-0.1.0-SNAPSHOT.rar
+java -jar payara-micro.jar --autobindhttp --deploy kafka-rar-0.8.0.rar
 ----
 
 The connector is subsequently available to all other applications deployed to Payara Micro. An application using a connector and the connector itself can be deployed simultaneously:
 
 ----
-java -jar payara-micro.jar --autobindhttp --deploy KafkaRAR-0.1.0-SNAPSHOT.rar --deploy myapp.war
+java -jar payara-micro.jar --autobindhttp --deploy kafka-rar-0.8.0.rar --deploy myapp.war
 ----
 
 == Securing credentials
