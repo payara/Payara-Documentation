@@ -203,7 +203,7 @@ See the links below for instructions.
 [[configuring-availability-for-individual-web-applications]]
 === Configuring Availability for Individual Web Applications
 
-To enable and configure availability for an individual web application, edit the application deployment descriptor file, `glassfish-web.xml`.
+To enable and configure availability for an individual web application, edit the application deployment descriptor file, `glassfish-web.xml` or `payara-web.xml`.
 The settings in an application's deployment descriptor override the web container's availability settings.
 
 The `session-manager` element's `persistence-type` attribute determines the type of session persistence an application uses.
@@ -212,9 +212,9 @@ It must be set to `replicated` to enable high availability session persistence.
 [[example]]
 ==== *Example*
 
-[source,shell]
+[source,xml]
 ----
-<glassfish-web-app> ...
+<payara-web-app> ...
   <session-config>
     <session-manager persistence-type="replicated">
       <manager-properties>
@@ -225,6 +225,7 @@ It must be set to `replicated` to enable high availability session persistence.
       </store-properties>
     </session-manager> ...
 </session-config> ...
+</payara-web-app>
 ----
 
 [[configuring-replication-and-multi-threaded-concurrent-access-to-httpsessions]]
@@ -240,18 +241,18 @@ Another example is when a page includes many static resources, such as JPG files
 In these situations, most browsers will optimize the loading of these resources by using multiple parallel connections, each of which is handled by a separate request processing thread.
 If the application has already established a session, then this will also involve more than one thread at a time accessing a single `HttpSession`.
 
-The solution in such cases is to use the `relaxVersionSemantics` property in the `glassfish-web.xml` deployment descriptor file for the application.
+The solution in such cases is to use the `relaxVersionSemantics` property in the `glassfish-web.xml` or `payara-web.xml` deployment descriptor file for the application.
 This enables the web container to return for each requesting thread whatever version of the session that is in the active cache regardless of the version number.
 This is critical when multiple threads are interacting in an essentially non-deterministic fashion with the container.
 
 [[example-1]]
 ==== *Example*
 
-The following is an example snippet from a `glassfish-web.xml` file that illustrates where to add the `relaxVersionSemantics` property.
+The following is an example snippet from a `glassfish-web.xml`/`payara-web.xml` file that illustrates where to add the `relaxVersionSemantics` property.
 
-[source,shell]
+[source,xml]
 ----
-<glassfish-web-app>
+<payara-web-app>
   <session-config>
     <session-manager persistence-type="replicated">
       <manager-properties>
@@ -261,7 +262,7 @@ The following is an example snippet from a `glassfish-web.xml` file that illustr
   </session-config>
 
 .....
-</glassfish-web-app>
+</payara-web-app>
 ----
 
 [[using-single-sign-on-with-session-failover]]

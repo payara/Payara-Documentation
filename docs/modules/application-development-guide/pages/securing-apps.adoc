@@ -67,7 +67,7 @@ For an application, roles used by any application must be defined in `@DeclareRo
 Those role names are scoped to the EJB XML deployment descriptors (`ejb-jar.xml` and `glassfish-ejb-jar.xml` files) and to the servlet XML deployment descriptors (`web.xml` and `payara-web.xml` files).
 For an individually deployed web or EJB module, you define roles using `@DeclareRoles` annotations or `role-name` elements in the Jakarta EE deployment descriptor files `web.xml` or `ejb-jar.xml`.
 
-To map roles to principals and groups, define matching `security-role-mapping` elements in the `glassfish-application.xml`, `glassfish-ejb-jar.xml`, or `glassfish-web.xml` file for each `role-name` used by the application.
+To map roles to principals and groups, define matching `security-role-mapping` elements in the `glassfish-application.xml`, `glassfish-ejb-jar.xml`, or `glassfish-web.xml`/`payara-web.xml` file for each `role-name` used by the application.
 By default, group principal names are mapped to roles of the same name.
 Accordingly, the Default Principal To Role Mapping setting is enabled by default on the Security page of the Payara Server Administration Console.
 This default role mapping definition is in effect if you do not define your own mapping in the deployment descriptor for your application as described in this section.
@@ -78,7 +78,7 @@ For more information, see xref:securing-apps.adoc#roles-principals-and-principal
 
 Component level security encompasses web components and EJB components.
 
-A secure web container authenticates users and authorizes access to a servlet or JSP by using the security policy laid out in the servlet XML deployment descriptors (`web.xml` and `glassfish-web.xml` files).
+A secure web container authenticates users and authorizes access to a servlet or JSP by using the security policy laid out in the servlet XML deployment descriptors (`web.xml`, `glassfish-web.xml` and `payara-web.xml` files).
 
 The EJB container is responsible for authorizing access to a bean method by using the security policy laid out in the EJB XML deployment descriptors (`ejb-jar.xml` and `glassfish-ejb-jar.xml` files).
 
@@ -103,17 +103,17 @@ Therefore, the Default Principal To Role Mapping setting is enabled by default o
 For applications, you define roles in `@DeclareRoles` annotations or the Jakarta EE deployment descriptor file `application.xml`.
 You define the corresponding role mappings in the Payara Server deployment descriptor file `glassfish-application.xml`.
 For individually deployed web or EJB modules, you define roles in `@DeclareRoles` annotations or the Jakarta EE deployment descriptor files `web.xml` or `ejb-jar.xml`.
-You define the corresponding role mappings in the Payara Server deployment descriptor files `glassfish-web.xml` or `glassfish-ejb-jar.xml`.
+You define the corresponding role mappings in the Payara Server deployment descriptor files `glassfish-web.xml`/`payara-web.xml` or `glassfish-ejb-jar.xml`.
 
 For more information regarding Jakarta EE deployment descriptors, see the Jakarta EE Specification. For more information regarding Payara Server deployment descriptors,
-see "xref:docs:application-deployment-guide:dd-elements.adoc#elements-of-the-payara-server-deployment-descriptors[Elements of the Payara Server Deployment Descriptors]" in Payara Server Open Source Edition Application Deployment Guide.
+see "xref:docs:application-deployment-guide:dd-elements.adoc#elements-of-the-payara-server-deployment-descriptors[Elements of the Payara Server Deployment Descriptors]" in Payara Server Application Deployment Guide.
 
-Each `security-role-mapping` element in the `glassfish-application.xml`, `glassfish-web.xml`, or `glassfish-ejb-jar.xml` file maps a role name permitted by the application or module to principals and groups.
-For example, a `glassfish-web.xml` file for an individually deployed web module might contain the following:
+Each `security-role-mapping` element in the `glassfish-application.xml`, `glassfish-web.xml`/`payara-web.xml`, or `glassfish-ejb-jar.xml` file maps a role name permitted by the application or module to principals and groups.
+For example, a `payara-web.xml` file for an individually deployed web module might contain the following:
 
 [source,shell]
 ----
-<glassfish-web-app>
+<payara-web-app>
     <security-role-mapping>
         <role-name>manager</role-name>
         <principal-name>jgarcia</principal-name>
@@ -124,7 +124,7 @@ For example, a `glassfish-web.xml` file for an individually deployed web module 
         <role-name>administrator</role-name>
         <principal-name>dsmith</principal-name>
     </security-role-mapping>
-</glassfish-web-app>
+</payara-web-app>
 ----
 
 A role can be mapped to either specific principals or to groups (or both). The principal or group names used must be valid principals or groups in the realm for the application or module.
@@ -215,7 +215,7 @@ For example, a realm is specified in `glassfish-application.xml` as follows:
 ----
 
 For more information about the deployment descriptor files and elements, see "xref:docs:application-deployment-guide:dd-elements.adoc#elements-of-the-payara-server-deployment-descriptors[Elements of the Payara Server Deployment Descriptors]"
-in Payara Server Open Source Edition Application Deployment Guide.
+in Payara Server Application Deployment Guide.
 
 [[creating-a-custom-realm]]
 === Creating a Custom Realm
@@ -712,9 +712,9 @@ providers, which are enabled when the Ant targets are run. You don't need to ena
 If you install the OpenSSO, you have these additional provider choices:
 
 * `AMClientProvider` and `AMServerProvider` - These providers secure web services and Simple Object Access Protocol (SOAP) messages using either WS-I BSP or Liberty ID-WSF tokens. These providers are used automatically if they are configured as the default providers.
-If you wish to override any provider settings, you can configure these providers in `message-security-binding` elements in the `glassfish-web.xml`, `glassfish-ejb-jar.xml`, and`glassfish-application-client.xml` deployment descriptor files.
+If you wish to override any provider settings, you can configure these providers in `message-security-binding` elements in the `glassfish-web.xml`/`payara-web.xml`, `glassfish-ejb-jar.xml`, and`glassfish-application-client.xml` deployment descriptor files.
 * `AMHttpProvider` - This provider handles the initial end user authentication for securing web services using Liberty ID-WSF tokens and redirects requests to the OpenSSO for single sign-on.
-To use this provider, specify it in the `httpservlet-security-provider` attribute of the `glassfish-web-app` element in the `glassfish-web.xml` file.
+To use this provider, specify it in the `httpservlet-security-provider` attribute of the `glassfish-web-app` element in the `glassfish-web.xml`/`payara-web.xml` file.
 
 Liberty specifications can be viewed at `http://www.projectliberty.org/resources/specifications.php/?f=resources/specifications.php`.
 The WS-I BSP specification can be viewed at `http://www.ws-i.org/Profiles/BasicSecurityProfile-1.0.html`.
@@ -816,11 +816,15 @@ Message security can also be specified using a WSIT security policy in the WSDL 
 For more information about message security providers, see xref:securing-apps.adoc#message-security-providers[Message Security Providers].
 
 For more details on message security binding for EJB web services,servlet web services, and clients, see the XML file descriptions in
-"xref:docs:application-deployment-guide:dd-elements.adoc#elements-of-the-payara-server-deployment-descriptors[Elements of the Payara Server Deployment Descriptors]" in Payara Server Open Source Edition Application Deployment Guide.
+"xref:docs:application-deployment-guide:dd-elements.adoc#elements-of-the-payara-server-deployment-descriptors[Elements of the Payara Server Deployment Descriptors]" in Payara Server Application Deployment Guide.
 
-* For `glassfish-ejb-jar.xml`, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in Payara Server Open Source Edition Application Deployment Guide.
-* For `glassfish-web.xml`, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-web.xml-file[The glassfish-web.xml File]" in Payara Server Open Source Edition Application Deployment Guide.
-* For `glassfish-application-client.xml`, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in Payara Server Open Source Edition Application Deployment Guide.
+////
+TODO - Create a separate page in the same guide for the payara-web.xml deployment descriptor and link it here
+////
+
+* For `glassfish-ejb-jar.xml`, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in Payara Server Application Deployment Guide.
+* For `glassfish-web.xml`, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-web.xml-file[The glassfish-web.xml File]" in Payara Server Application Deployment Guide.
+* For `glassfish-application-client.xml`, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in Payara Server Application Deployment Guide.
 
 [[using-a-signature-to-enable-message-protection-for-all-methods]]
 ==== *Using a Signature to Enable Message Protection for All Methods*
@@ -876,7 +880,7 @@ the EJB web service endpoint in the application's
 `glassfish-ejb-jar.xml` file. To this file, add `request-protection` and
 `response-protection` elements, which are analogous to the
 `request-policy` and `response-policy` elements discussed in the
-link:../security-guide/toc.html#GSSCG[GlassFish Server Open Source Edition Security Guide]. The
+link:../security-guide/toc.html#GSSCG[GlassFish Server Security Guide]. The
 administration guide includes a table listing the set and order of
 security operations for different request and response policy
 configurations.
@@ -1137,7 +1141,7 @@ After the user signs on to the consolidated booking service, the user informatio
 Single sign-on operates according to the following rules:
 
 * Single sign-on applies to web applications configured for the same realm and virtual server. The realm is defined by the `realm-name` element in the `web.xml` file. For information about virtual servers,
-see "xref:docs:administration-guide:http_https.adoc#administering-internet-connectivity[Administering Internet Connectivity]" in Payara Server Open Source Edition Administration Guide.
+see "xref:docs:administration-guide:http_https.adoc#administering-internet-connectivity[Administering Internet Connectivity]" in Payara Server Administration Guide.
 * As long as users access only unprotected resources in any of the web applications on a virtual server, they are not challenged to authenticate themselves.
 * As soon as a user accesses a protected resource in any web application associated with a virtual server, the user is challenged to authenticate
 himself or herself, using the login method defined for the web application currently being accessed.
@@ -1656,9 +1660,9 @@ For details, click the Help button in the Administration Console.
 After you install and configure the SAM, you can bind it for use by the container on behalf of one or more of your applications.
 You have two options in how you bind the SAM, depending on whether you are willing to repackage and redeploy your application:
 
-* If you are willing to repackage and redeploy, you can bind the SAM using the `glassfish-web.xml` file. Set the value of the
-`httpservlet-security-provider` attribute of the `glassfish-web-app` element to the SAM's configured provider ID, for example, `MySAM`. This option leverages the native `AuthConfigProvider`
-implementation that ships with the Payara Server.
+* If you are willing to repackage and redeploy, you can bind the SAM using the `glassfish-web.xml` or `payara-web.xml` file. Set the value of the
+`httpservlet-security-provider` attribute of the `glassfish-web-app`/`payara-web-app` element to the SAM's configured provider ID, for example, `MySAM`. This option leverages the native `AuthConfigProvider`
+implementation that ships with Payara Server.
 * Another approach is to develop your own `AuthConfigProvider` and register it with the Payara Server `AuthConfigFactory` for use on behalf of your applications. For example, a simple `AuthConfigProvider`
 can obtain, through its initialization properties, the classname of a SAM to configure on behalf of the applications for which the provider is registered.
 You can find a description of the functionality of an `AuthConfigProvider` and of the registration facilities provided by an `AuthConfigFactory` in the JSR 196 specification.

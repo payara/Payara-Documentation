@@ -4,7 +4,7 @@
 This chapter describes Oracle Payara Server support for web services.
 
 NOTE: If you installed the Web Profile, web services are not supported unless the optional Metro Web Services Stack add-on component is downloaded from the Update Tool.
-Without the Metro add-on component, a servlet or EJB component cannot be a web service endpoint, and the `glassfish-web.xml` and `glassfish-ejb-jar.xml` elements related to web services are ignored. +
+Without the Metro add-on component, a servlet or EJB component cannot be a web service endpoint, and the `glassfish-web.xml`/`payara-web.xml` and `glassfish-ejb-jar.xml` elements related to web services are ignored. +
 In addition, the as-install`/modules/webservices-osgi.jar` and as-install`/modules/webservices-api-osgi.jar` files must be in the classpath of your web services application.
 IDEs such as NetBeans and Eclipse do this automatically.
 
@@ -35,7 +35,7 @@ You deploy a web service endpoint to the Payara Server just as you would any ser
 
 NOTE: For complex services with dependent classes, user specified WSDL files, or other advanced features, autodeployment of an annotated file is not sufficient.
 
-The Payara Server deployment descriptor files `glassfish-web.xml` and `glassfish-ejb-jar.xml` provide optional web service enhancements in the
+The Payara Server deployment descriptor files `glassfish-web.xml`/`payara-web.xml` and `glassfish-ejb-jar.xml` provide optional web service enhancements in the
 `webservice-endpoint` and `webservice-description` elements, including a `debugging-enabled` subelement that enables the creation of a test page.
 The test page feature is enabled by default and described in xref:webservices.adoc#the-web-service-uri-wsdl-file-and-test-page[The Web Service URI, WSDL File, and Test Page].
 
@@ -50,18 +50,18 @@ http://host:port/context-root/servlet-mapping-url-pattern
 ----
 
 The context-root is defined in the `application.xml` or `web.xml` file, and can be overridden in the `glassfish-application.xml` or
-`glassfish-web.xml` file. The servlet-mapping-url-pattern is defined in the `web.xml` file.
+`glassfish-web.xml`/`payara-web.xml` file. The servlet-mapping-url-pattern is defined in the `web.xml` file.
 
 In the following example, the context-root is `my-ws` and the servlet-mapping-url-pattern is `/simple`:
 
-[source,shell]
+[source,text]
 ----
 http://localhost:8080/my-ws/simple
 ----
 
 You can view the WSDL file of the deployed service in a browser by adding `?WSDL` to the end of the URI. For example:
 
-[source,shell]
+[source,text]
 ----
 http://localhost:8080/my-ws/simple?WSDL
 ----
@@ -78,7 +78,7 @@ You can also test a service using the Administration Console. Open the Web Servi
 NOTE: The test page works only for WS-I compliant web services. This means that the tester servlet does not work for services with WSDL files that use RPC/encoded binding.
 
 Generation of the test page is enabled by default. You can disable the test page for a web service by setting the value of the
-`debugging-enabled` element in the `glassfish-web.xml` and `glassfish-ejb-jar.xml` deployment descriptor to `false`.
+`debugging-enabled` element in the `glassfish-web.xml`/`payara-web.xml` and `glassfish-ejb-jar.xml` deployment descriptor to `false`.
 
 [[the-databinding-provider]]
 == The Databinding Provider

@@ -730,7 +730,7 @@ The web module context root must be unique within the server instance. +
 The domain administration server (DAS) in Payara Server versions 2.1.1 and later supports the deployment of multiple web applications
 using the same web context root as long as those applications are deployed to different Payara Server stand-alone instances.
 Deploying multiple applications using the same context root within a single instance produces an error.
-* *Data Source*. If a web application accesses a `DataSource` that is not specified in a `resource-ref` in `glassfish-web.xml`, or there is no `glassfish-web.xml` file,
+* *Data Source*. If a web application accesses a `DataSource` that is not specified in a `resource-ref` in `glassfish-web.xml` or `payara-web.xml`, or there is no `glassfish-web.xml` or `payara-web.xml` files,
 the `resource-ref-name` defined in `web.xml` is used.
 A warning message is logged, recording the JNDI name that was used to look up the resource.
 * *Virtual Servers*. If you deploy a web application and do not specify any assigned virtual servers, the web application is assigned to all currently-defined virtual servers
@@ -743,7 +743,7 @@ See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2
 * *Load Balancing*.
 * *JSP Precompilation*. You can precompile JSP files during deployment by checking the appropriate box in the Administration Console, or by using the `--precompilejsp`
 option of the `deploy` subcommand. +
-You can keep the generated source for JSP files by adding the `keepgenerated` flag to the `jsp-config` element in `glassfish-web.xml`.
+You can keep the generated source for JSP files by adding the `keepgenerated` flag to the `jsp-config` element in `glassfish-web.xml` or `payara-web.xml`.
 For example: +
 [source,shell]
 ----
@@ -807,7 +807,7 @@ Deploying a stand-alone connector module allows multiple deployed Jakarta EE app
 [[to-deploy-and-configure-a-stand-alone-connector-module]]
 === To Deploy and Configure a Stand-Alone Connector Module
 
-As an alternative to Step 3 through Step 6, you can define application-scoped resources in the `glassfish-resources.xml` deployment descriptor.
+As an alternative to Step 3 through Step 6, you can define application-scoped resources in the `glassfish-resources.xml` or `payara-resources.xml` deployment descriptor.
 For more information, see xref:docs:application-deployment-guide:deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources].
 
 . Ensure that the server is running. Remote commands require a running server.
@@ -975,13 +975,13 @@ NOTE: If the `--failurefatal` option of `create-lifecycle-module` is set to `tru
 == Web Service Deployment Guidelines
 
 NOTE: If you installed the Web Profile, web services are not supported unless the optional Metro Web Services Stack add-on component is downloaded.
-Without the Metro add-on component, a servlet or EJB component cannot be a web service endpoint, and the `glassfish-web.xml` and `glassfish-ejb-jar.xml` elements related to web services are ignored.
+Without the Metro add-on component, a servlet or EJB component cannot be a web service endpoint, and the `glassfish-web.xml`/`payara-web.xml` and `glassfish-ejb-jar.xml` elements related to web services are ignored.
 
 The following guidelines apply when deploying a web service in Payara Server:
 
 * Web Service Endpoint. Deploy a web service endpoint to Payara Server as you would any servlet or stateless session bean.
 If the deployed application or module has a web service endpoint, the endpoint is detected automatically during deployment.
-The Payara Server -specific deployment descriptor files, `glassfish-web.xml` and
+The Payara Server -specific deployment descriptor files, `glassfish-web.xml`, `payara-web.xml` and
 `glassfish-ejb-jar.xml`, provide optional web service enhancements in their xref:docs:application-deployment-guide:dd-elements.adoc#webservice-endpoint[`webservice-endpoint`] and
 xref:docs:application-deployment-guide:dd-elements.adoc#webservice-description[`webservice-description`] elements.
 
@@ -1018,7 +1018,7 @@ In-progress connection requests must complete before this timeout expires or the
 New connection requests wait for this timeout to expire before acquiring connections to the reconfigured pool.
 If this property exists and has a positive value, it is enabled.
 
-You can set this property in the `glassfish-resources.xml` file.
+You can set this property in the `glassfish-resources.xml` or `payara-resources.xml` file.
 For more information, see the property descriptions under xref:docs:application-deployment-guide:dd-elements.adoc#jdbc-connection-pool[`jdbc-connection-pool`].
 
 For JDBC connection pools that are not application-scoped, use the `set` subcommand to set this property. For example, to configure `mypool` on `myserver`, type the following all on one line:
@@ -1053,11 +1053,11 @@ The following resource types can be application-scoped:
 * Admin object resources
 * JavaMail resources
 
-*Deployment Descriptor*. An application-scoped resource is defined in the `glassfish-resources.xml` deployment descriptor file.
+*Deployment Descriptor*. An application-scoped resource is defined in the `glassfish-resources.xml` or `payara-resources.xml` deployment descriptor file.
 This file is placed in the `META-INF` directory of the module or application archive.
 For web applications or modules, this file is placed in the `WEB-INF` directory.
-If any submodule archives of an enterprise application archive have their own `glassfish-resources.xml` files, the resource definitions are scoped to those modules only.
-For more information about the `glassfish-resources.xml` file, see xref:docs:application-deployment-guide:dd-files.adoc#payara-server-deployment-descriptor-files[Payara Server Deployment Descriptor Files]
+If any submodule archives of an enterprise application archive have their own `glassfish-resources.xml` or `payara-resources.xml` files, the resource definitions are scoped to those modules only.
+For more information about the `glassfish-resources.xml` and `payara-resources.xml`  file, see xref:docs:application-deployment-guide:dd-files.adoc#payara-server-deployment-descriptor-files[Payara Server Deployment Descriptor Files]
 and xref:docs:application-deployment-guide:dd-elements.adoc[Elements of the Payara Server Deployment Descriptors].
 
 *Naming*. Application-scoped resource JNDI names begin with `java:app` or `java:module`. If one of these prefixes is not specified in the JNDI name, it is added.
@@ -1068,7 +1068,7 @@ This is in accordance with the naming scopes introduced in the Java EE 6 Specifi
 Definitions with the same resource name and type but different attributes or properties are conflicts and cause deployment failure.
 When an application or module tries to look up a scoped resource that does not belong to it, a naming exception is thrown.
 
-*Redeployment*. When an application or module is undeployed, its scoped resources are deleted. During redeployment, resources are destroyed and recreated based on changes in the `glassfish-resources.xml` file.
+*Redeployment*. When an application or module is undeployed, its scoped resources are deleted. During redeployment, resources are destroyed and recreated based on changes in the `glassfish-resources.xml` or `payara-resources.xml` file.
 To preserve old resource definitions during redeployment, use the `preserveAppScopedResources` property of the `redeploy` (or `deploy` `--force=true`) subcommand. For example:
 
 [source,shell]
@@ -1088,8 +1088,8 @@ For more information, see xref:docs:reference-manual:list-applications.adoc[`lis
 
 Restrictions. Use of application-scoped resources is subject to the following restrictions:
 
-* `resource-adapter-config` and `connector-work-security-map` — These can only be specified in the `glassfish-resources.xml` file of the corresponding connector module.
-In an enterprise application, the `resource-adapter-config` or `connector-work-security-map` for an embedded connector module must be specified in the `glassfish-resources.xml` file of the connector module.
+* `resource-adapter-config` and `connector-work-security-map` — These can only be specified in the `glassfish-resources.xml` or `payara-resources.xml` file of the corresponding connector module.
+In an enterprise application, the `resource-adapter-config` or `connector-work-security-map` for an embedded connector module must be specified in the `glassfish-resources.xml` or `payara-resources.xml` file of the connector module.
 You cannot specify a `resource-adapter-config` or `connector-work-security-map` in an application for a connector module that is not part of the application.
 * Resource to connection pool cross references — A module-level `jdbc-resource` cannot reference an application-level `jdbc-connection-pool`. Likewise, a module-level `connector-resource` cannot reference an application-level `connector-connection-pool`.
 * Global resources — Defining `java:global` JNDI names is not supported.
