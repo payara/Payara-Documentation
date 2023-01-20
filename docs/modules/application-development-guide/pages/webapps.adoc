@@ -212,7 +212,7 @@ For more information about response caching as it pertains to servlets, see xref
 
 To globally enable JSP caching, set the `jspCachingEnabled` property to `true`. The default is `false`. For example:
 
-[source,shell]
+[source,console]
 ----
 asadmin set server-config.web-container.property.jspCachingEnabled="true"
 ----
@@ -240,7 +240,7 @@ Subsequently, the cache tags are available as `<`prefix`:cache>` and `<`prefix`:
 JSP caching is available in three different scopes: `request`, `session`, and `application`. The default is `application`. To use a
 cache in `request` scope, a web application must specify the `com.sun.appserv.web.taglibs.cache.CacheRequestListener` in its `web.xml` deployment descriptor, as follows:
 
-[source,shell]
+[source,xml]
 ----
 <listener>
    <listener-class>
@@ -252,7 +252,7 @@ cache in `request` scope, a web application must specify the `com.sun.appserv.we
 Likewise, for a web application to utilize a cache in `session` scope,
 it must specify the `com.sun.appserv.web.taglibs.cache.CacheSessionListener` in its `web.xml` deployment descriptor, as follows:
 
-[source,shell]
+[source,xml]
 ----
 <listener>
    <listener-class>
@@ -312,7 +312,7 @@ programmatically refresh the cache immediately regardless of the
 
 The following example represents a cached JSP file:
 
-[source,shell]
+[source,xml]
 ----
 <%@ taglib prefix="mypfx" uri="http://glassfish.org/taglibs/cache" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -367,14 +367,14 @@ the page.
 
 To flush the entry with `key="foobar"`:
 
-[source,shell]
+[source,xml]
 ----
 <mypfx:flush key="foobar"/>
 ----
 
 To flush the entire cache:
 
-[source,shell]
+[source,xml]
 ----
 <c:if test="${empty sessionScope.clearCache}">
    <mypfx:flush />
@@ -768,7 +768,7 @@ The way a developer would use this API in a web component is to perform the foll
 
 . Register the context path of the application with the `CometContext` object:
 +
-[source,shell]
+[source,java]
 ----
 CometEngine cometEngine = 
     CometEngine.getEngine();
@@ -777,13 +777,13 @@ CometContext cometContext =
 ----
 . Register the CometHandler implementation with the `CometContext` object:
 +
-[source,shell]
+[source,java]
 ----
 cometContext.addCometHandler(handler)
 ----
 . Notify one or more CometHandler implementations when an event happens:
 +
-[source,shell]
+[source,java]
 ----
 cometContext.notify((Object)(handler))
 ----
@@ -855,7 +855,7 @@ Note that the `load-on-startup` value for the `CometdServlet` is `1`.
 
 . Add script tags to the HTML page. For example:
 +
-[source,shell]
+[source,html]
 ----
 <script type="text/javascript" src="chat.js"></script>
 ----
@@ -880,7 +880,7 @@ asadmin deploy cometd-example.war
 ----
 . Run the application as you would any other web application. The context root for the example chat application is `/cometd` and the HTML page is `index.html`. So the URL might look like this:
 +
-[source,shell]
+[source,text]
 ----
 http://localhost:8080/cometd/index.html
 ----
@@ -988,7 +988,7 @@ Then redeploy your web application if it has already been deployed, or restart t
 If `listings` is set to `true`, you can also determine how directory listings are sorted. Set the value of the `init-param` named `sortedBy` to `NAME`, `SIZE`, or `LAST_MODIFIED`.
 Then redeploy your web application if it has already been deployed, or restart the server.
 
-[source,shell]
+[source,xml]
 ----
 <init-param>
    <param-name>sortedBy</param-name>
@@ -1119,35 +1119,35 @@ the second component, `dir`, specifies the alternate docroot's physical location
 
 Suppose the above examples belong to a web application deployed at `http://company22.com/myapp`. The first alternate docroot maps any requests with this URL:
 
-[source,shell]
+[source,text]
 ----
 http://company22.com/myapp/my.jpg
 ----
 
 To this resource:
 
-[source,shell]
+[source,text]
 ----
 /svr/images/jpg/my.jpg
 ----
 
 The second alternate docroot maps any requests with a `*.jpg` suffix, such as:
 
-[source,shell]
+[source,text]
 ----
 http://company22.com/myapp/*.jpg
 ----
 
 To this physical location:
 
-[source,shell]
+[source,text]
 ----
 /svr/images/jpg
 ----
 
 The third alternate docroot maps any requests whose URI starts with `/myapp/jpg/`, such as:
 
-[source,shell]
+[source,text]
 ----
 http://company22.com/myapp/jpg/*
 ----
@@ -1156,28 +1156,28 @@ To the same directory as the second alternate docroot.
 
 For example, the second alternate docroot maps this request:
 
-[source,shell]
+[source,text]
 ----
 http://company22.com/myapp/abc/def/my.jpg
 ----
 
 To:
 
-[source,shell]
+[source,text]
 ----
 /srv/images/jpg/abc/def/my.jpg
 ----
 
 The third alternate docroot maps:
 
-[source,shell]
+[source,text]
 ----
 http://company22.com/myapp/jpg/abc/resource
 ----
 
 To:
 
-[source,shell]
+[source,text]
 ----
 /srv/images/jpg/abc/resource
 ----
@@ -1299,14 +1299,14 @@ Enable the security manager as described in xref:docs:application-development-gu
 
 You can now use any WebDav client by connecting to the WebDav servlet URL, which has this format:
 
-[source,shell]
+[source,text]
 ----
 http://host:port/context-root/webdav/file
 ----
 
 For example:
 
-[source,shell]
+[source,text]
 ----
 http://localhost:80/glassfish-webdav/webdav/index.html
 ----
@@ -1318,7 +1318,7 @@ You can add the WebDav servlet to your `default-web.xml` file to enable it for a
 
 To enable SSI (server-side includes) processing for a specific web module, add the `SSIServlet` to your `web.xml` file as follows:
 
-[source,shell]
+[source,xml]
 ----
 <web-app>
    <servlet>
@@ -1371,7 +1371,7 @@ For more information about SSI, see `http://httpd.apache.org/docs/2.2/mod/mod_in
 
 To enable CGI (common gateway interface) processing for a specific web module, add the `CGIServlet` to your `web.xml` file as follows:
 
-[source,shell]
+[source,xml]
 ----
 <web-app>
    <servlet>
@@ -1393,14 +1393,14 @@ For information about hiding directory listings, see xref:webapps.adoc#using-the
 
 Invoke the CGI program using a URL of the following format:
 
-[source,shell]
+[source,text]
 ----
 http://host:8080/context-root/cgi-bin/cgi-name
 ----
 
 For example:
 
-[source,shell]
+[source,text]
 ----
 http://localhost:8080/mycontext/cgi-bin/hello
 ----

@@ -68,13 +68,14 @@ asadmin-options::
     If the value of this property is `true`, resources that are symbolic links will be served for all web applications deployed on this virtual server. Individual web applications may override this
     setting by using the property `allowLinking` under the `sun-web-app` element in the `sun-web.xml` file:
 +
-[source,shell]
+[source,xml]
 ----
 <sun-web-app>
 <property name="allowLinking" value="[true|false]"/>
 </sun-web-app>
 ----
-    The default value is `true`.
+The default value is `true`.
+
   `accessLogWriteInterval`;;
     Indicates the number of seconds before the log will be written to the disk. The access log is written when the buffer is full or when
     the interval expires. If the value is 0 (zero), then the buffer is always written even if it is not full. This means that each time the
@@ -125,7 +126,7 @@ asadmin-options::
     For example, the following properties specify three alternate docroots. The URI pattern of the first alternate docroot uses an
     exact match, whereas the URI patterns of the second and third alternate docroots use extension and longest path prefix matches, respectively.
 +
-[source,shell]
+[source,xml]
 ----
 <property name="alternatedocroot_1" 
    value="from=/my.jpg dir=/srv/images/jpg"/>
@@ -134,10 +135,12 @@ asadmin-options::
 <property name="alternatedocroot_3" 
    value="from=/jpg/* dir=/src/images"/>
 ----
-    The `value` of each alternate docroot has two components: The first component, `from`, specifies the alternate docroot's URI pattern,
+
+The `value` of each alternate docroot has two components: The first component, `from`, specifies the alternate docroot's URI pattern,
     and the second component, `dir`, specifies the alternate docroot's physical location (directory). Spaces are allowed in the `dir` component. +
     You can set this property for a specific web application. For details, see "xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app]" in Payara Server Open Source Edition Application Deployment Guide.
-  `send-error_n`;;
+
+    `send-error_n`;;
     Specifies custom error page mappings for the virtual server, which are inherited by all web applications deployed on the virtual server. A web application can override these custom error page
     mappings in its `web.xml` deployment descriptor. The value of each `send-error_n` property has three components, which may be specified in any order: +
     The first component, `code`, specifies the three-digit HTTP response status code for which the custom error page should be returned in the response. +
@@ -146,12 +149,13 @@ asadmin-options::
     The third component, `reason`, is optional and specifies the text of the reason string (such as `Unauthorized` or `Forbidden`) to be returned. +
     For example:
 +
-[source,shell]
+[source,xml]
 ----
 <property name="send-error_1"
    value="code=401 path=/myhost/401.html reason=MY-401-REASON"/>
 ----
-    This example property definition causes the contents of `/myhost/401.html` to be returned with 401 responses, along with this response line:
+
+This example property definition causes the contents of `/myhost/401.html` to be returned with 401 responses, along with this response line:
 +
 [source,shell]
 ----
@@ -164,7 +168,7 @@ HTTP/1.1 401 MY-401-REASON
     The second component, `url-prefix`, specifies the new URL prefix to return to the client. The from prefix is simply replaced by this URL prefix. +
     For example:
 +
-[source,shell]
+[source,xml]
 ----
 <property name="redirect_1" 
 value="from=/dummy url-prefix=http://etude"/>
@@ -174,23 +178,25 @@ value="from=/dummy url-prefix=http://etude"/>
     valve class must implement the `org.apache.catalina.Valve` interface from Tomcat or previous \{product---name} releases, or the
     `org.glassfish.web.valve.GlassFishValve` interface from the current \{product---name} release. For example:
 +
-[source,shell]
+[source,xml]
 ----
 <property name="valve_1" 
    value="org.glassfish.extension.Valve"/>
 ----
-    You can set this property for a specific web application. For
+You can set this property for a specific web application. For
     details, see "xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app]" in Payara Server Open Source Edition Application Deployment Guide.
+
   `listener_n`;;
     Specifies a fully qualified class name of a custom Catalina listener, where n is a positive integer that allows specification of
     more than one. The listener class must implement the `org.apache.catalina.ContainerListener` or `org.apache.catalina.LifecycleListener` interface. For example:
 +
-[source,shell]
+[source,xml]
 ----
 <property name="listener_1" 
    value="org.glassfish.extension.MyLifecycleListener"/>
 ----
-    You can set this property for a specific web application. For  details, see "xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app]" in Payara Server Open Source Edition Application Deployment Guide.
+You can set this property for a specific web application. For  details, see "xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app]" in Payara Server Open Source Edition Application Deployment Guide.
+
   `docroot`;;
     Absolute path to root document directory for server. Deprecated. Replaced with a `virtual-server` attribute, `docroot`, that is
     accessible using the `get`, `set`, and `list` subcommands.
