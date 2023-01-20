@@ -1,7 +1,7 @@
 [[administering-web-applications]]
 = Administering Web Applications
 
-This chapter explains how to administer web applications in the Payara Server Open Source Edition 5.0 environment.
+This chapter explains how to administer web applications in the Payara Server environment.
 
 Instructions for accomplishing some of these tasks by using the Administration Console are contained in the Administration Console online help.
 
@@ -10,7 +10,7 @@ Instructions for accomplishing some of these tasks by using the Administration C
 
 You can call a servlet deployed to Payara Server by using a URL in a browser or embedded as a link in an HTML or JSP file. The format of a servlet invocation URL is as follows:
 
-[source,shell]
+[source,text]
 ----
 http://server:port/context-root/servlet-mapping?name=value
 ----
@@ -39,7 +39,7 @@ For both applications and individually deployed web modules, the default context
 In this example, `localhost` is the host name, `MortPages` is the context root, and `calcMortgage` is the servlet mapping.
 
 .Example 6-1 Invoking a Servlet With a URL
-[source,shell]
+[source,text]
 ----
 http://localhost:8080/MortPages/calcMortgage?rate=8.0&per=360&bal=180000
 ----
@@ -47,7 +47,7 @@ http://localhost:8080/MortPages/calcMortgage?rate=8.0&per=360&bal=180000
 To invoke a servlet from within a JSP file, you can use a relative path. For example:
 
 .Example 6-2 Invoking a Servlet From Within a JSP File
-[source,shell]
+[source,text]
 ----
 <jsp:forward page="TestServlet"/><jsp:include page="TestServlet"/>
 ----
@@ -70,7 +70,7 @@ For example, directory listings are disabled by default for added security. To e
 `default-web.xml` file, search for the definition of the servlet whose `servlet-name` is equal to `default`, and set the value of the `init-param` named `listings`
 to `true`. Then restart the server.
 
-[source,shell]
+[source,xml]
 ----
 <init-param>
    <param-name>listings</param-name>
@@ -81,7 +81,7 @@ to `true`. Then restart the server.
 If `listings` is set to `true`, you can also determine how directory listings are sorted. Set the value of the
 `init-param` named `sortedBy` to `NAME`, `SIZE`, or `LAST_MODIFIED`. Then restart the server.
 
-[source,shell]
+[source,xml]
 ----
 <init-param>
    <param-name>sortedBy</param-name>
@@ -117,7 +117,7 @@ The value of each `redirect_n` property has two components which can be specifie
 
 This example redirects `from` `dummy` to `etude`:
 .Example 6-3 Redirecting a URL
-[source,shell]
+[source,xml]
 ----
 <property name="redirect_1" value="from=/dummy url-prefix=http://etude"/>
 ----
@@ -130,7 +130,7 @@ you can front Payara Server with Apache HTTP Server.
 
 You can also use `mod_jk` directly at the JSP/servlet engine for load balancing. For more information about configuring `mod_jk` and Apache HTTP Server for load
 balancing with Payara Server 5.0 refer to xref:docs:ha-administration-guide:http-load-balancing.adoc#configuring-http-load-balancing[Configuring HTTP Load Balancing]
-in Payara Server Open Source Edition High Availability Administration Guide.
+in Payara Server High Availability Administration Guide.
 
 [[to-enable-mod_jk]]
 === To Enable `mod_jk`
@@ -183,7 +183,7 @@ See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a
 
 This example shows an `httpd.conf` file that is set for `mod_jk`. In this example, `mod_jk` used as a simple pass-through.
 
-[source,shell]
+[source,text]
 ----
 LoadModule jk_module /usr/lib/httpd/modules/mod_jk.so
 JkWorkersFile /etc/httpd/conf/worker.properties
@@ -211,7 +211,7 @@ JkMount /glassfish-test/* worker1
 This example shows a `workers.properties` that is set for `mod_jk`. This `workers.properties` file is referenced in the second line of
 xref:docs:administration-guide:webapps.adoc#example-6-4[Example 6-4].
 
-[source,shell]
+[source,text]
 ----
 # Define 1 real worker using ajp13
 worker.list=worker1
@@ -254,7 +254,7 @@ represent the instance in the `workers.properties` file.
 
 This example shows an `httpd.conf` file that is set for load balancing.
 
-[source,shell]
+[source,text]
 ----
 LoadModule jk_module /usr/lib/httpd/modules/mod_jk.so 
 JkWorkersFile /etc/httpd/conf/worker.properties 
@@ -279,7 +279,7 @@ JkMount /glassfish-test/* loadbalancer
 
 This example shows a `workers.properties` or `glassfish-jk.properties` file that is set for load balancing. The `worker.worker*.port` should match with JK ports you created.
 
-[source,shell]
+[source,text]
 ----
 worker.list=worker1,worker2,loadbalancer
 worker.worker1.type=ajp13
@@ -338,7 +338,7 @@ This temporary certificate is good for 60 days.
 . In the `http-ssl.conf` file, add one of the following redirects:
 * Redirect a web application, for example, `JkMount /hello/* worker1`.
 * Redirect all requests, for example, `JkMount /* worker1`. +
-[source,shell]
+[source,text]
 ----
 # Send all jsp requests to GlassFish
 JkMount /*.jsp worker1
@@ -351,7 +351,7 @@ JkMount /glassfish-test/* loadbalancer
 
 A basic SSL-enabled virtual host will appear in the `http-ssl.conf` file. In this example, all requests are redirected.
 
-[source,shell]
+[source,text]
 ----
 Listen 443
 <VirtualHost _default_:443>

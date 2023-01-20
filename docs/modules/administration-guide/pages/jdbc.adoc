@@ -29,8 +29,7 @@ At runtime, the following sequence occurs when an application connects to a data
 . The application gets the JDBC resource associated with the database by making a call through the JNDI API. +
 Using the JNDI name of the resource, the naming and directory service locates the JDBC resource. Each JDBC resource specifies a connection pool.
 . Using the JDBC resource, the application gets a database connection. +
-Payara Server retrieves a physical connection from the connection pool that corresponds to the database. The pool defines connection
-attributes such as the database name (URL), user name, and password.
+Payara Server retrieves a physical connection from the connection pool that corresponds to the database. The pool defines connection attributes such as the database name (URL), username, and password.
 . After the database connection is established, the application can read, modify, and add data to the database. +
 The application accesses the database by making calls to the JDBC API. The JDBC driver translates the application's JDBC calls into the protocol of the database server.
 . When the application is finished accessing the database, the application closes the connection and returns the connection to the connection pool.
@@ -43,7 +42,7 @@ Most applications use relational databases to store, organize, and retrieve data
 [[to-install-the-database-and-database-driver]]
 === To Install the Database and Database Driver
 
-. Install a supported database product.To see the current list of database products supported by Payara Server, refer to the xref:community:relase-notes.adoc[Payara Server Release Notes].
+. Install a supported database product.To see the current list of database products supported by Payara Server, refer to the xref:docs:ROOT:Release Notes/relase-notes.adoc[Payara Server Release Notes].
 .  Install a supported JDBC driver for the database product. For a list of drivers supported by Payara Server, see
 xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 . Make the JDBC driver JAR file accessible to the domain administration server (DAS). +
@@ -318,7 +317,7 @@ For example: `asadmin set resources.jdbc-connection-pool.DerbyPool.steady-pool-s
 . If needed, restart the server. Some parameters require server restart. See +
 xref:docs:administration-guide:overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
 
-For information about how to tune a connection pool, see the xref:docs:performance-tuning-guide:toc.adoc[Payara Server Performance Tuning Guide].
+For information about how to tune a connection pool, see the xref:docs:performance-tuning-guide:overview.adoc[Payara Server Performance Tuning Guide].
 
 [[to-delete-a-jdbc-connection-pool]]
 ==== *To Delete a JDBC Connection Pool*
@@ -541,7 +540,7 @@ A JDBC resource, also known as a data source, provides an application with a mea
 resource for each database that is accessed by the applications deployed in a domain. Multiple JDBC resources can be specified for a database.
 JDBC resources can be globally accessible or be scoped to an enterprise application, web module, EJB module, connector module or application
 client module, as described in "xref:docs:application-deployment-guide:deploying-applications.adoc#application-scoped-resources[Application-Scoped
-Resources]" in Payara Server Open Source Edition Application Deployment Guide.
+Resources]" in Payara Server Application Deployment Guide.
 
 A JDBC resource is created by specifying the connection pool with which the resource will be associated. Use a unique Java Naming and Directory
 Interface (JNDI) name to identify the resource. For example, the JNDI name for the resource of a payroll database might be `java:comp/env/jdbc/payrolldb`.
@@ -689,8 +688,7 @@ To use JDBC features, you must choose a JDBC driver to work with the Payara Serv
 ==== *Supported Database Drivers*
 
 Supported JDBC drivers are those that have been fully tested by Oracle.For a list of the JDBC drivers currently supported by the Payara
-Server, see the xref:docs:release-notes:toc.adoc[Payara Release Notes]. For configurations of supported and other drivers, see
-xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
+Server, see the xref:ROOT:Release Notes/release-notes.adoc[Payara Release Notes]. For configurations of supported and other drivers, see xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 
 NOTE: Because the drivers and databases supported by the Payara Server are constantly being updated, and because database vendors continue to
 upgrade their products, always check with Oracle technical support for the latest database support information.
@@ -788,7 +786,7 @@ The JAR file for the Apache Derby DB driver is `derbyclient.jar`. Configure the 
 * Database Vendor: Apache Derby
 * DataSource Classname: Specify one of the following:
 +
-[source,shell]
+[source,text]
 ----
 org.apache.derby.jdbc.ClientDataSource40
 org.apache.derby.jdbc.ClientXADataSource40
@@ -818,7 +816,7 @@ The JAR file for the MySQL driver is `mysql-connector-java-5.1.14-bin.jar`. Conf
 * Database Vendor: MySql
 * DataSource Classname:
 +
-[source,shell]
+[source,text]
 ----
 com.mysql.jdbc.jdbc2.optional.MysqlDataSource
 com.mysql.jdbc.jdbc2.optional.MysqlXADataSource
@@ -855,7 +853,7 @@ Configure the connection pool using the following settings:
 * Database Vendor: Oracle
 * DataSource Classname: Specify one of the following:
 +
-[source,shell]
+[source,text]
 ----
 oracle.jdbc.pool.OracleDataSource
 oracle.jdbc.xa.client.OracleXADataSource
@@ -885,7 +883,7 @@ Configure the connection pool using the following settings:
 * Database Vendor: Oracle
 * DataSource Classname: Specify one of the following:
 +
-[source,shell]
+[source,text]
 ----
 oracle.jdbc.pool.OracleDataSource
 oracle.jdbc.xa.client.OracleXADataSource
@@ -962,7 +960,7 @@ Configure the connection pool using the following settings:
 * Database Vendor: DataDirect-Informix
 * DataSource Classname: Specify one of the following:
 +
-[source,shell]
+[source,text]
 ----
 com.informix.jdbcx.IfxDataSource
 com.informix.jdbcx.IfxXADataSource
@@ -1099,13 +1097,13 @@ The JAR file for the Inet Oracle driver is `Oranxo.jar`. Configure the connectio
 
 ** `serviceName` - Specify the URL of the database. The syntax is as follows:
 +
-[source,shell]
+[source,text]
 ----
 jdbc:inetora:server:port:dbname
 ----
 For example:
 +
-[source,shell]
+[source,text]
 ----
 jdbc:inetora:localhost:1521:payrolldb
 ----
@@ -1164,7 +1162,7 @@ The JAR file for the Sybase driver is `jconn4.jar`. Configure the connection poo
 * Database Vendor: Sybase
 * DataSource Classname: Specify one of the following: 
 
-[source,shell]
+[source,text]
 ----
 com.sybase.jdbc4.jdbc.SybDataSource
 com.sybase.jdbc4.jdbc.SybXADataSource

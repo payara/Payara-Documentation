@@ -72,9 +72,7 @@ The attributes you can set are:
 `init-timeout-in-seconds`::
   The number of seconds Payara Server waits for the JMS service to start before aborting the startup.
 `start-args`::
-  A list of arguments the JMS service passes to Embedded and Local type JMS hosts on startup. Permissible arguments are the options supported
-  by the Message Queue `imqbrokerd` command, as described in "link:../../openmq/mq-admin-guide/command-line-reference.html#GMADG00280[Broker Utility]" in Open Message Queue
-  Administration Guide.
+  A list of arguments the JMS service passes to Embedded and Local type JMS hosts on startup.
 `default-jms-host`::
   The name of the default JMS host.
 `reconnect-enabled`::
@@ -130,7 +128,7 @@ When you create JMS resources or deploy message driven beans, the resources or b
 
 For information about administering JMS hosts that are servicing Payara clusters,
 see xref:docs:ha-administration-guide:jms.adoc#configuring-payara-clusters-to-use-message-queue-broker-clusters[Configuring Payara Clusters to Use Message Queue Broker Clusters] in
-Payara Server Open Source Edition High Availability Administration Guide.
+Payara Server High Availability Administration Guide.
 
 [[about-jms-host-types]]
 === About JMS Host Types
@@ -166,7 +164,7 @@ location of the Embedded or Local JMS host. This location depends on which Payar
 
 * For `server`, the Domain Administration Server (DAS), the `IMQ_VARHOME` location is:
 +
-[source,shell]
+[source,text]
 ----
 domain-root-dir/domain-dir/imq
 ----
@@ -212,7 +210,7 @@ asadmin> create-jms-host --mqhost hostName --mqport portNumber
 `--property`::
   A list of one or more Message Queue broker properties to configure the broker. The list is colon-separated (`:`) and has the form:
 +
-[source,shell]
+[source,text]
 ----
 prop1Name=prop1Value:prop2Name=prop2Value:...
 ----
@@ -361,7 +359,7 @@ Payara Server provides the following types of destination objects: +
 
 The subcommands in this section can be used to administer both the connection factory resources and the destination resources.
 For information on JMS service support of connection pooling and failover, see xref:docs:ha-administration-guide:jms.adoc#connection-failover[Connection Failover]
-in Payara Server Open Source Edition High Availability Administration Guide. For instructions on administering physical destinations,
+in Payara Server High Availability Administration Guide. For instructions on administering physical destinations,
 see xref:docs:administration-guide:jms.adoc#administering-jms-physical-destinations[Administering JMS Physical Destinations].
 
 [[to-create-a-connection-factory-or-destination-resource]]
@@ -647,7 +645,7 @@ In such cases, these native libraries must be made available to any Payara Serve
 . Download the `genericra.rar` archive.
 . Deploy GenericJMSRA the same way you would deploy a connector module. +
 See xref:docs:application-deployment-guide:deploying-applications.adoc#deploying-a-connector-module[Deploying a Connector Module] in
-Payara Server Open Source Edition Application Deployment Guide.
+Payara Server Application Deployment Guide.
 . Configure the resource adapter's properties. See  xref:docs:administration-guide:jms.adoc#genericjmsra-configuration-properties[GenericJMSRA Configuration Properties].
 . Create a connector connection pool. See xref:docs:administration-guide:connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
 . Create a connector resource. See xref:docs:administration-guide:connectors.adoc#to-create-a-connector-resource[To Create a Connector Resource].
@@ -844,7 +842,7 @@ There are a couple of methods to deploy the WebLogic Thin T3 client in Payara Se
 The Thin T3 client can be found in a WebLogic Server installation in a directory similar to MW_HOME`/server/lib`.
 * It is also possible to deploy the Thin T3 client in a less global manner, so that it is specific to an individual application. For information on how to do this,
 see xref:docs:application-development-guide:class-loaders.adoc#application-specific-class-loading[Application-Specific Class Loading] in
-Payara Server Open Source Edition Application Development Guide.
+Payara Server Application Development Guide.
 
 [[configure-weblogic-jms-resources-for-integration]]
 ==== *Configure WebLogic JMS Resources for Integration*
@@ -943,7 +941,7 @@ To configure a MDB to receive messages from WebLogic JMS, you would configure th
 
 .  Configure the ejb-jar.xml deployment descriptor:
 +
-[source,shell]
+[source,xml]
 ----
 <ejb-jar>
   <enterprise-beans>
@@ -973,7 +971,7 @@ attribute must be set to `NotSupported`. For more information,
 see xref:docs:administration-guide:jms.adoc#limitations-when-using-genericjmsra-with-weblogic-jms[Limitations When Using GenericJMSRA with WebLogic JMS].
 
 . Configure the glassfish-ejb-jar.xml deployment descriptor: +
-[source,shell]
+[source,xml]
 ----
 <sun-ejb-jar>
   <enterprise-beans>
@@ -1043,21 +1041,19 @@ xref:docs:administration-guide:connectors.adoc#to-create-a-connector-resource[To
 
 . Looking up the connection factory and destination +
 The following code looks up a connection factory with the JNDI name `jms/QCFactory` and a queue with the name`jms/outboundQueue` from the Payara Server JNDI store: +
-[source,shell]
+[source,java]
 ----
      Context initialContect  = new InitialContext();
      QueueConnectionFactory queueConnectionFactory = (QueueConnectionFactory)
           jndiContext.lookup("java:comp/env/jms/MyQCFactory");
      Queue queue = (Queue) jndiContext.lookup("java:comp/env/jms/outboundQueue");
 ----
-Note that the resources used are Payara Server resources, not WebLogic JMS resources. For every connection factory or destination
-that you want to use in the WebLogic JMS JNDI store, you need to create a corresponding connection factory or destination in the Payara Server JNDI store and
-configure the Payara Server object to point to the corresponding WebLogic JMS object.
+Note that the resources used are Payara Server resources, not WebLogic JMS resources. For every connection factory or destination that you want to use in the WebLogic JMS JNDI store, you need to create a corresponding connection factory or destination in the Payara Server JNDI store and configure the Payara Server object to point to the corresponding WebLogic JMS object.
 
 . Declaring the connection factory and destination +
 In accordance with standard Java EE requirements, these resources need to be declared in the deployment descriptor for the MDB, EJB or other component. For example, for a session bean, configure the `ejb-jar.xml` with `<resource-env-ref>` elements, as follows:
 +
-[source,shell]
+[source,xml]
 ----
 <ejb-jar>
   <enterprise-beans>
@@ -1071,7 +1067,12 @@ In accordance with standard Java EE requirements, these resources need to be dec
         <resource-env-ref-name>jms/outboundQueue</resource-env-ref-name>
         <resource-env-ref-type>jakarta.jms.Queue</resource-env-ref-type>
       </resource-env-ref>
+      . . .
+    </session>
+  </enterprise-beans>
+</ejb-jar>
 ----
+
 . Create a Connector Connection Pool and Connector Resource by entering the following `asadmin` commands, both all in one line: +
 In order to configure a JMS Connection Factory using GenericJMSRA, a Connector connection pool and resource need to be created in Payara Server
 using names that map to the corresponding connection factory in the WebLogic JNDI store.
@@ -1096,7 +1097,7 @@ For more information, see
 xref:docs:administration-guide:jms.adoc#limitations-when-using-genericjmsra-with-weblogic-jms[Limitations When Using GenericJMSRA with WebLogic JMS].
 * The connection pool is configured with the properties specified using the `properties` argument; multiple properties are configured as a colon-separated
 list of name-value pairs. Only one property is configured in this example, as follows: +
-[source,shell]
+[source,text]
 ----
 ConnectionFactoryJndiName=jms/WLOutboundQueueFactory
 ----
@@ -1117,7 +1118,7 @@ This `asadmin` command creates a destination in Payara Server.
 * The destination has the JNDI name `jms/outboundQueue`, uses the resource adapter `genericra`, and is of type `jakarta.jms.Queue`.
 * The destination is configured with the properties specified using the `properties` argument; multiple properties are configured as a colon-separated list of name-value pairs. Only one property is configured in this example, as follows:
 +
-[source,shell]
+[source,text]
 ----
 DestinationJndiName=jms/WLOutboundQueue
 ----
@@ -1237,7 +1238,7 @@ Set to `jndi` for WebLogic JMS.
 
 |`JndiProperties`
 a|
-[source,shell]
+[source,text]
 ----
 java.naming.factory.initial
 =weblogic.jndi.WLInitialContextFactory,
@@ -1396,7 +1397,7 @@ Before you can configure WebSphere MQ to exchange messages with Payara Server, y
 ** Use a text editor to modify the `server.policy` file in the `${appserver-install-dir}/domains/domain1/config/`directory by adding the following line
 to the default grant block:
 +
-[source,shell]
+[source,text]
 ----
 permission java.util.logging.LoggingPermission "control";
 permission java.util.PropertyPermission "*", "read,write";
@@ -1405,7 +1406,7 @@ permission java.util.PropertyPermission "*", "read,write";
 ** If you use an application client in your application, edit the client's `client.policy` file in the `${appserver-install-dir}/lib/appclient/` directory by adding
 the following permission:
 +
-[source,shell]
+[source,text]
 ----
 permission javax.security.auth.PrivateCredentialPermission
 "javax.resource.spi.security.PasswordCredential * \"*\"","read";
@@ -1413,7 +1414,7 @@ permission javax.security.auth.PrivateCredentialPermission
 * To integrate Payara Server with WebSphere MQ 6.0 or 7.0, copy the necessary JAR files to the as-install`/lib` directory:
 
 ** For WebSphere MQ 6.0, copy these JAR files to the as-install`/lib` directory: +
-[source,shell]
+[source,text]
 ----
 /opt/mqm/java/lib/com.ibm.mq.jar
 /opt/mqm/java/lib/com.ibm.mq.jms.Nojndi.jar
@@ -1430,7 +1431,7 @@ permission javax.security.auth.PrivateCredentialPermission
 where `/opt/mqm` is the location of the WebSphere MQ 6.0 installation.
 
 ** For WebSphere MQ 7.0, copy these JAR files to the as-install`/lib` directory: +
-[source,shell]
+[source,text]
 ----
 /opt/mqm/java/lib/com.ibm.mq.jar,
 /opt/mqm/java/lib/com.ibm.mq.jms.Nojndi.jar,
@@ -1484,7 +1485,7 @@ $ source setjmsenv
 where `/opt/mqm` is the location of the WebSphere MQ installation.
 ..  Change the JMSAdmin.config file to indicate the Initial Context Factory you will be using by setting the following name-value pairs and commenting out the rest: ,
 +
-[source,shell]
+[source,text]
 ----
 INITIAL_CONTEXT_FACTORY=com.sun.jndi.fscontext.RefFSContextFactory
     PROVIDER_URL=file:/opt/tmp
@@ -1596,7 +1597,7 @@ can use distributed transactions to coordinate the EIS resource with JDBC and JM
 
 |`JndiProperties`
 a|
-[source,shell]
+[source,text]
 ----
 JndiProperties=
 java.naming.factory.url.pkgs\\
@@ -1724,7 +1725,7 @@ xref:docs:administration-guide:jms.adoc#configure-the-websphere-mq-administered-
 The deployment descriptors need to take into account the resource adapter and the connection resources that have been created.
 A sample `sun-ejb-jar.xml` for a Message Driven Bean that listens to a destination called `TQueue` in WebSphere MQ, and publishes back
 reply messages to a destination resource named `jms/replyQueue` in Payara Server, as shown below.
-[source,shell]
+[source,xml]
 ----
        <sun-ejb-jar>
          <enterprise-beans>
@@ -1798,7 +1799,7 @@ reply messages to a destination resource named `jms/replyQueue` in Payara Server
 
 The business logic encoded in Message Driven Bean could then lookup the configured `QueueConnectionFactory/Destination` resource to create a connection as shown below.
 
-[source,shell]
+[source,java]
 ----
              Context context = null;
              ConnectionFactory connectionFactory = null;

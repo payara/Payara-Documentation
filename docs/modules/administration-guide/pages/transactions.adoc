@@ -1,7 +1,7 @@
 [[administering-transactions]]
 = Administering Transactions
 
-This chapter discusses how to manage the transaction service for the Payara Server Open Source Edition environment by using the `asadmin` command-line utility.
+This chapter discusses how to manage the transaction service for the Payara Server environment by using the `asadmin` command-line utility.
 Instructions for manually recovering transactions are also included.
 
 Instructions for accomplishing the tasks in this chapter by using the Administration Console are contained in the Administration Console online help.
@@ -51,7 +51,7 @@ see xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-dr
 to look up transactional data sources and, optionally, the user transaction).
 The application might use declarative transaction attribute settings for enterprise beans, or explicit programmatic transaction demarcation. For more information,
 see xref:docs:application-development-guide:transaction-service.adoc#the-transaction-manager-the-transaction-synchronization-registry-and-usertransaction[The Transaction Manager, the Transaction Synchronization Registry, and UserTransaction]
-in Payara Server Open Source Edition Application Development Guide.
+in Payara Server Application Development Guide.
 
 [[transaction-resource-managers]]
 === Transaction Resource Managers
@@ -60,7 +60,7 @@ There are three types of transaction resource managers:
 
 * *Databases* - Use of transactions prevents databases from being left in inconsistent states due to incomplete updates. For information about JDBC transaction isolation levels,
 see xref:docs:application-development-guide:transaction-service.adoc#using-jdbc-transaction-isolation-levels[Using JDBC Transaction Isolation Levels] in
-Payara Server Open Source Edition Application Development Guide. +
+Payara Server Application Development Guide. +
 The Payara Server supports a variety of JDBC XA drivers. For configurations of supported and other drivers,
 see xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 
@@ -115,7 +115,7 @@ The following examples show the `server-config` configuration, but values for an
 `cluster1` and a configuration named `cluster1-config` is automatically created for it, you can use `cluster1-config` in the `set` subcommand to get the transaction service
 settings for that cluster.
 +
-[source,shell]
+[source,text]
 ----
 server-config.transaction-service.automatic-recovery = false
 server-config.transaction-service.heuristic-decision = rollback
@@ -125,7 +125,7 @@ server-config.transaction-service.timeout-in-seconds = 0
 server-config.transaction-service.tx-log-dir = domain-dir/logs
 ----
 You can also set these properties: +
-[source,shell]
+[source,text]
 ----
 server-config.transaction-service.property.oracle-xa-recovery-workaround = true
 server-config.transaction-service.property.sybase-xa-recovery-workaround = false
@@ -160,7 +160,7 @@ Changing `keypoint-interval`, `retry-timeout-in-seconds`, or `timeout-in-seconds
 server restart.
 * You can also set the following system properties:
 +
-[source,shell]
+[source,text]
 ----
 ALLOW_MULTIPLE_ENLISTS_DELISTS=false
 JTA_RESOURCE_TABLE_MAX_ENTRIES=8192
@@ -310,7 +310,7 @@ To use manual transaction recovery in this way, the following conditions must be
 
 * The `recover-transactions` command should be executed after the resource is restarted.
 * Connection validation should be enabled so the connection pool is refreshed when the resource is accessed after the recovery. For more information,
-see xref:docs:performance-tuning-guide:tuning-glassfish.adoc#connection-validation-settings[Connection Validation Settings] in Payara Server Open Source Edition Performance Tuning Guide.
+see xref:docs:performance-tuning-guide:tuning-glassfish.adoc#connection-validation-settings[Connection Validation Settings] in Payara Server Performance Tuning Guide.
 
 If commit fails during recovery, a message is written to the server log.
 
@@ -370,7 +370,7 @@ This is because for conventional Message Queue clustering, state information in 
 
 You must configure the following `grant` statements in your Oracle database to set up transaction recovery:
 
-[source,shell]
+[source,text]
 ----
 grant select on SYS.DBA_PENDING_TRANSACTIONS to user; 
 grant execute on SYS.DBMS_SYSTEM to user; 
@@ -437,7 +437,7 @@ Transaction logs should be stored in a high-availability network file system (NF
 === To Store Transaction Logs in a Database
 
 For multi-core machines, logging transactions to a database may be more efficient. Transaction logging is designed to work with any JDBC-compliant database.
-For databases with which transaction logging has been tested, see the Payara Server Open Source Edition Release Notes.
+For databases with which transaction logging has been tested, see the Payara Server Release Notes.
 
 . Create a JDBC connection Pool. To use non-transactional connections to
 insert log records, you can either set the `non-transactional-connections` attribute to `true` in this step, or you can perform step 5 later.

@@ -19,22 +19,27 @@ recommended for better log configuration. For more information about JSR 47, see
 [[log-files]]
 === Log Files
 
-Payara Server Open Source Edition log records are captured in the server log file, which captures information about the operation of a
-server instance running in the domain. Each instance, managed server instance (that is, each cluster member), and the domain administration
-server (DAS) has an individual server log file.
+Payara Server log records are captured in the server log file, which captures information about the operation of a server instance running in the domain. Each instance, managed server instance (that is, each cluster member), and the domain administration server (DAS) has an individual server log file.
 
 [[log-file-names-and-locations]]
-==== *Log File Names and Locations*
+==== Log File Names and Locations
 
-In an Payara Server Open Source Edition domain, log files have the following name and location by default:
+In an Payara Server domain, log files have the following name and location by default:
 
 [width="100%",cols="27%,73%",options="header",]
-|====================================================
-|Instance |Default Log File Name and Location
-|DAS |domain-dir`/logs/server.log`
-|Each server instance |instance-dir`/logs/server.log`
-|Cluster instance |instance-dir`/logs/server.log`
-|====================================================
+|===
+|Instance
+|Default Log File Name and Location
+
+|DAS
+|domain-dir`/logs/server.log`
+
+|Each server instance
+|instance-dir`/logs/server.log`
+
+|Cluster instance
+|instance-dir`/logs/server.log`
+|===
 
 
 For example, in a domain hosted on a given machine that includes a cluster with two managed servers (`ClusterServer1` and `ClusterServer1`)
@@ -87,7 +92,7 @@ Log records formatted in the ODL format are displayed as follows:
 
 * `[` and `]` mark the beginning and end of fields in the record. Some fields may be empty.
 * yyyy-mm-dd`T`hh:mm:ss.SSSS-Z represents the date and time that the record was created. For example: `2013-04-12T08:08:30.154-0700`
-* ProductName-Version represents the current version of Payara Server Open Source Edition. For example: `payara`
+* ProductName-Version represents the current version of Payara Server. For example: `payara`
 * Log Level represents the log level. You can set any of the following values: `EMERGENCY`, `ALERT`, `SEVERE`, `WARNING`, `INFO`, `CONFIG`,
 `FINE`, `FINER`, and `FINEST`. The default is `INFO`.
 * Message ID consists of a module code that indicates the origin of the message and the message number. For example: `AS-WEB-GLUE-00172`
@@ -107,7 +112,7 @@ The following is an example of a log record formatted in the ODL format:
 
 Log records formatted in the ULF format are displayed as follows:
 
-[source,shell]
+[source,text]
 ----
 [#|yyyy-mm-ddThh:mm:ss.SSS-Z|Log Level|ProductName-Version|LoggerName|Key Value Pairs|Message|#]
 ----
@@ -135,9 +140,7 @@ The following is an example of a log record formatted in the ULF format:
 
 [source,shell]
 ----
-[#|2013-04-18T09:27:44.315-0700|INFO|glassfish 6.0|jakarta.enterprise.web.core|
-_ThreadID=15;_ThreadName=RunLevelControllerThread-1366302462682;_TimeMillis=1366302464315;_LevelValue=800;_MessageID=AS-WEB-CORE-00306;|
-  Setting JAAS app name glassfish-web|#]
+[#|2013-04-18T09:27:44.315-0700|INFO|glassfish 6.0|jakarta.enterprise.web.core| _ThreadID=15;_ThreadName=RunLevelControllerThread-1366302462682;_TimeMillis=1366302464315;_LevelValue=800;_MessageID=AS-WEB-CORE-00306;| Setting JAAS app name glassfish-web|#]
 ----
 
 The Administration Console presents log records in a more readable display. For information about viewing log records using the
@@ -155,10 +158,9 @@ log file rotation, as explained in xref:docs:administration-guide:logging.adoc#s
 [[logger-namespaces]]
 === Logger Namespaces
 
-Payara Server provides a logger for each of its modules. The following list is an example of the logger namespaces in a
-server instance as they appear when using the `list-log-levels` subcommand.
+Payara Server provides a logger for each of its modules. The following list is an example of the logger namespaces in a server instance as they appear when using the `list-log-levels` subcommand.
 
-[source,shell]
+[source,text]
 ----
 java.util.logging.ConsoleHandler     <FINEST>
 jakarta.enterprise.resource.corba     <INFO>
@@ -506,7 +508,7 @@ A module log level specifies the events that are logged for a particular logger.
 
 By default, the module log level is set to `FINE`. The lines for the loggers in the logging properties file might look like this (the modules are indicated in bold):
 
-[source,shell]
+[source,text]
 ----
 jakarta.enterprise.system.tools.level=FINE
 jakarta.enterprise.system.container.ejb.level=FINE
@@ -839,7 +841,7 @@ by implementing a custom log handler. This section explains how to add a custom 
 A comma-separated list of log handlers is installed during startup of the Java Virtual Machine (JVM) host. The default log handler that is
 provided in the `logging.properties` file, `ConsoleHandler`, is configured as follows:
 
-[source,shell]
+[source,text]
 ----
 handlers=java.util.logging.ConsoleHandler
 ----
@@ -919,7 +921,7 @@ Command collect-log-files executed successfully.
 
 When the ZIP file created by the preceding command is uncompressed, the following directory structure is created:
 
-[source,shell]
+[source,text]
 ----
 as-install-parent/
        glassfish/
