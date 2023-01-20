@@ -111,7 +111,7 @@ see "xref:docs:application-deployment-guide:dd-elements.adoc#elements-of-the-pay
 Each `security-role-mapping` element in the `glassfish-application.xml`, `glassfish-web.xml`/`payara-web.xml`, or `glassfish-ejb-jar.xml` file maps a role name permitted by the application or module to principals and groups.
 For example, a `payara-web.xml` file for an individually deployed web module might contain the following:
 
-[source,shell]
+[source,xml]
 ----
 <payara-web-app>
     <security-role-mapping>
@@ -133,7 +133,7 @@ Note that the `role-name` in this example must match the `@DeclareRoles` annotat
 You can also specify a custom principal implementation class. This provides more flexibility in how principals can be assigned to roles.
 A user's JAAS login module now can authenticate its custom principal, and the authenticated custom principal can further participate in the Payara Server authorization process. For example:
 
-[source,shell]
+[source,xml]
 ----
 <security-role-mapping>
     <role-name>administrator</role-name>
@@ -206,7 +206,7 @@ If modules within an application specify realms, these are ignored. If present, 
 
 For example, a realm is specified in `glassfish-application.xml` as follows:
 
-[source,shell]
+[source,xml]
 ----
 <glassfish-application>
     ...
@@ -238,7 +238,7 @@ Custom login modules must extend the `com.sun.appserv.security.AppservPasswordLo
 
 Custom login modules must provide an implementation for one abstract method defined in `AppservPasswordLoginModule`:
 
-[source,shell]
+[source,java]
 ----
 abstract protected void authenticateUser() throws LoginException
 ----
@@ -248,7 +248,7 @@ This method performs the actual authentication. The custom login module must not
 
 The custom login module can access the following protected object fields, which it inherits from `AppservPasswordLoginModule`. These contain the user name and password of the user to be authenticated:
 
-[source,shell]
+[source,java]
 ----
 protected String _username;
 protected String _password;
@@ -256,7 +256,7 @@ protected String _password;
 
 The `authenticateUser` method must end with the following sequence:
 
-[source,shell]
+[source,java]
 ----
 String[] grpList;
 // populate grpList with the set of groups to which
@@ -266,7 +266,7 @@ commitUserAuthentication(grpList);
 
 Custom realms must extend the `com.sun.appserv.security.AppservRealm` class and implement the following methods:
 
-[source,shell]
+[source,java]
 ----
 public void init(Properties props) throws BadRealmException, 
     NoSuchRealmException
@@ -275,14 +275,14 @@ public void init(Properties props) throws BadRealmException,
 This method is invoked during server startup when the realm is initially loaded. The `props` argument contains the properties defined for this realm. The realm can do any initialization it needs in this method.
 If the method returns without throwing an exception, the Payara Server assumes that the realm is ready to service authentication requests. If an exception is thrown, the realm is disabled.
 
-[source,shell]
+[source,java]
 ----
 public String getAuthType()
 ----
 
 This method returns a descriptive string representing the type of authentication done by this realm.
 
-[source,shell]
+[source,java]
 ----
 public abstract Enumeration getGroupNames(String username) throws 
     InvalidOperationException, NoSuchUserException
@@ -292,42 +292,42 @@ This method returns an `Enumeration` (of `String` objects) enumerating the group
 
 Custom realms that manage users must implement the following additional methods:
 
-[source,shell]
+[source,java]
 ----
 public abstract boolean supportsUserManagement();
 ----
 
 This method returns `true` if the realm supports user management.
 
-[source,shell]
+[source,java]
 ----
 public abstract Enumeration getGroupNames() throws BadRealmException;
 ----
 
 This method returns an `Enumeration` of all group names.
 
-[source,shell]
+[source,java]
 ----
 public abstract Enumeration getUserNames() throws BadRealmException;
 ----
 
 This method returns an `Enumeration` of all user names.
 
-[source,shell]
+[source,java]
 ----
 public abstract void refresh() throws BadRealmException;
 ----
 
 This method refreshes the realm data so that new users and groups are visible.
 
-[source,shell]
+[source,java]
 ----
 public abstract void persist() throws BadRealmException;
 ----
 
 This method persists the realm data to permanent storage.
 
-[source,shell]
+[source,java]
 ----
 public abstract User getUser(String name) throws NoSuchUserException, 
 BadRealmException;
@@ -335,7 +335,7 @@ BadRealmException;
 
 This method returns the information recorded about a particular named user.
 
-[source,shell]
+[source,java]
 ----
 public abstract void addUser(String name, String password, String[] groupList) throws 
 BadRealmException, IASSecurityException;
@@ -343,7 +343,7 @@ BadRealmException, IASSecurityException;
 
 This method adds a new user, who cannot already exist.
 
-[source,shell]
+[source,java]
 ----
 public abstract void removeUser(String name) throws NoSuchUserException, 
 BadRealmException;
@@ -351,7 +351,7 @@ BadRealmException;
 
 This method removes a user, who must exist.
 
-[source,shell]
+[source,java]
 ----
 public abstract void updateUser(String name, String newName, String password, 
 String[] groups) throws NoSuchUserException, BadRealmException, IASSecurityException;
@@ -415,7 +415,7 @@ For Javadoc tool pages relevant to audit modules, see the `com.sun.enterprise.se
 
 The `AuditModule` class provides default "no-op" implementations for each of the following methods, which your custom class can override.
 
-[source,shell]
+[source,java]
 ----
 public void init(Properties props)
 ----
@@ -423,14 +423,14 @@ public void init(Properties props)
 The preceding method is invoked during server startup when the audit module is initially loaded. The `props` argument contains the properties defined for this module. The module can do any initialization it needs in this method.
 If the method returns without throwing an exception, the Payara Server assumes the module realm is ready to service audit requests. If an exception is thrown, the module is disabled.
 
-[source,shell]
+[source,java]
 ----
 public void authentication(String user, String realm, boolean success)
 ----
 
 This method is invoked when an authentication request has been processed by a realm for the given user. The `success` flag indicates whether the authorization was granted or denied.
 
-[source,shell]
+[source,java]
 ----
 public void webInvocation(String user, HttpServletRequest req, String type, boolean success)
 ----
@@ -438,7 +438,7 @@ public void webInvocation(String user, HttpServletRequest req, String type, bool
 This method is invoked when a web container call has been processed by authorization. The `success` flag indicates whether the authorization was granted or denied. The `req` object is the standard `HttpServletRequest` object for this request.
 The `type` string is one of `hasUserDataPermission` or `hasResourcePermission` (see http://www.jcp.org/en/jsr/detail?id=115[JSR 115] (`http://www.jcp.org/en/jsr/detail?id=115`)).
 
-[source,shell]
+[source,java]
 ----
 public void ejbInvocation(String user, String ejb, String method, boolean success)
 ----
@@ -446,7 +446,7 @@ public void ejbInvocation(String user, String ejb, String method, boolean succes
 This method is invoked when an EJB container call has been processed by authorization. The `success` flag indicates whether the authorization was granted or denied.
 The `ejb` and `method` strings describe the EJB component and its method that is being invoked.
 
-[source,shell]
+[source,java]
 ----
 public void webServiceInvocation(String uri, String endpoint, boolean success)
 ----
@@ -454,7 +454,7 @@ public void webServiceInvocation(String uri, String endpoint, boolean success)
 This method is invoked during validation of a web service request in which the endpoint is a servlet. The `uri` is the URL representation of the web service endpoint.
 The `endpoint` is the name of the endpoint representation. The `success` flag indicates whether the authorization was granted or denied.
 
-[source,shell]
+[source,java]
 ----
 public void ejbAsWebServiceInvocation(String endpoint, boolean success)
 ----
@@ -521,7 +521,7 @@ Instead, add a new grant block with a codebase specific to the applications requ
 
 If you develop multiple applications that require more than this default set of permissions, you can add the custom permissions that your applications need. The `com.sun.aas.instanceRoot` variable refers to the domain-dir. For example:
 
-[source,shell]
+[source,text]
 ----
 grant codeBase "file:${com.sun.aas.instanceRoot}/applications/-" {
 ...
@@ -530,7 +530,7 @@ grant codeBase "file:${com.sun.aas.instanceRoot}/applications/-" {
 
 You can add permissions to stub code with the following grant block:
 
-[source,shell]
+[source,text]
 ----
 grant codeBase "file:${com.sun.aas.instanceRoot}/generated/-" {
 ...
@@ -539,7 +539,7 @@ grant codeBase "file:${com.sun.aas.instanceRoot}/generated/-" {
 
 In general, you should add extra permissions only to the applications or modules that require them, not to all applications deployed to a domain. For example:
 
-[source,shell]
+[source,text]
 ----
 grant codeBase "file:${com.sun.aas.instanceRoot}/applications/MyApp/-" {
 ...
@@ -548,7 +548,7 @@ grant codeBase "file:${com.sun.aas.instanceRoot}/applications/MyApp/-" {
 
 For a module:
 
-[source,shell]
+[source,text]
 ----
 grant codeBase "file:${com.sun.aas.instanceRoot}/applications/MyModule/-" {
 ...
@@ -575,7 +575,7 @@ domain that failed(ProtectionDomain
 
 Granting the following permission eliminates the message:
 
-[source,shell]
+[source,text]
 ----
 grant codeBase "file:${com.sun.aas.instanceRoot}/applications/cejug-clfds/-" {
     permission java.util.PropertyPermission "java.security.manager", "write";
@@ -647,7 +647,7 @@ You must grant additional permissions to CDI-enabled Jakarta EE applications tha
 
 To deploy CDI-enabled Jakarta EE applications in a Payara Server 5.0 domain or cluster for which security manager is enabled, add the following permissions to the applications:
 
-[source,shell]
+[source,text]
 ----
 grant codeBase "file:${com.sun.aas.instanceRoot}/applications/[ApplicationName]" {
  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
@@ -656,7 +656,7 @@ grant codeBase "file:${com.sun.aas.instanceRoot}/applications/[ApplicationName]"
 
 For example, for a CDI application named `foo.war`, add the following permissions to the `server.policy` file, restart the domain or cluster, and then deploy and use the application.
 
-[source,shell]
+[source,text]
 ----
 grant codeBase "file:${com.sun.aas.instanceRoot}/applications/foo" {
  permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
@@ -845,7 +845,7 @@ Follow this procedure.
 For the `xms` example, this file is located in the directory app-dir`/xms-ejb/src/conf`, where app-dir is defined in xref:securing-apps.adoc#to-set-up-the-sample-application[To Set Up the Sample Application].
 . Modify the `glassfish-ejb-jar.xml` file by adding the `message-security-binding` element as shown:
 +
-[source,shell]
+[source,xml]
 ----
 <glassfish-ejb-jar>
   <enterprise-beans>
@@ -880,7 +880,7 @@ the EJB web service endpoint in the application's
 `glassfish-ejb-jar.xml` file. To this file, add `request-protection` and
 `response-protection` elements, which are analogous to the
 `request-policy` and `response-policy` elements discussed in the
-link:../security-guide/toc.html#GSSCG[GlassFish Server Security Guide]. The
+xref:docs:security-guide:system-security.adoc[Payara Server Security Guide]. The
 administration guide includes a table listing the set and order of
 security operations for different request and response policy
 configurations.
@@ -898,7 +898,7 @@ Follow this procedure.
 For the `xms` example, this file is located in the directory app-dir`/xms-ejb/src/conf`, where app-dir is defined in xref:securing-apps.adoc#to-set-up-the-sample-application[To Set Up the Sample Application].
 . Modify the `glassfish-ejb-jar.xml` file by adding the `message-security-binding` element as shown:
 +
-[source,shell]
+[source,xml]
 ----
 <glassfish-ejb-jar>
   <enterprise-beans>
@@ -979,7 +979,7 @@ Message security providers are set up when the Ant targets are run, so you do no
 . If you are not running HTTP on the default port of 8080, change the WSDL file for the example to reflect the change, and change the `common.properties` file to reflect the change as well. +
 The WSDL file for this example is located at app-dir`/xms-ejb/``src/conf/HelloWorld.wsdl`. The port number is in the following section:
 +
-[source,shell]
+[source,xml]
 ----
 <service name="HelloWorld">
   <port name="HelloIFPort" binding="tns:HelloIFBinding">
@@ -1047,7 +1047,7 @@ This permission is not granted by default to deployed applications because this 
 
 To grant the required permission to the application, add the following to the domain-dir`/config/server.policy` file:
 
-[source,shell]
+[source,text]
 ----
 grant codeBase "file:jar-file-path" {
      permission com.sun.appserv.security.ProgrammaticLoginPermission
@@ -1068,7 +1068,7 @@ The `ProgrammaticLogin` class has four `login` methods, two for servlets or JSP 
 
 The login methods for servlets or JSP files have the following signatures:
 
-[source,shell]
+[source,java]
 ----
 public java.lang.Boolean login(String user, String password, 
     javax.servlet.http.HttpServletRequest request, 
@@ -1082,7 +1082,7 @@ public java.lang.Boolean login(String user, String password,
 
 The login methods for EJB components have the following signatures:
 
-[source,shell]
+[source,java]
 ----
 public java.lang.Boolean login(String user, String password)
 
@@ -1104,7 +1104,7 @@ A `java.rmi.AccessException` with `COBRA NO_PERMISSION` occurs if the actual log
 
 The logout methods for servlets or JSP files have the following signatures:
 
-[source,shell]
+[source,java]
 ----
 public java.lang.Boolean logout(HttpServletRequest request, 
     HttpServletResponse response)
@@ -1116,7 +1116,7 @@ public java.lang.Boolean logout(HttpServletRequest request,
 
 The logout methods for EJB components have the following signatures:
 
-[source,shell]
+[source,java]
 ----
 public java.lang.Boolean logout()
 
@@ -1207,7 +1207,7 @@ for an extended period, so that the caller can return to the application periodi
 There are two built-in implementations of `IdentityStore`: an LDAP identity store, and a Database identity store.
 The following snippet shows the usage of `DatabaseIdentityStoreDefinition`, which makes `DatabaseIdentityStore` available as CDI bean.
 
-[source,shell]
+[source,java]
 ----
 @DatabaseIdentityStoreDefinition(
     callerQuery = "#{'select password from caller where name = ?'}",
@@ -1233,7 +1233,7 @@ An application provider can choose to provide its own custom authentication mech
 
 A custom authentication mechanism implements the `HttpAuthenticationMechanism` interface, introduced in Jakarta EE Security API. This interface defines the following three methods.
 
-[source,shell]
+[source,java]
 ----
 AuthenticationStatus validateRequest(HttpServletRequest request,
                                      HttpServletResponse response,
@@ -1269,7 +1269,7 @@ The class `MyAuthenticationMechanism.java` is a sample `HttpAuthenticationMechan
 Note that only`validateRequest` method has been implemented, since Jakarta EE Security API provides default implementation of other two methods.
 An application provider may choose to override the default implementation depending on the requirement.
 
-[source,shell]
+[source,java]
 ----
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -1408,7 +1408,7 @@ See the Servlet Container Profile section in the JSR 196 specification for addit
 
 The class `MySam.java` is a sample SAM implementation. Notice that the sample implements the five methods of the ServerAuthModule interface. This SAM implements an approximation of HTTP basic authentication.
 
-[source,shell]
+[source,java]
 ----
 package tip.sam;
 

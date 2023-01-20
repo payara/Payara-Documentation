@@ -53,7 +53,7 @@ a logical name. To change the Jakarta Mail session, you can change its entry in 
 
 The resource lookup in the application code looks like this:
 
-[source,shell]
+[source,java]
 ----
 InitialContext ic = new InitialContext();
 String snName = "java:comp/env/mail/MyMailSession";
@@ -70,7 +70,7 @@ For more information about the JNDI API, see xref:docs:application-development-g
 
 . Import the packages that you need.
 +
-[source,shell]
+[source,java]
 ----
 import java.util.*;
 import jakarta.activation.*;
@@ -80,7 +80,7 @@ import javax.naming.*;
 ----
 . Look up the Jakarta Mail session.
 +
-[source,shell]
+[source,java]
 ----
 InitialContext ic = new InitialContext();
 String snName = "java:comp/env/mail/MyMailSession";
@@ -89,14 +89,14 @@ Session session = (Session)ic.lookup(snName);
 For more information, see xref:mail.adoc#looking-up-a-jakarta-mail-session[Looking Up a Jakarta Mail Session].
 .  Override the Jakarta Mail session properties if necessary. For example:
 +
-[source,shell]
+[source,java]
 ----
 Properties props = session.getProperties();
 props.put("mail.from", "user2@mailserver.com");
 ----
 . Create a `MimeMessage`. The msgRecipient, msgSubject, and msgTxt variables in the following example contain input from the user:
 +
-[source,shell]
+[source,java]
 ----
 Message msg = new MimeMessage(session);
 msg.setSubject(msgSubject);
@@ -107,7 +107,7 @@ msg.setRecipients(Message.RecipientType.TO,
 msg.setText(msgTxt);
 ----
 . Send the message. +
-[source,shell]
+[source,java]
 ----
 Transport.send(msg);
 ----
@@ -117,7 +117,7 @@ Transport.send(msg);
 
 . Import the packages that you need.
 +
-[source,shell]
+[source,java]
 ----
 import java.util.*;
 import jakarta.activation.*;
@@ -127,7 +127,7 @@ import javax.naming.*;
 ----
 . Look up the Jakarta Mail session.
 +
-[source,shell]
+[source,java]
 ----
 InitialContext ic = new InitialContext();
 String snName = "java:comp/env/mail/MyMailSession";
@@ -136,27 +136,27 @@ Session session = (jakarta.mail.Session)ic.lookup(snName);
 For more information, see xref:mail.adoc#looking-up-a-jakarta-mail-session[Looking Up a Jakarta Mail Session].
 . Override the Jakarta Mail session properties if necessary. For example:
 +
-[source,shell]
+[source,java]
 ----
 Properties props = session.getProperties();
 props.put("mail.from", "user2@mailserver.com");
 ----
 . Get a `Store` object from the `Session`, then connect to the mail server using the Store object's `connect` method. You must supply a mail server name, a mail user name, and a password.
 +
-[source,shell]
+[source,java]
 ----
 Store store = session.getStore();
 store.connect("MailServer", "MailUser", "secret");
 ----
 . Get the INBOX folder.
 +
-[source,shell]
+[source,java]
 ----
 Folder folder = store.getFolder("INBOX");
 ----
 . It is efficient to read the `Message` objects (which represent messages on the server) into an array.
 +
-[source,shell]
+[source,java]
 ----
 Message[] messages = folder.getMessages();
 ----
@@ -165,4 +165,4 @@ Message[] messages = folder.getMessages();
 == Using Application-Scoped Jakarta Mail Resources
 
 You can define an application-scoped Jakarta Mail or other resource for an enterprise application, web module, EJB module, connector module, or application client module by supplying a `payara-resources.xml` deployment descriptor file.
-For details, see "xref:docs:application-deployment-guide:deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources]" in Payara Server Open Source Edition Application Deployment Guide.
+For details, see "xref:docs:application-deployment-guide:deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources]" in Payara Server Application Deployment Guide.

@@ -8,21 +8,21 @@ NOTE: JMS resources are supported only in the full Payara Server, not in the Web
 For information about the JMS, see "https://javaee.github.io/tutorial/partmessaging.html[Messaging]" in The Jakarta EE 8 Tutorial.
 
 For detailed information about JMS concepts and JMS support in the Payara Server, see
-"xref:docs:administration-guide:jms.adoc#administering-the-java-message-service-jms[Administering the Java Message Service (JMS)]" in Payara Server Open Source Edition Administration Guide.
+"xref:docs:administration-guide:jms.adoc#administering-the-java-message-service-jms[Administering the Java Message Service (JMS)]" in Payara Server Administration Guide.
 
 [[using-application-scoped-jms-resources]]
 == Using Application-Scoped JMS Resources
 
 You can define an application-scoped JMS or other resource for an enterprise application, web module, EJB module, connector module, or application client module by supplying a
 `payara-resources.xml` deployment descriptor file. For details, see
-"xref:docs:application-deployment-guide:deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources]" in Payara Server Open Source Edition Application Deployment Guide.
+"xref:docs:application-deployment-guide:deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources]" in Payara Server Application Deployment Guide.
 
 [[load-balanced-message-inflow]]
 == Load-Balanced Message Inflow
 
 You can configure `ActivationSpec` properties of the `jmsra` resource adapter in the `glassfish-ejb-jar.xml` file for a message-driven bean using `activation-config-property`
 elements. Whenever a message-driven bean (`EndPointFactory`) is deployed, the connector runtime engine finds these properties and configures them accordingly in the
-resource adapter. See "xref:docs:application-deployment-guide:dd-elements.adoc#activation-config-property[activation-config-property]" in Payara Server Open Source Edition Application Deployment Guide.
+resource adapter. See "xref:docs:application-deployment-guide:dd-elements.adoc#activation-config-property[activation-config-property]" in Payara Server Application Deployment Guide.
 
 The Payara Server transparently enables messages to be delivered in random fashion to message-driven beans having same `ClientID`. The `ClientID` is required for durable subscribers.
 
@@ -62,14 +62,14 @@ You can convert a SOAP message into a JMS message, send the JMS message, then co
 
 . Import the `MessageTransformer` library.
 +
-[source,shell]
+[source,java]
 ----
 import com.sun.messaging.xml.MessageTransformer;
 ----
 This is the utility whose methods you use to convert SOAP messages to JMS messages and the reverse. You can then send a JMS message containing a SOAP payload as if it were a normal JMS message.
 . Initialize the `TopicConnectionFactory`, `TopicConnection`, `TopicSession`, and publisher.
 +
-[source,shell]
+[source,java]
 ----
 tcf = new TopicConnectionFactory();
 tc = tcf.createTopicConnection();
@@ -79,7 +79,7 @@ publisher = session.createPublisher(topic);
 ----
 . Construct a SOAP message using the SOAP with Attachments API for Java (SAAJ).
 +
-[source,shell]
+[source,java]
 ----
 /*construct a default soap MessageFactory */
 MessageFactory mf = MessageFactory.newInstance();
@@ -112,20 +112,20 @@ soapMessage.saveChanges();
 ----
 . Convert the SOAP message to a JMS message by calling the `MessageTransformer.SOAPMessageintoJMSMessage()` method.
 +
-[source,shell]
+[source,java]
 ----
 Message m = MessageTransformer.SOAPMessageIntoJMSMessage (soapMessage, 
 session );
 ----
 . Publish the JMS message.
 +
-[source,shell]
+[source,java]
 ----
 publisher.publish(m);
 ----
 . Close the JMS connection.
 +
-[source,shell]
+[source,java]
 ----
 tc.close();
 ----
@@ -135,7 +135,7 @@ tc.close();
 
 . Import the `MessageTransformer` library.
 +
-[source,shell]
+[source,java]
 ----
 import com.sun.messaging.xml.MessageTransformer;
 ----
@@ -143,7 +143,7 @@ This is the utility whose methods you use to convert SOAP messages to JMS messag
 if it were a normal JMS message.
 . Initialize the `TopicConnectionFactory`, `TopicConnection`, `TopicSession`, `TopicSubscriber`, and Topic.
 +
-[source,shell]
+[source,java]
 ----
 messageFactory = MessageFactory.newInstance();
 tcf = new com.sun.messaging.TopicConnectionFactory();
@@ -156,7 +156,7 @@ tc.start();
 ----
 . Use the `OnMessage` method to receive the message. Use the `SOAPMessageFromJMSMessage` method to convert the JMS message to a SOAP message.
 +
-[source,shell]
+[source,java]
 ----
 public void onMessage (Message message) {
 SOAPMessage soapMessage =

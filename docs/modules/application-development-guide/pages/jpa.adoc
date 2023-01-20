@@ -1,7 +1,7 @@
 [[configuring-the-java-persistence-provider]]
 = Configuring the Java Persistence Provider
 
-This chapter describes Oracle TopLink, the default persistence provider in Payara Server Open Source Edition, and introduces how to use it.
+This chapter describes Oracle TopLink, the default persistence provider in Payara Server, and introduces how to use it.
 This chapter also tells how to set the default persistence provider in Payara Server and how to use persistence-related features specific to Payara Server such as automatic schema generation.
 
 [[overview-of-oracle-toplink]]
@@ -11,7 +11,7 @@ Oracle TopLink is the default persistence provider in Oracle Payara Server.
 It is a comprehensive standards-based object-persistence and object-transformation framework that provides APIs, schemas, and run-time services for the persistence layer of an application.
 
 TopLink includes all of EclipseLink, from the Eclipse Foundation.
-EclipseLink is the default persistence provider in Payara Server Open Source Edition. EclipseLink is the open source implementation of the development framework and the runtime provided in TopLink.
+EclipseLink is the default persistence provider in Payara Server. EclipseLink is the open source implementation of the development framework and the runtime provided in TopLink.
 EclipseLink implements the following specifications, plus value-added extensions:
 
 * Java Persistence Architecture (JPA) 2.0. +
@@ -24,7 +24,7 @@ For more information about MOXy support in Payara Server, see xref:docs:applicat
 For the JAXB 2.0 specification, see http://jcp.org/aboutJava/communityprocess/pfd/jsr222/index.html[Java Specification Request (JSR) 222].
 * EclipseLink utilities are not included but can be used with Payara Server. Download the EclipseLink zip file at `http://www.eclipse.org/eclipselink/downloads/` and unzip it. The utility files are located here:
 +
-[source,shell]
+[source,text]
 ----
 bin/jaxb-compiler.cmd
 bin/jaxb-compiler.sh
@@ -53,14 +53,14 @@ To run TopLink JPA applications in Payara Server, you must configure the server 
 For a summary of these steps, see "http://docs.oracle.com/html/E25034_01/tlandgs.html#CIHDDACF[Using TopLink with WebLogic Server]" in Oracle Fusion Middleware Solution Guide for Oracle TopLink.
 For more detailed explanations of these steps, see the links in the steps.
 
-. Set up the datasource. See "xref:docs:administration-guide:jdbc.adoc#administering-database-connectivity[Administering Database Connectivity]" in Payara Server Open Source Edition Administration Guide.
+. Set up the datasource. See "xref:docs:administration-guide:jdbc.adoc#administering-database-connectivity[Administering Database Connectivity]" in Payara Server Administration Guide.
 . Create the application. For guidance in writing your application, see "https://javaee.github.io/tutorial/partpersist.html[Persistence]" in The Jakarta EE 8 Tutorial.
 . Create the `persistence.xml` file. See xref:jpa.adoc#specifying-the-database-for-an-application[Specifying the Database for an Application] for considerations specific to Payara Server. +
 If you are using the Java Persistence API by calling `Persistence.createEMF()`, see xref:jpa.adoc#specifying-the-persistence-provider-for-an-application[Specifying the Persistence Provider for an Application].
 . If the security manager is enabled and you are using the Java Persistence API by calling `Persistence.createEMF()`, see xref:docs:application-development-guide:securing-apps.adoc#enabling-and-disabling-the-security-manager[Enabling and Disabling the Security Manager].
-. Deploy the application. See the Payara Server Open Source Edition Application Deployment Guide.
+. Deploy the application. See the Payara Server Application Deployment Guide.
 . Run the application. See "Application Client Launch" and "To Launch an Application" in Administration Console online help.
-. Monitor the application. See "xref:docs:administration-guide:monitoring.adoc#administering-the-monitoring-service[Administering the Monitoring Service]" in Payara Server Open Source Edition Administration Guide.
+. Monitor the application. See "xref:docs:administration-guide:monitoring.adoc#administering-the-monitoring-service[Administering the Monitoring Service]" in Payara Server Administration Guide.
 
 [[specifying-the-database-for-an-application]]
 == Specifying the Database for an Application
@@ -75,7 +75,7 @@ If you are using the default persistence provider, the provider attempts
 to automatically detect the database type based on the connection metadata. This database type is used to issue SQL statements specific to the detected database type's dialect.
 You can specify the optional `eclipselink.target-database` property to guarantee that the database type is correct. For example:
 
-[source,shell]
+[source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
     <persistence xmlns="http://java.sun.com/xml/ns/persistence">
@@ -92,7 +92,7 @@ You can specify the optional `eclipselink.target-database` property to guarantee
 The following `eclipselink.target-database` property values are allowed.
 Supported platforms have been tested with the Payara Server and are found to be Jakarta EE compatible.
 
-[source,shell]
+[source,text]
 ----
 //Supported platforms
 JavaDB
@@ -121,7 +121,7 @@ EclipseLink JPA Extensions for Session, Target Database and Target Application S
 If you are using the Java Persistence API by calling `Persistence.createEMF()`, do not specify the `jta-data-source` or `non-jta-data-source` elements. Instead, specify the `provider` element
 and any additional properties required by the JDBC driver or the database. For example:
 
-[source,shell]
+[source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
     <persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
@@ -142,7 +142,7 @@ value="jdbc:derby://localhost:1527/testdb;retrieveMessagesFromServerOnGetMessage
     </persistence>
 ----
 
-For configurations of supported and other drivers, see "xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in Payara Server Open Source Edition Administration Guide.
+For configurations of supported and other drivers, see "xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in Payara Server Administration Guide.
 
 [[specifying-the-persistence-provider-for-an-application]]
 == Specifying the Persistence Provider for an Application
@@ -161,7 +161,7 @@ deployed on servers that share the same configuration. +
 However, the default provider remains the same, Oracle TopLink or EclipseLink.
 . In your persistence unit, specify the provider and any properties the provider requires in the `persistence.xml` file. For example:
 +
-[source,shell]
+[source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
     <persistence xmlns="http://java.sun.com/xml/ns/persistence">
@@ -176,7 +176,7 @@ However, the default provider remains the same, Oracle TopLink or EclipseLink.
 
 To specify the provider programmatically instead of in the `persistence.xml` file, set the `javax.persistence.provider` property and pass it to the `Map` parameter of the following method:
 
-[source,shell]
+[source,java]
 ----
 javax.persistence.Persistence.createEntityManagerFactory(String, Map)
 ----
@@ -330,7 +330,7 @@ Setting `@OrderBy` on a `ManyToMany` or `OneToMany` relationship field in which 
 * Refresh the session cache using `EntityManager.refresh()` if you don't want to maintain the order during creation or modification of the `List`.
 * Disable session cache sharing in `persistence.xml` as follows:
 +
-[source,shell]
+[source,xml]
 ----
 <property name="eclipselink.cache.shared.default" value="false"/>
 ----
@@ -354,14 +354,14 @@ The following are examples of how case sensitivity affects mapping elements that
 
 If column names are not explicitly specified on a field, unique constraints and foreign key mappings must be specified using uppercase references. For example:
 
-[source,shell]
+[source,java]
 ----
 @Table(name="Department", uniqueConstraints={ @UniqueConstraint ( columnNames= { "DEPTNAME" } ) } )
 ----
 
 The other way to handle this is by specifying explicit column names for each field with the required case. For example:
 
-[source,shell]
+[source,java]
 ----
 @Table(name="Department", uniqueConstraints={ @UniqueConstraint ( columnNames= { "deptName" } ) } )
 public class Department{ @Column(name="deptName") private String deptName; }
@@ -379,7 +379,7 @@ Use `@OneToMany(mappedBy="COMPANY")` or specify an explicit column name for the 
 
 Use the following elements:
 
-[source,shell]
+[source,xml]
 ----
 <sql-result-set-mapping name="SRSMName">
    <entity-result entity-class="entities.someEntity" />
@@ -400,7 +400,7 @@ Column or table names specified in SQL queries must be in accordance with the ex
 
 PostgreSQL stores column and table names in lower case. JDBC queries on PostgreSQL retrieve column or table names in lowercase unless the names are quoted. For example:
 
-[source,shell]
+[source,roomsql]
 ----
 use aliases Select m.ID AS \"ID\" from Department m
 ----
@@ -431,7 +431,7 @@ The following restrictions apply when you use a MySQL database with the Payara S
 * The order of fields in a foreign key index must match the order in the explicitly created index on the primary table.
 * The `CREATE TABLE` syntax in the SQL file must end with the following line.
 +
-[source,shell]
+[source,roomsql]
 ----
 )  Engine=InnoDB;
 ----
@@ -454,7 +454,7 @@ Error open transaction is not closed
 To resolve this issue, add `relaxAutoCommit=true` to the JDBC URL. For more information, see `http://forums.mysql.com/read.php?39,31326,31404`.
 * MySQL does not allow a `DELETE` on a row that contains a reference to itself. Here is an example that illustrates the issue.
 +
-[source,shell]
+[source,roomsql]
 ----
 create table EMPLOYEE (
         empId   int         NOT NULL,
@@ -477,7 +477,7 @@ a foreign key constraint fails
 To resolve this issue, change the table creation script to the
 following:
 +
-[source,shell]
+[source,roomsql]
 ----
 create table EMPLOYEE (
         empId   int         NOT NULL,

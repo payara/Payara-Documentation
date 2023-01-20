@@ -5,7 +5,7 @@ The Jakarta EE platform provides several abstractions that simplify development 
 This chapter discusses Jakarta EE transactions and transaction support in the Payara Server.
 
 For more information about the Java Transaction API (JTA) and Java Transaction Service (JTS), see "xref:docs:administration-guide:transactions.adoc#administering-transactions[Administering Transactions]" in
-Payara Server Open Source Edition Administration Guide and the following sites:
+Payara Server Administration Guide and the following sites:
 `http://www.oracle.com/technetwork/java/javaee/jta/index.html` and `http://www.oracle.com/technetwork/java/javaee/tech/index.html`.
 
 You might also want to read "https://javaee.github.io/tutorial/transactions.html[Transactions]" in The Jakarta EE 8 Tutorial.
@@ -50,12 +50,12 @@ asadmin set domain1.resources.jdbc-connection-pool.DerbyPool.transaction-isolati
 Note that you cannot call `setTransactionIsolation` during a transaction.
 
 You can set the default transaction isolation level for a JDBC
-connection pool. For details, see "xref:docs:administration-guide:jdbc.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool]" in Payara Server Open Source Edition Administration Guide.
+connection pool. For details, see "xref:docs:administration-guide:jdbc.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool]" in Payara Server Administration Guide.
 
 To verify that a level is supported by your database management system, test your database programmatically using the
 `supportsTransactionIsolationLevel` method in `java.sql.DatabaseMetaData`, as shown in the following example:
 
-[source,shell]
+[source,java]
 ----
 InitialContext ctx = new InitialContext();
 DataSource ds = (DataSource)
@@ -100,7 +100,7 @@ asadmin set domain1.resources.jdbc-connection-pool.DerbyPool.non-transactional-c
 ----
 * Use the `DataSource` implementation in the Payara Server, which provides a `getNonTxConnection` method. This method retrieves a JDBC connection that is not in the scope of any transaction. There are two variants.
 +
-[source,shell]
+[source,java]
 ----
 public java.sql.Connection getNonTxConnection() throws java.sql.SQLException
 
@@ -160,7 +160,7 @@ In this case, the container must synchronize the instance's state by invoking `e
 * *Option C* - The container does not cache a ready instance between transactions, but instead returns the instance to the pool of available instances after a transaction has completed. +
 The life cycle for every business method invocation under commit option C looks like this.
 +
-[source,shell]
+[source,text]
 ----
 ejbActivate   ejbLoad   business method   ejbStore   ejbPassivate
 ----

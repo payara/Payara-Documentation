@@ -71,9 +71,9 @@ Each module with CMP beans must have the following files:
 
 * `ejb-jar.xml` - The J2EE standard file for assembling enterprise beans. For a detailed description, see the Enterprise JavaBeans Specification, v2.1. 
 * `glassfish-ejb-jar.xml` - The v Server standard file for assembling enterprise beans. For a detailed description,
-see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in Payara Server Open Source Edition Application Deployment Guide.
+see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in Payara Server Application Deployment Guide.
 * `sun-cmp-mappings.xml` - The mapping deployment descriptor file, which describes the mapping of CMP beans to tables in a database. For a detailed description,
-see "xref:docs:application-deployment-guide:dd-files.adoc#the-sun-cmp-mappings.xml-file[The sun-cmp-mappings.xml File]" in Payara Server Open Source Edition Application Deployment Guide.
+see "xref:docs:application-deployment-guide:dd-files.adoc#the-sun-cmp-mappings.xml-file[The sun-cmp-mappings.xml File]" in Payara Server Application Deployment Guide.
 
 The `sun-cmp-mappings.xml` file can be automatically generated and does not have to exist prior to deployment. For details,
 see xref:docs:application-development-guide:container_managed-persistence.adoc#generation-options-for-cmp[Generation Options for CMP].
@@ -134,7 +134,7 @@ affect the relationship fields in memory differently. Basically, the Payara Serv
 
 A managed field can have any `fetched-with` subelement. If the `fetched-with` subelement is `<default/>`, the `-DAllowManagedFieldsInDefaultFetchGroup` flag must be set to
 `true`. See xref:docs:application-development-guide:container_managed-persistence.adoc#default-fetch-group-flags[Default Fetch Group Flags]
-and "xref:docs:application-deployment-guide:dd-elements.adoc#fetched-with[fetched-with]" in Payara Server Open Source Edition Application Deployment Guide.
+and "xref:docs:application-deployment-guide:dd-elements.adoc#fetched-with[fetched-with]" in Payara Server Application Deployment Guide.
 
 [[blob-support]]
 ==== *BLOB Support*
@@ -155,7 +155,7 @@ For configurations of supported and other drivers, see
 
 For automatic mapping, you might need to change the default BLOB column length for the generated schema using the `schema-generator-properties` element in `glassfish-ejb-jar.xml`. See your database vendor documentation to determine whether you need to specify the length. For example:
 
-[source,shell]
+[source,xml]
 ----
 <schema-generator-properties>
    <property>
@@ -185,7 +185,7 @@ For configurations of supported and other drivers, see "xref:docs:administration
 For automatic mapping, you might need to change the default CLOB column length for the generated schema using the `schema-generator-properties` element in
 `glassfish-ejb-jar.xml`. See your database vendor documentation to determine whether you need to specify the length. For example:
 
-[source,shell]
+[source,xml]
 ----
 <schema-generator-properties>
    <property>
@@ -604,7 +604,7 @@ In the Administration Console, open the Resources component, then select JDBC. C
 
 For example, if the JDBC resource has the JNDI name `jdbc/MyDatabase`, set the CMP resource in the `glassfish-ejb-jar.xml` file as follows:
 
-[source,shell]
+[source,xml]
 ----
 <cmp-resource>
    <jndi-name>jdbc/MyDatabase</jndi-name>
@@ -644,10 +644,10 @@ Relationship prefetching saves database round trips by fetching data for an enti
 
 To enable relationship prefetching for a CMR field, use the `default` subelement of the `fetched-with` element in the `sun-cmp-mappings.xml`file.
 By default, these CMR fields are prefetched whenever `findByPrimaryKey` or a custom finder is executed for the entity, or when the entity is navigated to from a relationship.
-(Recursive prefetching is not supported, because it does not usually enhance performance.) See "xref:docs:application-deployment-guide:dd-elements.adoc#fetched-with[fetched-with]" in Payara Server Open Source Edition Application Deployment Guide.
+(Recursive prefetching is not supported, because it does not usually enhance performance.) See "xref:docs:application-deployment-guide:dd-elements.adoc#fetched-with[fetched-with]" in Payara Server Application Deployment Guide.
 
 To disable prefetching for specific custom finders, use the `prefetch-disabled` element in the `glassfish-ejb-jar.xml` file.
-See "xref:docs:application-deployment-guide:dd-elements.adoc#prefetch-disabled[prefetch-disabled]" in Payara Server Open Source Edition Application Deployment Guide.
+See "xref:docs:application-deployment-guide:dd-elements.adoc#prefetch-disabled[prefetch-disabled]" in Payara Server Application Deployment Guide.
 
 Multilevel relationship prefetching is supported for CMP 2.1 entity beans. To enable multilevel relationship prefetching, set the following property using the `asadmin  create-jvm-options` command:
 
@@ -717,7 +717,7 @@ Language (JDOQL) queries to implement finder and selector methods. You can speci
 
 The Payara Server specific deployment descriptor (`glassfish-ejb-jar.xml`) provides the following elements to store the EJB 1.1 finder method settings:
 
-[source,shell]
+[source,text]
 ----
 query-filter
 query-params
@@ -749,7 +749,7 @@ it defaults to true. Rules for constructing valid expressions follow the Java la
 
 ** Pre- and post-decrement
 * Methods, including object construction, are not supported, except for these methods.
-[source,shell]
+[source,java]
 ----
 Collection.contains(Object o)
 Collection.isEmpty()
@@ -757,7 +757,7 @@ String.startsWith(String s)
 String.endsWith(String e)
 ----
 In addition, the Payara Server supports the following nonstandard JDOQL methods. 
-[source,shell]
+[source,java]
 ----
 String.like(String pattern)
 String.like(String pattern, char escape)
@@ -805,14 +805,14 @@ This section provides a few query examples.
 
 The following query returns all players called Michael. It defines a filter that compares the name field with a string literal:
 
-[source,shell]
+[source,text]
 ----
 name == "Michael"
 ----
 
 The `finder` element of the `glassfish-ejb-jar.xml` file looks like this:
 
-[source,shell]
+[source,xml]
 ----
 <finder>
    <method-name>findPlayerByName</method-name>
@@ -825,7 +825,7 @@ The `finder` element of the `glassfish-ejb-jar.xml` file looks like this:
 
 This query returns all products in a specified price range. It defines two query parameters which are the lower and upper bound for the price: double low, double high. The filter compares the query parameters with the price field:
 
-[source,shell]
+[source,text]
 ----
 low < price && price < high
 ----
@@ -834,7 +834,7 @@ Query ordering is set to `price ascending`.
 
 The `finder` element of the `glassfish-ejb-jar.xml` file looks like this:
 
-[source,shell]
+[source,xml]
 ----
 <finder>
    <method-name>findInRange</method-name>
@@ -850,21 +850,21 @@ The `finder` element of the `glassfish-ejb-jar.xml` file looks like this:
 This query returns all players having a higher salary than the player with the specified name. It defines a query parameter for the name `java.lang.String name`. Furthermore, it
 defines a variable to which the player's salary is compared. It has the type of the persistence capable class that corresponds to the bean:
 
-[source,shell]
+[source,text]
 ----
     mypackage.PlayerEJB_170160966_JDOState player
 ----
 
 The filter compares the salary of the current player denoted by the `this` keyword with the salary of the player with the specified name:
 
-[source,shell]
+[source,text]
 ----
     (this.salary> player.salary) && (player.name == name)
 ----
 
 The `finder` element of the `glassfish-ejb-jar.xml` file looks like this:
 
-[source,shell]
+[source,xml]
 ----
 <finder>
    <method-name>findByHigherSalary</method-name>
@@ -948,7 +948,7 @@ See "xref:docs:application-deployment-guide:dd-elements.adoc#consistency[consist
 If a finder method with an input greater than 255 characters is executed and the primary key column is mapped to a VARCHAR column, Sybase attempts to convert type VARCHAR to
 type TEXT and generates the following error:
 
-[source,shell]
+[source,text]
 ----
 com.sybase.jdbc2.jdbc.SybSQLException: Implicit conversion from datatype  'TEXT' to 'VARCHAR' is not allowed. Use the CONVERT function to run this query. 
 ----
@@ -963,7 +963,7 @@ in the database.
 
 For example, the following code uses a `java.sql.Date` type as a primary key field:
 
-[source,shell]
+[source,java]
 ----
 java.sql.Date myDate = new java.sql.Date(System.currentTimeMillis())
 BeanA.create(myDate, ...);
@@ -972,7 +972,7 @@ BeanA.create(myDate, ...);
 For some databases, this code results in only the year, month, and date portion of the field value being stored in the database. Later if the client tries to find
 this bean by primary key as follows, the bean is not found in the database because the value does not match the one that is stored in the database.
 
-[source,shell]
+[source,java]
 ----
 myBean = BeanA.findByPrimaryKey(myDate);
 ----
@@ -990,7 +990,7 @@ For version consistency triggers on MSSQL, the property `RECURSIVE_TRIGGERS` mus
 
 Set this property as follows:
 
-[source,shell]
+[source,roomsql]
 ----
 EXEC sp_dboption 'database-name', 'recursive triggers', 'FALSE'
 go
@@ -998,7 +998,7 @@ go
 
 You can test this property as follows:
 
-[source,shell]
+[source,roomsql]
 ----
 SELECT DATABASEPROPERTYEX('database-name', 'IsRecursiveTriggersEnabled')
 go
@@ -1013,7 +1013,7 @@ The following restrictions apply when you use a MySQL database with the Payara S
 * When `VARCHAR` fields get truncated, a warning is displayed instead of an error. To get an error message, start the MySQL database in strict SQL mode.
 * The order of fields in a foreign key index must match the order in the explicitly created index on the primary table.
 * The `CREATE TABLE` syntax in the SQL file must end with the following line. 
-[source,shell]
+[source,roomsql]
 ----
 )  Engine=InnoDB;
 ----
@@ -1026,7 +1026,7 @@ which forces the database to use an eight-byte double-precision column. For more
 * To use `||` as the string concatenation symbol, start the MySQL server with the `--sql-mode="PIPES_AS_CONCAT"` option. For more information, see `http://dev.mysql.com/doc/refman/5.0/en/server-sql-mode.html` and `http://dev.mysql.com/doc/mysql/en/ansi-mode.html`.
 * MySQL always starts a new connection when `autoCommit==true` is set. This ensures that each SQL statement forms a single transaction on its own. If you try to rollback or commit an SQL statement, you get an error message.
 +
-[source,shell]
+[source,text]
 ----
 javax.transaction.SystemException: java.sql.SQLException: 
 Can't call rollback when autocommit=true
@@ -1038,7 +1038,7 @@ To resolve this issue, add `relaxAutoCommit=true` to the JDBC URL. For more info
 
 * Change the trigger create format from the following:
 +
-[source,shell]
+[source,roomsql]
 ----
 CREATE TRIGGER T_UNKNOWNPKVC1 
 BEFORE UPDATE ON UNKNOWNPKVC1
@@ -1051,7 +1051,7 @@ END;
 ----
 To the following:
 +
-[source,shell]
+[source,roomsql]
 ----
 DELIMITER |
 CREATE TRIGGER T_UNKNOWNPKVC1
@@ -1068,7 +1068,7 @@ For more information, see `http://dev.mysql.com/doc/mysql/en/create-trigger.html
 
 * MySQL does not allow a `DELETE` on a row that contains a reference to itself. Here is an example that illustrates the issue. 
 +
-[source,shell]
+[source,roomsql]
 ----
 create table EMPLOYEE (
         empId   int         NOT NULL,
@@ -1090,7 +1090,7 @@ a foreign key constraint fails
 ----
 To resolve this issue, change the table creation script to the following:
 +
-[source,shell]
+[source,roomsql]
 ----
 create table EMPLOYEE (
         empId   int         NOT NULL,
@@ -1108,7 +1108,7 @@ This can be done only if the foreign key field is allowed to be null. For more i
 
 * When an SQL script has foreign key constraints defined, `capture-schema` fails to capture the table information correctly. To work around the problem, remove the constraints and then run `capture-schema`. Here is an example that illustrates the issue. 
 +
-[source,shell]
+[source,roomsql]
 ----
 CREATE TABLE ADDRESSBOOKBEANTABLE (ADDRESSBOOKNAME VARCHAR(255) 
     NOT NULL PRIMARY KEY, 
@@ -1121,7 +1121,7 @@ CONSTRAINT FK_ACCESSPRIVILEGE FOREIGN KEY (FK_FOR_ACCESSPRIVILEGES)
 ----
 To resolve this issue, change the table creation script to the following: 
 +
-[source,shell]
+[source,roomsql]
 ----
 CREATE TABLE ADDRESSBOOKBEANTABLE (ADDRESSBOOKNAME VARCHAR(255) 
     NOT NULL PRIMARY KEY, 

@@ -50,7 +50,7 @@ The client container enables the application clients to use the Java Naming and 
 === Application Client Annotation
 
 Annotation is supported for the main class and the optional callback handler class in application clients. For more information, see
-"xref:docs:application-deployment-guide:overview.adoc#deployment-descriptors-and-annotations[Deployment Descriptors and Annotations]" in Payara Server Open Source Edition Application Deployment Guide.
+"xref:docs:application-deployment-guide:overview.adoc#deployment-descriptors-and-annotations[Deployment Descriptors and Annotations]" in Payara Server Application Deployment Guide.
 
 [[java-web-start]]
 === Java Web Start
@@ -77,13 +77,13 @@ This section describes the procedure to develop, assemble, and deploy client app
 For more information about naming and lookups, see xref:docs:application-development-guide:jndi.adoc#accessing-the-naming-context[Accessing the Naming Context]. +
 If load balancing is enabled as in Step 7 and the EJB components being accessed are in a different cluster, the endpoint list must be included in the lookup, as follows:
 +
-[source,shell]
+[source,text]
 ----
 corbaname:host1:port1,host2:port2,.../NameService#ejb/jndi-name
 ----
 . Define the `@EJB` annotations or the `ejb-ref` elements in the `application-client.xml` file. Define the corresponding `ejb-ref` elements in the`glassfish-application-client.xml` file. +
 For more information on the `glassfish-application-client.xml` file, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in
-Payara Server Open Source Edition Application Deployment Guide.
+Payara Server Application Deployment Guide.
 For a general explanation of how to map JNDI names using reference elements, see xref:docs:application-development-guide:jndi.adoc#mapping-references[Mapping References].
 .  Deploy the application client and EJB component together in an application. +
 To get the client JAR file, use the `--retrieve` option of the `asadmin deploy` command. +
@@ -92,7 +92,7 @@ To retrieve the stubs and ties generated during deployment, use the `asadmin get
 * A Java class to access the bean.
 * `application-client.xml` - (optional) Jakarta EE application client deployment descriptor.
 * `glassfish-application-client.xml` - (optional) Payara Server specific client deployment descriptor. For information on the
-`glassfish-application-client.xml` file, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in Payara Server Open Source Edition Application Deployment Guide.
+`glassfish-application-client.xml` file, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in Payara Server Application Deployment Guide.
 * The `MANIFEST.MF` file. This file contains a reference to the `main` class, which states the complete package prefix and class name of the Java client.
 .  Prepare the client machine. +
 This step is not needed for Java Web Start. This step is not needed if
@@ -101,7 +101,7 @@ If you are using the `appclient` script, package the Payara Server system files 
 For more information, see xref:java-clients.adoc#using-the-package-appclient-script[Using the `package-appclient` Script] .
 .  To access EJB components that are residing in a remote system, make the following changes to the `sun-acc.xml` file or the `appclient` script. This step is not needed for Java Web Start.
 * Define the `target-server` element's `address` and `port` attributes to reference the remote server machine and its ORB port.
-See "xref:docs:application-deployment-guide:dd-elements.adoc#target-server[target-server]" in Payara Server Open Source Edition Application Deployment Guide.
+See "xref:docs:application-deployment-guide:dd-elements.adoc#target-server[target-server]" in Payara Server bApplication Deployment Guide.
 * Use the `-targetserver` option of the appclient script to reference the remote server machine and its ORB port.
 For more information, see xref:java-clients.adoc#running-an-application-client-using-the-appclient-script[Running an Application Client Using the `appclient` Script]. +
 To determine the ORB port on the remote server, use the `asadmin get` command. For example:
@@ -115,7 +115,7 @@ If the Payara Server instance on which the application client is deployed partic
 However, a client should have at least two endpoints specified for bootstrapping purposes, in case one of the endpoints has failed. +
 The `target-server` elements in the `sun-acc.xml` file specify one or more IIOP endpoints used for load balancing. The `address` attribute is
 an IPv4 address or host name, and the `port` attribute specifies the port number. See "xref:docs:application-deployment-guide:dd-elements.adoc#client-container[client-container]" in
-Payara Server Open Source Edition Application Deployment Guide. +
+Payara Server Application Deployment Guide. +
 The `--targetserver` option of the appclient script specifies one or more IIOP endpoints used for load balancing. For more information, see
 xref:java-clients.adoc#running-an-application-client-using-the-appclient-script[Running an Application Client Using the `appclient` Script].
 
@@ -123,7 +123,7 @@ xref:java-clients.adoc#running-an-application-client-using-the-appclient-script[
 
 * For instructions on running the application client, see
 xref:java-clients.adoc#using-java-web-start[Using Java Web Start] or xref:java-clients.adoc#running-an-application-client-using-the-appclient-script[Running an Application Client Using the `appclient` Script].
-* For more information about RMI-IIOP load balancing and failover, see "xref:docs:ha-administration-guide:rmi-iiop.adoc#rmi-iiop-load-balancing-and-failover[RMI-IIOP Load Balancing and Failover]" in Payara Server Open Source Edition High Availability Administration Guide.
+* For more information about RMI-IIOP load balancing and failover, see "xref:docs:ha-administration-guide:rmi-iiop.adoc#rmi-iiop-load-balancing-and-failover[RMI-IIOP Load Balancing and Failover]" in Payara Server High Availability Administration Guide.
 
 [[to-access-a-jms-resource-from-an-application-client]]
 === To Access a JMS Resource From an Application Client
@@ -132,16 +132,16 @@ xref:java-clients.adoc#using-java-web-start[Using Java Web Start] or xref:java-c
 For detailed instructions on developing a JMS client, see "https://javaee.github.io/tutorial/jms-examples.html[Java Message Service Examples]" in The Jakarta EE 8 Tutorial.
 . Next, configure a JMS resource on the Payara Server. +
 For information on configuring JMS resources, see "xref:docs:administration-guide:jms.adoc#administering-jms-connection-factories-and-destinations[Administering JMS Connection Factories and Destinations]" in
-Payara Server Open Source Edition Administration Guide.
+Payara Server Administration Guide.
 .  Define the `@Resource` or `@Resources` annotations or the `resource-ref` elements in the `application-client.xml` file. Define the corresponding `resource-ref`
 elements in the `glassfish-application-client.xml` file. +
 For more information on the `glassfish-application-client.xml` file, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in
-Payara Server Open Source Edition Application Deployment Guide. For a general explanation of how to map JNDI names using reference elements, see xref:docs:application-development-guide:jndi.adoc#mapping-references[Mapping References].
+Payara Server Application Deployment Guide. For a general explanation of how to map JNDI names using reference elements, see xref:docs:application-development-guide:jndi.adoc#mapping-references[Mapping References].
 .  Ensure that the client JAR file includes the following files:
 * A Java class to access the resource.
 * `application-client.xml` - (optional) Jakarta EE application client deployment descriptor.
 * `glassfish-application-client.xml` - (optional) Payara Server specific client deployment descriptor. For information on the
-`glassfish-application-client.xml` file, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in Payara Server Open Source Edition Application Deployment Guide.
+`glassfish-application-client.xml` file, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in Payara Server Application Deployment Guide.
 * The `MANIFEST.MF` file. This file contains a reference to the `main` class, which states the complete package prefix and class name of the Java client.
 .  Prepare the client machine. +
 This step is not needed for Java Web Start. This step is not needed if the client and server machines are the same. +
@@ -207,21 +207,21 @@ This means you can redeploy an application client without having to worry about 
 
 The default URL for an application or module generally is as follows:
 
-[source,shell]
+[source,text]
 ----
 http://host:port/context-root
 ----
 
 The default URL for a stand-alone application client module is as follows:
 
-[source,shell]
+[source,text]
 ----
 http://host:port/appclient-module-id
 ----
 
 The default URL for an application client module embedded within an application is as follows. Note that the relative path to the application client JAR file is included.
 
-[source,shell]
+[source,text]
 ----
 http://host:port/application-id/appclient-path
 ----
@@ -230,7 +230,7 @@ If the context-root, appclient-module-id, or application-id is not specified dur
 If the application client module or application is not in JAR or EAR file format, an appclient-module-id or application-id is generated.
 
 Regardless of how the context-root or id is determined, it is written to the server log when you deploy the application.
-For details about naming, see "xref:docs:application-deployment-guide:overview.adoc#naming-standards[Naming Standards]" in Payara Server Open Source Edition Application Deployment Guide.
+For details about naming, see "xref:docs:application-deployment-guide:overview.adoc#naming-standards[Naming Standards]" in Payara Server Application Deployment Guide.
 
 To set a different URL for an application client, use the `context-root` subelement of the `java-web-start-access` element in the `glassfish-application-client.xml` file. This overrides the appclient-module-id or application-id.
 
@@ -239,7 +239,7 @@ You can also pass arguments to the ACC or to the application client's `main` met
 A question mark separates the context root from the arguments. Ampersands (`&`) separate the arguments and their values. Each argument and each value must begin with `arg=`.
 Here is an example URL with a `-color` argument for a stand-alone application client. The `-color` argument is passed to the application client's `main` method.
 
-[source,shell]
+[source,text]
 ----
 http://localhost:8080/testClient?arg=-color&arg=red
 ----
@@ -301,7 +301,7 @@ If you use the Payara Server Java Web Start feature or deploy applications that 
 . Replace the Payara Server self-signed certificate with the trusted certificate by importing the trusted certificate into thePayara Server keystore using the `s1as` alias.
 By default, the keystore is located at domain-dir`/config/keystore.jks`. +
 For more information about importing a trusted certificate into the
-domain keystore, see "xref:docs:security-guide:system-security.adoc#administering-jsse-certificates[Administering JSSE Certificates]" in Payara Server Open Source Edition Security Guide.
+domain keystore, see "xref:docs:security-guide:system-security.adoc#administering-jsse-certificates[Administering JSSE Certificates]" in Payara Server Security Guide.
 . Delete any signed JARs already generated by Payara Server:
 .. At the command prompt, type: +
 `rm -rf` domain-dir`/java_web_start`
@@ -324,7 +324,7 @@ Payara Server signs the JAR file automatically using the self-signed certificate
 
 To sign this JAR file with a different certificate, first add the certificate to the domain keystore. You can use a certificate from a
 trusted authority, which avoids the Java Web Start prompt. To add a certificate to the domain keystore,
-see "xref:docs:security-guide:system-security.adoc#administering-jsse-certificates[Administering JSSE Certificates]" in Payara Server Open Source Edition Security Guide.
+see "xref:docs:security-guide:system-security.adoc#administering-jsse-certificates[Administering JSSE Certificates]" in Payara Server Security Guide.
 
 Next, deploy your application using the `jar-signing-alias` property. For example:
 
@@ -346,35 +346,35 @@ application client code does not catch and handle errors itself.
 To specify a vendor-specific icon, splash screen, text string, or a combination of these for Java Web Start download and launch screens, use the `vendor`
 element in the `glassfish-application-client.xml` file. The complete format of this element's data is as follows:
 
-[source,shell]
+[source,xml]
 ----
 <vendor>icon-image-URI::splash-screen-image-URI::vendor-text</vendor>
 ----
 
 The following example vendor element contains an icon, a splash screen, and a text string:
 
-[source,shell]
+[source,xml]
 ----
 <vendor>images/icon.jpg::otherDir/splash.jpg::MyCorp, Inc.</vendor>
 ----
 
 The following example vendor element contains an icon and a text string:
 
-[source,shell]
+[source,xml]
 ----
 <vendor>images/icon.jpg::MyCorp, Inc.</vendor>
 ----
 
 The following example vendor element contains a splash screen and a text string; note the initial double colon:
 
-[source,shell]
+[source,xml]
 ----
 <vendor>::otherDir/splash.jpg::MyCorp, Inc.</vendor>
 ----
 
 The following example vendor element contains only a text string:
 
-[source,shell]
+[source,xml]
 ----
 <vendor>MyCorp, Inc.</vendor>
 ----
@@ -399,14 +399,14 @@ To specify a custom JNLP file for Java Web Start, use the `jnlp-doc` element in 
 
 The value of the `jnlp-doc` element is a relative path with the following format:
 
-[source,shell]
+[source,text]
 ----
 [path-to-JAR-in-EAR!]path-to-JNLP-in-JAR
 ----
 
 The default path-to-JAR-in-EAR is the current application client JAR file. For example, if the JNLP file is in the application client JAR file at `custom/myInfo.jnlp`, the element value would look like this:
 
-[source,shell]
+[source,xml]
 ----
 <java-web-start-access>
    <jnlp-doc>custom/myInfo.jnlp</jnlp-doc>
@@ -416,14 +416,14 @@ The default path-to-JAR-in-EAR is the current application client JAR file. For e
 If the application client is inside an EAR file, you can place the custom JNLP file inside another JAR file in the EAR.
 For example, if the JNLP file is in a JAR file at `other/myLib.jar`, the element value would look like this, with an exclamation point (`!`) separating the path to the JAR from the path in the JAR:
 
-[source,shell]
+[source,xml]
 ----
 <java-web-start-access>
    <jnlp-doc>other/myLib.jar!custom/myInfo.jnlp</jnlp-doc>
 </java-web-start-access>
 ----
 
-For more information about the `glassfish-application-client.xml` file, see the Payara Server Open Source Edition Application Deployment Guide.
+For more information about the `glassfish-application-client.xml` file, see the Payara Server Application Deployment Guide.
 
 [[referring-to-jar-files-from-the-jnlp-file]]
 ==== Referring to JAR Files from the JNLP File
@@ -448,7 +448,7 @@ The JNLP file can also refer to other custom JNLP files using `<extension href="
 the relative `href` references to JNLP files are resolved within the EAR file. You can place these JNLP files directly in the EAR file or inside JAR files that the EAR file contains.
 Use one of these formats for these `href` references:
 
-[source,shell]
+[source,text]
 ----
 [path-to-JAR-in-EAR!]path-to-JNLP-in-JAR
 
@@ -476,14 +476,14 @@ JNLP format so that Payara Server can properly place it in the final JNLP file.
 
 For example, to specify a single native library to be included only for Windows systems, the new element to add might be as follows:
 
-[source,shell]
+[source,xml]
 ----
 <nativelib href="windows/myLib.jar"/>
 ----
 
 However, you must indicate where in the overall document this element belongs. The actual custom JNLP file should look like this:
 
-[source,shell]
+[source,xml]
 ----
 <jnlp>
    <resources os="Windows">
@@ -514,21 +514,21 @@ The following tables provide more detail about what parts of the JNLP file you c
 |JNLP File Fragment |Description
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp codebase="xxx" ...>
 ----
 |Payara Server controls this content for application clients packaged in EAR files. The developer controls this content for application clients packaged in WAR files.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp href="xxx" ...>
 ----
 |Payara Server controls this content for application clients packaged in EAR files. The developer controls this content for application clients packaged in WAR files.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <security>
@@ -536,7 +536,7 @@ a|
 |Payara Server must control the permissions requested for each JNLP file. All permissions are needed for the main file, which launches the ACC. The permissions requested for other JNLP documents depend on whether the JAR files referenced in those documents are signed.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <application-desc>
@@ -552,14 +552,14 @@ a|
 |JNLP File Fragment |Description
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp spec="xxx" ...>
 ----
 |Specifies the JNLP specification version.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <information [no-attributes]>
@@ -567,7 +567,7 @@ a|
 |Specifies the application title, vendor, home page, various description text values, icon images, and whether offline execution is allowed.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <resources [no-attributes]>
@@ -587,7 +587,7 @@ a|
 |===
 |JNLP File Fragment |Description
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <information [attributes]>
@@ -595,7 +595,7 @@ a|
 |You can specify one or more of the `os`, `arch`, `platform`, and `locale` attributes for the `<information>` element. You can also specify child elements; Payara Server provides no default children.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <resources [attributes]>
@@ -603,7 +603,7 @@ a|
 |You can specify one or more of the `os`, `arch`, `platform`, and `locale` attributes for the `<resources>` element. You can also specify child elements; Payara Server provides no default children.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <resources [no-attributes]>
@@ -612,7 +612,7 @@ a|
 |Adds JAR files to be included in the application to the JAR files provided by Payara Server.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <resources [no-attributes]>
@@ -622,7 +622,7 @@ a|
 correct platform. The full syntax of the `<nativelib>` element lets the developer specify the platform for that native library.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <resources [no-attributes]>
@@ -631,7 +631,7 @@ a|
 |Adds system properties to be included in the application to the system properties defined by Payara Server.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <resources [no-attributes]>
@@ -640,7 +640,7 @@ a|
 |Specifies another custom JNLP file.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <component-desc ...>
@@ -648,7 +648,7 @@ a|
 |Includes another custom JNLP file that specifies a component extension.
 
 a|
-[source,shell]
+[source,xml]
 ----
 <jnlp>
   <installer-desc ...>
@@ -671,7 +671,7 @@ then requests that the ACC start the application client portion. The basic model
 
 Your code should follow this general pattern:
 
-[source,shell]
+[source,java]
 ----
 // one TargetServer for each ORB endpoint for bootstrapping
 TargetServer[] servers = ...;
@@ -745,7 +745,7 @@ To use a username and password, configure the `ior-security-config` element in t
 The following configuration establishes SSL between an application client and an EJB component using a username and password.
 The user has to login to the ACC using either the `sun-acc.xml` mechanism or the xref:docs:application-development-guide:securing-apps.adoc#programmatic-login-using-the-programmaticlogin-class[Programmatic Login Using the ProgrammaticLogin Class] mechanism.
 
-[source,shell]
+[source,xml]
 ----
 <ior-security-config>
   <transport-config>
@@ -768,7 +768,7 @@ The user has to login to the ACC using either the `sun-acc.xml` mechanism or the
 To use a client certificate, configure the `ior-security-config` element in the `glassfish-ejb-jar.xml` file.
 The following configuration establishes SSL between an application client and an EJB component using a client certificate.
 
-[source,shell]
+[source,xml]
 ----
 <ior-security-config>
   <transport-config>
@@ -801,7 +801,7 @@ export VMARGS="-Djavax.net.ssl.keyStore=${keystore.db.file}
 -Djavax.net.ssl.trustStorePassword=${ssl.password}"
 ----
 * Optionally, you can set the `env` element using Ant. For example: +
-[source,shell]
+[source,xml]
 ----
 <target name="runclient">
   <exec executable="${S1AS_HOME}/bin/appclient">
@@ -890,38 +890,38 @@ For information about using the ACC, see xref:java-clients.adoc#developing-clien
 
 . In your client code, instantiate the `InitialContext`:
 +
-[source,shell]
+[source,java]
 ----
 InitialContext ctx = new InitialContext();
 ----
 It is not necessary to explicitly instantiate a naming context that points to the CosNaming service.
 . In the client code, look up the home object by specifying the JNDI name of the home object. Here is an EJB 2.x example:
 +
-[source,shell]
+[source,java]
 ----
 Object ref = ctx.lookup("jndi-name");
 BeanAHome = (BeanAHome)PortableRemoteObject.narrow(ref,BeanAHome.class);
 ----
 Here is an EJB 3.x example:
 +
-[source,shell]
+[source,java]
 ----
 BeanRemoteBusiness bean =(BeanRemoteBusiness) ctx.lookup("com.acme.BeanRemoteBusiness");
 ----
 If load balancing is enabled as in Step 6 and the EJB components being accessed are in a different cluster, the endpoint list must be included in the lookup, as follows:
 +
-[source,shell]
+[source,text]
 ----
 corbaname:host1:port1,host2:port2,.../NameService#ejb/jndi-name
 ----
-. Deploy the EJB component to be accessed. + For more information on deployment, see "xref:docs:application-deployment-guide:overview.adoc#about-deployment-tools[About Deployment Tools]" in Payara Server Open Source Edition Application Deployment Guide.
+. Deploy the EJB component to be accessed. + For more information on deployment, see "xref:docs:application-deployment-guide:overview.adoc#about-deployment-tools[About Deployment Tools]" in Payara Server Application Deployment Guide.
 . Copy the as-install`/lib/gf-client.jar` file to the client machine and include it in the classpath on the client side. +
 The `gf-client.jar` file references Payara Server JAR files in its `MANIFEST.MF` file. If there is no Payara Server installation on the
 client machine, you must also copy the as-install`/modules` directory to the client machine and maintain its directory structure relative to the
 as-install`/lib/gf-client.jar` file. Or you can use the `package-appclient` script; see xref:java-clients.adoc#using-the-package-appclient-script[Using the `package-appclient` Script].
 . To access EJB components that are residing in a remote system, set the following system properties for the Java Virtual Machine startup options:
 +
-[source,shell]
+[source,text]
 ----
 -Dorg.omg.CORBA.ORBInitialHost=${ORBhost}
 -Dorg.omg.CORBA.ORBInitialPort=${ORBport}
@@ -935,7 +935,7 @@ asadmin get "configs.config.server-config.iiop-service.iiop-listener.orb-listene
 ----
 . To set up load balancing and remote EJB reference failover, define the `endpoints` property as follows:
 +
-[source,shell]
+[source,text]
 ----
 -Dcom.sun.appserv.iiop.endpoints=host1:port1,host2:port2,...
 ----
@@ -954,7 +954,7 @@ A server-side module can be a servlet, another EJB component, or another type of
 
 . In your module code, instantiate the `InitialContext`:
 +
-[source,shell]
+[source,java]
 ----
 InitialContext ctx = new InitialContext();
 ----
@@ -962,7 +962,7 @@ It is not necessary to explicitly instantiate a naming context that
 points to the CosNaming service. To set up load balancing and remote EJB reference failover, define the
 `endpoints` property as follows:
 +
-[source,shell]
+[source,java]
 ----
 Hashtable env = new Hashtable();
 env.put("com.sun.appserv.iiop.endpoints","host1:port1,host2:port2,...");
@@ -979,35 +979,35 @@ asadmin get "configs.config.server-config.iiop-service.iiop-listener.orb-listene
 ----
 . In the module code, look up the home object by specifying the JNDI name of the home object. Here is an EJB 2.x example:
 +
-[source,shell]
+[source,java]
 ----
 Object ref = ctx.lookup("jndi-name");
 BeanAHome = (BeanAHome)PortableRemoteObject.narrow(ref,BeanAHome.class);
 ----
 Here is an EJB 3.x example:
 +
-[source,shell]
+[source,java]
 ----
 BeanRemoteBusiness bean =(BeanRemoteBusiness) ctx.lookup("com.acme.BeanRemoteBusiness");
 ----
 If load balancing is enabled as in Step 1 and the EJB components being accessed are in a different cluster, the endpoint list must be included in the lookup, as follows:
 +
-[source,shell]
+[source,text]
 ----
 corbaname:host1:port1,host2:port2,.../NameService#ejb/jndi-name
 ----
 For more information about naming and lookups, see xref:docs:application-development-guide:jndi.adoc#accessing-the-naming-context[Accessing the Naming Context].
-. Deploy the EJB component to be accessed. For more information on deployment, see "xref:docs:application-deployment-guide:overview.adoc#about-deployment-tools[About Deployment Tools]" in Payara Server Open Source Edition Application Deployment Guide.
+. Deploy the EJB component to be accessed. For more information on deployment, see "xref:docs:application-deployment-guide:overview.adoc#about-deployment-tools[About Deployment Tools]" in Payara Server Application Deployment Guide.
 . To access EJB components that are residing in a remote system, set the following system properties for the Java Virtual Machine startup options:
 +
-[source,shell]
+[source,text]
 ----
 -Dorg.omg.CORBA.ORBInitialHost=${ORBhost}
 -Dorg.omg.CORBA.ORBInitialPort=${ORBport}
 ----
 Here ORBhost is the Application Server hostname and ORBport is the ORB port number (default is `3700` for the default server instance, named `server`).
 .  Deploy the module. +
-For more information on deployment, see "xref:docs:application-deployment-guide:overview.adoc#about-deployment-tools[About Deployment Tools]" in Payara Server Open Source Edition Application Deployment Guide.
+For more information on deployment, see "xref:docs:application-deployment-guide:overview.adoc#about-deployment-tools[About Deployment Tools]" in Payara Server Application Deployment Guide.
 
 [[to-access-a-jms-resource-from-a-stand-alone-client]]
 === To access a JMS resource from a stand-alone client
@@ -1015,7 +1015,7 @@ For more information on deployment, see "xref:docs:application-deployment-guide:
 . Create a JMS client. +
 For detailed instructions on developing a JMS client, see "https://javaee.github.io/tutorial/jms-examples.html[Java Message Service Examples]" in The Jakarta EE 8 Tutorial.
 . Configure a JMS resource on Payara Server. +
-For information on configuring JMS resources, see "xref:docs:administration-guide:jms.adoc#administering-jms-connection-factories-and-destinations[Administering JMS Connection Factories and Destinations]" in Payara Server Open Source Edition Administration Guide.
+For information on configuring JMS resources, see "xref:docs:administration-guide:jms.adoc#administering-jms-connection-factories-and-destinations[Administering JMS Connection Factories and Destinations]" in Payara Server Administration Guide.
 . Copy the following JAR files to the client machine and include them in the classpath on the client side:
 * `gf-client.jar` - available at as-install`/lib`
 * `imqjmsra.jar` - available at as-install`/lib/install/aplications/jmsra` +
@@ -1023,7 +1023,7 @@ The `gf-client.jar` file references Payara Server JAR files in its `MANIFEST.MF`
 the client machine and maintain its directory structure relative to the as-install`/lib/gf-client.jar` file. Or you can use the `package-appclient` script; see xref:java-clients.adoc#using-the-package-appclient-script[Using the `package-appclient` Script].
 . To access EJB components that are residing in a remote system, set the following system properties for the Java Virtual Machine startup options:
 +
-[source,shell]
+[source,text]
 ----
 -Dorg.omg.CORBA.ORBInitialHost=${ORBhost}
 -Dorg.omg.CORBA.ORBInitialPort=${ORBport}

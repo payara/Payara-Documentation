@@ -97,9 +97,8 @@ value by setting an appropriate value in the OSGi configuration property or in a
 
 For example, HelloWorldServlet will be available at `http://localhost:8080/osgi/helloworld` when the following code is executed:
 
-[source,shell]
+[source,java]
 ----
-
 HttpService httpService = getHttpService(); // Obtain HttpService
 httpService.registerServlet(httpService.registerServlet("/helloworld", 
 new HelloWorldServlet(), null, ctx);
@@ -121,21 +120,21 @@ There is no additional service property associated with them. Although `UserTran
 actual transaction associated with the calling thread. Code that runs in the context of a Jakarta EE component typically gets a handle on `UserTransaction` by doing a
 JNDI lookup in the component naming context or by using injection, as shown here:
 
-[source,shell]
+[source,java]
 ----
 (UserTransaction)(new InitialContext().lookup("java:comp/UserTransaction")); 
 ----
 
 or
 
-[source,shell]
+[source,java]
 ----
 @Resource UserTransaction utx;
 ----
 
 When certain code (such as an OSGi Bundle Activator), which does not have a Jakarta EE component context, wants to get hold of `UserTransaction`, or any of the other JTA artifacts, then they can look it up in the service registry. Here is an example of such code:
 
-[source,shell]
+[source,java]
 ----
 
 BundleContext context;
@@ -154,7 +153,7 @@ The life of the OSGi service matches that of the underlying data source created 
 Payara Server registers each JDBC data source as an OSGi service with `objectClass = "javax.sql.DataSource"` and a service property called `jndi-name`, which is set to the JNDI name of the data source.
 Here is a code sample that looks up a data source service:
 
-[source,shell]
+[source,java]
 ----
   @Inject
   @OSGiService(true,
@@ -209,7 +208,7 @@ Moreover, `WEB-INF/classes/` should be specified ahead of `WEB-INF/lib/` in the 
 
 Assuming the WAB is structured as follows:
 
-[source,shell]
+[source,text]
 ----
 
   foo.war/
@@ -223,7 +222,7 @@ Assuming the WAB is structured as follows:
 
 Then the OSGi metadata for the WAB as specified in `META-INF/MANIFEST.MF` of the WAB would appear as follows:
 
-[source,shell]
+[source,text]
 ----
 
   MANIFEST.MF:Manifest-Version: 1.0 
@@ -243,7 +242,7 @@ Since a WAB has a valid `Bundle-Context`, it can consume OSGi services.
 Although you are free to use any OSGi API to locate OSGi services, Payara Server makes it easy for WAB users to use OSGi services by
 virtue of extending the Context and Dependency Injection (CDI) framework. Here's an example of the injection of an OSGi Service into a Servlet:
 
-[source,shell]
+[source,java]
 ----
 
   @WebServlet 
@@ -282,7 +281,7 @@ Bundle B2 is a hybrid application bundle that imports the `com.acme` package.
 It has a component called BarServlet that expresses a dependency to `com.acme.Foo` by adding a field/setter method and qualifies that injection point with `@OsgiService`.
 For instance, BarServlet could look like:
 
-[source,shell]
+[source,java]
 ----
 
   @Servlet
@@ -305,7 +304,7 @@ Payara Server supports only packaging the OSGi bundle as a simple JAR file with 
 An EJB Application Bundle must have a manifest metadata called Export-EJB in order to be considered as an EJB Bundle.
 For syntax of Export-EJB header, please refer to the Publishing EJB as OSGi Service section. Here's an example of an EJB Application Bundle with its metadata:
 
-[source,shell]
+[source,text]
 ----
 
   myEjb.jar/
@@ -330,7 +329,7 @@ Since an EJB has a valid Bundle-Context, it can consume OSGi services. Although 
 Payara Server makes it easy to use OSGi services by virtue of extending the Context and Dependency Injection (CDI) framework.
 Here's an example of injection of an OSGi Service into a servlet:
 
-[source,shell]
+[source,java]
 ----
 
   @Stateless 
@@ -359,4 +358,4 @@ The following `@OsgiService` attributes are currently available:
 [[deploying-osgi-bundles-in-payara-server]]
 == Deploying OSGi Bundles in Payara Server
 
-For instruction on deploying OSGi bundle, see "xref:docs:application-deployment-guide:deploying-applications.adoc#osgi-bundle-deployment-guidelines[OSGi Bundle Deployment Guidelines]" in Payara Server Open Source Edition Application Deployment Guide.
+For instruction on deploying OSGi bundle, see "xref:docs:application-deployment-guide:deploying-applications.adoc#osgi-bundle-deployment-guidelines[OSGi Bundle Deployment Guidelines]" in Payara ServerApplication Deployment Guide.

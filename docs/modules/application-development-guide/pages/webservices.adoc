@@ -10,7 +10,7 @@ IDEs such as NetBeans and Eclipse do this automatically.
 
 "https://javaee.github.io/tutorial/partwebsvcs.html[Web Services]" in The Jakarta EE 8 Tutorial shows how to deploy simple web services to Payara Server.
 
-For additional information about JAXB (Java Architecture for XML Binding), see http://jcp.org/aboutJava/communityprocess/pfd/jsr222/index.html[Java Specification Request (JSR) 222] and link:#CHDEBBCH[The Databinding Provider].
+For additional information about JAXB (Java Architecture for XML Binding), see http://jcp.org/aboutJava/communityprocess/pfd/jsr222/index.html[Java Specification Request (JSR) 222] and xref:webservices.adoc#the-databinding-provider[The Databinding Provider].
 
 For additional information about JAX-WS (Java API for XML-Based Web Services),
 see http://jcp.org/aboutJava/communityprocess/pfd/jsr224/index.html[Java Specification Request (JSR) 224] and http://jcp.org/en/jsr/detail?id=109[Java Specification Request (JSR) 109].
@@ -44,7 +44,7 @@ The test page feature is enabled by default and described in xref:webservices.ad
 
 Clients can run a deployed web service by accessing its service endpoint address URI, which has the following format:
 
-[source,shell]
+[source,text]
 ----
 http://host:port/context-root/servlet-mapping-url-pattern
 ----
@@ -68,7 +68,7 @@ http://localhost:8080/my-ws/simple?WSDL
 
 For debugging, you can run a test page for the deployed service in a browser by adding `?Tester` to the end of the URL. For example:
 
-[source,shell]
+[source,text]
 ----
 http://localhost:8080/my-ws/simple?Tester
 ----
@@ -112,7 +112,7 @@ com.sun.xml.ws.db.toplink.JAXBContextFactory.ECLIPSELINK_JAXB::
   Specifies Eclipselink MOXy JAXB binding.
 +
 For example: +
-[source,shell]
+[source,java]
 ----
 import jakarta.xml.ws.WebServiceFeature;
 import org.jvnet.ws.databinding.DatabindingModeFeature;
@@ -123,7 +123,7 @@ WebServiceFeature[] features = {new DatabindingModeFeature(JAXBContextFactory.EC
 ----
 * Set the `org.jvnet.ws.databinding.DatabindingModeFeature` feature using the `@DatabindingMode` annotation. For example:
 +
-[source,shell]
+[source,java]
 ----
 import jakarta.jws.WebService;
 import org.jvnet.ws.databinding.DatabindingMode;
@@ -135,7 +135,7 @@ import com.sun.xml.ws.db.toplink.JAXBContextFactory;
 ----
 * Set the `databinding` attribute of the `endpoint` element in the `sun-jaxws.xml` file. Allowed values are `glassfish.jaxb` or `eclipselink.jaxb`. For example:
 +
-[source,shell]
+[source,xml]
 ----
 <endpoint
 name='hello'
@@ -147,7 +147,7 @@ databinding='eclipselink.jaxb'/>
 The EclipseLink JAXB compiler is not included but can be used with Payara Server. Download the EclipseLink zip file at
 `http://www.eclipse.org/eclipselink/downloads/` and unzip it. The compiler files are located here:
 
-[source,shell]
+[source,text]
 ----
 bin/jaxb-compiler.cmd
 bin/jaxb-compiler.sh
@@ -173,7 +173,7 @@ Similarly, the JSR 208 specification allows a security subject to be propagated 
 Thus a security subject can be propagated from a Jakarta EE application or module to a JBI application or the reverse.
 
 To deploy a Jakarta EE application or module as a JBI service unit, use the `asadmin deploy` command, or autodeployment. For more information about
-autodeployment, see "xref:docs:application-deployment-guide:deploying-applications.adoc#to-deploy-an-application-or-module-automatically[To Deploy an Application or Module Automatically]" in Payara Server Open Source Edition Application Deployment Guide.
+autodeployment, see "xref:docs:application-deployment-guide:deploying-applications.adoc#to-deploy-an-application-or-module-automatically[To Deploy an Application or Module Automatically]" in Payara Server Application Deployment Guide.
 
 [[using-the-jbi.xml-file]]
 === Using the `jbi.xml` File
@@ -181,7 +181,7 @@ autodeployment, see "xref:docs:application-deployment-guide:deploying-applicatio
 Section 6.3.1 of the JSR 208 specification describes the `jbi.xml` file. This is a deployment descriptor, located in the `META-INF` directory.
 To deploy a Jakarta EE application or module as a JBI service unit, you need only specify a small subset of elements in the `jbi.xml` file. Here is an example provider:
 
-[source,shell]
+[source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <jbi version="1.0" xmlns="http://java.sun.com/xml/ns/jbi" xmlns:ns0="http://ejbws.jbi.misc/">
@@ -193,7 +193,7 @@ To deploy a Jakarta EE application or module as a JBI service unit, you need onl
 
 Here is an example consumer:
 
-[source,shell]
+[source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <jbi version="1.0" xmlns="http://java.sun.com/xml/ns/jbi" xmlns:ns0="http://message.hello.jbi/">

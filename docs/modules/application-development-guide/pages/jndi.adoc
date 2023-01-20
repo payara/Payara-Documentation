@@ -104,7 +104,7 @@ asadmin> create-jvm-options -Djava.naming.factory.initial=org.glassfish.jndi.cos
 
 Or you can set this property in the code, as follows:
 
-[source,shell]
+[source,java]
 ----
 Properties properties = null;
       try {
@@ -124,7 +124,7 @@ The `java.naming.factory.initial` property applies to only one instance. The pro
 The recommended approach for looking up an EJB component in a remote Payara Server from a client that is a servlet or EJB component is to use the Interoperable Naming Service syntax.
 Host and port information is prepended to any global JNDI names and is automatically resolved during the lookup. The syntax for an interoperable global name is as follows:
 
-[source,shell]
+[source,text]
 ----
 corbaname:iiop:host:port#a/b/name
 ----
@@ -138,7 +138,7 @@ For example, suppose a servlet looks up an EJB reference using `java:comp/env/ej
 
 The `ejb-ref` element in `glassfish-web.xml` or `payara-web.xml` looks like this:
 
-[source,shell]
+[source,xml]
 ----
 <ejb-ref>
    <ejb-ref-name>ejb/Foo</ejb-ref-name>
@@ -148,7 +148,7 @@ The `ejb-ref` element in `glassfish-web.xml` or `payara-web.xml` looks like this
 
 The code looks like this:
 
-[source,shell]
+[source,java]
 ----
 Context ic = new InitialContext();
 Object o = ic.lookup("java:comp/env/ejb/Foo");
@@ -156,7 +156,7 @@ Object o = ic.lookup("java:comp/env/ejb/Foo");
 
 For a client that doesn't run within a Jakarta EE container, the code just uses the interoperable global name instead of the simple global JNDI name. For example:
 
-[source,shell]
+[source,java]
 ----
 Context ic = new InitialContext();
 Object o = ic.lookup("corbaname:iiop:host:port#a/b/Foo");
@@ -277,7 +277,7 @@ For the third constructor, define a property named `spec` and assign it the valu
 === Using Application-Scoped Resources
 
 You can define an application-scoped JNDI or other resource for an enterprise application, web module, EJB module, connector module, or application client module by supplying a `glassfish-resources.xml` or `payara-resources.xml` deployment descriptor file.
-For details, see "xref:docs:application-deployment-guide:deploying-applications.adoc#application-scope-resources[Application-Scoped Resources]" in Payara Server Open Source Edition Application Deployment Guide.
+For details, see "xref:docs:application-deployment-guide:deploying-applications.adoc#application-scope-resources[Application-Scoped Resources]" in Payara Server Application Deployment Guide.
 
 [[using-a-custom-jndi.properties-file]]
 == Using a Custom `jndi.properties` File
@@ -300,14 +300,14 @@ In this case, `mycompany.pkging.pkgingEJB.MyEJB` would be the JNDI name for an E
 These elements are part of the `glassfish-web.xml`/`payara-web.xml`, `glassfish-application-client.xml`, `glassfish-ejb-jar.xml`, and `glassfish-application.xml` deployment descriptor files.
 For more information about how these elements behave in each of the deployment descriptor files,
 see "xref:docs:application-deployment-guide:dd-elements.adoc#elements-of-the-payara-server-deployment-descriptors[Elements of the Payara Server Deployment Descriptors]"
-in Payara Server Open Source Edition Application Deployment Guide.
+in Payara Server Application Deployment Guide.
 
 The rest of this section uses an example of a JDBC resource lookup to describe how to reference resource factories. The same principle is applicable to all resources
 (such as JMS destinations, JavaMail sessions, and so on).
 
 The `@Resource` annotation in the application code looks like this:
 
-[source,shell]
+[source,java]
 ----
 @Resource(name="jdbc/helloDbDs") javax.sql.DataSource ds;
 ----
@@ -317,7 +317,7 @@ This references a resource with the JNDI name of `java:jdbc/helloDbDs`. If this 
 However, you can use a Payara Server specific deployment descriptor to override the annotation. For example, the `resource-ref` element in
 the `payara-web.xml` file maps the `res-ref-name` (the name specified in the annotation) to the JNDI name of another JDBC resource configured in Payara Server.
 
-[source,shell]
+[source,xml]
 ----
 <resource-ref>
    <res-ref-name>jdbc/helloDbDs</res-ref-name>
