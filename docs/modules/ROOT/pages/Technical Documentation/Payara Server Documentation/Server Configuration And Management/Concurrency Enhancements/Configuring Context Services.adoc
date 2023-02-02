@@ -1,0 +1,144 @@
+[[configuring-context-services]]
+= Configuring Context Services
+
+Context services are used to create dynamic proxy objects that capture the context of a container and enable applications to run within that context at a later time. The context of the container is propagated to the thread executing the task.
+
+NOTE: Jakarta Concurrency specifies that certain default resources be made available to applications, and defines specific JNDI names for these default resources. Payara Server makes these names available through the use of logical JNDI names, which map Jakarta EE JNDI names to specific Payara Server resources. +
+For context services, the mapping is as follows: +
+`java:comp/DefaultContextService` +
+This Jakarta Concurrency standard name is mapped to the `concurrent/__defaultContextService` resource.
+
+[[create-context-service]]
+== Create a Context Service
+
+Context services can be created by using Admin Console or Asadmin commands.
+
+To create a new Context Service in the Admin Console, go to Resources → Concurrent Resources → Context Services → New:
+
+image:concurrency/new_context_service.png[New Context Service]
+
+Alternatively, you can use the `create-context-service` asadmin command to create a context service resource.
+
+Because all JNDI names are in the `java:comp/env` subcontext, when specifying the JNDI name of a context service, use only the `concurrent/name` format. For example, `concurrent/Context1`. 
+
+IMPORTANT: Creating a context service resource is a dynamic event and typically does not require server restart. Applications can use a resource as soon as it is created. However, if an application tried to use a resource before it was created, and that resource is created later, the application or the server must be restarted. Otherwise, the application will not be able to locate the resource.
+
+=== Usage
+----
+asadmin> create-context-service [--help]
+        [--enabled={false|true}]
+        [--contextinfoenabled={false|true}]
+        [--contextinfo={Classloader|JNDI|Security|WorkArea}]]
+        [--description description]
+        [--property property]
+        [--target target]
+        jndi_name
+----
+*Aim*::
+The `create-context-service` asadmin command creates a context service resource.
+
+=== Command Options
+
+[cols="25,10,40,15,10", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Determines whether the resource is enabled at runtime.
+|true
+|No
+
+|`contextinfoenabled`
+|Boolean
+|Determines whether container contexts are propagated to threads. If set to `true`, the contexts specified in the `--contextinfo` option are propagated. If set to `false`, no contexts are propagated and the `--contextinfo` option is ignored.
+|true
+|No
+
+|`contextinfo`
+|String
+|Specifies individual container contexts to propagate to threads. Valid values are `Classloader`, `JNDI`, `Security`, and `WorkArea`. Values are specified in a comma-separated list and are case-insensitive.
+|`Classloader,JNDI,Security,WorkArea`
+|No
+
+|`description`
+|String
+|Descriptive details about the resource.
+|-
+|No
+
+|`property`
+|String
+|Optional attribute name/value pairs for configuring the resource.
+|-
+|No
+
+|`target`
+|String
+|Specifies the target for which you are creating the resource. Valid targets are: server, domain, cluster_name, instance_name
+|server
+|No
+|===
+
+=== Command Operands
+*jndi_name*::
+The JNDI name of this resource.
+
+=== Example
+
+[source, shell, subs="quotes"]
+----
+asadmin> *create-context-service* --description "context example" --property name=Jose --target domain concurrent/myContextService
+Context service concurrent/myContextService created successfully.
+Command create-context-service executed successfully.
+----
+
+[[list-context-services]]
+== List Context Services
+
+The `list-context-services` asadmin command can be used to list the existing context service resources.
+
+=== Listing Context Service
+This example lists context service resources on the default server instance, server.
+[source, shell, subs="quotes"]
+----
+asadmin> *list-context-services*
+concurrent/__defaultContextService
+concurrent/Context1
+concurrent/Context2 
+Command list-context-services executed successfully.
+----
+
+[[update-context-services]]
+== Update a Context Service
+
+You can change all of the settings for an existing context service resource except its
+JNDI name. Use the `get` and `set` asadmin commands to view and change the values of the context service attributes.
+
+IMPORTANT: When a resource is updated, the existing resource is shut down and recreated. If an application used the resource prior to the update, the application or the server must be restarted.
+
+. View the attributes of a specific context service you wish to update by using the `get` asadmin command. +
+`asadmin> *get resources.context-service.{resource-JNDI-name}.**`
+. Set an attribute of the context service by using the set asadmin command. +
+`asadmin> *set resources.context-service.{resource-JNDI-name}.deployment-order=120*`
+
+[[delete-context-services]]
+== Delete a Context Service
+
+The `delete-context-service` asadmin command allows you to delete an existing context service. Deleting a context service is a dynamic event and does not require server restart.
+
+Before deleting a context service resource, all associations to the resource must be removed.
+
+=== Deleting a Context Service
+This example deletes the context service resource named `concurrent/Context1`.
+
+[source, shell, subs="quotes"]
+----
+asadmin> *delete-context-service concurrent/Context1*
+Context service concurrent/Context1 deleted successfully.
+Command delete-context-service executed successfully.
+----

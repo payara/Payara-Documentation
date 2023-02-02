@@ -56,7 +56,7 @@ The `@TwoIdentityStoreAuthenticationMechanismDefinition` annotation can be confi
 [[two-identity-stores-usage-example]]
 ==== Example
 
-The following code sample authenticates a user by using both single username/password credentials and a Yubikey code. Observe the 2 calls made to the `SecurityContext.authenticate()` method:
+The following code sample authenticates a user by using both single username/password credentials and a Yubikey code. Observe the 2 calls made to the `SecurityContext.authenticate()` method: 
 
 [source, java]
 ----
@@ -65,8 +65,8 @@ TwoIdentityStoreAuthenticationMechanismDefinition(loginToContinue
 )
 @WebServlet("/Login")
 public class LoginServlet extends HttpServlet {
-
-    @Inject
+    
+    @Inject 
     private SecurityContext securityContext;
 
     @Override
@@ -88,7 +88,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        
         Credential firstCredential = new UsernamePasswordCredential(req.getParameter("username"), req.getParameter("password"));
         Credential secondCredential = new YubikeyCredential(req.getParameter("yubikey"));
         // First call to securityContext.authenticate()
@@ -103,25 +103,25 @@ public class LoginServlet extends HttpServlet {
         else {
             PrintWriter out = resp.getWriter();
             printHeaders(out);
-            out.println("Failed to log in");
+            out.println("Failed to log in");    
         }
         out.flush();
     }
-
+    
     private void printHeaders(PrintWriter out){
         out.println("<html>");
         out.println("<head>");
         out.println("<title>Two Identity Stores Authentication</title>");
         out.println("</head>");
         out.println("<body>");
-    }
+    }   
 }
 ----
 
 [[custom-identity-stores]]
 == Custom Identity Stores
 
-By default, the Jakarta EE Security API only instructs containers to implement identity stores for the following types:
+By default, the Jakarta EE Security API only instructs containers to implement identity stores for the following types: 
 
 * LDAP directories through the `@LdapIdentityStoreDefinition` annotation.
 * Relational databases through the `@DatabaseIdentityStoreDefinition` annotation.
@@ -228,7 +228,7 @@ The certificate realm identity store can be configured via both `@CertificateIde
 |===
 | Option | MP Config property | Description | Default | Required
 | `value`| | The name of the certificate realm. | `certificate` | `true`
-| `assignGroups` | `payara.security.certificate.assignGroups` | Users will get assigned membership to these groups automatically on successful authentication.| |`false`
+| `assignGroups` | `payara.security.certificate.assignGroups` | Users will get assigned membership to these groups automatically on successful authentication.| |`false` 
 |===
 
 CAUTION: If both an annotation attribute and a MicroProfile Configuration property are defined for the same option then the configuration property always takes precedence.
