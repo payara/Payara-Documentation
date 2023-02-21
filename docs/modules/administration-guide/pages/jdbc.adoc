@@ -13,7 +13,7 @@ data in relational databases. Applications can access database information by us
 
 The key elements of database connectivity are the following:
 
-* Database. The repository where data is stored for an enterprise. Java EE applications access relational databases through the JDBC API. For
+* Database. The repository where data is stored for an enterprise. Jakarta EE applications access relational databases through the JDBC API. For
 administration procedures, see xref:docs:administration-guide:jdbc.adoc#setting-up-the-database[Setting Up the Database].
 * JDBC Connection Pool. A JDBC connection pool is a group of reusable connections for a particular database. For administration procedures,
 see xref:docs:administration-guide:jdbc.adoc#administering-jdbc-connection-pools[Administering JDBC Connection Pools].
@@ -60,27 +60,28 @@ xref:docs:administration-guide:jdbc.adoc#integrating-the-jdbc-driver[Integrating
 [[to-start-the-database]]
 === To Start the Database
 
-Payara Server includes an implementation of the Apache Derby database, however, you can use any JDBC-compliant database. The database
-is not started automatically when you start Payara Server, so if you have applications that require a database, you need to start Apache
-Derby database manually by using the local `start-database` subcommand.
+Payara Server includes an implementation of the H2 Database, however, you can use any JDBC-compliant database. The database
+is not started automatically when you start Payara Server, so if you have applications that require a database, you need to start H2 database manually by using the local `start-database` subcommand.
 
 Start the database by using the xref:docs:reference-manual:start-database.adoc[`start-database`] subcommand.
 
 When the database server starts, or a client connects to it successfully, the following files are created at the location that is specified by the `--dbhome` option:
 
-* The `derby.log` file contains the database server process log along with its standard output and standard error information.
+* The `h2.log` file contains the database server process log along with its standard output and standard error information.
 * The database files contain your schema (for example, database tables).
 
 [[example-to-start-a-database]]
-.Example
+==== Example 11-1 To Start a Database
 
-This example starts the Apache Derby database on the host host1 and port 5001.
+This example starts the H2 database on the host host1 and port 5001.
 
 [source,shell]
 ----
-asadmin> start-database --dbhost host1 --dbport 5001 --terse=true
-Starting database in the background. 
-Log redirected to /opt/SUNWappserver/databases/javadb.log.
+asadmin> start-database --dbhost=localhost --dbport=5001
+Starting database in Network Server mode on host localhost and port 5001.
+tcp://192.168.0.110:5001
+Starting database in the background.
+Log redirected to C:\payara-server\_WORKDIR\6.2022.2\payara6\glassfish\databases\h2.log.
 Command start-database executed successfully.
 ----
 
@@ -89,44 +90,42 @@ You can also view the full syntax and options of the subcommand by typing `asadm
 [[to-stop-the-database]]
 === To Stop the Database
 
-Use the local `stop-database` subcommand to stop the Apache Derby
-database on a specified port. A single host can have multiple database
-server processes running on different ports.
+Use the local `stop-database` subcommand to stop the H2
+database on a specified port. A single host can have multiple database server processes running on different ports.
 
 . If necessary, notify users that the database is being stopped.
 . Stop the database by using the xref:docs:reference-manual:stop-database.adoc[`stop-database`] subcommand.
 
 [[example-to-stop-the-database]]
-.Example
+==== Example 11-1 To Stop a Database
 
-This example stops the Apache Derby database on port 5001 of `localhost`.
+This example stops the H2 database on port 5001 of `localhost`.
 
 [source,shell]
 ----
 asadmin> stop-database --dbhost=localhost --dbport=5001
-onnection obtained for host: localhost, port number 5001.
-Apache Derby Network Server - 10.2.2.1 - (538595) shutdown 
-at 2008-10-17 23:34:2 7.218 GMT
 Command stop-database executed successfully.
 ----
 
 [[database-troubleshooting]]
 === Troubleshooting
 
-For a laptop that roams between networks, you might have trouble shutting down the database. If you start the Apache Derby database and
-then change your IP address, you will not be able to stop the Apache Derby database unless you add a specific `--dbhost` argument. For
-example, if you run `asadmin start-database` `dbhost` `= 0.0.0.0`, and then disconnect Ethernet and switch to wifi, you should run a command
-similar to the following to stop the database:
+For a laptop that roams between networks, you might have trouble shutting down the database. If you start the H2 database and then change your IP address, you will not be able to stop the H2 database unless you add a specific `--dbhost` argument. For example, if you run `asadmin start-database` `dbhost` `= 0.0.0.0`, and then disconnect Ethernet and switch to Wi-Fi, you should run a command similar to the following to stop the database:
 
 `asadmin stop-database` `dbhost` `localhost`
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help stop-database` at the command line.
 
+[[h2-documentation]]
+=== H2 Database documentation
+
+For further details on how to configure the embedded H2 database you can visit the following: https://www.h2database.com/html/quickstart.html[H2 Database Documentation].
+
+////
 [[apache-derby-database-utility-scripts]]
 === Apache Derby Database Utility Scripts
 
-The Apache Derby database configuration that is available for use with Payara Server includes scripts that can help you use the Apache Derby
-database. The following scripts are available in the as-install`/javadb/bin` directory:
+The H2 database configuration that is available for use with Payara Server includes scripts that can help you use the H2 database. The following scripts are available in the as-install`/javadb/bin` directory:
 
 `startNetworkServer,startNetworkServer.bat`::
   Script to start the network server
@@ -151,6 +150,7 @@ For more information about these utilities, see the following documentation:
 
 * http://db.apache.org/derby/docs/10.13/tools/[Apache Derby Tools and Utilities Guide]
 * http://db.apache.org/derby/docs/10.13/adminguide/[Derby Server and Administration Guide]
+////
 
 [[configuring-access-to-the-database]]
 == Configuring Access to the Database
@@ -161,15 +161,9 @@ JDBC connection pool, creating a JDBC resource for the connection pool, and inte
 [[administering-jdbc-connection-pools]]
 === Administering JDBC Connection Pools
 
-A JDBC connection pool is a group of reusable connections for a particular database. Because creating each new physical connection is
-time consuming, Payara Server maintains a pool of available connections. When an application requests a connection, it obtains one
-from the pool. When an application closes a connection, the connection is returned to the pool. JDBC connection pools can be globally
-accessible or be scoped to an enterprise application, web module, EJB module, connector module or application client module, as described in
-"xref:docs:application-deployment-guide:deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources]" in Payara Server Application Deployment Guide.
+A JDBC connection pool is a group of reusable connections for a particular database. Because creating each new physical connection is time-consuming, Payara Server maintains a pool of available connections. When an application requests a connection, it obtains one from the pool. When an application closes a connection, the connection is returned to the pool. JDBC connection pools can be globally accessible or be scoped to an enterprise application, web module, EJB module, connector module or application client module, as described in "xref:docs:application-deployment-guide:deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources]" in Payara Server Application Deployment Guide.
 
-A JDBC resource is created by specifying the connection pool with which the resource is associated. Multiple JDBC resources can specify a single
-connection pool. The properties of connection pools can vary with different database vendors. Some common properties are the database name
-(URL), the user name, and the password.
+A JDBC resource is created by specifying the connection pool with which the resource is associated. Multiple JDBC resources can specify a single connection pool. The properties of connection pools can vary with different database vendors. Some common properties are the database name (URL), the username, and the password.
 
 [[to-create-a-jdbc-connection-pool]]
 ==== *To Create a JDBC Connection Pool*
@@ -203,7 +197,7 @@ xref:docs:reference-manual:create-jdbc-connection-pool.adoc#create-jdbc-connecti
 xref:docs:administration-guide:overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
 
 [[example-to-create-a-jdbc-connection-pool]]
-.Example
+==== Example 11-3 To Create a JDBC Connection Pool
 
 This example creates a JDBC connection pool named `sample_derby_pool` on `localhost`.
 
@@ -229,7 +223,7 @@ Use the `list-jdbc-connection-pools` subcommand in remote mode to list all exist
 . List the JDBC connection pools by using the xref:docs:reference-manual:list-jdbc-connection-pools.adoc[`list-jdbc-connection-pools`] subcommand.
 
 [[example-to-list-jdbc-connection-pools]]
-.Example
+==== Example 11-4 To List a JDBC Connection Pool
 
 This example lists the JDBC connection pools that are on `localhost`.
 
@@ -261,7 +255,7 @@ Before you can contact a connection pool, the connection pool must be created wi
 . Ping a connection pool by using the xref:docs:reference-manual:ping-connection-pool.adoc[`ping-connection-pool`] subcommand.
 
 [[example-to-contact-ping-a-connection-pool]]
-.Example
+==== Example 11-5 To Contact (Ping) a Connection Pool
 
 This example tests to see if the `DerbyPool` connection pool is usable.
 
@@ -289,8 +283,8 @@ for the pool, and restores the pool to its steady pool size.
 . Ensure that the server is running. Remote subcommands require a running server.
 . Reset a connection pool by using the `flush-connection-pool` subcommand.
 
-[[example]]
-.Example
+[[example-flushing-connection-pool]]
+====  Example 11-6 Resetting (Flushing) a Connection Pool
 
 This example resets the JDBC connection pool named `__TimerPool` to its steady pool size.
 
@@ -303,7 +297,7 @@ Command flush-connection-pool executed successfully.
 You can also view the full syntax and options of the subcommand by typing `asadmin help flush-connection-pool` at the command line.
 
 [[to-update-a-jdbc-connection-pool]]
-==== *To Update a JDBC Connection Pool*
+==== To Update a JDBC Connection Pool
 
 You can change all of the settings for an existing pool except its name. Use the `get` and `set` subcommands to view and change the values of the
 JDBC connection pool properties.
@@ -320,7 +314,7 @@ xref:docs:administration-guide:overview.adoc#configuration-changes-that-require-
 For information about how to tune a connection pool, see the xref:docs:performance-tuning-guide:overview.adoc[Payara Server Performance Tuning Guide].
 
 [[to-delete-a-jdbc-connection-pool]]
-==== *To Delete a JDBC Connection Pool*
+==== To Delete a JDBC Connection Pool
 
 Use the `delete-jdbc-connection-pool` subcommand in remote mode to delete an existing JDBC connection pool. Deleting a JDBC connection pool
 is a dynamic event and does not require server restart.
@@ -337,7 +331,7 @@ xref:docs:reference-manual:list-jdbc-connection-pools.adoc[`list-jdbc-connection
 xref:docs:reference-manual:delete-jdbc-connection-pool.adoc[`delete-jdbc-connection-pool`] subcommand.
 
 [[example-to-delete-a-jdbc-connection-pool]]
-.Example
+==== Example 11-7 To Delete a JDBC Connection Pool
 
 This example deletes the JDBC connection pool named `DerbyPool`.
 
@@ -545,9 +539,9 @@ Resources]" in Payara Server Application Deployment Guide.
 A JDBC resource is created by specifying the connection pool with which the resource will be associated. Use a unique Java Naming and Directory
 Interface (JNDI) name to identify the resource. For example, the JNDI name for the resource of a payroll database might be `java:comp/env/jdbc/payrolldb`.
 
-The Java EE standard specifies that certain default resources be made available to applications, and defines specific JNDI names for these
-default resources. Payara Server makes these names available through the use of logical JNDI names, which map Java EE standard JNDI names to
-specific Payara Server resources. For JDBC resources, the Java EE standard name `java:comp/DefaultDataSource` is mapped to the `jdbc/__default` resource.
+The Jakarta EE standard specifies that certain default resources be made available to applications, and defines specific JNDI names for these
+default resources. Payara Server makes these names available through the use of logical JNDI names, which map Jakarta EE standard JNDI names to
+specific Payara Server resources. For JDBC resources, the Jakarta EE standard name `java:comp/DefaultDataSource` is mapped to the `jdbc/__default` resource.
 
 [[to-create-a-jdbc-resource]]
 ==== *To Create a JDBC Resource*
@@ -569,7 +563,7 @@ Information about properties for the subcommand is included in this help page.
 . If necessary, notify users that the new resource has been created.
 
 [[example-to-create-a-jdbc-resource]]
-.Example
+==== Example 11-8 To Create a JDBC Resource
 
 This example creates a JDBC resource named `DerbyPool`.
 
@@ -590,7 +584,7 @@ Use the `list-jdbc-resources` subcommand in remote mode to list the existing JDB
 . List JDBC resources by using the xref:docs:reference-manual:list-jdbc-resources.adoc[`list-jdbc-resources`] subcommand.
 
 [[example-to-list-jdbc-resources]]
-.Example
+==== Example 11-9 To List a JDBC Resource
 
 This example lists JDBC resources for `localhost`.
 
@@ -607,7 +601,7 @@ Command list-jdbc-resources executed successfully.
 You can also view the full syntax and options of the subcommand by typing `asadmin help list-jdbc-resources` at the command line.
 
 [[to-update-a-jdbc-resource]]
-==== *To Update a JDBC Resource*
+==== To Update a JDBC Resource
 
 You can enable or disable a JDBC resource by using the `set` subcommand. The JDBC resource is identified by its dotted name.
 
@@ -616,7 +610,7 @@ You can enable or disable a JDBC resource by using the `set` subcommand. The JDB
 For example:
 
 [[example-to-update-a-jdbc-resource]]
-.Example
+==== Example 11-10 To Update a JDBC Resource
 
 This example changes the `res1` enabled setting to false.
 
@@ -626,10 +620,9 @@ asadmin>set resources.jdbc-resource.res1.enabled=false
 ----
 
 [[to-delete-a-jdbc-resource]]
-==== *To Delete a JDBC Resource*
+==== To Delete a JDBC Resource
 
-Use the `delete-jdbc-resource` subcommand in remote mode to delete an existing JDBC resource. Deleting a JDBC resource is a dynamic event and
-does not require server restart.
+Use the `delete-jdbc-resource` subcommand in remote mode to delete an existing JDBC resource. Deleting a JDBC resource is a dynamic event and does not require server restart.
 
 *Before You Begin*
 
@@ -641,7 +634,7 @@ Before deleting a JDBC resource, all associations with this resource must be rem
 . Delete a JDBC resource by using the xref:docs:reference-manual:delete-jdbc-resource.adoc[`delete-jdbc-resource`] subcommand.
 
 [[example-to-delete-a-jdbc-resource]]
-.Example
+==== Example 11-11 To Delete a JDBC Resource
 
 This example deletes a JDBC resource named `DerbyPool`.
 
@@ -654,17 +647,14 @@ Command delete-jdbc-resource executed successfully.
 You can also view the full syntax and options of the subcommand by typing `asadmin help delete-jdbc-resource` at the command line.
 
 [[enabling-the-jdbc__default-resource-in-a-clustered-environment]]
-=== *Enabling the `jdbc/__default` Resource in a Clustered Environment*
+=== Enabling the `jdbc/__default` Resource in a Clustered Environment
 
-Payara Server 5.0 includes a preconfigured JDBC resource with the JNDI name `jdbc/__default`. This `jdbc/__default` resource is not
-enabled by default, so you need to explicitly enable it if you want to use it in a cluster.
+Payara Server  includes a preconfigured JDBC resource with the JNDI name `jdbc/__default`. This `jdbc/__default` resource is not enabled by default, so you need to explicitly enable it if you want to use it in a cluster.
 
 [[to-enable-the-jdbc__default-resource-for-a-clustered-environment]]
-==== *To Enable the `jdbc/__default` Resource for a Clustered Environment*
+==== To Enable the `jdbc/__default` Resource for a Clustered Environment
 
-Instructions for creating JDBC resources in general are provided in
-xref:docs:administration-guide:jdbc.adoc#to-create-a-jdbc-resource[To Create a JDBC Resource]. Use the following procedure to
-enable the preconfigured `jdbc/__default` resource for a clustered Payara Server environment.
+Instructions for creating JDBC resources in general are provided in xref:docs:administration-guide:jdbc.adoc#to-create-a-jdbc-resource[To Create a JDBC Resource]. Use the following procedure to enable the preconfigured `jdbc/__default` resource for a clustered Payara Server environment.
 
 . Create the `jdbc/__default` resource reference for the cluster. for example: 'asadmin create-resource-ref --target cluster-name jdbc/__default'
 . Enable the resource on the DAS that manages the cluster, for example: 'asadmin set resources.jdbc-connection-pool.DerbyPool.property.serverName=DAS-machine-name'
@@ -685,42 +675,32 @@ asadmin start-cluster cluster-name
 To use JDBC features, you must choose a JDBC driver to work with the Payara Server, then you must set up the driver.
 
 [[supported-database-drivers]]
-==== *Supported Database Drivers*
+==== Supported Database Drivers
 
-Supported JDBC drivers are those that have been fully tested by Oracle.For a list of the JDBC drivers currently supported by the Payara
-Server, see the xref:ROOT:Release Notes/release-notes.adoc[Payara Release Notes]. For configurations of supported and other drivers, see xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
+Supported JDBC drivers are those that have been fully tested by Oracle.For a list of the JDBC drivers currently supported by the Payara Server, see the xref:ROOT:Release Notes/release-notes.adoc[Payara Release Notes]. For configurations of supported and other drivers, see xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 
-NOTE: Because the drivers and databases supported by the Payara Server are constantly being updated, and because database vendors continue to
-upgrade their products, always check with Oracle technical support for the latest database support information.
+NOTE: Because the drivers and databases supported by the Payara Server are constantly being updated, and because database vendors continue to upgrade their products, always check with Oracle technical support for the latest database support information.
 
 [[making-the-jdbc-driver-jar-files-accessible]]
-==== *Making the JDBC Driver JAR Files Accessible*
+==== Making the JDBC Driver JAR Files Accessible
 
-To integrate the JDBC driver into a Payara Server domain, copy the JAR files into the domain-dir`/lib` directory, then restart the server.
-This makes classes accessible to all applications or modules deployed on servers that share the same configuration. For more information about
-Payara Server class loaders, see "xref:docs:application-development-guide:class-loaders.adoc[Class Loaders]" in Payara Server Application Development Guide.
+To integrate the JDBC driver into a Payara Server domain, copy the JAR files into the domain-dir`/lib` directory, then restart the server. This makes classes accessible to all applications or modules deployed on servers that share the same configuration. For more information about Payara Server class loaders, see "xref:docs:application-development-guide:class-loaders.adoc[Class Loaders]" in Payara Server Application Development Guide.
 
-If you are using an Oracle database with EclipseLink extensions, copy the JAR files into the domain-dir`/lib/ext` directory, then restart the
-server. For details, see "xref:docs:application-development-guide:jpa.adoc#oracle-database-enhancements[Oracle Database Enhancements]" in
-Payara Server Application Development Guide.
+If you are using an Oracle database with EclipseLink extensions, copy the JAR files into the domain-dir`/lib/ext` directory, then restart the server. For details, see "xref:docs:application-development-guide:jpa.adoc#oracle-database-enhancements[Oracle Database Enhancements]" in Payara Server Application Development Guide.
 
 [[automatic-detection-of-installed-drivers]]
-==== *Automatic Detection of Installed Drivers*
+==== Automatic Detection of Installed Drivers
 
-The Administration Console detects installed JDBC Drivers automatically when you create a JDBC connection pool. To create a JDBC connection pool
-using the Administration Console, open the Resources component, open the JDBC component, select Connection Pools, and click on the New button.
-This displays the New JDBC Connection Pool page.
+The Administration Console detects installed JDBC Drivers automatically when you create a JDBC connection pool. To create a JDBC connection pool using the Administration Console, open the Resources component, open the JDBC component, select Connection Pools, and click on the New button. This displays the New JDBC Connection Pool page.
 
-Based on the Resource Type and Database Vendor you select on the New JDBC Connection Pool page, data source or driver implementation class
-names are listed in the Datasource Classname or Driver Classname field when you click on the Next button. When you choose a specific
-implementation class name on the next page, additional properties relevant to the installed JDBC driver are displayed in the Additional
-Properties section.
+Based on the Resource Type and Database Vendor you select on the New JDBC Connection Pool page, data source or driver implementation class names are listed in the Datasource Classname or Driver Classname field when you click on the Next button. When you choose a specific implementation class name on the next page, additional properties relevant to the installed JDBC driver are displayed in the Additional Properties section.
 
 [[configuration-specifics-for-jdbc-drivers]]
 == Configuration Specifics for JDBC Drivers
 
 Payara Server is designed to support connectivity to any database management system by using a corresponding JDBC driver.
 
+////
 [[ibm-db2-database-type-2-driver]]
 === IBM DB2 Database Type 2 Driver
 
@@ -728,7 +708,7 @@ The JAR files for the DB2 driver are `db2jcc.jar`, `db2jcc_license_cu.jar`, and 
 
 [source,shell]
 ----
-LD_LIBRARY_PATH=/usr/db2user/sqllib/lib:${Java EE.home}/lib
+LD_LIBRARY_PATH=/usr/db2user/sqllib/lib:${Jakarta EE.home}/lib
 DB2DIR=/opt/IBM/db2/V8.2
 DB2INSTANCE=db2user
 INSTHOME=/usr/db2user
@@ -753,7 +733,7 @@ Configure the connection pool using the following settings:
 ** `driverType` - Set to `2`.
 
 ** `deferPrepares` - Set to `false`.
-
+////
 [[ibm-db2-database-type-4-driver]]
 === IBM DB2 Database Type 4 Driver
 
@@ -775,9 +755,6 @@ The JAR file for the DB2 driver is `db2jcc.jar`. Configure the connection pool u
 
 [[apache-derby-dbderby-type-4-driver]]
 === Apache Derby DB/Derby Type 4 Driver
-
-The Apache Derby DB/Derby JDBC driver is included with Payara Server by default, so you do not need to integrate this JDBC driver with
-Payara Server.
 
 The JAR file for the Apache Derby DB driver is `derbyclient.jar`. Configure the connection pool using the following settings:
 
@@ -836,8 +813,7 @@ com.mysql.jdbc.jdbc2.optional.MysqlXADataSource
 [[oracle-10-database-driver]]
 === Oracle 10 Database Driver
 
-The JAR file for the Oracle 10 database driver is `ojdbc14.jar`. Make sure that the shared library is available through `LD_LIBRARY_PATH` and
-that the `ORACLE_HOME` property is set.
+The JAR file for the Oracle 10 database driver is `ojdbc14.jar`. Make sure that the shared library is available through `LD_LIBRARY_PATH` and that the `ORACLE_HOME` property is set.
 
 To make the Oracle driver behave in a Java EE-compliant manner, you must define the following JVM property:
 
