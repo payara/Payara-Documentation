@@ -1,0 +1,75 @@
+= Payara Micro NetBeans Plugin
+
+Netbeans has Payara Micro support built into the IDE, so there is no need to install a plugin to integrate and control Payara Micro from Netbeans.
+
+== Creating a Payara Micro project
+Apache Netbeans IDE supports Payara Micro out of the box. To create a Payara Micro project, follow these steps:
+
+. Create a new project using Payara Micro Application archetype under Java with Maven category.
++
+image::netbeans-plugin/payara-micro/netbeans-new-project-payara6.png[]
++
+. Input the desired project name, project name, artifact id, group id and version.
++
+image::netbeans-plugin/payara-micro/netbeans-new-application-payara6.png[]
++
+. Select the desired Payara Micro version. Make sure that Auto Bind HTTP is left unchecked.
++
+image::netbeans-plugin/payara-micro/netbeans-new-application-version-payara6.png[]
+
+[NOTE]
+====
+The template as of Netbeans 17 is based on outdated Payara Micro version and requires the follwing modifications to work with Payara 6:
+====
+. Change the Jakarta EE version to 10:
++
+[source,xml]
+----
+<version.javaee>7.0</version.javaee>
+to
+<version.jakartaee>10.0.0</version.jakartaee>
+----
+. Change the javaee-web-api dependency to jakartaee-web-api:
++
+[source,xml]
+----
+<dependency>
+    <groupId>javax</groupId>
+    <artifactId>javaee-web-api</artifactId>
+    <version>${version.javaee}</version>
+    <scope>provided</scope>
+</dependency>
+to
+<dependency>
+    <groupId>jakarta.platform</groupId>
+    <artifactId>jakarta.jakartaee-web-apii</artifactId>
+    <version>${version.jakartaee}</version>
+    <scope>provided</scope>
+</dependency>
+----
++
+. Change the source and target version of Java to 11:
++
+[source,xml]
+----
+<source>1.8</source>
+<target>1.8</target>
+to
+<source>11</source>
+<target>11</target>
+----
++
+. Remove the following option from the command line options of payara-micro-maven-plugin
++
+[source,xml]
+----
+<option>
+    <key>--autoBindHttp</key>
+    <value>true</value>
+</option>
+----
+
+== Deploying the Payara Micro project
+To deploy the Payara Micro project, simply run the application using the Run Project option from the Run menu. The Payara Micro application will be deployed and the URL will be displayed in the Output window.
+
+image::netbeans-plugin/payara-micro/netbeans-app-running-payara6.png[]
