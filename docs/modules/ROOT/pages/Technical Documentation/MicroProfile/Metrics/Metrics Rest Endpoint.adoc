@@ -5,19 +5,42 @@ MicroProfile Metrics specifies that all metrics are published at the endpoint `/
 
 [[metric-scopes]]
 == Metric Scopes
-The Metrics specification {mpMetricsSpecUrl}#scopes[defines three _Scopes_], **Base**, **Vendor** and **Application** which correspond to the following purposes:
+The Metrics specification {mpMetricsSpecUrl}#scopes[defines three _Scopes_], **Base**, **Vendor**, **Application** and **Custom** which correspond to the following purposes:
 
 **Base**::
-Base metrics are mandatory for all implementations to provide. This is so that there is a predictable baseline of metrics which will be available on any MicroProfile implementation.
+Base metrics are a set of optional metrics that a compliant server may provide. A server that provides this kind of metric can implement all, some of them or none of them. A reason to choose a different set of metrics is that the metrics libraries they are using in their implementation come with metrics with a similar purpose to the {mpMetricsSpecUrl}#base-metrics[spec-described] base metrics.
 +
-These metrics can be accessed under `/metrics/base`.
+These metrics can be accessed under `/metrics?scope=base`. 
++
+These metrics must tag with `mp_scope=base`.
 
 **Vendor**::
 Vendor metrics are specific to each implementation and are intended to offer metrics which are unique to each vendor.
 +
-These metrics can be accessed under `/metrics/vendor`.
+These metrics can be accessed under `/metrics?scope=vendor`.
++
+These metrics must tag with `mp_scope=vendor`.
 
 **Application**::
 Application metrics are reserved for those metrics which are to be exposed from the application by using the developer API.
 +
-These metrics can be accessed under `/metrics/application`.
+These metrics can be accessed under `/metrics?scope=application`.
++
+These metrics must tag with `mp_scope=application`.
+
+**Custom Scopes**::
+Applications may also define their own scope names by tagging metrics with another scope (other than base, vendor or application).
++
+For example:
+[source, java]
+----
+@Gauge(name = "gaugeMethod", unit = MetricUnits.NONE, scope = "mygauge")
+public long getGauge() {
+    log.info("Private Gauge:"+getPrivateGauge());
+    return gauge;
+}
+----
++
+These metrics can be accessed under `/metrics?scope=scope_name`.
++
+These metrics must tag with `mp_scope=scope_name`.
