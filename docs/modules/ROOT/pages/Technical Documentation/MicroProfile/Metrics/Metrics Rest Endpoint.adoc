@@ -5,7 +5,7 @@ MicroProfile Metrics specifies that all metrics are published at the endpoint `/
 
 [[metric-scopes]]
 == Metric Scopes
-The Metrics specification {mpMetricsSpecUrl}#scopes[defines three _Scopes_], **Base**, **Vendor**, **Application** and **Custom** which correspond to the following purposes:
+The Metrics specification {mpMetricsSpecUrl}#scopes[defines four _Scopes_], **Base**, **Vendor**, **Application** and **Custom** which correspond to the following purposes:
 
 **Base**::
 Base metrics are a set of optional metrics that a compliant server may provide. A server that provides this kind of metric can implement all, some of them or none of them. A reason to choose a different set of metrics is that the metrics libraries they are using in their implementation come with metrics with a similar purpose to the {mpMetricsSpecUrl}#base-metrics[spec-described] base metrics.
@@ -31,6 +31,10 @@ These metrics must tag with `mp_scope=application`.
 **Custom Scopes**::
 Applications may also define their own scope names by tagging metrics with another scope (other than base, vendor or application).
 +
+These metrics can be accessed under `/metrics?scope=scope_name`.
++
+These metrics must tag with `mp_scope=scope_name`.
++
 For example:
 [source, java]
 ----
@@ -40,7 +44,3 @@ public long getGauge() {
     return gauge;
 }
 ----
-+
-These metrics can be accessed under `/metrics?scope=scope_name`.
-+
-These metrics must tag with `mp_scope=scope_name`.
