@@ -1,7 +1,7 @@
 [[create-virtual-server]]
 = create-virtual-server
 
-creates the named virtual server
+Creates the named virtual server.
 
 [[synopsis]]
 == Synopsis
@@ -24,7 +24,7 @@ virtual-server-id
 == Description
 
 The `create-virtual-server` subcommand creates the named virtual server.
-Virtualization in the \{product---name} allows multiple URL domains to be served by a single HTTP server process that is listening on multiple
+Virtualization in the Payara Server allows multiple URL domains to be served by a single HTTP server process that is listening on multiple
 host addresses. If the application is available at two virtual servers, they still share the same physical resource pools.
 
 This subcommand is supported in remote mode only.
@@ -106,13 +106,12 @@ The default value is `true`.
   `securePagesWithPragma`;;
     Set this property to `false` to ensure that for all web applications on this virtual server file downloads using SSL work properly in
     Internet Explorer. +
-    You can set this property for a specific web application. For details, see "xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app]" in Payara Server Open Source Edition Application Deployment Guide.
+    You can set this property for a specific web application. For details, see xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app] in Payara Server Application Deployment Guide.
   `contextXmlDefault`;;
     Specifies the location, relative to domain-dir, of the `context.xml`
     file for this virtual server, if one is used. For more information
-    about the `context.xml` file, see "xref:docs:application-development-guide:webapps.adoc#using-a-context.xml-file[Using a context.xml File]" in Payara Server Open Source Edition
-    Application Development Guide and The Context Container (`http://tomcat.apache.org/tomcat-5.5-doc/config/context.html`).
-    Context parameters, environment entries, and resource definitions in `context.xml` are supported in the \{product---name}.
+    about the `context.xml` file, see xref:docs:application-development-guide:webapps.adoc#using-a-context.xml-file[Using a context.xml File] in Payara Server Application Development Guide and The Context Container (`http://tomcat.apache.org/tomcat-5.5-doc/config/context.html`).
+    Context parameters, environment entries, and resource definitions in `context.xml` are supported in the Payara Server.
   `alternatedocroot_n`;;
     Specifies an alternate document root (docroot), where n is a positive integer that allows specification of more than one.
     Alternate docroots allow web applications to serve requests for certain resources from outside their own docroot, based on whether
@@ -138,14 +137,14 @@ The default value is `true`.
 
 The `value` of each alternate docroot has two components: The first component, `from`, specifies the alternate docroot's URI pattern,
     and the second component, `dir`, specifies the alternate docroot's physical location (directory). Spaces are allowed in the `dir` component. +
-    You can set this property for a specific web application. For details, see "xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app]" in Payara Server Open Source Edition Application Deployment Guide.
+    You can set this property for a specific web application. For details, see xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app] in Payara Server Application Deployment Guide.
 
     `send-error_n`;;
     Specifies custom error page mappings for the virtual server, which are inherited by all web applications deployed on the virtual server. A web application can override these custom error page
     mappings in its `web.xml` deployment descriptor. The value of each `send-error_n` property has three components, which may be specified in any order: +
     The first component, `code`, specifies the three-digit HTTP response status code for which the custom error page should be returned in the response. +
     The second component, `path`, specifies the absolute or relative file system path of the custom error page. A relative file system
-    path is interpreted as relative to the domain-dir`/config` directory. +
+    path is interpreted as relative to the `domain-dir/config` directory. +
     The third component, `reason`, is optional and specifies the text of the reason string (such as `Unauthorized` or `Forbidden`) to be returned. +
     For example:
 +
@@ -155,13 +154,12 @@ The `value` of each alternate docroot has two components: The first component, `
    value="code=401 path=/myhost/401.html reason=MY-401-REASON"/>
 ----
 
-This example property definition causes the contents of `/myhost/401.html` to be returned with 401 responses, along with this response line:
-+
+This example property definition causes the contents of `/myhost/401.html` to be returned with 401 responses, along with this response line: +
 [source,shell]
 ----
 HTTP/1.1 401 MY-401-REASON
 ----
-  `redirect_`n;;
+  `redirect_n`;;
     Specifies that a request for an old URL is treated as a request for a new URL. These properties are inherited by all web applications
     deployed on the virtual server. The value of each `redirect_n` property has two components, which may be specified in any order: +
     The first component, `from`, specifies the prefix of the requested URI to match. +
@@ -173,10 +171,10 @@ HTTP/1.1 401 MY-401-REASON
 <property name="redirect_1" 
 value="from=/dummy url-prefix=http://etude"/>
 ----
-  `valve_`n;;
+  `valve_n`;;
     Specifies a fully qualified class name of a custom valve, where n is a positive integer that allows specification of more than one. The
-    valve class must implement the `org.apache.catalina.Valve` interface from Tomcat or previous \{product---name} releases, or the
-    `org.glassfish.web.valve.GlassFishValve` interface from the current \{product---name} release. For example:
+    valve class must implement the `org.apache.catalina.Valve` interface from Tomcat or previous Payara Server releases, or the
+    `org.glassfish.web.valve.GlassFishValve` interface from the current Payara Server release. For example:
 +
 [source,xml]
 ----
@@ -184,7 +182,7 @@ value="from=/dummy url-prefix=http://etude"/>
    value="org.glassfish.extension.Valve"/>
 ----
 You can set this property for a specific web application. For
-    details, see "xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app]" in Payara Server Open Source Edition Application Deployment Guide.
+    details, see xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app] in Payara Server Application Deployment Guide.
 
   `listener_n`;;
     Specifies a fully qualified class name of a custom Catalina listener, where n is a positive integer that allows specification of
@@ -195,7 +193,7 @@ You can set this property for a specific web application. For
 <property name="listener_1" 
    value="org.glassfish.extension.MyLifecycleListener"/>
 ----
-You can set this property for a specific web application. For  details, see "xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app]" in Payara Server Open Source Edition Application Deployment Guide.
+You can set this property for a specific web application. For  details, see xref:docs:application-deployment-guide:dd-elements.adoc#glassfish-web-app[glassfish-web-app] in Payara Server Application Deployment Guide.
 
   `docroot`;;
     Absolute path to root document directory for server. Deprecated. Replaced with a `virtual-server` attribute, `docroot`, that is
@@ -256,11 +254,11 @@ Command create-virtual-server executed successfully.
 
 *See Also*
 
-* xref:asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:asadmin.adoc#asadmin-1m[`asadmin`],
 * xref:delete-virtual-server.adoc#delete-virtual-server[`delete-virtual-server`],
 * xref:list-virtual-servers.adoc#list-virtual-servers[`list-virtual-servers`],
 * xref:create-http-listener.adoc#create-http-listener[`create-http-listener`],
-* xref:create-network-listener.adoc#create-network-listener[`create-network-listener`]
+* xref:create-network-listener.adoc#create-network-listener[`create-network-listener`],
 * xref:get.adoc#get[`get`],
 * xref:list.adoc#list[`list`],
 * xref:set.adoc#set[`set`]
