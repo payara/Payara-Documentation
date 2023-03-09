@@ -1,7 +1,7 @@
 [[create-instance]]
 = create-instance
 
-creates a \{product---name} instance
+Creates a Payara instance
 
 [[synopsis]]
 == Synopsis
@@ -20,44 +20,37 @@ instance-name
 [[description]]
 == Description
 
-The `create-instance` subcommand creates a \{product---name} instance. This subcommand requires the Distributed Component Object Model (DCOM)
+The `create-instance` subcommand creates a Payara instance. This subcommand requires the Distributed Component Object Model (DCOM)
 remote protocol or secure shell (SSH) to be configured on the host where the domain administration server (DAS) is running and on the host that is represented by the node where the instance is to reside.
 
 NOTE: DCOM or SSH is not required if the instance is to reside on a node of type `CONFIG` that represents the local host. A node of type `CONFIG` is not enabled for remote communication over DCOM or SSH.
 
 You may run this command from any host that can contact the DAS.
 
-A \{product---name} instance is a single Virtual Machine for the Java platform (Java Virtual Machine or JVM machine) on a single node in which \{product---name} is running. A node defines the host where the
-\{product---name} instance resides. The JVM machine must be compatible with the Java Platform, Enterprise Edition (Java EE).
+A Payara instance is a single Virtual Machine for the Java platform (Java Virtual Machine or JVM machine) on a single node in which Payara is running. A node defines the host where the
+Payara instance resides. The JVM machine must be compatible with the Java Platform, Enterprise Edition (Java EE).
 
-A \{product---name} instance requires a reference to the following items:
+A Payara instance requires a reference to the following items:
 
 * The node that defines the host where the instance resides. The node must be specified in the command to create the instance.
 * The named configuration that defines the configuration of the
 instance. The configuration can be specified in the command to create the instance, but is not required. If no configuration is specified for
 an instance that is not joining a cluster, the subcommand creates a configuration for the instance. An instance that is joining a cluster receives its configuration from its parent cluster.
 
-Each \{product---name} instance is one of the following types of instance:
+Each Payara instance is one of the following types of instance:
 
 Standalone instance::
   A standalone instance does not share its configuration with any other instances or clusters. A standalone instance is created if either of the following conditions is met: +
   * No configuration or cluster is specified in the command to create the instance.
   * A configuration that is not referenced by any other instances or clusters is specified in the command to create the instance. +
-  When no configuration or cluster is specified, a copy of the `default-config` configuration is created for the instance.
-  The name of this configuration is instance-name`-config`, where instance-name represents the name of an unclustered server instance.
+  When no configuration or cluster is specified, a copy of the `default-config` configuration is created for the instance. The name of this configuration is instance-name`-config`, where instance-name represents the name of an unclustered server instance.
 Shared instance::
-  A shared instance shares its configuration with other instances or clusters. A shared instance is created if a configuration that is
-  referenced by other instances or clusters is specified in the command to create the instance.
+  A shared instance shares its configuration with other instances or clusters. A shared instance is created if a configuration that is referenced by other instances or clusters is specified in the command to create the instance.
 Clustered instance::
-  A clustered instance inherits its configuration from the cluster to which the instance belongs and shares its configuration with other
-  instances in the cluster. A clustered instance is created if a cluster is specified in the command to create the instance. +
+  A clustered instance inherits its configuration from the cluster to which the instance belongs and shares its configuration with other instances in the cluster. A clustered instance is created if a cluster is specified in the command to create the instance. +
   Any instance that is not part of a cluster is considered an unclustered server instance. Therefore, standalone instances and shared instances are unclustered server instances.
 
-By default, this subcommand attempts to resolve possible port conflicts for the instance that is being created. The subcommand also assigns
-ports that are currently not in use and not already assigned to other instances on the same node. The subcommand assigns these ports on the basis of an algorithm that is internal to the subcommand.
-Use the `--systemproperties` option to resolve port conflicts for additional instances on the same node. System properties of an instance can be manipulated by using the
-xref:create-system-properties.adoc#create-system-properties[`create-system-properties`] subcommand and the
-xref:delete-system-property.adoc#delete-system-property[`delete-system-property`] subcommand.
+By default, this subcommand attempts to resolve possible port conflicts for the instance that is being created. The subcommand also assigns ports that are currently not in use and not already assigned to other instances on the same node. The subcommand assigns these ports on the basis of an algorithm that is internal to the subcommand. Use the `--systemproperties` option to resolve port conflicts for additional instances on the same node. System properties of an instance can be manipulated by using the xref:create-system-properties.adoc#create-system-properties[`create-system-properties`] subcommand and the xref:delete-system-property.adoc#delete-system-property[`delete-system-property`] subcommand.
 
 This subcommand is supported in remote mode only.
 
@@ -70,26 +63,19 @@ asadmin-options::
 `-?`::
   Displays the help text for the subcommand.
 `--node`::
-  The name of the node that defines the host where the instance is to be created. The node must already exist. If the instance is to be created
-  on the host where the domain administration server (DAS) is running, use the predefined node `localhost-`domain.
+  The name of the node that defines the host where the instance is to be created. The node must already exist. If the instance is to be created on the host where the domain administration server (DAS) is running, use the predefined node `localhost-`domain.
 `--config`::
-  Specifies the named configuration that the instance references. The configuration must exist and must not be named `default-config` or
-  `server-config`. Specifying the `--config` option creates a shared instance. +
-  The `--config` option and the `--cluster` option are mutually exclusive. If both options are omitted, a standalone instance is created.
+  Specifies the named configuration that the instance references. The configuration must exist and must not be named `default-config` or `server-config`. Specifying the `--config` option creates a shared instance. The `--config` option and the `--cluster` option are mutually exclusive. If both options are omitted, a standalone instance is created.
 `--cluster`::
-  Specifies the cluster from which the instance inherits its configuration. Specifying the `--cluster` option creates a clustered instance. +
-  The `--config` option and the `--cluster` option are mutually exclusive. If both options are omitted, a standalone instance is created.
+  Specifies the cluster from which the instance inherits its configuration. Specifying the `--cluster` option creates a clustered instance. The `--config` option and the `--cluster` option are mutually exclusive. If both options are omitted, a standalone instance is created.
 `--lbenabled`::
   Specifies whether the instance is enabled for load balancing. Possible values are as follows: +
   `true`;;
-    The instance is enabled for load balancing (default). +
-    When an instance is enabled for load balancing, a load balancer sends requests to the instance.
+    The instance is enabled for load balancing (default). When an instance is enabled for load balancing, a load balancer sends requests to the instance.
   `false`;;
-    The instance is disabled for load balancing. +
-    When an instance is disabled for load balancing, a load balancer does not send requests to the instance.
+    The instance is disabled for load balancing. When an instance is disabled for load balancing, a load balancer does not send requests to the instance.
 `--portbase`::
-  Determines the number with which the port assignment should start. An instance uses a certain number of ports that are statically assigned.
-  The portbase value determines where the assignment should start. The values for the ports are calculated as follows: +
+  Determines the number with which the port assignment should start. An instance uses a certain number of ports that are statically assigned. The portbase value determines where the assignment should start. The values for the ports are calculated as follows: +
   * Administration port: portbase + 48
   * HTTP listener port: portbase + 80
   * HTTPS listener port: portbase + 81
@@ -104,36 +90,23 @@ asadmin-options::
 `--checkports`::
   Specifies whether to check for the availability of the administration, HTTP, JMS, JMX, and IIOP ports. The default value is `true`.
 `--systemproperties`::
-  Defines system properties for the instance. These properties override property definitions for port settings in the instance's configuration.
-  Predefined port settings must be overridden if, for example, two clustered instances reside on the same host.
-  In this situation, port settings for one instance must be overridden because both instances share the same configuration. +
-  The following properties are available: +
+  Defines system properties for the instance. These properties override property definitions for port settings in the instance's configuration. Predefined port settings must be overridden if, for example, two clustered instances reside on the same host. In this situation, port settings for one instance must be overridden because both instances share the same configuration. The following properties are available: +
   `ASADMIN_LISTENER_PORT`;;
-    This property specifies the port number of the HTTP port or HTTPS port through which the DAS connects to the instance to manage the
-    instance. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
+    This property specifies the port number of the HTTP port or HTTPS port through which the DAS connects to the instance to manage the instance. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `HTTP_LISTENER_PORT`;;
-    This property specifies the port number of the port that is used to listen for HTTP requests. Valid values are 1-65535.
-    On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
+    This property specifies the port number of the port that is used to listen for HTTP requests. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `HTTP_SSL_LISTENER_PORT`;;
-    This property specifies the port number of the port that is used to listen for HTTPS requests. Valid values are 1-65535.
-    On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
+    This property specifies the port number of the port that is used to listen for HTTPS requests. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `IIOP_LISTENER_PORT`;;
-    This property specifies the port number of the port that is used for
-    IIOP connections. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
+    This property specifies the port number of the port that is used for IIOP connections. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `IIOP_SSL_LISTENER_PORT`;;
-    This property specifies the port number of the port that is used for
-    secure IIOP connections. Valid values are 1-65535. On UNIX, creating
-    sockets that listen on ports 1-1024 requires superuser privileges.
+    This property specifies the port number of the port that is used for secure IIOP connections. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `IIOP_SSL_MUTUALAUTH_PORT`;;
-    This property specifies the port number of the port that is used for secure IIOP connections with client authentication.
-    Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
+    This property specifies the port number of the port that is used for secure IIOP connections with client authentication. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `JAVA_DEBUGGER_PORT`;;
-    This property specifies the port number of the port that is used for connections to the Java Platform Debugger Architecture (JPDA)
-    (http://www.oracle.com/technetwork/java/javase/tech/jpda-141715.html) debugger.
-    Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
+    This property specifies the port number of the port that is used for connections to the Java Platform Debugger Architecture (JPDA)(http://www.oracle.com/technetwork/java/javase/tech/jpda-141715.html) debugger. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `JMS_PROVIDER_PORT`;;
-    This property specifies the port number for the Java Message Service provider.
-    Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
+    This property specifies the port number for the Java Message Service provider. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `JMX_SYSTEM_CONNECTOR_PORT`;;
     This property specifies the port number on which the JMX connector listens. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `OSGI_SHELL_TELNET_PORT`;;
@@ -155,16 +128,16 @@ instance-name::
   ** Hyphen
   ** Period
   ** Underscore
-  * The name must be unique in the domain and must not be the name of another \{product---name} instance, a cluster, a named configuration, or a node.
+  * The name must be unique in the domain and must not be the name of another Payara instance, a cluster, a named configuration, or a node.
   * The name must not be `domain`, `server`, or any other keyword that is reserved by \{product---name}.
 
 
 [[examples]]
 == Examples
 
-*Example 1 Creating a Standalone \{product---name} Instance*
+*Example 1 Creating a Standalone Payara Instance*
 
-This example creates the standalone \{product---name} instance `pmdsainst` in the domain `domain1` on the local host.
+This example creates the standalone Payara instance `pmdsainst` in the domain `domain1` on the local host.
 
 [source,shell]
 ----
@@ -182,9 +155,9 @@ IIOP_SSL_MUTUALAUTH_PORT=23922
 Command create-instance executed successfully.
 ----
 
-*Example 2 Creating a Standalone \{product---name} Instance With Custom Port Assignments*
+*Example 2 Creating a Standalone Payara Instance With Custom Port Assignments*
 
-This example creates the standalone \{product---name} instance `pmdcpinst` in the domain `domain1` on the local host. Custom port numbers are assigned to the following ports:
+This example creates the standalone Payara instance `pmdcpinst` in the domain `domain1` on the local host. Custom port numbers are assigned to the following ports:
 
 * HTTP listener port
 * HTTPS listener port
@@ -209,9 +182,9 @@ ASADMIN_LISTENER_PORT=24851
 Command create-instance executed successfully.
 ----
 
-*Example 3 Creating a Shared \{product---name} Instance*
+*Example 3 Creating a Shared PayaraInstance*
 
-This example creates the shared \{product---name} instance `pmdsharedinst1` in the domain `domain1` on the local host. The shared configuration of this instance is `pmdsharedconfig`.
+This example creates the shared Payara instance `pmdsharedinst1` in the domain `domain1` on the local host. The shared configuration of this instance is `pmdsharedconfig`.
 
 [source,shell]
 ----
@@ -230,9 +203,9 @@ IIOP_SSL_MUTUALAUTH_PORT=23921
 Command create-instance executed successfully.
 ----
 
-*Example 4 Creating a Clustered \{product---name} Instance*
+*Example 4 Creating a Clustered Payara Instance*
 
-This example creates the clustered \{product---name} instance `pmdinst1` in the domain `domain1` on the local host. The instance is a member of the cluster `pmdclust1`.
+This example creates the clustered Payara instance `pmdinst1` in the domain `domain1` on the local host. The instance is a member of the cluster `pmdclust1`.
 
 [source,shell]
 ----
