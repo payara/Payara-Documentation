@@ -13,25 +13,24 @@ Datadog supports gathering metrics from the following sources:
 * SQL and NoSQL Databases (MySQL, PostgreSQL, MongoDB, CouchBase)
 * Monitoring Solutions (New Relic, Nagios, Splunk, Amazon Cloud Trail)
 
-Payara Server includes a special notifier to send notifications from the xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Notification Service/Overview.adoc[Notification service] to a Datadog account by means of an API key.
+Payara Server includes a special notifier to send notifications from the Notification service to a Datadog account by means of an API key.
 
 [[downloads]]
 == Downloads
 
-- link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/datadog-notifier-core/2.0-enterprise/datadog-notifier-core-2.0-enterprise.jar[Datadog Notifier Core 2.0-enterprise]
-- link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/datadog-notifier-console-plugin/2.0-enterprise-enterprise/datadog-notifier-console-plugin-2.0-enterprise-enterprise.jar[Datadog Notifier Console Plugin 2.0-enterprise]
+- link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/datadog-notifier-core/2.0/datadog-notifier-core-2.0.jar[Datadog Notifier Core 2.0]
+- link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/datadog-notifier-console-plugin/2.0/datadog-notifier-console-plugin-2.0.jar[Datadog Notifier Console Plugin 2.0]
 
 [[datadog-integration-configuration]]
 == Datadog Account Integration
 
 When you create a Datadog account, the service will provide you a default API key that you can use to integrate Payara Server with your account.
 
-NOTE: You can sign up for a free trial account (14 days) if you want to test this integration without having to worry about a permanent subscription.
+TIP: You can sign up for a free trial account (14 days) if you want to test this integration without having to worry about a permanent subscription.
 
 Here are the instructions to retrieve the API keys:
 
-. First, access the Datadog administration panel located at https://app.datadoghq.com/. Then, in the side menu select the _Integrations_ ->
-_APIs_ option:
+. First, access the Datadog administration panel located at https://app.datadoghq.com/. Then, in the side menu select the _Integrations_ -> _APIs_ option:
 +
 image:notification-service/datadog/side-menu.png[Datadog Admin Panel Side Menu]
 
@@ -48,10 +47,10 @@ image:notification-service/datadog/apikey-name-dialog.png[Datadog API Key Name]
 [[payara-server-configuration]]
 == Payara Server Configuration
 
-Having retrieved the API key from Datadog's administration panel, it's necessary to configure this key to the notification service on Payara Server. It's possible to do this either by using the administration web console, from the command line using administration commands or by modifying the _domain.xml_ configuration file directly.
+Having retrieved the API key from Datadog's administration panel, it's necessary to configure this key to the notification service on Payara Server.
 
-[[using-the-administration-web-console]]
-=== Using the Administration Web Console
+[[using-the-admin-console]]
+=== Using the Admin Console
 
 To configure the Notification Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_ and click on the *Datadog* tab:
 
@@ -59,11 +58,10 @@ image:notification-service/datadog/datadog-admin-console-configuration.png[Datad
 
 Check the *Enabled* box (and the *Dynamic* box too if you don't want to restart the domain) and input the three tokens highlighted in the previous section. Hit the *Save* button to preserve the changes.
 
-[[from-the-command-line]]
-=== From the Command Line
+[[using-the-asadmin-cli]]
+=== Using the Asadmin CLI
 
-To configure the Notification Service from the command line, use the `set-datadog-notifier-configuration` asadmin command, specifying the tokens
-like this:
+To configure the Notification Service from the command line, use the `set-datadog-notifier-configuration` asadmin command, specifying the tokens like this:
 
 [source, shell]
 ----
@@ -81,21 +79,6 @@ asadmin > get-datadog-notifier-configuration
 Enabled  Noisy  Key
 true     false  af510f122026bc9107f7c5f4f049e597
 ----
-
-[[on-the-domain.xml-configuration-file]]
-=== On the _domain.xml_ configuration file
-
-To configure the Notification Service in the _domain.xml_ configuration file, locate the `notification-service-configuration` element in the tree and insert the `datadog-notifier-configuration` with the respective attributes like this:
-
-[source, xml]
-----
-<notification-service-configuration enabled="true">
-  <log-notifier-configuration enabled="true"></log-notifier-configuration>
-  <datadog-notifier-configuration enabled="true" key="af510f122026bc9107f7c5f4f049e597"></datadog-notifier-configuration>
-</notification-service-configuration>
-----
-
-WARNING: Modifying the _domain.xml_ configuration is not a supported configuration method, so be careful when considering this option.
 
 [[troubleshooting]]
 == Troubleshooting

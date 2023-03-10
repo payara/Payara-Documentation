@@ -1,25 +1,24 @@
 [[slack-notifier]]
 = Slack Notifier
 
-https://slack.com/[Slack] is a functional enterprise chat and team collaboration tool inspired by IRC. It allows an organisation to create
-specific *domains* and discuss work topics or subjects in separate *channels* that can either be public or private.
+https://slack.com/[Slack] is a functional enterprise chat and team collaboration tool inspired by IRC. It allows an organisation to create specific *domains* and discuss work topics or subjects in separate *channels* that can either be public or private.
 
-Payara Server includes a special notifier to send notifications from the xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Notification Service/Overview.adoc[Notification service] to an organisation's domain channel using Slack API integrations.
+Payara Server includes a special notifier to send notifications from the Notification service to an organisation's domain channel using Slack API integrations.
 
 [[downloads]]
 == Downloads
 
-- link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/slack-notifier-core/2.0-enterprise/slack-notifier-core-2.0-enterprise.jar[Slack Notifier Core 2.0-enterprise]
-- link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/slack-notifier-console-plugin/2.0-enterprise/slack-notifier-console-plugin-2.0-enterprise.jar[Slack Notifier Console Plugin 2.0-enterprise]
+- link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/slack-notifier-core/2.0/slack-notifier-core-2.0.jar[Slack Notifier Core 2.0]
+- link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/slack-notifier-console-plugin/2.0/slack-notifier-console-plugin-2.0.jar[Slack Notifier Console Plugin 2.0]
 
 [[slack-integration-configuration]]
 == Slack Integration Configuration
 
 In order to allow the notification service to log events on a Slack channel of your choice, you must fulfill the following requirements first:
 
-* Have created a Slack account within your organisation's domain (for example *payara.slack.com*)
-* Have a Slack account with granted permissions to create channels and configure API integrations.
-* Have created a Slack channel which will be used by the notification service to report notification events.
+. Have created a Slack account within your organisation's domain (for example `payara.slack.com`)
+. Have a Slack account with granted permissions to create channels and configure API integrations.
+. Have created a Slack channel which will be used by the Notification Service to report notification events.
 
 Once you have completed these requirements, you can configure an https://api.slack.com/incoming-webhooks[Incoming Webhook integration] for the channel. An _Incoming Webhook_ is the simplest integration mechanism that Slack provides, in that they make use of normal HTTP requests with a _JSON_ payload that includes the message text and additional options to format incoming messages to the channel.
 
@@ -57,21 +56,23 @@ image:notification-service/slack/webhook-additional-settings.png[WebHook Additio
 [[payara-server-configuration]]
 == Payara Server Configuration
 
-With the Incoming WebHook properly configured, now it's time to setup the Notification Service in the domain configuration. As usual you can do this using the administration web console, from the command line or editing the _domain.xml_ configuration file directly.
+With the Incoming WebHook properly configured, now it's time to setup the Notification Service in the domain configuration.
 
-[[using-the-administration-web-console]]
-=== Using the Administration Web Console
+[[using-the-admin-console]]
+=== Using the Admin Console
 
-To configure the Notification Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_ and click on the *Slack* tab:
+To configure the Notification Service in the Administration Console, go  to _Configuration -> [instance-configuration (like server-config)] ->
+Notification Service_ and click on the *Slack* tab:
 
 image:notification-service/slack/slack-admin-console-configuration.png[Slack Configuration on Admin Console]
 
 Check the *Enabled* box (and the *Dynamic* box too if you don't want to restart the domain) and input the three tokens highlighted in the previous section. Hit the *Save* button to preserve the changes.
 
-[[from-the-command-line]]
-=== From the Command Line
+[[using-asadmin-cli]]
+=== Using the Asadmin CLI
 
-To configure the Notification Service from the command line, use the `set-slack-notifier-configuration` asadmin command, specifying the tokens like this:
+To configure the Notification Service from the command line, use the `set-slack-notifier-configuration` asadmin command, specifying the tokens
+like this:
 
 [source, shell]
 ----
@@ -89,20 +90,6 @@ asadmin > get-slack-notifier-configuration
 Enabled  Noisy  Token 1    Token 2    Token 3
 true     false  T43CHENUC  B441EFQB1  Jas8P3jCZ4wK8Y2m88dCxGkn
 ----
-
-[[on-the-domain.xml-configuration-file]]
-=== On the _domain.xml_ configuration file
-
-To configure the Notification Service in the _domain.xml_ configuration file, locate the `notification-service-configuration` element in the tree and insert the `slack-notifier-configuration` with the respective attributes like this:
-
-[source, xml]
-----
-<notification-service-configuration enabled="true">
-    <slack-notifier-configuration token1="T43CHENUC" token2="B441EFQB1" token3="Jas8P3jCZ4wK8Y2m88dCxGkn" enabled="true"></slack-notifier-configuration>
-</notification-service-configuration>
-----
-
-WARNING: Modifying the domain.xml configuration is not a supported configuration method, so be careful when considering this option.
 
 [[troubleshooting]]
 == Troubleshooting
