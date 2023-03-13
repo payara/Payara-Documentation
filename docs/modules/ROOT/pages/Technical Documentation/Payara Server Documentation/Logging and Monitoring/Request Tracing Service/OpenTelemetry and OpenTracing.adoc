@@ -2,29 +2,30 @@
 = OpenTelemetry and OpenTracing support
 
 Payara Server and Payara Micro natively support OpenTelemetry APIs as well as export of traces over OTLP protocol.
-Natively in the context means, that deployment of OpenTelemetry Agent is not necessary and may lead to duplicate traces.
+Natively in this context means, that deployment of an OpenTelemetry Agent is not necessary and may lead to duplicate traces.
 
-All of OpenTracing support in Payara products is done by means of https://opentelemetry.io/docs/migration/opentracing[OpenTracing Compatibility Layer].
+All OpenTracing support in Payara products is done by means of https://opentelemetry.io/docs/migration/opentracing[OpenTracing Compatibility Layer].
 
 Payara Server and Payara Micro satisfy requirements of both link:{mpOpenTracingSpecUrl}[MicroProfile OpenTracing {mpOpenTracingVersion}] and link:{mpTelemetrySpecUrl}[MicroProfile Telemetry Tracing {mpTelemetryVersion}] provided appropriate <<span-convention-settings>> are applied.
 
-Implementation only covers tracing aspect of OpenTelemetry, no metrics or logs are provided by default.
+Implementation only covers the tracing aspect of OpenTelemetry, no metrics or logs are provided by default.
 Manual instrumentation is needed to enable these.
 
 == Enabling OpenTelemetry
 
-OpenTelemetry is enabled for particular application when:
+OpenTelemetry is enabled for a particular application when:
 
-* it defines MicroProfile config property `otel.sdk.disabled` with value of `false` as defined by MicroProfile Telemetry Tracing; or
-* Request Tracing Service is enabled; or
-* System property `otel.sdk.disabled` is set to `false`, or environment variable `OTEL_SDK_DISABLED` is set to `false`
+* It defines MicroProfile config property `otel.sdk.disabled` with value of `false` as defined by MicroProfile Telemetry Tracing
+* Request Tracing Service is enabled
+* System property `otel.sdk.disabled` is set to `false`
+* Environment variable `OTEL_SDK_DISABLED` is set to `false`
 
 [[configuring-opentelemetry]]
 == Configuring OpenTelemetry
 
-When OpenTelemetry is enabled it proceeds to configure OpenTelemetry components by means of link:https://github.com/open-telemetry/opentelemetry-java/blob/v{openTelemetryVersion}/sdk-extensions/autoconfigure/README.md[autoconfiguration], using application's MicroProfile Config properties prefixed with `otel.` first, but also falling back to system properties and environment variables as described in linked documentation.
+When OpenTelemetry is enabled it proceeds to configure OpenTelemetry components by means of link:https://github.com/open-telemetry/opentelemetry-java/blob/v{openTelemetryVersion}/sdk-extensions/autoconfigure/README.md[autoconfiguration], using the application's MicroProfile Config properties prefixed with `otel.` first, but also falling back to system properties and environment variables as described in the linked documentation.
 
-If the configured component does not ship with Payara distribution, it can be added as server or application library as described in <<using-additional-components>>.
+If the configured component does not ship with Payara distribution, it can be added as a server or application library as described in <<using-additional-components>>.
 
 === Default Settings
 
@@ -35,7 +36,7 @@ With no other configuration properties specified OpenTelemetry components will:
 * Respect parent trace's sampling decision and always sample local root traces (sampler setting `parentbased_always_on`)
 * Will not export metrics or logs
 
-To easily receive traces in default configuration run following Jaeger container and then access its UI at port `16686`:
+To easily receive traces in default configuration run the following Jaeger container and then access its UI at port `16686`:
 
 [source,bash]
 ----
@@ -51,10 +52,10 @@ docker run --name jaeger \
 === Span Convention Settings
 
 In order to improve consistency among products our implementation offers several strategies of naming and tagging spans of Jakarta REST client and server calls.
-These are configured by specifying MicroProfile Config property `payara.telemetry.span-convention` of your application.
-Following values are accepted:
+These are configured by specifying the MicroProfile Config property `payara.telemetry.span-convention` for your application.
+The following values are accepted:
 
-* `opentelemetry` follows convention presribed by https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/http/[OpenTelemetry semantic conventions for HTTP spans] (default setting)
+* `opentelemetry` follows convention prescribed by https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/http/[OpenTelemetry semantic conventions for HTTP spans] (default setting)
 * `opentracing-http-path` satisfies MicroProfile OpenTracing setting for Operation Name Provider `http-path`
 * `opentracing-class-method` corresponds to MicroProfile OpenTracing setting for Operation Name Provider `class-method`
 * `microprofile-telemetry` satisfies span naming as tested by the MicroProfile Telemetry Tracing TCK
@@ -68,7 +69,7 @@ Let's assume `GET` request made to `/app/rest/resource/method`, where
 * `/resource` is `@Path` annotation of class `example.Resource`
 * `/method` is `@Path` annotation of method `restMethod`
 
-Following span names will be created for this request for different Span Convention settings:
+The following span names will be created for this request for different Span Convention settings:
 
 |===
 | span-convention setting| Server Span Name
@@ -82,24 +83,24 @@ Following span names will be created for this request for different Span Convent
 
 === Suppressing Export Warning Message
 
-When export endpoint is not available in default setting following error message is logged by logger `io.opentelemetry.exported.internal.grpc.OkHttpGrpcExporter`:
+When the export endpoint is not available in default setting the following error message is logged by logger `io.opentelemetry.exported.internal.grpc.OkHttpGrpcExporter`:
 
 > Failed to export spans. The request could not be executed. Full error message: Failed to connect to `localhost/127.0.0.1:4317`
 
-If you don't intend to run OTEL endpoint on localhost or at all you need to configure exporter by means of MP Config Properties, system properties or environment variables:
+If you don't intend to run an OTEL endpoint on localhost or at all you need to configure exporter by means of MP Config Properties, system properties, or environment variables:
 
 * in order to turn off exports set `otel.traces.exporter` to `none`
 * in order to set remote endpoint `otel.exporter.otlp.endpoint` to `http://<collector-host>:<port>`
 
 == Manual tracing
 
-In order to fine-tune spans and have better control about their boundaries one can use directly either OpenTracing on OpenTelemetry APIs.
+In order to fine-tune spans and have better control about their boundaries one can use directly either the OpenTracing or OpenTelemetry APIs.
 
 === Dependencies
 
 The appropriate versions of APIs are provided by xref:/Technical Documentation/Ecosystem/Project Management Tools/Maven Bom.adoc[Payara BOM artifact] matching the version of Payara Server or Micro you are using.
 
-Server provides following APIs and it is advised to mark them as `provided` dependencies in your application and don't package them with it:
+Payara Platform provides the following APIs and it is advised to mark them as `provided` dependencies in your application and don't package them with it:
 
 * `io.opentelemetry:opentelemetry-sdk-extension-autoconfigure`
 * `io.opentelemetry:opentelemetry-sdk`
@@ -174,7 +175,7 @@ public class TracedComponent {
 [[using-additional-components]]
 == Using additional components
 
-If your application requires OpenTracing components that are not shipped with server, it is possible to either put them in common libraries, or ship them with an application.
+If your application requires OpenTracing components that are not shipped with Payara Platform, it is possible to either put them in common libraries, or ship them with an application.
 Extension components can be even coded directly in the application code.
 
 === Provider components in library directory
@@ -240,11 +241,11 @@ public class LogExporter implements SpanExporter {
 
 == Relation to Request Tracing Service
 
-All spans created by OpenTelemetry and OpenTracing APIs are passed into Request Tracing Service when span ends.
-Propagated trace IDs are propagated into Request Tracing Service at start of span.
+All spans created by OpenTelemetry and OpenTracing APIs are passed into Request Tracing Service when they end.
+Propagated trace IDs are propagated into Request Tracing Service at the start of spans.
 
 Sampling decisions of Request Tracing service are _not_ taken into account when these traces are created, because Request Tracing Service does tracing decision at the end of span rather than at the beginning.
-This means that trace might get exported via OTLP but not passed to notifiers configured in Request Tracing Service, because the service might have taken decision not to sample this particular trace.
+This means that traces might get exported via OTLP but not passed to the notifiers configured in the Request Tracing Service, because the service might have taken the decision not to sample this particular trace.
 
 Information that server's components put into Request Tracing Service is not available to OpenTelemetry traces, as information does not flow in this direction.
 However, more and more parts of Payara Server will gradually switch to using OpenTelemetry API natively and therefore this gap will eventually close.

@@ -53,17 +53,3 @@ It is not possible to use other OpenTracing implementations in Payara Platform 6
 It is however possible to deploy and configure other OpenTelemetry exporters (i. e. zipkin) into the server or ship them with application. Please consult xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/OpenTelemetry and OpenTracing.adoc#using-additional-components[OpenTelemetry Configuration].
 
 
-
-[[microprofile-4-upgrade]]
-== Upgrading from MicroProfile 3.x to 4.x
-
-MicroProfile 4.0 brings with it a number of changes to MicroProfile OpenTracing, among these changes are some which break previous behaviour. The breaking changes are primarily to do with the removal of a number of methods from the API, and only affect the use of OpenTracing programmatically (the use of the annotations has not changed).
-
-The following methods have all been removed, and the alternative method to use provided if available:
-
-* `ScopeManager.active()` - This method no longer returns a `Scope`, and now returns the active `Span`.
-* `ScopeManager.activate(Span, boolean)` - Use `ScopeManager.activate(Span)`
-* `Scope.span()` - Use `ScopeManager.activeSpan()`, `Tracer.activeSpan()`, or hold the `Span` reference returned from
-`SpanBuilder.start()`.
-* `SpanBuilder.startActive()` - Use `Tracer.activateSpan(Span)` or `ScopeManager.activate(Span)`
-* `SpanBuilder.startManual()` - Use `SpanBuilder.start()`.
