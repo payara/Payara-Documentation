@@ -4,13 +4,25 @@
 This appendix describes the element hierarchies in the Payara Server
 deployment descriptors that are included in this release of the Payara Server software.
 
+The following topics are addressed here:
+
+* xref:about-the-payara-server-deployment-descriptors[About the Payara Server Deployment Descriptors]
+* xref:the-glassfish-application.xml-file[The glassfish-application.xml File]
+* xref:the-glassfish-web.xml-file[The glassfish-web.xml File]
+* xref:the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]
+* xref:the-sun-cmp-mappings.xml-file[The sun-cmp-mappings.xml File]
+* xref:the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]
+* xref:the-sun-acc.xml-file[The sun-acc.xml File]
+* xref:the-glassfish-resources.xml-file[The glassfish-resources.xml File]
+* xref:weblogic-server-deployment-descriptor-support-in-payara-server[WebLogic Server Deployment Descriptor Support in Payara Server]
+
 [[about-the-payara-server-deployment-descriptors]]
 == About the Payara Server Deployment Descriptors
 
 Each deployment descriptor XML file has a corresponding Document Type Definition (DTD) file, which defines the elements, data, and attributes that
 the deployment descriptor file can contain.
 For example, the `glassfish-application_6_0-1.dtd` file defines the structure of the `glassfish-application.xml` file.
-The DTD files for the Payara Server deployment descriptors are located in the as-install`/lib/dtds` directory.
+The DTD files for the Payara Server deployment descriptors are located in the `as-install/lib/dtds` directory.
 
 The Payara Server deployment descriptor files must be readable and writable by the file owners.
 In each deployment descriptor file, sub-elements must be defined in the order in which they are listed under each Sub-elements heading, unless otherwise noted.
@@ -811,7 +823,7 @@ glassfish-application-client
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE glassfish-application-client PUBLIC ""-//GlassFish.org//DTD 
 GlassFish Application Server 3.1 Application Client 6.0//EN"" 
-"http://glassfish.org/dtds/glassfish-application-client_6_0-1.dtd">
+"http://glassfish.org/dtds/glassfish-application-client_6_0-2.dtd">
 <glassfish-application-client>
   <message-destination-ref>
     <message-destination-ref-name>ClientQueue</message-destination-ref-name>
@@ -824,7 +836,7 @@ GlassFish Application Server 3.1 Application Client 6.0//EN""
 == The sun-acc.xml File
 
 The `sun-acc.xml` file configures the Application Client Container. This is more of a configuration file than a deployment descriptor.
-Payara Server provides a default file in the domain-dir`/config` directory. Specifying a different file is optional. The element hierarchy is as follows:
+Payara Server provides a default file in the `domain-dir/config` directory. Specifying a different file is optional. The element hierarchy is as follows:
 
 [source,text]
 ----
@@ -906,15 +918,15 @@ resources
 
 Payara Server offers limited support for the `weblogic-application.xml`, `weblogic.xml`, and `weblogic-webservices.xml` deployment descriptor files.
 
-The only element in `weblogic-application.xml` that Payra Server supports is `security`. The equivalent element in the `glassfish-application.xml` file is `security-role-mapping`.
+The only element in `weblogic-application.xml` that Payara Server supports is `security`. The equivalent element in the `glassfish-application.xml` file is `security-role-mapping`.
 
-The elements of `weblogic.xml` that GlassFish Server supports are explained in the following table.
+The elements of `weblogic.xml` that Payara Server supports are explained in the following table.
 
 .`weblogic.xml` Support in Payara Server
 
 [cols="2,6",options="header"]
 |===
-| `weblogic.xml` Element Name | Payara Server Support
+| *`weblogic.xml` Element Name* | *Payara Server Support*
 
 | `role-name` under `security-role-assignment`
 | `role-name` under `security-role-mapping` `glassfish-web.xml` equivalent
@@ -1011,11 +1023,11 @@ The elements of `weblogic-webservices.xml` that Payara Server supports are expla
 .`weblogic-webservices.xml` Support in Payara Server
 [cols="3,6",options="header"]
 |===
-| `weblogic-webservices.xml` Element Name | Payara Server Support
+| *`weblogic-webservices.xml` Element Name* | *Payara Server Support*
 
 | `webservice-type`
-| Possible values are `JAXRPC` or `JAXWS`. Payara Server does not support JAX-RPC web services with JSR 181 annotations.
-The use of this element is limited, because the container can find out if the type is JAX-WS or JAX-RPC based on presence of JSR 181 annotations.
+| Possible values are `JAXRPC` or `JAXWS`. Payara Server does not support JAX-RPC web services with Jakarta Web Services Metadata annotations.
+The use of this element is limited, because the container can find out if the type is JAX-WS or JAX-RPC based on presence of Jakarta Web Services Metadata annotations.
 
 | `wsdl-publish-file`
 | Same as `wsdl-publish-location` in `glassfish-web.xml`
