@@ -532,3 +532,138 @@ If the log file indicates that a Message Queue broker acting as a Remote JMS hos
 asadmin set domain1.jms-service.reconnect-interval-in-seconds=5
 ----
 
+[[using-activemq-with-payara-server]]
+== Using ActiveMQ with Payara Server
+
+Payara Server comes with it's own message queue broker: OpenMQ. However, ActiveMQ is also an option for a message queue broker. This section describes how to use ActiveMQ with Payara Server.
+
+[[installing-activemq]]
+=== Installing ActiveMQ
+The latest version of ActiveMQ can be downloaded from here: https://activemq.apache.org/components/classic/download/[ActiveMQ Downloads]
+
+Once downloaded, unzip the file and navigate to /bin folder and run the following command in order to start ActiveMQ:
+
+[source,shell]
+----
+activemq start
+----
+
+image:docs:administration-guide:activemq-1.png[ActiveMQ Console]
+
+This is going to start the ActiveMQ broker at http://127.0.0.1:8161
+
+After accessing the web console and logged in with the default credentals (admin/admin), you can create a new queue or topic by clicking on the Queues tab, inputting a name to Queue Name text box and clicking on "Create" button. For the purpose of this example we will create a queue named "TESTQ".
+
+[[deploying-the-activemq-rar-to-payara-server]]
+=== Deploy the ActiveMQ RAR to Payara Serve
+In order to use ActiveMQ with Payara Server, you need to deploy the ActiveMQ RAR to Payara Server. You can download the ActiveMQ RAR from here: https://mvnrepository.com/artifact/org.apache.activemq/activemq-rar/5.17.4[ActiveMQ RAR]
+
+The rar needs then to be deployed to Payara Server. This can be done by using the Payara Admin Console or by using the following asadmin command:
+[source,shell]
+----
+asadmin deploy --type rar activemq-rar-5.17.4.rar
+----
+
+[[configuring-the-activemq-connector]]
+=== Configuring the ActiveMQ Connector
+The first thing to do is to create a new JMS Resource Adapter Config. This can be done by using the Payara Admin Console or by using the following asadmin command:
+
+[source,shell]
+----
+asadmin create-resource-adapter-config  --property ServerUrl=tcp://127.0.0.1:61616:UserName='admin':Password='admin' activemq-rar-5.17.4
+----
+
+If you chose to use the Payara Admin Console, you will need to create a new JMS Resource Adapter Config by clicking on the "JMS Resource Adapter Configs" link under the "Resources" section of the left menu. The key properties for a default ActiveMQ configuration are:
+
+[[table-jms-resource-adapter-config-properties]]
+|===
+|Property |Value
+
+|ServerUrl
+|tcp://127.0.0.1:61616
+
+|UserName
+|admin
+
+|Password
+|admin
+|===
+
+Now we need to create a new JMS Connector Connection Pool as shown in the following screenshots:
+
+image:docs:administration-guide:activemq-2.png[Payara Admin Console - JMS Connector Connection Pool 1]
+
+image:docs:administration-guide:activemq-3.png[Payara Admin Console - JMS Connector Connection Pool 2]
+
+The Connactor Connection Pool can also be created by using the following asadmin command:
+
+[source,shell]
+----
+asadmin create-connector-connection-pool --raname activemq-rar-5.17.4 --connectiondefinition javax.jms.ConnectionFactory --ping true --isconnectvalidatereq true jms/myConnectionPool
+----
+
+Another configuration needed is the JNDI mapping for te JMS Connector Connection Pool. This can be done by using the Payara Admin Console following this screenshot:
+
+image:docs:administration-guide:activemq-4.png[Payara Admin Console - JMS Connector Resource]
+
+Alternatively you can use the follwing asadmin command:
+[source,shell]
+----
+asadmin create-connector-resource --poolname jms/myConnectionPool jms/myConnectionFactory
+----
+
+Now we have the connection factory configured we can also create a JMS mapping to our Queue. This can be done by using the Payara Admin Console following this screenshot:
+
+image:docs:administration-guide:activemq-5.png[Payara Admin Console - JMS mapping]
+
+Again, if you prefer, you can use the follwing asadmin command to create the same mapping:
+
+[source,shell]
+----
+asadmin create-admin-object --raname activemq-rar-5.17.4 --restype javax.jms.Queue --property PhysicalName=TESTQ jms/TESTQ
+----
+
+[[testing-the-activemq-configuration-via-mdb]]
+=== Testing the ActiveMQ Configuration via MDB
+Below shows the code for an MDB that listens on the queue configured in this blog within ActiveMQ. We can see that both the resource adapter, the physical name of the queue and the JNDI name are set as Activation Properties of the MDB.
+
+[source,java]
+----
+package fish.payara.support.activemqtest;
+
+import javax.ejb.ActivationConfigProperty;
+import javax.ejb.MessageDriven;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+
+@MessageDriven(name = "testmdb", activationConfig = {
+    @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "jms/TESTQ"),
+    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+    @ActivationConfigProperty(propertyName = "destination", propertyValue = "TESTQ"),
+    @ActivationConfigProperty(propertyName = "resourceAdapter", propertyValue = "activemq-rar-5.17.4")
+
+})
+public class NewMessageBean implements MessageListener {
+
+    public NewMessageBean() {
+    }
+
+    @Override
+    public void onMessage(Message message) {
+        System.out.println("Got message " + message);
+    }
+}
+
+----
+
+If we build and deploy this MDB we will see in the Active MQ console that we have a single consumer on our queue.
+
+image:docs:administration-guide:activemq-6.png[ActiveMQ Console - Consumer]
+
+We can test the MDB by sending a message using the ActiveMQ console.
+
+image:docs:administration-guide:activemq-7.png[ActiveMQ Console - Sending a message]
+
+Once you have sent the message we can check the server log, the message will be printed out:
+
+image:docs:administration-guide:activemq-8.png[Payara Server Log]
