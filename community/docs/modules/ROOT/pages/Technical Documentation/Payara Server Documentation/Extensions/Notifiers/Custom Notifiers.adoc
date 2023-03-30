@@ -1,0 +1,498 @@
+[[creating-custom-notifiers]]
+= Create Custom Notifiers
+
+The notification service allows customized notifiers to be implemented by users in a modular fashion. New notifiers can be plugin into Payara Server easily. The following are the general steps to follow to implement a custom notifier.
+
+[[requirements]]
+== Requirements
+
+. A notifier configuration class
++
+_The data needs to be stored in the `domain.xml` configuration file_
+
+. Asadmin CLI subcommand definitions
++
+_That will be used to read and write the notifier's configuration, including the plugin's activation_
+. The Notifier's implementation class
++
+_Which takes the Notification event and writes it to the channel of your choice._
+. Optionally, an additional module plugin for the Admin Console
++
+_Which allows the notifier to be managed through the Admin Console_
+
+[[setup]]
+== Project Setup
+
+A custom notifier us composed of 2 OSGI module bundles:
+
+* One bundle contains the classes for the configuration, the Asadmin CLI subcommands and the notifier implementations.
+* Another (optional) bundle contains the plugin classes for the notifier's management in the Admin Console.
+
+Since each module must be an OSGI module, you'll have to define the following Maven packaging:
+
+[source, xml]
+----
+<packaging>glassfish-jar</packaging>
+----
+
+The following plugins are used to generate the correct OSGI module to be bundled in Payara Server:
+
+[source, xml]
+----
+<plugins>
+    <plugin>
+        <groupId>org.glassfish.build</groupId>
+        <artifactId>glassfishbuild-maven-plugin</artifactId>
+        <version>3.2.20.payara-p2</version>
+        <extensions>true</extensions>
+        <configuration>
+            <dir>${project.build.directory}/classes</dir>
+        </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>hk2-inhabitant-generator</artifactId>
+        <version>2.6.1.payara-p1</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>generate-inhabitants</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <supportedProjectTypes>jar,glassfish-jar</supportedProjectTypes>
+        </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>4.1.0</version>
+        <executions>
+            <execution>
+                <id>default-manifest</id>
+                <phase>process-classes</phase>
+                <goals>
+                    <goal>manifest</goal>
+                </goals>
+                <configuration>
+                    <Export-Package />
+                    <instructions>
+                        <_include>-osgi.bundle</_include>
+                    </instructions>
+                    <excludeDependencies>tools-jar</excludeDependencies>
+                    <supportedProjectTypes>
+                        <supportedProjectType>glassfish-jar</supportedProjectType>
+                        <supportedProjectType>jar</supportedProjectType>
+                    </supportedProjectTypes>
+                </configuration>
+            </execution>
+        </executions>
+        <configuration>
+            <Export-Package />
+            <instructions>
+                <_include>-osgi.bundle</_include>
+            </instructions>
+            <excludeDependencies>tools-jar</excludeDependencies>
+            <supportedProjectTypes>
+                <supportedProjectType>glassfish-jar</supportedProjectType>
+                <supportedProjectType>jar</supportedProjectType>
+            </supportedProjectTypes>
+        </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.glassfish.build</groupId>
+        <artifactId>command-security-maven-plugin</artifactId>
+        <version>1.0.10.payara-p1</version>
+        <configuration>
+            <isFailureFatal>false</isFailureFatal>
+        </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>config-generator</artifactId>
+        <version>2.5.0-b53</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>generate-injectors</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <supportedProjectTypes>jar,glassfish-jar</supportedProjectTypes>
+        </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>osgiversion-maven-plugin</artifactId>
+        <version>2.6.1.payara-p1</version>
+        <executions>
+            <execution>
+                <id>default-compute-osgi-version</id>
+                <phase>process-classes</phase>
+                <goals>
+                    <goal>compute-osgi-version</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <dropVersionComponent>qualifier</dropVersionComponent>
+            <versionPropertyName>project.osgi.version</versionPropertyName>
+        </configuration>
+    </plugin>
+</plugins>
+----
+
+The specific versions of these plugins can be found in the Payara Artifacts repository on Nexus:
+
+[source, xml]
+----
+<repositories>
+    <repository>
+        <id>payara-artifacts</id>
+        <name>Payara Artifacts</name>
+        <url>https://nexus.payara.fish/repository/payara-artifacts/</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
+</repositories>
+----
+
+The Notifier API itself is available in the `internal-api` artifact that is located in the Payara Platform's Public Nexus repository:
+
+[source, xml, subs=attributes+]
+----
+<dependency>
+    <groupId>fish.payara.server.core.common</groupId>
+    <artifactId>internal-api</artifactId>
+    <version>{page-version}</version>
+    <optional>true</optional>
+</dependency>
+----
+
+NOTE: Any additional dependencies that you custom notifier implementation needs must be specified and included when you install the bundles in Payara Server.
+
+Have a look at https://github.com/payara/Notifiers[Notifiers GitHub repository] for the setup of the current Notifiers.
+
+[[instalation]]
+== Installation
+
+After the OSGI module is built and packaged by Maven, simply drop the JAR file in the `<PAYARA-HOME>/glassfish/modules` directory and restart the domain.
+
+[[configuration]]
+== Notifier Configuration
+
+By default, a notifier implementation has 3 basic configuration parameters
+
+`enabled`:: Is the Notifier active?
+`dynamic`:: Whether to apply the changes immediately (true) or after server restart.
+`noisy`:: When set, the notifier includes verbose information in the output.
+
+Additional configuration options can be provided by defining properties using the `org.jvnet.hk2.config.Attribute` annotation like this:
+
+[source, java]
+----
+import org.jvnet.hk2.config.Attribute;
+import org.jvnet.hk2.config.Configured;
+
+import fish.payara.internal.notification.PayaraNotifierConfiguration;
+
+@Configured
+public interface CustomNotifierConfiguration extends PayaraNotifierConfiguration {
+
+    @Attribute(defaultValue = "*", dataType = String.class)
+    String getTestValue();
+    void setTestValue(String value) throws PropertyVetoException;
+
+    @Attribute(required = false, dataType = Integer.class)
+    Integer getThresholdValue();
+    void setThresholdValue(Integer value) throws PropertyVetoException;
+
+    @Attribute(dataType = Boolean.class, defaultValue = "true")
+    Boolean getDuplicateValue();
+    void setDuplicateValue(Boolean value) throws PropertyVetoException;
+}
+----
+
+From the above code the following components are used:
+
+* `@Configured`: Defines the interface as part of the configuration, and a suitable proxy holding the actual configuration values will be created at runtime.
+* `PayaraNotifierConfiguration`: Holds the common attributes like _enabled_ and _noisy_, and is required for storing it in the `domain.xml` configuration file.
+* `@Attribute`: Defines an additional configuration property. You can specify the type of the value (`dataType`), if the value is required (`required`), and a default value if the user doesn't specify it explicitly (`defaultValue`).
+
+[[asadmin-commands]]
+== Notifier Asadmin CLI Subcommands
+
+Asadmin CLI subcommands are required for your custom notifier to be configured and enabled once it is installed in Payara Server. Although you can choose the name of these commands with whatever suits you best, it is recommended to follow this convention:
+
+[source, text]
+----
+get-<notifierName>-notifier-configuration
+set-<notifierName>-notifier-configuration
+----
+
+For each subcommand, you must create its corresponding implementation class. Here's the class for the command that retrieves the notifier's configuration settings:
+
+[source, java]
+----
+import org.glassfish.api.admin.CommandLock;
+import org.glassfish.api.admin.ExecuteOn;
+import org.glassfish.api.admin.RestEndpoint;
+import org.glassfish.api.admin.RestEndpoints;
+import org.glassfish.api.admin.RuntimeType;
+import org.glassfish.config.support.CommandTarget;
+import org.glassfish.config.support.TargetType;
+import org.glassfish.hk2.api.PerLookup;
+import org.jvnet.hk2.annotations.Service;
+
+import fish.payara.internal.notification.admin.BaseGetNotifierConfigurationCommand;
+import fish.payara.internal.notification.admin.NotificationServiceConfiguration;
+
+@Service(name = "get-custom-notifier-configuration")
+@PerLookup
+@CommandLock(CommandLock.LockType.NONE)
+@ExecuteOn({RuntimeType.DAS, RuntimeType.INSTANCE})
+@TargetType(value = {CommandTarget.DAS, CommandTarget.STANDALONE_INSTANCE, CommandTarget.CLUSTER, CommandTarget.CLUSTERED_INSTANCE, CommandTarget.CONFIG})
+@RestEndpoints({
+   @RestEndpoint(configBean = NotificationServiceConfiguration.class,
+       opType = RestEndpoint.OpType.GET,
+       path = "get-custom-notifier-configuration",
+       description = "Lists Custom Notifier Configuration")
+})
+public class GetCustomNotifierConfigurationCommand extends BaseGetNotifierConfigurationCommand<CustomNotifierConfiguration> {
+
+    @Override
+    protected Map<String, Object> getNotifierConfiguration(CustomNotifierConfiguration configuration) {
+        Map<String, Object> map = super.getNotifierConfiguration(configuration);
+
+        if (configuration != null) {
+            map.put("Test Value", configuration.getTestValue());
+            //...
+        }
+
+        return map;
+    }
+
+}
+----
+
+From the above code notice the following elements:
+
+* `@Service(name = "get-custom-notifier-configuration")`: Defines the command's name.
+* `@ExecuteOn` and `@TargetType`: Determines on which environments the command can be used. Make sure it can be run on both the domain and separate server instances.
+* `@RestEndpoint`: All Asadmin CLI commands are handled via REST calls to the DAS. This annotation defines the endpoint (name, type, etc) and is required to make the command work.
+* `BaseGetNotifierConfigurationCommand<CustomNotifierConfiguration>`: Base implementation of the asadmin command to retrieve the configuration for a notifier.
+* `protected Map<String, Object> getNotifierConfiguration()`: Method that needs to be implemented to retrieve the specific values of the notifier. The result is a Map that contains the configuration that will be printed as the result of the Asadmin command.
+
+The following class implements the specifics of a sample command that modifies the notifier's configuration:
+
+[source, java]
+----
+import java.beans.PropertyVetoException;
+
+import org.glassfish.api.Param;
+import org.glassfish.api.admin.CommandLock;
+import org.glassfish.api.admin.ExecuteOn;
+import org.glassfish.api.admin.RestEndpoint;
+import org.glassfish.api.admin.RestEndpoints;
+import org.glassfish.api.admin.RuntimeType;
+import org.glassfish.config.support.CommandTarget;
+import org.glassfish.config.support.TargetType;
+import org.glassfish.hk2.api.PerLookup;
+import org.jvnet.hk2.annotations.Service;
+
+import fish.payara.internal.notification.admin.BaseSetNotifierConfigurationCommand;
+import fish.payara.internal.notification.admin.NotificationServiceConfiguration;
+
+
+@Service(name = "set-custom-notifier-configuration")
+@PerLookup
+@CommandLock(CommandLock.LockType.NONE)
+@ExecuteOn({RuntimeType.DAS, RuntimeType.INSTANCE})
+@TargetType(value = {CommandTarget.DAS, CommandTarget.STANDALONE_INSTANCE, CommandTarget.CLUSTER, CommandTarget.CLUSTERED_INSTANCE, CommandTarget.CONFIG})
+@RestEndpoints({
+        @RestEndpoint(configBean = NotificationServiceConfiguration.class,
+                opType = RestEndpoint.OpType.POST,
+                path = "set-custom-notifier-configuration",
+                description = "Configures Custom Notification Service")
+})
+public class SetCustomNotifierConfigurationCommand extends BaseSetNotifierConfigurationCommand<CustomNotifierConfiguration> {
+
+    @Param(name = "testValue")
+    private String testValue;
+
+    @Param(name = "thresholdValue", optional = true)
+    private Integer thresholdValue;
+
+    @Param(name = "duplicateValue")
+    private Boolean duplicateValue;
+
+    @Override
+    protected void applyValues(CustomNotifierConfiguration configuration) throws PropertyVetoException {
+        super.applyValues(configuration);
+        if (this.testValue != null) {
+            configuration.setTestValue(this.testValue);
+        }
+        // ...
+    }
+
+}
+----
+
+Notice the following elements which are not present in the previous example:
+
+* `@Param`: Parameters used for the REST operation that hold the new configuration settings. The name is the name of the variable defined in the Notifier Configuration class.
+
+[[notifier-implementation]]
+== Notifier Implementation Code
+
+Now that we have the implemented the classes for configuration management, we'll proceed to implement the class that handles the notification events.
+
+[source, java]
+----
+import org.jvnet.hk2.annotations.Service;
+
+import fish.payara.internal.notification.PayaraConfiguredNotifier;
+import fish.payara.internal.notification.PayaraNotification;
+
+@Service(name = "custom-notifier")
+public class CustomNotifier extends PayaraConfiguredNotifier<CustomNotifierConfiguration> {
+
+    @Override
+    public void handleNotification(PayaraNotification event) {
+        // Handle the event.
+    }
+
+    @Override
+    public void bootstrap() {
+        System.out.println("Bootstrapping custom notifier");
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("Destroying custom notifier");
+    }
+
+}
+----
+
+From the above code notice the following elements:
+
+* `@Service(name = "custom-notifier")`: Name of the notifier, which must be unique amongst all notifiers registered within the server.
+* `PayaraConfiguredNotifier`: The base class that allows the notifier's code to access the server's facilities. You only need to implement the method `handleNotification` to handle the notification event.
+* `bootstrap()`: Override this method if you want to perform specific actions after the notifier is instantiated.
+* `destroy()`: Override this method if you want to perform specific actions before the notifier's instance is destroyed.
+
+[[payara-notification-event]]
+== Payara Notification Event
+
+This is the main class that abstracts event data. Events can be raised for the following scenarios:
+
+- JMX Monitoring
+- Health Check Monitoring
+- Asadmin CLI auditing feature
+- Request Tracing traces
+
+And the attributes of this class are the following:
+
+`eventType`:: Log.Level value of the event, like INFO, WARN, ...
+`hostName`:: Hostname on which the Notification was generated.
+`domainName`:: The name of the domain where the notification was triggered.
+`instanceName`:: The name of the server instance where the notification was triggered.
+`serverName`:: The name of the current server instance.
+`subject`:: A short subject title of the notification.
+`message`:: The full message of the notification.
+`data`:: Detailed data of the notification event, supplied by the subsystem that triggered it, like:
++
+* `HealthCheckNotificationData`: Data for the HealthCheck notification event like Status (_GOOD_, _CRITICAL_, ... )
+* `RequestTracingNotificationData`: Data for the Request Tracing notification event like tracing span information details.
+
+[[notifier-plugin]]
+== Notifier Admin Console Plugin
+
+With the Notifier's Admin Console plugin, you can prepare a dedicated view of the notifier's configuration in the Web Admin console. Preparing this plugin is an optional task and thus not required.
+
+In this section, the basic requirements and conventions are described in order to create such a plugin. You can also have a look at the plugins of the existing notifiers to see several examples of how to implement your own console plugin.
+
+NOTE: The console plugin is based on Payara Server's console provider which allows users to extend Admin Console functionality.
+
+TIP: The configuration view of the notifier will be structured as a tab view under the notifier's section in the **Notification Service** option in the console's side menu.
+
+[[console-plugin]]
+=== Console Plugin
+
+Define the plugin by creating the `META-INF/admingui/console-plugin.xml` file and filling it with the following content:
+
+[source, xml]
+----
+<console-config id="customNotifier">
+   <integration-point
+      id="customNotifier"
+      type="fish.payara.admingui:notifierTab"
+      priority="40"
+      parentId="notificationConfigTabs"
+      content="custom/customNotifierTabs.jsf"
+   />
+</console-config>
+----
+
+Here's a description of the attributes of the `integration-point` tag:
+
+`id`:: Defines the unique ID of the integration point and is also used as part of the identifier of the plugin.
+`priority`:: Location of the notifier's tab view on the screen. A higher priority (lower value) will locate the tab to the left of the screen.
+`content`:: Location of the code snippet that defines the tab view of the notifier 
+
+[[tab-snippet]]
+=== Tab Snippet
+
+NOTE: The code of the tab view is implemented using the specific JSF templating framework for Payara Server.
+
+Here's a sample of the code snippet that defines the tab view of a custom notifier:
+
+[source, xml]
+----
+<sun:tab id="customNotifierTab" immediate="true" text="$resource{i18nexn.notifier.custom.tabs.tabText}"
+         toolTip="$resource{i18nexn.notifier.custom.tabs.tabToolTip}">
+    <!beforeCreate
+        setResourceBundle(key="i18nexn" bundle="fish.payara.admingui.notifier.custom.Strings");
+    />
+    <!command
+        setSessionAttribute(key="notificationConfigTab" value="customNotifierTab");
+        gf.redirect(page="#{request.contextPath}/customNotifier/custom/customNotifierConfiguration.jsf?configName=#{pageSession.configName}");
+    />
+</sun:tab>
+----
+
+From the above code notice the following elements:
+
+* `id`: The ID of the component. It should correspond to the ID defined in the _console-plugin.xml_ file followed by the `Tab` suffix.
+* `Resource bundle`: Make sure the Resource bundle is defined containing all the labels that needs to be shown on the screen.
+* `Command`: Use this section to link the location of the snippet defining the body of the notifier's configuration page.
+
+[[plugin-configuration-page]]
+=== Configuration Page
+
+This is the page that the Admin console will use to expose the configuration settings of the custom notifier. The easiest way to create this page template is to start from an existing example and modify the configuration fields to match the ones in your notifiers implementation.
+
+Here's a sample template:
+
+[source, xml]
+----
+<sun:property id="testValueProp" labelAlign="left" noWrap="#{true}" overlapLabel="#{false}"
+              label="$resource{i18nexn.notifier.jfr.configuration.categoryLabel}"
+              helpText="$resource{i18nexn.notifier.jfr.configuration.categoryLabelHelpText}">
+    <sun:textField id="namesField"  maxLength="255"
+                   text="#{pageSession.valueMap['testvalue']}" styleClass="string"
+                   required="#{true}"/>
+</sun:property>
+----
+
+From the above code notice the following elements:
+
+* `sun:textField`: A simple input text field that corresponds to a configuration attribute of the notifier. Use `sun:checkbox` if you want a checkbox for a true/false value.
+* `text="#{pageSession.valueMap['testvalue']}"`: This binding defines the property that needs to be displayed and the value that is assigned to this property when the save button is clicked. This must be an all lowercase value of the property you have defined in the configuration and its corresponding REST method parameter.
