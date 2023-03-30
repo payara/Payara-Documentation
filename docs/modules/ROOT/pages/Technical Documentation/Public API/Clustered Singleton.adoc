@@ -27,7 +27,7 @@ Care must be taken in this scenario. By default, the `@PostConstruct` lifecycle 
 == CDI Considerations and Notes
 
 Since there are no default locks for CDI, `@Clustered` CDI `@ApplicationScoped` beans do not have distributed locks on by default.
-It is highly recommended to enable distributed locks for CDI Clustered beans: `@Clustered(lock = DistributedLockType.LOCK)` so there is no chance of race condition / data corruption for CDI Clustered beans
+It is highly recommended to enable distributed locks for CDI Clustered beans: `@Clustered(lock = DistributedLockType.LOCK)` so there is no chance of race condition / data corruption for CDI Clustered beans.
 
 [[requirementss]]
 == Requirements and assumption
@@ -40,6 +40,16 @@ It is highly recommended to enable distributed locks for CDI Clustered beans: `@
 . All method calls to `@Clustered` beans operate on a local instance
 . Data corruption is possible if distributed lock is turned off and there is a race condition between method calls to the same bean on multiple cluster nodes simultaneously. In such a case, last method call wins the singleton state
 . Clustered singletons are stored in Hazelcast map under "Payara/(EJB/CDI)/singleton/<singletonComponentName>/[lock]"
+
+IMPORTANT: It is also highly recommended to add a `serialVersionUID` variable to the `@Clustered @Singleton` class, in order to verify that a loaded class and the serialized object are compatible. A previously serialized entry in the Data Grid is compatible with an updated version of the same class.
+
+[source, java]
+----
+private static final long serialVersionUID = 1234L;
+----
+
+Adding a `serialVersionUID` is expected to prevent serialization issues encountered by the Data Grid if your singleton's source code is updated regularly.
+
 
 [[usage]]
 == Usage
