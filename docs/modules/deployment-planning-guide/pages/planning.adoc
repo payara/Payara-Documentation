@@ -20,12 +20,16 @@ You can calculate some of these metrics using a remote browser emulator (RBE) to
 
 The results of the calculations described in this chapter are not absolute. Treat them as reference points to work against, as you fine-tune the performance of Payara Server and your applications.
 
+Examples of RBEs include: Puppeteer, Apache JMeter, LoadRunner, Selenium etc.
+
+[[establishing-availability-goals]]
+
 [[estimating-throughput]]
 === Estimating Throughput
 
 In broad terms, throughput measures the amount of work performed by Payara Server. For Payara Server, throughput can be defined as the number of requests processed per minute per server instance.
 
-As described in the next section, Payara Server throughput is a function of many factors, including the nature and size of user requests, number of users, and performance of Payara Server instances and back-end databases. You can estimate throughput on a single machine by benchmarking with simulated workloads.
+As described in the next section, Payara Server throughput is a function of many factors, including the nature and size of user requests, number of users, performance of Payara Server instances and back-end databases. You can estimate throughput on a single machine by benchmarking with simulated workloads.
 
 High availability applications incur additional overhead because they periodically save session data. The amount of overhead depends on the amount of data, how frequently it changes, and how often it is saved. The first two factors depend on the application in question; the latter is also affected by server settings.
 
@@ -41,7 +45,7 @@ Users interact with an application through a client, such as a web browser or Ja
 
 Initially, as the number of users increases, throughput increases correspondingly. However, as the number of concurrent requests increases, server performance begins to saturate, and throughput begins to decline.
 
-Identify the point at which adding concurrent users reduces the number of requests that can be processed per minute. This point indicates when optimal performance is reached and beyond which throughput start to degrade. Generally, strive to operate the system at optimal throughput as much as possible. You might need to add processing power to handle additional load and increase throughput.
+Identify the point at which adding concurrent users reduces the number of requests that can be processed per minute. This point indicates when optimal performance is reached and beyond which throughput starts to degrade. Generally, strive to operate the system at optimal throughput as much as possible. You might need to add processing power to handle additional load and increase throughput.
 
 [[think-time]]
 ==== *Think Time*
@@ -55,7 +59,7 @@ Determining the average think time is important. You can use this duration to ca
 [[average-response-time]]
 ==== *Average Response Time*
 
-Response time refers to the amount of time Payara Server takes to return the results of a request to the user. The response time is affected by factors such as network bandwidth, number of users, number and type of requests submitted, and average think time.
+Response time refers to the amount of time Payara Server takes to return the results of a request to the user. The response time is affected by factors such as network bandwidth, number of users, number and type of requests submitted, and the average think time.
 
 In this section, response time refers to the mean, or average, response time. Each type of request has its own minimal response time. However, when evaluating system performance, base the analysis on the average response time of all requests.
 
@@ -80,12 +84,11 @@ To obtain an accurate response time result, always include think time in the equ
 
 *Calculation of Response Time*
 
-If the following conditions exist:
+Consider the following example:
 
-* Maximum number of concurrent users, n, that the system can support at peak load is 5,000.
-* Maximum number of requests, r, the system can process at peak load is 1,000 per second.
-
-Average think time, T~think~, is three seconds per request.
+* Assume maximum number of concurrent users, n, is 5,000.
+* Assume maximum number of requests, r,  1,000 per second.
+* Assume average think time, T~think~, is three seconds per request.
 
 Thus, the calculation of response time is:
 
@@ -100,8 +103,7 @@ After the system's response time has been calculated, particularly at peak load,
 
 If you know the number of concurrent users at any given time, the response time of their requests, and the average user think time, then you can calculate the number of requests per minute. Typically, start by estimating the number of concurrent users that are on the system.
 
-For example, after running website performance software, the administrator concludes that the average number of concurrent users submitting requests on an online banking website is 3,000.
-This number depends on the number of users who have signed up to be members of the online bank, their banking transaction behavior, the time of the day or week they choose to submit requests, and so on.
+For example, after running website performance software, the administrator concludes that the average number of concurrent users submitting requests on an online banking website is 3,000. This number depends on the number of users who have signed up to be members of the online bank, their banking transaction behavior, the time of the day or week they choose to submit requests, and so on.
 
 Therefore, knowing this information enables you to use the requests per minute formula described in this section to calculate how many requests per minute your system can handle for this user base. Since requests per minute and response time become inversely proportional at peak load, decide if fewer requests per minute is acceptable as a trade-off for better response time, or alternatively, if a slower response time is acceptable as a trade-off for more requests per minute.
 
@@ -114,7 +116,7 @@ r = n/(T~response~ + T~think~)
 [[example-2-2]]
 *Calculation of Requests Per Second*
 
-For the values:
+Consider the following example:
 
 * n = 2,800 concurrent users
 * T~response~ = 1 (one second per request average response time)
@@ -134,14 +136,6 @@ Therefore, the number of requests per second is 700 and the number of requests p
 
 When planning how to integrate the Payara Server into the network, estimate the bandwidth requirements and plan the network in such a way that it can meet users' performance requirements.
 
-[[setting-up-traffic-separation]]
-=== Setting Up Traffic Separation
-
-You can separate external traffic, such as client requests, from the internal traffic, such as session state failover, database transactions, and messaging. Traffic separation enables you to plan a network better and augment certain parts of the network, as required.
-
-To separate the traffic, run each server instance on a multi-homed machine. A multi-homed machine has two IP addresses belonging to different networks, an external IP and an internal IP. The objective is to expose only the external IP to user requests. The internal IP is used only by the cluster instances for internal communication. For details, see "xref:docs:ha-administration-guide:clusters.adoc#using-the-multi-homing-feature-with-gms[Using the Multi-Homing Feature With GMS]" in Payara Server High Availability Administration Guide.
-
-To plan for traffic on both networks, see xref:planning.adoc#estimating-bandwidth-requirements[Estimating Bandwidth Requirements]. For external networks, follow the guidelines in xref:planning.adoc#calculating-bandwidth-required[Calculating Bandwidth Required] and xref:planning.adoc#estimating-peak-load[Estimating Peak Load]. To size the interfaces for internal networks, see xref:planning.adoc#choosing-network-cards[Choosing Network Cards].
 
 [[estimating-bandwidth-requirements]]
 === Estimating Bandwidth Requirements
