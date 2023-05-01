@@ -1,7 +1,7 @@
 [[start-database]]
 = start-database
 
-starts the Java DB
+Starts the Java DB.
 
 [[synopsis]]
 == Synopsis
@@ -17,21 +17,20 @@ asadmin [asadmin-options] start-database [--help]
 [[description]]
 == Description
 
-The `start-database` subcommand starts the Java DB server that is available for use with \{product---name}. Java DB is based upon Apache
-Derby. Use this subcommand only for working with applications deployed to the server.
+The `start-database` subcommand starts the Java DB server that is available for use with Payara. Java DB is based upon H2 database. Use this subcommand only for working with applications deployed to the server.
 
 When you start Java DB server by using the `start-database` subcommand, the database server is started in Network Server mode. Clients
-connecting to it must use the Java DB ClientDriver. For details on connecting to the database, refer to the Apache Derby documentation.
+connecting to it must use the Java DB ClientDriver. For details on connecting to the database, refer to the H2 documentation.
 
 When the database server starts, or a client connects to it successfully, the following files are created:
 
-* The `derby.log` file that contains the database server process log along with its standard output and standard error information
+* The `h2.log` file that contains the database server process log along with its standard output and standard error information
 * The database files that contain your schema (for example, database tables)
 
 These files are created at the location that is specified by the `--dbhome` option. To create the database files at a particular
 location, you must set the `--dbhome` option. If the `--dbhome` option is not specified, the `start-database` subcommand determines where to create these files as follows:
 
-* If the current working directory contains a file that is named `derby.log`, the `start-database` subcommand creates the files in the current working directory.
+* If the current working directory contains a file that is named `h2.log`, the `start-database` subcommand creates the files in the current working directory.
 * Otherwise, the `start-database` subcommand creates the files in the as-install`/databases` directory.
 
 The `start-database` subcommand starts the database process, even if it cannot write to the log file.
@@ -59,9 +58,9 @@ asadmin-options::
   The port number where the Java DB server listens for client connections. This port must be available for the listen socket,
   otherwise the database server will not start. The default is 1527.
 `--dbhome`::
-  The absolute path to the directory where the database files and the `derby.log` file are created. If the `--dbhome` option is not
+  The absolute path to the directory where the database files and the `h2.log` file are created. If the `--dbhome` option is not
   specified, the `start-database` subcommand determines where to create these files as follows: +
-  * If the current working directory contains a file that is named `derby.log`, the `start-database` subcommand creates the files in the
+  * If the current working directory contains a file that is named `h2.log`, the `start-database` subcommand creates the files in the
   current working directory.
   * Otherwise, the `start-database` subcommand creates the files in the as-install`/databases` directory. +
   To create the database files at a particular location, you must set the `--dbhome` option.
@@ -77,7 +76,7 @@ This example starts Java DB on the host `host1` and port 5001.
 ----
 asadmin> start-database --dbhost host1 --dbport 5001 --terse=true
 Starting database in the background.  Log redirected to 
-/opt/SUNWappserver/databases/derby.log.
+/opt/SUNWappserver/databases/h2.log.
 ----
 
 *Example 2 Starting Java DB With Options for the Java Application Launcher*
@@ -88,15 +87,15 @@ This example starts Java DB with the options for setting the minimum heap memory
 ----
 asadmin> start-database --jvmoptions="-Xms128m -Xmx512m" --terse=true
 Starting database in the background.
-Log redirected to /export/glassfish3/glassfish/databases/derby.log.
+Log redirected to /export/payara6/glassfish/databases/h2.log.
 ----
 
 [[exit-status]]
 == Exit Status
 
-The exit status applies to errors in executing the `asadmin` utility.For information on database errors, see the `derby.log` file. This file
+The exit status applies to errors in executing the `asadmin` utility.For information on database errors, see the `h2.log` file. This file
 is located in the directory you specify by using the `--dbhome` option when you run the `start-database` subcommand. If you did not specify
-`--dbhome`, the value of `DERBY_INSTALL` defaults to as-install`/javadb`.
+`--dbhome`, the value of `H2_INSTALL` defaults to `as-install/javadb`.
 
 0::
   subcommand executed successfully
@@ -105,13 +104,11 @@ is located in the directory you specify by using the `--dbhome` option when you 
 
 *See Also*
 
-* xref:asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:asadmin.adoc#asadmin-1m[`asadmin`],
 * xref:stop-database.adoc#stop-database[`stop-database`]
-* "xref:docs:administration-guide:jdbc.adoc#administering-database-connectivity[Administering Database Connectivity]" in Payara
-Server Open Source Edition Administration Guide
+* xref:docs:administration-guide:jdbc.adoc#administering-database-connectivity[Administering Database Connectivity] in Payara Server Administration Guide
 
-For more information about the Java application launcher, see the
-reference page for the operating system that you are using:
+For more information about the Java application launcher, see the reference page for the operating system that you are using:
 
 * Oracle Solaris and Linux: java - the Java application launcher (`http://docs.oracle.com/javase/6/docs/technotes/tools/solaris/java.html`)
 * Windows: java - the Java application launcher (`http://docs.oracle.com/javase/6/docs/technotes/tools/windows/java.html`)
