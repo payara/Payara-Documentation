@@ -1,7 +1,7 @@
 [[create-cluster]]
 = create-cluster
 
-Creates a \{product---name} cluster.
+Creates a Payara Server cluster.
 
 [[synopsis]]
 == Synopsis
@@ -28,7 +28,7 @@ cluster-name
 [[description]]
 == Description
 
-The `create-cluster` subcommand creates a \{product---name} cluster. Initially the cluster contains no \{product---name} instances, applications, or resources.
+The `create-cluster` subcommand creates a Payara Server cluster. Initially the cluster contains no Payara Server instances, applications, or resources.
 
 A cluster requires a reference to the named configuration that defines the configuration of all instances that are added to the cluster. The configuration can be specified in the command to create the cluster, but is not required. If no configuration is specified, the subcommand creates a configuration that is named cluster-name`-config` for the cluster. The cluster that is created is a standalone cluster because the cluster's configuration is not shared with any other clusters or standalone instances.
 
@@ -102,11 +102,11 @@ asadmin-options::
 `--properties`::
   Defines properties for the cluster. The following properties are available: +
   `GMS_DISCOVERY_URI_LIST`;;
-    The locations of \{product---name} instances in the cluster to use for discovering the cluster. This property is required only if the Group Management Service (GMS)
+    The locations of Payara Server instances in the cluster to use for discovering the cluster. This property is required only if the Group Management Service (GMS)
      is not using multicast for broadcasting messages. +
     Valid values for this property are as follows: +
-    * A comma-separated list of uniform resource identifiers (URIs). Each URI must locate a \{product---name} instance or the DAS. This format is required if multiple
-    \{product---name} instances are running on the same host. +
+    * A comma-separated list of uniform resource identifiers (URIs). Each URI must locate a Payara Server instance or the DAS. This format is required if multiple
+Payara Server instances are running on the same host. +
     The format of each URI in the list is as follows: +
     scheme`://`host-name-or -IP-address`:`port
     ** scheme is the URI scheme, which is `tcp`.
@@ -120,7 +120,7 @@ asadmin-options::
   `GMS_LISTENER_PORT`;;
     The port number of the port on which the cluster listens for messages from GMS. +
     The default value is a reference to the `GMS_LISTENER_PORT-` cluster-name system property. By default, this system property is not set. In this situation, GMS selects a free port from the range that is defined by the properties `GMS_TCPSTARTPORT` and `GMS_TCPENDPORT`. By default, this range is 9090-9200. In most situations, the default behavior should suffice. +
-    However, if GMS is not using multicast for broadcasting messages, the `GMS_LISTENER_PORT` property must specify a port number that is valid for all \{product---name} instances in the cluster. To use the default value to meet this requirement, use a system property to set
+    However, if GMS is not using multicast for broadcasting messages, the `GMS_LISTENER_PORT` property must specify a port number that is valid for all Payara Server instances in the cluster. To use the default value to meet this requirement, use a system property to set
     the port number individually for each instance. +
     For example, use the `create-system-properties` subcommand to create the system property `GMS_LISTENER_PORT-` cluster-name for the DAS. Then, for each instance in the cluster, set the `GMS_LISTENER_PORT-` cluster-name system property to the port number on which the instance listens for messages from GMS. The default value of the `GMS_LISTENER_PORT` property for the cluster references this system property.
   `GMS_LOOPBACK`;;
@@ -162,7 +162,7 @@ asadmin-options::
   The Internet Protocol (IP) address of the network interface to which GMS binds. This option must specify the IP address of a local network interface. The default is all public network interface addresses. +
   On a multihome machine, this option configures the network interface that is used for the GMS. A multihome machine possesses two or more
   network interfaces. +
-  To specify an address that is valid for all \{product---name} instances in the cluster, use a system property to set the address
+  To specify an address that is valid for all Payara Server instances in the cluster, use a system property to set the address
   individually for each instance. +
   For example, use the `create-system-properties` subcommand to create the system property `GMS-BIND-INTERFACE-ADDRESS-`cluster-name. Then set the `--bindaddress` option of this subcommand to `${GMS-BIND-INTERFACE-ADDRESS-`cluster-name`}` to specify the system property. Finally, for each instance in the cluster, set the `GMS-BIND-INTERFACE-ADDRESS-`cluster-name system property to the required network interface address on the instance's machine.
 `--hosts`::
@@ -197,11 +197,11 @@ cluster-name::
   ** Hyphen
   ** Period
   ** Underscore
-  * The name must be unique in the domain and must not be the name of another cluster, a named configuration, a \{product---name} instance, or a node.
-  * The name must not be `domain`, `server`, or any other keyword that   is reserved by \{product---name}. +
+  * The name must be unique in the domain and must not be the name of another cluster, a named configuration, a Payara Server instance, or a node.
+  * The name must not be `domain`, `server`, or any other keyword that   is reserved by Payara Server. +
   If the xref:configure-jms-cluster.adoc#configure-jms-cluster[`configure-jms-cluster`]
-  subcommand is to be used to configure a Message Queue cluster to provide JMS services to the \{product---name} cluster, the length of
-  the \{product---name} cluster name is might be restricted: +
+  subcommand is to be used to configure a Message Queue cluster to provide JMS services to the Payara Server cluster, the length of
+  the Payara Server cluster name is might be restricted: +
   * If `clustertype` is set to `enhanced` in the xref:configure-jms-cluster.adoc#configure-jms-cluster[`configure-jms-cluster`]
   subcommand, the name can be no longer than n–21 characters, where n is the maximum table name length allowed by the database.
   * If `configstoretype` is set to `shareddb` in the xref:configure-jms-cluster.adoc#configure-jms-cluster[`configure-jms-cluster`]
@@ -226,7 +226,7 @@ Command create-cluster executed successfully.
 *Example 2 Creating a Cluster With a List of URIs for Discovering the Cluster*
 
 This example creates a cluster that is named `tcpcluster`. In this example, GMS is not using multicast for broadcasting messages and multiple instances reside on the same host.
-Therefore, the `GMS_DISCOVERY_URI_LIST` property is set to the locations of the \{product---name} instances to use for discovering the cluster.
+Therefore, the `GMS_DISCOVERY_URI_LIST` property is set to the locations of the Payara Server instances to use for discovering the cluster.
 These instances reside on the host whose IP address is `10.152.23.224` and listen for GMS events on ports 9090, 9091, and 9092.
 
 To distinguish colon (`:`) characters in URIs from separators in a property list, colons in URIs are escaped with single quote characters (`'`) and backslash (`\`) characters.
