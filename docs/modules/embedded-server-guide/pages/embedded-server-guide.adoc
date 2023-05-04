@@ -13,13 +13,11 @@ platform (Java Virtual Machine or JVMmachine).
 No installation or configuration of embedded Payara Server is required. The ability to run Payara Server inside applications without installation or configuration
 simplifies the process of bundling Payara Server with applications.
 
-NOTE: Embedded Payara Server does not run on the Java Platform, Micro Edition (Java ME platform).
-
 You can use embedded Payara Server in the following ways:
 
 * With the Embedded Server API (see xref:docs:embedded-server-guide:embedded-server-guide.adoc#including-the-payara-server-embedded-server-api-in-applications[Including the Payara Server Embedded Server API in Applications])
 * With the Maven Plug-in (see xref:docs:embedded-server-guide:embedded-server-guide.adoc#testing-applications-with-the-maven-plug-in-for-embedded-payara-server[Testing Applications with the Maven Plug-in for Embedded Payara Server])
-* With the EJB 3.1 Embeddable API (see xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-the-ejb-3.1-embeddable-api-with-embedded-payara-server[Using the EJB 3.1 Embeddable API with Embedded Payara Server])
+* With the EJB Embeddable API (see xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-the-ejb-embeddable-api-with-embedded-payara-server[Using the EJB Embeddable API with Embedded Payara Server])
 
 Embedded Payara Server provides a plug-in for http://maven.apache.org/[Apache Maven] (`http://maven.apache.org/`). This plug-in simplifies the testing of applications by
 enabling you to build an application and run it with Payara Server on a single system. Testing and debugging are simplified because the need for an installed and configured
@@ -44,16 +42,11 @@ for an installation of Payara Server:
 * `domains`
 * `lib`
 
-Specify the installation root directory only if you have a valid non-embedded Payara Server installation and are using `glassfish-embedded-static-shell.jar`.
-
 [[instance-root-directory]]
 === Instance Root Directory
 
 The instance root directory, represented as domain-dir, is the parent directory of a server instance directory. Embedded Payara Server uses the server instance directory
 for domain configuration files.
-
-Specify the instance root directory only if you have a valid non-embedded Payara Server domain directory and are using `glassfish-embedded-static-shell.jar`.
-
 
 NOTE: If you have valid non-embedded Payara Server as-install and domain-dir directories, specify both in the `BootstrapProperties` and `GlassFishProperties` classes respectively
 as described in xref:docs:embedded-server-guide:embedded-server-guide.adoc#creating-and-configuring-an-embedded-payara-server[Creating and Configuring an Embedded Payara Server].
@@ -76,9 +69,7 @@ You can customize this file and pass it in using the `setConfigFileURI` method w
 [[including-the-payara-server-embedded-server-api-in-applications]]
 == Including the Payara Server Embedded Server API in Applications
 
-Payara Server provides an application programming interface (API) for developing applications in which Payara Server is embedded. For details, see the
-`org.glassfish.embeddable` packages at `#http://embedded-glassfish.java.net/nonav/apidocs/#`.
-
+Payara Server provides an application programming interface (API) for developing applications in which Payara Server is embedded.
 
 [[setting-the-class-path]]
 === Setting the Class Path
@@ -86,28 +77,15 @@ Payara Server provides an application programming interface (API) for developing
 To enable your applications to locate the class libraries for embedded
 Payara Server, add one of the following JAR files to your class path:
 
-`glassfish-embedded-nucleus.jar`::
-  Corresponds to the nucleus distribution. Download this file from
-  `https://repo1.maven.org/maven2/org/glassfish/main/extras/glassfish-embedded-nucleus/`.
 `payara-embedded-web.jar`::
-  Contains classes needed for deploying Jakarta EE web applications.
-  Download this file from
-  `http://download.java.net/maven/glassfish/org/glassfish/extras/payara-embedded-web/`.
+Contains classes needed for deploying Jakarta EE web applications.
+Download this file from
+`http://download.java.net/maven/glassfish/org/glassfish/extras/payara-embedded-web/`.
 `payara-embedded-all.jar`::
-  Contains classes needed for deploying all Jakarta EE application types.
-  Download this file from
-  `http://download.java.net/maven/glassfish/org/glassfish/extras/payara-embedded-all/`.
-`glassfish-embedded-static-shell.jar`::
-  Contains references to classes needed for deploying all Jakarta EE
-  application types. Must be used with a non-embedded installation of
-  Payara Server. Reference this file from the
-  `as-install/lib/embedded` directory of a non-embedded Payara Server
-  installation. Do not move this file, or it will not work. For an
-  explanation of as-install, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root  Directory].
+Contains classes needed for deploying all Jakarta EE application types.
+Download this file from
+`http://download.java.net/maven/glassfish/org/glassfish/extras/payara-embedded-all/`.
 
-
-##NOTE: Payara Server only supports use of the `glassfish-embedded-static-shell.jar` file. The other files are part of Payara Server and are offered without official support.
-##
 In addition, add to the class path any other JAR files or classes upon which your applications depend. For example, if an application uses a database other than
 Java DB, include the Java DataBase Connectivity (JDBC) driver JAR files in the class path.
 
@@ -144,8 +122,7 @@ a|
 setInstallRoot(String as-install)
 ----
 
-|None. If `glassfish-embedded-static-shell.jar` is used, the xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root Directory]
-is automatically determined and does not need to be specified.
+|None.
 |===
 
 The methods of the `GlassFishProperties` class for setting the server configuration are listed in the following table. The default value of each configuration setting
@@ -387,9 +364,6 @@ import org.glassfish.embeddable.*;
 
 Undeploy an application when the application is no longer required to run in Payara Server. For example, before stopping Payara Server, undeploy all
 applications that are running in Payara Server.
-
-NOTE: If you reference a non-embedded Payara Server installation using the `glassfish-embedded-static-shell.jar` file and do not undeploy your applications in the same
-server life cycle in which you deployed them, expanded archives for these applications remain under the `domain-dir/applications` directory.
 
 To undeploy an application, invoke the `undeploy` method of an existing `Deployer` object. In the method invocation, pass the name of the application as a parameter.
 This name is specified when the application is deployed.
@@ -775,8 +749,8 @@ public class Main {
 If you are using http://maven.apache.org/[Apache Maven] (`http://maven.apache.org/`), the plug-in for embedded Payara Server simplifies the
 testing of applications. This plug-in enables you to build and start an unpackaged application with a single Maven goal.
 
-To use Maven with Embedded Payara Server and the EJB 3.1 Embeddable API, see
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-maven-with-the-ejb-3.1-embeddable-api-and-embedded-payara-server[Using Maven with the EJB 3.1 Embeddable API and Embedded Payara Server].
+To use Maven with Embedded Payara Server and the EJB Embeddable API, see
+xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-maven-with-the-ejb-embeddable-api-and-embedded-payara-server[Using Maven with the EJB Embeddable API and Embedded Payara Server].
 
 [[to-set-up-your-maven-environment]]
 === To Set Up Your Maven Environment
@@ -797,8 +771,8 @@ Ensure that http://maven.apache.org/[Apache Maven] (`http://maven.apache.org/`) 
         <plugins>
             ...
             <plugin>
-                <groupId>org.glassfish</groupId>
-                <artifactId>maven-embedded-glassfish-plugin</artifactId>
+                    <groupId>fish.payara.extras</groupId>
+                    <artifactId>payara-embedded-web</artifactId>
                 <version>version</version>
             </plugin>
             ...
@@ -806,11 +780,9 @@ Ensure that http://maven.apache.org/[Apache Maven] (`http://maven.apache.org/`) 
 ...
 ----
 version::
-  The version to use. The version of the final promoted build for this
-  release is `3.1`. The Maven plug-in is not bound to a specific version
-  of Payara Server. You can specify the version you want to use. If
-  no version is specified, a default version, 3.1 for this release, is
-  used.
+The version to use. The Maven plug-in is not bound to a specific version
+of Payara Server. You can specify the version you want to use. If
+no version is specified, a default version is used.
 
 . Configure the `embedded-glassfish` goal prefix, the application name, and other standard settings. Add the following `configuration` element to your POM file:
 +
@@ -909,7 +881,7 @@ show example values. For details, see xref:docs:embedded-server-guide:embedded-s
 ...
 ----
 goal::
-  The goal to use. See xref:docs:embedded-server-guide:embedded-server-guide.adoc#maven-goals-for-embedded-payara-server[Maven Goals for Embedded Payara Server].
+The goal to use. See xref:docs:embedded-server-guide:embedded-server-guide.adoc#maven-goals-for-embedded-payara-server[Maven Goals for Embedded Payara Server].
 . Configure the repository. Add the following `repository` element to your POM file:
 +
 [source,xml]
@@ -1239,9 +1211,6 @@ For more information, see xref:docs:application-deployment-guide:overview.adoc#n
 [[embedded-glassfishundeploy-goal]]
 ==== *`embedded-glassfish:undeploy` Goal*
 
-NOTE: If you reference a non-embedded Payara Server installation using the `glassfish-embedded-static-shell.jar` file and do not undeploy your applications in the same server
-life cycle in which you deployed them, expanded archives for these applications remain under the `domain-dir/applications` directory.
-
 This goal undeploys an application. You can set the parameters described in the following table.
 
 [[table-1-8-embeddedglassfishundeploy-parameters]]
@@ -1314,7 +1283,7 @@ Table 1-10 `embedded-glassfish:start` Parameters
 
 |commandParameters
 |None
-|A map of the command parameters. See the `org.glassfish.embeddable.admin.CommandParameters` class at `#http://glassfish.java.net/nonav/docs/v3/api/#`.
+|A map of the command parameters.
 
 |commandLine
 |None
@@ -1322,40 +1291,30 @@ Table 1-10 `embedded-glassfish:start` Parameters
 |===
 
 
-[[using-the-ejb-3.1-embeddable-api-with-embedded-payara-server]]
-== Using the EJB 3.1 Embeddable API with Embedded Payara Server
+[[using-the-ejb-embeddable-api-with-embedded-payara-server]]
+== Using the EJB Embeddable API with Embedded Payara Server
 
-The EJB 3.1 Embeddable API is designed for unit testing of EJB modules. You must use this API with a pre-installed, non-embedded Payara Server instance. However, you can take
-advantage of Embedded Payara Server's ease of use by referencing the non-embedded Payara Server instance with the `glassfish-embedded-static-shell.jar` file.
-
-Embedded Payara Server is not related to the EJB 3.1 Embeddable API, but you can use these APIs together.
+Embedded Payara Server is not related to the EJB Embeddable API, but you can use these APIs together.
 
 The Maven plug-in does not apply to embeddable EJB applications. However, you can use Maven with the POM file shown in
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-maven-with-the-ejb-3.1-embeddable-api-and-embedded-payara-server[Using Maven with the EJB 3.1 Embeddable API and Embedded Payara Server].
+xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-maven-with-the-ejb-embeddable-api-and-embedded-payara-server[Using Maven with the EJB Embeddable API and Embedded Payara Server].
 
-The EJB 3.1 Embeddable API is described in http://jcp.org/en/jsr/detail?id=318[Java Specification Request (JSR) 318] (`http://jcp.org/en/jsr/detail?id=318`).
-An `ejb-embedded` sample is included in the samples available at http://www.oracle.com/technetwork/java/javaee/downloads/index.html[Java EE 7 Downloads]
-(`http://www.oracle.com/technetwork/java/javaee/downloads/index.html`) or http://www.oracle.com/technetwork/java/javaee/documentation/index.html[Code Samples]
-(`http://www.oracle.com/technetwork/java/javaee/documentation/index.html`).
-
-The EJB 3.1 Embeddable API supports all EJB 3.1 Lite features with addition of the EJB timer service and testing of EJB modules packaged in a WAR file.
+The EJB Embeddable API supports all EJB Lite features with addition of the EJB timer service and testing of EJB modules packaged in a WAR file.
 
 For EJB modules in a WAR file (or an exploded directory), if a web application has one EJB module, and there are no other EJB modules in the classpath,
 those entries (libraries) are ignored. If there are other EJB modules, a temporary EAR file is created. For EJB modules in a WAR file to be tested,
 the client code must use EJB modules with interfaces or without annotations. Those EJB modules are not part of the classpath and can't be loaded by the client class loader.
 
-[[to-use-the-ejb-3.1-embeddable-api-with-embedded-payara-server]]
-=== To Use the EJB 3.1 Embeddable API with Embedded Payara Server
+[[to-use-the-ejb-embeddable-api-with-embedded-payara-server]]
+=== To Use the EJB Embeddable API with Embedded Payara Server
 
-.  To specify Payara Server as the Container Provider, include `glassfish-embedded-static-shell.jar` or `payara-embedded-all.jar` in the class path of your embeddable
+.  To specify Payara Server as the Container Provider, include `payara-embedded-all.jar` in the class path of your embeddable
 EJB application. +
-Reference the `glassfish-embedded-static-shell.jar` file from the `as-install/lib/embedded` directory of a Payara Server installation. Do not move this file, or it
-will not work. +
-See xref:docs:embedded-server-guide:embedded-server-guide.adoc#setting-the-class-path[Setting the Class Path] and Section 22.3.3 of the EJB 3.1 Specification,
+See xref:docs:embedded-server-guide:embedded-server-guide.adoc#setting-the-class-path[Setting the Class Path] and Section 22.3.3 of the EJB Specification,
 Embeddable Container Bootstrapping.
 .  Configure any required resources. +
 For more information about configuring resources, see the Administration Console Online Help. The `jdbc/__default` Java DB database is preconfigured with all distributions of
-Payara Server. However, if you are using `glassfish-embedded-static-shell.jar`, you must start the database manually. +
+Payara Server. +
 If your embeddable EJB application uses Java Persistence, you do not need to specify a JDBC resource.
 See xref:docs:embedded-server-guide:embedded-server-guide.adoc#default-java-persistence-data-source-for-embedded-payara-server[Default Java Persistence Data Source for Embedded Payara Server].
 .  Invoke one of the `createEJBContainer` methods.
@@ -1368,23 +1327,22 @@ The default xref:docs:embedded-server-guide:embedded-server-guide.adoc#instance-
 location is `as-install/domains/domain1` if a non-embedded installation is referenced. This system property applies only to embeddable EJB applications used with non-embedded Payara Server.
 .  Close the EJB container properly to release all acquired resources and threads.
 
-[[ejb-3.1-embeddable-api-properties]]
-=== EJB 3.1 Embeddable API Properties
+[[ejb-embeddable-api-properties]]
+=== EJB Embeddable API Properties
 
 Properties that can be passed to the `EJBContainer#createEJBContainer(Properties)` method are summarized in the following table.
 All properties are in the `org.glassfish.ejb.embedded.glassfish` package. For example, the full name of the `installation.root`
 property is `org.glassfish.ejb.embedded.glassfish.installation.root`.
 
-[[table-1-11-ejb3-1-embedded-api-services]]
-Table 1-11 EJB 3.1 Embeddable API Properties
+[[table-1-11-ejb-embedded-api-services]]
+Table 1-11 EJB Embeddable API Properties
 
 [width="100%",cols="<30%,<39%,<31%",options="header",]
 |===
 |Property |Default |Description
 
 |`installation.root`
-|Payara Server installation location from which
-`glassfish-embedded-static-shell.jar` is referenced
+|Payara Server installation location
 |The xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root Directory].
 
 |`instance.root`
@@ -1422,16 +1380,16 @@ the existing server instance. Do not use this option if the reused server instan
 |===
 
 
-[[using-maven-with-the-ejb-3.1-embeddable-api-and-embedded-payara-server]]
-=== Using Maven with the EJB 3.1 Embeddable API and Embedded Payara Server
+[[using-maven-with-the-ejb-embeddable-api-and-embedded-payara-server]]
+=== Using Maven with the EJB Embeddable API and Embedded Payara Server
 
-When using Maven with the EJB 3.1 Embeddable API and Embedded Payara Server, you cannot use the features of the Maven plug-in. You must start and stop Embedded Payara
+When using Maven with the EJB Embeddable API and Embedded Payara Server, you cannot use the features of the Maven plug-in. You must start and stop Embedded Payara
 Server manually or programmatically outside of Maven.
 
 [[example-1-14]]
-*Example 1-14 Maven POM File for Using the EJB 3.1 Embeddable API with  Embedded Payara Server*
+*Example 1-14 Maven POM File for Using the EJB Embeddable API with  Embedded Payara Server*
 
-This example shows a POM file for configuring Maven to use the EJB 3.1 Embeddable API with Embedded Payara Server.
+This example shows a POM file for configuring Maven to use the EJB Embeddable API with Embedded Payara Server.
 
 [source,xml]
 ----
@@ -1447,12 +1405,12 @@ http://maven.apache.org/maven-v4_0_0.xsd">
     <name>Maven test</name>
     <dependencies>
         <dependency>
-            <groupId>org.glassfish.extras</groupId>
-            <artifactId>glassfish-embedded-static-shell</artifactId>
+            <groupId>fish.payara.extras</groupId>
+            <artifactId>payara-embedded-web</artifactId>
             <version>${project.version}</version>
             <scope>system</scope>
             <systemPath>
-                ${env.S1AS_HOME}/lib/embedded/glassfish-embedded-static-shell.jar
+                ${env.S1AS_HOME}/lib/embedded/payara-embedded-web.jar
             </systemPath>
         </dependency>
 <!--
@@ -1479,8 +1437,6 @@ http://maven.apache.org/maven-v4_0_0.xsd">
     </pluginRepositories>
 </project>
 ----
-
-If you are using `glassfish-embedded-static-shell.jar`, you can omit the `dependency` element with the `javaee-api` `artifactId` and the `pluginRepositories` element.
 
 Set the `S1AS_HOME` environment variable to the installation root directory before running the `mvn clean verify` command.
 
@@ -1572,14 +1528,14 @@ The `payara-embedded-web.jar` file for embedded Payara Server supports only thes
 * Java Transaction API
 * Java Transaction Service
 
-The `payara-embedded-all.jar` and `glassfish-embedded-static-shell.jar` files support all features of nonembedded Payara Server with these exceptions:
+The `payara-embedded-all.jar` files support all features of nonembedded Payara Server with these exceptions:
 
 * Installers
 * Administration Console
 * Update Tool
 * Apache Felix OSGi framework
 * The Maven plug-in for embedded Payara Server does not support application clients.
-* Applications that require ports for communication, such as remote EJB components, do not work with the EJB 3.1 Embeddable API running with embedded Payara Server if a
+* Applications that require ports for communication, such as remote EJB components, do not work with the EJB Embeddable API running with embedded Payara Server if a
 non-embedded Payara Server is running in parallel.
 
 Embedded Payara Server requires no installation or configuration. As a result, the following files and directories are absent from the file system until embedded Payara Server
