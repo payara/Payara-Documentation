@@ -13,6 +13,9 @@ It is possible to use the upgrade tool to upgrade a Payara 5 domain to Payara 6.
 
 * The upgrade tool only supports upgrading to Payara 6 versions 6.x.y or higher.
 * When performing an upgrade from Payara 5 to Payara 6, make sure that you're using JDK 11 - this is the minimum JDK version required by Payara 6.
+* The upgrade tool will not adjust the default-web.xml, though this comes with some caveats to be aware of:
+** A `<servlet-class>` entry of `org.apache.jasper.servlet.JspServlet` will be converted to `org.glassfish.wasp.servlet.JspServlet`
+** The default `<system-jar-includes>` init parameter of the `'jsp'` servlet has had a change in value between Payara Server 5 and Payara Server 6, reflecting the change in modules from Jakarta EE 8 to Jakarta EE 10. For example, the `javax.servlet.jsp.jar` file changed to `wasp.jar`. You may wish to review your default-web.xml and look at updating the default value of this parameter to that of a clean Payara 6 domain if you encounter issues.
 
 TIP: We generally recommend upgrading to the latest version of Payara 5 before attempting to upgrade to Payara 6.
 
