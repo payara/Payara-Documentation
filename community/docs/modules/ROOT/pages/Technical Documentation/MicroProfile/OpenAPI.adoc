@@ -36,7 +36,7 @@ MicroProfile OpenAPI specifies several ways of configuring the data in the produ
 ----
 
 [[sources-config]]
-=== Config Properties
+=== Configuration Properties
 
 The OpenAPI document generation process can be configured through the xref:Technical Documentation/MicroProfile/Config/Overview.adoc[Config API]. The following are the standard configuration properties as presented by the specification:
 
@@ -64,7 +64,7 @@ Operations that want to specify an alternative list of servers must define an `o
 | `mp.openapi.schema.` a| Prefix of the configuration property to specify an alternative list of servers to service an operation.
 Prefix of the configuration property to specify a schema for a specific class, in JSON format. The remainder of the property key must be the fully-qualified class name. The value must be a valid OpenAPI schema object, specified in the JSON format. The use of this property is functionally equivalent to the use of the `@Schema` annotation on a Java class, but may be used in cases where the application developer does not have access to the source code of a class.
 
-When a `name` key is provided with a string value, the schema will be added to the `schemas` collection in the `components` object of the resulting OpenAPI document using `name`'s value as the key.
+When a `name` key is provided with a string value, the schema will be added to the `schemas` collection in the `components` object of the resulting OpenAPI document using ``name```'s value as the key.
 
 For example, in the case where an application wishes to represent a Java `Date` object in epoch-style milliseconds, the following configuration can be used (line escapes and indentation added for readability):
 
@@ -83,7 +83,7 @@ In addition to the standard properties, the following properties have been added
 
 |===
 | Property key | Description
-| `mp.openapi.scan.lib`  |  Configuration property that allows the server to scan packaged JAR files inside the WAR's library directory (`WEB-INF/lib`). Default value is `false`.
+| `mp.openapi.extensions.scan.lib`  |  Configuration property that allows the server to scan packaged JAR files inside the WAR's library directory (`WEB-INF/lib`). If the WAR is inside EAR, the server also scans JAR files inside the EAR's `lib/` directory. Default value is `false`.
 |===
 
 [[sources-model-reader]]
@@ -122,7 +122,6 @@ The following file names are allowed for this file. The file given must also be 
 
 |===
 | File Format | Allowed File Names
-
 | `yaml` | `openapi.yaml` `openapi.yml`
 | `json` | `openapi.json`
 |===
@@ -263,8 +262,7 @@ OpenAPI can be configured by using Admin Console or Asadmin commands.
 [[using-the-admin-console]]
 === Using the Admin Console
 
-To configure the OpenAPI in the Admin Console, go to Configuration 
-→ [instance-configuration (like server-config)] → MicroProfile → OpenAPI:
+To configure the OpenAPI in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → OpenAPI:
 
 image:microprofile/openapi.png[Set OpenAPI Configuration]
 
@@ -289,7 +287,7 @@ asadmin> set-openapi-configuration
 Enables or disables the OpenAPI service.
 
 [[configuration-note]]
-NOTE: When the OpenAPI service is disabled, the endpoint will always return a 403 error and any applications deployed during this period will *not* have an OpenAPI document built. Enabling the service again will not cause a documents to be built for any currently deployed applications.
+NOTE: When the OpenAPI service is disabled, the `/openapi` endpoint will always return a `403` error and any applications deployed during this period will *not* have an OpenAPI document built. Enabling the service again will not cause a documents to be built for any currently deployed applications.
 
 ===== Command Options
 
@@ -315,7 +313,7 @@ NOTE: When the OpenAPI service is disabled, the endpoint will always return a 40
 
 |`securityenabled`
 |Boolean
-|Whether or not secure access to the endpoint is enabled.
+|Whether or not secure access to the OpenAPI endpoint is enabled.
 |false
 |No
 
@@ -327,7 +325,7 @@ NOTE: When the OpenAPI service is disabled, the endpoint will always return a 40
 
 |`endpoint`
 |String
-|The context root used to expose the service endpoint.
+|The context root used to expose the OpenAPI endpoint.
 |`openapi`
 |No
 
