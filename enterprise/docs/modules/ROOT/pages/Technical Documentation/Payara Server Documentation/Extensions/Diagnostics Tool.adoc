@@ -1,0 +1,97 @@
+[[payara-diagnostics-tool]]
+= Payara Diagnostics Tool
+
+NOTE: To fully utalise the features of the tool, a Payara Enterprise subscription is required.
+
+The Payara Server Diagnostics Tool (or Diagnostics Tool) allows users to easily gather complex diagnostics that can be shared as a bundle, allowing for faster diagnosis and investigation.
+
+[[manual-install]]
+== Manual Installation
+
+All Payara Enteprise versions 5.x and 6.x include the diagnostics tool. However, the tool can be installed manually on older versions if neccesery, the minimum version of 5.x. To do so, download the latest 1.x JAR release from Payara Nexus using [NEXUS LINK][this link] and then drop it into your Payara Server installation under the `payara5/glassfish/lib/asadmin` folder, replacing an older version of the artifact in case it exists.
+
+[[commands]]
+== Asadmin commands
+
+The following are the Asadmin CLI commands available to the diagnostics tool.
+
+[[upgrade-server-command]]
+=== Collection Server Command
+
+*Usage*:: `asadmin> collect-diagnostics`
+
+*Aim*::
+This command will collect a array of diagnostics and will bundle them in a local zip, by default in the home directory.
+
+[[command-options-1]]
+==== Command Options
+
+[cols="20,10,35,35,20",options="header",]
+|=======================================================================
+|Option |Type |Description |Default |Mandatory
+|`--serverlogs` |Boolean | Collect server log files.|True|No
+|`--domainxml` |Boolean |Collect domain files.|True|No
+|`--dir` |String |File path for collected bundle.|$\{user-home\}/payara-diagnostics-1685969635663.zip|No
+|`--properties` |String |File path to the properties file.|$\{user-home\}/.properties|No
+|`--domaindir` |String |Path to domain. Will determine which domain is collected from|domain1|No
+|=======================================================================
+
+[[collect-example]]
+==== Example
+
+This example collects only the server logs for domain1, and the results are stored at a custom location.
+
+[source, shell]
+----
+asadmin> collect-diagnostics --dir=/my/path/to/diagnostics/ --domainxml=false --serverlogs=true
+----
+
+[[upload-server-command]]
+=== Upload Server Command
+
+*Usage*:: `asadmin> upload-diagnostics`
+
+*Aim*::
+This command will attempt to upload the diagnostics to a external service from the command line, it will use previously collected diagnostics.
+
+WARNING: Using this command will perform communication to external services administered by Payara, this is optional and the local bundle can be shared manually.
+
+[[command-options-1]]
+==== Command Options
+
+[cols="20,10,35,35,20",options="header",]
+|=======================================================================
+|Option |Type |Description |Default |Mandatory
+|`--username` |String | The username for the service being uploaded to.||Yes
+|`--password` |String | The password for the service being uploaded to.||Yes
+|`--dir` |String |File path for bundle to upload.|$\{user-home\}/payara-diagnostics-1685969635663.zip|No
+|`--properties` |String |File path to the properties file.|$\{user-home\}/.properties|No
+|`--ticket` |String |Ticket number to upload to.||Yes, if destination is Customer Hub.
+|`--destination` |String |The name of the service to upload to.||Yes
+|=======================================================================
+
+[[upload-example]]
+==== Example
+
+This example upload to Customer Hub to a existing ticket.
+
+[source, shell]
+----
+asadmin> collect-diagnostics --username=example-user@example.com --destination=Zendesk --Ticket=12345
+----
+
+[[properties-file]]
+== Properties File
+The proprties file keeps data between collection and upload to provide a seamless experience. The file can be configured, and is designed to be extensible in the future to hold more information as required.
+
+The properties file is not required for operation of the tool, but it provides a ease of use.
+
+[[example-properties-file]]
+=== Sample Properties File
+
+The properties file keeps basic information between collection and upload.
+
+```
+#Mon Jun 05 13:53:55 BST 2023
+dir=/home/userhome/payara-diagnostics-1685969635663
+```
