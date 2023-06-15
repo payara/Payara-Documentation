@@ -18,16 +18,13 @@ http://server:port/context-root/servlet-mapping?name=value
 .Table 6-1 URL Fields for Servlets Within an Application
 [header, cols="3,7"]
 |===
-|URL element |Description
+|URL element
+|Description
 |server`:`port
-| The IP address (or host name) and optional port number. +
-To access the default web module for a virtual server, specify only this URL section. You do not need to specify the context-root or servlet-name unless you also wish
-to specify name-value parameters. +
+| The IP address (or host name) and optional port number. To access the default web module for a virtual server, specify only this URL section. You do not need to specify the context-root or servlet-name unless you also wish to specify name-value parameters.
 
 | context-root
-| For an application, the context root is defined in the `context-root` element of the `application.xml`, `sun-application.xml`, or `sun-web.xml` file. For an individually
-deployed web module, the context  root is specified during deployment. +
-For both applications and individually deployed web modules, the default context root is the name of the WAR file minus the `.war` suffix.
+| For an application, the context root is defined in the `context-root` element of the `application.xml`, `sun-application.xml`, or `sun-web.xml` file. For an individually deployed web module, the context  root is specified during deployment. For both applications and individually deployed web modules, the default context root is the name of the WAR file minus the `.war` suffix.
 
 | servlet-mapping
 | The `servlet-mapping` as configured in the `web.xml` file.
@@ -55,20 +52,16 @@ To invoke a servlet from within a JSP file, you can use a relative path. For exa
 [[changing-log-output-for-a-servlet]]
 == Changing Log Output for a Servlet
 
-`ServletContext.log` messages are sent to the server log. By default, the `System.out` and `System.err` output of servlets are sent to the server log.
-During startup, server log messages are echoed to the `System.err` output. Also by default, there is no Windows-only console for the `System.err` output.
+`ServletContext.log` messages are sent to the server log. By default, the `System.out` and `System.err` output of servlets are sent to the server log. During startup, server log messages are echoed to the `System.err` output. Also by default, there is no Windows-only console for the `System.err` output.
 
-You can change these defaults using the Administration Console Write to System Log box. If this box is checked, `System.out` output is sent to the server log.
-If it is unchecked, `System.out` output is sent to the system default location only.
+You can change these defaults using the Administration Console Write to System Log box. If this box is checked, `System.out` output is sent to the server log. If it is unchecked, `System.out` output is sent to the system default location only.
 
 [[defining-global-features-for-web-applications]]
 == Defining Global Features for Web Applications
 
 You can use the `default-web.xml` file to define features such as filters and security constraints that apply to all web applications.
 
-For example, directory listings are disabled by default for added security. To enable directory listings in your domain's
-`default-web.xml` file, search for the definition of the servlet whose `servlet-name` is equal to `default`, and set the value of the `init-param` named `listings`
-to `true`. Then restart the server.
+For example, directory listings are disabled by default for added security. To enable directory listings in your domain's `default-web.xml` file, search for the definition of the servlet whose `servlet-name` is equal to `default`, and set the value of the `init-param` named `listings` to `true`. Then restart the server.
 
 [source,xml]
 ----
@@ -78,8 +71,7 @@ to `true`. Then restart the server.
 </init-param>
 ----
 
-If `listings` is set to `true`, you can also determine how directory listings are sorted. Set the value of the
-`init-param` named `sortedBy` to `NAME`, `SIZE`, or `LAST_MODIFIED`. Then restart the server.
+If `listings` is set to `true`, you can also determine how directory listings are sorted. Set the value of the `init-param` named `sortedBy` to `NAME`, `SIZE`, or `LAST_MODIFIED`. Then restart the server.
 
 [source,xml]
 ----
@@ -89,8 +81,7 @@ If `listings` is set to `true`, you can also determine how directory listings ar
 </init-param>
 ----
 
-The `mime-mapping` elements in `default-web.xml` are global and inherited by all web applications. You can override these mappings or
-define your own using `mime-mapping` elements in your web application's `web.xml` file. For more information about `mime-mapping` elements, see the Servlet specification.
+The `mime-mapping` elements in `default-web.xml` are global and inherited by all web applications. You can override these mappings or define your own using `mime-mapping` elements in your web application's `web.xml` file. For more information about `mime-mapping` elements, see the Servlet specification.
 
 You can use the Administration Console to edit the `default-web.xml` file, or edit the file directly using the following steps.
 
@@ -106,8 +97,7 @@ You can use the Administration Console to edit the `default-web.xml` file, or ed
 
 You can specify that a request for an old URL be treated as a request for a new URL. This is called redirecting a URL.
 
-To specify a redirected URL for a virtual server, use the `redirect_n` property, where n is a positive integer that allows specification of more than one. Each of these
-`redirect_n` properties is inherited by all web applications deployed on the virtual server.
+To specify a redirected URL for a virtual server, use the `redirect_n` property, where n is a positive integer that allows specification of more than one. Each of these `redirect_n` properties is inherited by all web applications deployed on the virtual server.
 
 The value of each `redirect_n` property has two components which can be specified in any order:
 
@@ -125,25 +115,20 @@ This example redirects `from` `dummy` to `etude`:
 [[administering-mod_jk]]
 == Administering `mod_jk`
 
-The Apache Tomcat Connector `mod_jk` can be used to connect the web container with web servers such as Apache HTTP Server. By using `mod_jk`, which comes with Payara Server,
-you can front Payara Server with Apache HTTP Server.
+The Apache Tomcat Connector `mod_jk` can be used to connect the web container with web servers such as Apache HTTP Server. By using `mod_jk`, which comes with Payara Server, you can front Payara Server with Apache HTTP Server.
 
 You can also use `mod_jk` directly at the JSP/servlet engine for load balancing. For more information about configuring `mod_jk` and Apache HTTP Server for load
-balancing with Payara Server 5.0 refer to xref:docs:ha-administration-guide:http-load-balancing.adoc#configuring-http-load-balancing[Configuring HTTP Load Balancing]
-in Payara Server High Availability Administration Guide.
+balancing with Payara Server refer to ref:docs:ha-administration-guide:http-load-balancing.adoc#configuring-http-load-balancing[Configuring HTTP Load Balancing] in Payara Server High Availability Administration Guide.
 
 [[to-enable-mod_jk]]
 === To Enable `mod_jk`
 
-You can front Payara Server with Apache HTTP Server by enabling the `mod_jk` protocol for one of Payara Server's network listeners, as described in this procedure.
-A typical use for `mod_jk` would be to have Apache HTTP Server handle requests for static resources, while having requests for dynamic resources, such as servlets and
-JavaServer Pages (JSPs), forwarded to, and handled by the Payara Server back-end instance.
+You can front Payara Server with Apache HTTP Server by enabling the `mod_jk` protocol for one of Payara Server's network listeners, as described in this procedure. A typical use for `mod_jk` would be to have Apache HTTP Server handle requests for static resources, while having requests for dynamic resources, such as servlets and JavaServer Pages (JSPs), forwarded to, and handled by the Payara Server back-end instance.
 
-When you use the `jk-enabled` attribute of the network listener, you do not need to copy any additional JAR files into the `/lib` directory.
-You can also create JK connectors under different virtual servers by using the network listener attribute `jk-enabled`.
+When you use the `jk-enabled` attribute of the network listener, you do not need to copy any additional JAR files into the `/lib` directory. You can also create JK connectors under different virtual servers by using the network listener attribute `jk-enabled`.
 
 . Install Apache HTTP Server and `mod_jk`.
-* For information on installing Apache HTTP Server, see `http://httpd.apache.org/docs/2.2/install.html`.
+* For information on installing Apache HTTP Server, see `https://httpd.apache.org/docs/2.4/install.html`.
 * For information on installing `mod_jk`, see `http://tomcat.apache.org/connectors-doc/webserver_howto/apache.html`.
 . Configure the following files:
 * `apache2/conf/httpd.conf`, the main Apache configuration file
@@ -159,9 +144,7 @@ In order for the `mod_jk`-enabled network listener to start listening for reques
 asadmin> create-network-listener --protocol http-listener-1 \
 --listenerport 8009 --jkenabled true jk-connector
 ----
-. If you are using the `glassfish-jk.properties` file to use non-default values of attributes described at
-`http://tomcat.apache.org/tomcat-5.5-doc/config/ajp.html`), set the `jk-configuration-file` property of the network listener to the
-fully-qualified file name of the `glassfish-jk.properties` file.
+. If you are using the `glassfish-jk.properties` file to use non-default values of attributes described at `http://tomcat.apache.org/tomcat-5.5-doc/config/ajp.html`), set the `jk-configuration-file` property of the network listener to the fully-qualified file name of the `glassfish-jk.properties` file.
 +
 [source,shell]
 ----
@@ -175,8 +158,7 @@ jk-connector.jk-configuration-file=domain-dir/config/glassfish-jk.properties
 asadmin> set configs.config.server-config.thread-pools.thread-pool.\
 http-thread-pool.max-thread-pool-size=value
 ----
-. To apply your changes, restart Payara Server. +
-See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
+. To apply your changes, restart Payara Server. See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-6-4]]
 ==== Example 6-4 `httpd.conf` File for `mod_jk`
@@ -208,8 +190,7 @@ JkMount /glassfish-test/* worker1
 [[example-6-5]]
 ==== Example 6-5 `workers.properties` File for `mod_jk`
 
-This example shows a `workers.properties` that is set for `mod_jk`. This `workers.properties` file is referenced in the second line of
-xref:docs:administration-guide:webapps.adoc#example-6-4[Example 6-4].
+This example shows a `workers.properties` that is set for `mod_jk`. This `workers.properties` file is referenced in the second line of xref:docs:administration-guide:webapps.adoc#example-6-4[Example 6-4].
 
 [source,text]
 ----
@@ -227,16 +208,13 @@ worker.worker1.port=8009
 [[to-load-balance-using-mod_jk-and-payara-server]]
 === To Load Balance Using `mod_jk` and Payara Server
 
-Load balancing is the process of dividing the amount of work that a computer has to do between two or more computers so that more work
-gets done in the same amount of time. Load balancing can be configured with or without security.
+Load balancing is the process of dividing the amount of work that a computer has to do between two or more computers so that more work gets done in the same amount of time. Load balancing can be configured with or without security.
 
-In order to support stickiness, the Apache `mod_jk` load balancer relies on a `jvmRoute` system property that is included in any `JSESSIONID`
-received by the load balancer. This means that every Payara Server instance that is front-ended by the Apache load balancer must be configured with a unique
+In order to support stickiness, the Apache `mod_jk` load balancer relies on a `jvmRoute` system property that is included in any `JSESSIONID` received by the load balancer. This means that every Payara Server instance that is front-ended by the Apache load balancer must be configured with a unique
 `jvmRoute` system property.
 
-.  On each of the instances, perform the steps in xref:docs:administration-guide:webapps.adoc#to-enable-mod_jk[To Enable `mod_jk`]. +
-If your instances run on the same machine, you must choose different JK ports. The ports must match `worker.worker*.port` in your `workers.properties` file.
-See the properties file in xref:docs:administration-guide:webapps.adoc#example-6-5[Example 6-5].
+.  On each of the instances, perform the steps in  xref:docs:administration-guide:webapps.adoc#to-enable-mod_jk[To Enable `mod_jk`]. +
+If your instances run on the same machine, you must choose different JK ports. The ports must match `worker.worker*.port` in your `workers.properties` file. See the properties file in xref:docs:administration-guide:webapps.adoc#example-6-5[Example 6-5].
 
 . On each of the instances, create the `jvmRoute` system property of Payara Server by using the xref:docs:reference-manual:create-jvm-options.adoc[`create-jvm-options`] subcommand. +
 Use the following format:
@@ -256,10 +234,10 @@ This example shows an `httpd.conf` file that is set for load balancing.
 
 [source,text]
 ----
-LoadModule jk_module /usr/lib/httpd/modules/mod_jk.so 
-JkWorkersFile /etc/httpd/conf/worker.properties 
+LoadModule jk_module /usr/lib/httpd/modules/mod_jk.so
+JkWorkersFile /etc/httpd/conf/worker.properties
 # Where to put jk logs 
-JkLogFile /var/log/httpd/mod_jk.log 
+JkLogFile /var/log/httpd/mod_jk.log
 # Set the jk log level [debug/error/info] 
 JkLogLevel debug 
 # Select the log format 
@@ -301,8 +279,7 @@ worker.loadbalancer.balance_workers=worker1,worker2
 [[to-enable-ssl-between-the-mod_jk-load-balancer-and-the-browser]]
 === To Enable SSL Between the `mod_jk` Load Balancer and the Browser
 
-To activate security for `mod_jk` on Payara Server, you must first generate a Secure Socket Layer (SSL) self-signed certificate on the Apache HTTP Server with the
-`mod_ssl` module. The tasks include generating a private key, a Certificate Signing Request (CSR), a self-signed certificate, and configuring SSL-enabled virtual hosts.
+To activate security for `mod_jk` on Payara Server, you must first generate a Secure Socket Layer (SSL) self-signed certificate on the Apache HTTP Server with the `mod_ssl` module. The tasks include generating a private key, a Certificate Signing Request (CSR), a self-signed certificate, and configuring SSL-enabled virtual hosts.
 
 Before You Begin, The `mod_jk` connector must be enabled.
 
@@ -371,11 +348,8 @@ This procedure does not enable SSL transfer between `mod_jk` and Payara Server. 
 Before You Begin, The self-signed certificate must be configured.
 
 . Perform the steps in xref:docs:administration-guide:webapps.adoc#to-enable-mod_jk[To Enable `mod_jk`].
-. Start another Payara Server with at least one web application deployed. +
-In order for the `mod_jk`-enabled network listener to start listening for requests, the web container must be started. Normally, this is achieved by
-deploying a web application.
-. Follow instructions from xref:docs:administration-guide:http_https.adoc#to-configure-an-http-listener-for-ssl[To Configure and HTTP Listener for SSL]
-on the `mod_jk` connector. +
+. Start another Payara Server with at least one web application deployed. In order for the `mod_jk`-enabled network listener to start listening for requests, the web container must be started. Normally, this is achieved by deploying a web application.
+. Follow instructions from xref:docs:administration-guide:http_https.adoc#to-configure-an-http-listener-for-ssl[To Configure and HTTP Listener for SSL] on the `mod_jk` connector. +
 Use the following format: +
 [source,shell]
 ----
@@ -400,8 +374,7 @@ JkCERTSIndicator SSL_CLIENT_CERT
 [[administering-mod_proxy_ajp]]
 == Administering `mod_proxy_ajp`
 
-The Apache Connector `mod_proxy_ajp` can be used to connect the web container with Apache HTTP Server. By using `mod_proxy_ajp`,
-you can front Payara Server with Apache HTTP Server.
+The Apache Connector `mod_proxy_ajp` can be used to connect the web container with Apache HTTP Server. By using `mod_proxy_ajp`, you can front Payara Server with Apache HTTP Server.
 
 [[to-enable-mod_proxy_ajp]]
 === To Enable `mod_proxy_ajp`
@@ -410,7 +383,7 @@ You can front Payara Server with Apache HTTP Server and its `mod_proxy_ajp` conn
 listeners, as described in this procedure. A typical use for `mod_proxy_ajp` would be to have Apache HTTP Server handle requests for static resources,
 while having requests for dynamic resources, such as servlets and JavaServer Pages (JSPs), forwarded to, and handled by the Payara Server back-end instance.
 
-. Install Apache HTTP Server. For information on installing Apache HTTP Server, see `http://httpd.apache.org/docs/2.2/install.html`.
+. Install Apache HTTP Server. For information on installing Apache HTTP Server, see `https://httpd.apache.org/docs/2.4/install.html`.
 . Configure `apache2/conf/httpd.conf`, the main Apache configuration file. For example:
 +
 [source,shell]
@@ -454,23 +427,20 @@ http-thread-pool.max-thread-pool-size=value
 See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 * For more information on Apache, see `http://httpd.apache.org/`.
-* For more information on the Apache `mod_proxy_ajp` Connector, see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html
-and https://httpd.apache.org/docs/2.4/mod/mod_proxy_ajp.html.
+* For more information on the Apache `mod_proxy_ajp` Connector, see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html and https://httpd.apache.org/docs/2.4/mod/mod_proxy_ajp.html.
 * For more information on the AJP protocol, see http://tomcat.apache.org/connectors-doc/ajp/ajpv13a.html.
 
 
 [[to-load-balance-using-mod_proxy_ajp-and-payara-server]]
 === To Load Balance Using `mod_proxy_ajp` and Payara Server
 
-Load balancing is the process of dividing the amount of work that a computer has to do between two or more computers so that more work gets done in the same amount of time.
-In the Payara Server context, load balancing is most frequently used to distribute work among the instances in a Payara Server cluster.
+Load balancing is the process of dividing the amount of work that a computer has to do between two or more computers so that more work gets done in the same amount of time. In the Payara Server context, load balancing is most frequently used to distribute work among the instances in a Payara Server cluster.
 
 To configure load balancing using `mod_proxy_ajp`, you must use the `mod_proxy_balancer` Apache module in addition to `mod_proxy_ajp`.
 
-In order to support stickiness, the `mod_proxy_balancer` load balancer relies on a `jvmRoute` system property that is included in any `JSESSIONID` received by the load balancer.
- Consequently, every Payara Server instance that is front-ended by the Apache load balancer must be configured with a unique `jvmRoute` system property.
+In order to support stickiness, the `mod_proxy_balancer` load balancer relies on a `jvmRoute` system property that is included in any `JSESSIONID` received by the load balancer.  Consequently, every Payara Server instance that is front-ended by the Apache load balancer must be configured with a unique `jvmRoute` system property.
 
-. Install Apache HTTP Server. For information on installing Apache HTTP Server, see http://httpd.apache.org/docs/2.2/install.html
+. Install Apache HTTP Server. For information on installing Apache HTTP Server, see https://httpd.apache.org/docs/2.4/install.html
 . Configure `apache2/conf/httpd.conf`, the main Apache configuration file. For example:
 +
 [source,shell]
@@ -525,8 +495,7 @@ asadmin> create-jvm-options --target cluster1 \
 "-DjvmRoute=\${AJP_INSTANCE_NAME}"
 ----
 
-. Use the `create-system-properties` subcommand to define the `AJP_PORT` and `AJP_INSTANCE_NAME` properties for each of the instances
-in the cluster, making sure to match the port values you used in Step 2 when specifying the load balancer members. For example:
+. Use the `create-system-properties` subcommand to define the `AJP_PORT` and `AJP_INSTANCE_NAME` properties for each of the instances in the cluster, making sure to match the port values you used in Step 2 when specifying the load balancer members. For example:
 +
 [source,shell]
 ----
