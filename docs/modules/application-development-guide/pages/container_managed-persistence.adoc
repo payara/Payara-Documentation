@@ -3,40 +3,34 @@
 
 This chapter contains information on how EJB 2.1 container-managed persistence (CMP) works in Payara Server.
 
-NOTE: The Web Profile of the Payara Server supports the EJB 3.1 Lite specification, which allows enterprise beans within web applications,
-among other features. The full Payara Server supports the entire EJB 3.1 specification. For details,
-see http://jcp.org/en/jsr/detail?id=318[JSR 318](`http://jcp.org/en/jsr/detail?id=318`).
+NOTE: The Web Profile of Payara Server supports the Jakarta Enterprise Beans (formerly known as EJB) 4.0 Lite specification, which allows enterprise beans within web applications, among other features. The Full Profile supports the entire 4.0 specification. For details,
+see https://jakarta.ee/specifications/enterprise-beans[Jakarta Enterprise Beans]
 
+WARNING: As of Jakarta EE 10, the CMP API group has been marked as deprecated and will be removed in a future release.
 
 [[payara-server-support-for-cmp]]
 == Payara Server Support for CMP
 
 Payara Server support for EJB 2.1 CMP beans includes:
 
-* Full support for the J2EE v1.4 specification's CMP model. Extensive information on CMP is contained in chapters 10, 11,
-and 14 of the Enterprise JavaBeans Specification, v2.1. This includes the following:
+* Full support for the J2EE v1.4 specification's CMP model. This includes the following:
 
-** Support for commit options B and C for transactions. See xref:docs:application-development-guide:transaction-service.adoc#commit-options[Commit Options].
-
+** Support for commit options `B` and `C` for transactions. See xref:docs:application-development-guide:transaction-service.adoc#commit-options[Commit Options].
 ** The primary key class must be a subclass of `java.lang.Object`. This ensures portability, and is noted because some vendors allow primitive types
 (such as `int`) to be used as the primary key class.
-* The Payara Server CMP implementation, which provides the following:
+
+* Payara Server CMP implementation, which provides the following:
 
 ** An Object/Relational (O/R) mapping tool that creates XML deployment descriptors for EJB JAR files that contain beans that use CMP.
-
 ** Support for compound (multi-column) primary keys.
-
 ** Support for sophisticated custom finder methods.
-
 ** Standards-based query language (EJB QL).
-
 ** CMP runtime support. See xref:docs:application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource].
+
 * Payara Server performance-related features, including the following:
 
 ** Version column consistency checking
-
 ** Relationship prefetching
-
 ** Read-Only Beans
 
 For details, see xref:docs:application-development-guide:container_managed-persistence.adoc#performance-related-features[Performance-Related Features].
@@ -49,12 +43,9 @@ Implementation for entity beans that use CMP is mostly a matter of mapping CMP f
 [[mapping-capabilities]]
 === Mapping Capabilities
 
-Mapping refers to the ability to tie an object-based model to a relational model of data, usually the schema of a relational database.
-The CMP implementation provides the ability to tie a set of interrelated beans containing data and associated behaviors to the schema.
-This object representation of the database becomes part of the Java application. You can also customize this mapping to optimize these beans
-for the particular needs of an application. The result is a single data model through which both persistent database information and regular transient program data are accessed.
+Mapping refers to the ability to tie an object-based model to a relational model of data, usually the schema of a relational database. The CMP implementation provides the ability to tie a set of interrelated beans containing data and associated behaviors to the schema. This object representation of the database becomes part of the Java application. You can also customize this mapping to optimize these beans for the particular needs of an application. The result is a single data model through which both persistent database information and regular transient program data are accessed.
 
-The mapping capabilities provided by the Payara Server include:
+The mapping capabilities provided by Payara Server include:
 
 * Mapping a CMP bean to one or more tables
 * Mapping CMP fields to one or more columns
@@ -69,91 +60,72 @@ The mapping capabilities provided by the Payara Server include:
 
 Each module with CMP beans must have the following files:
 
-* `ejb-jar.xml` - The J2EE standard file for assembling enterprise beans. For a detailed description, see the Enterprise JavaBeans Specification, v2.1. 
-* `glassfish-ejb-jar.xml` - The v Server standard file for assembling enterprise beans. For a detailed description,
-see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in Payara Server Application Deployment Guide.
-* `sun-cmp-mappings.xml` - The mapping deployment descriptor file, which describes the mapping of CMP beans to tables in a database. For a detailed description,
-see "xref:docs:application-deployment-guide:dd-files.adoc#the-sun-cmp-mappings.xml-file[The sun-cmp-mappings.xml File]" in Payara Server Application Deployment Guide.
+* `ejb-jar.xml` - The standard deployment descriptor for assembling enterprise beans.
+* `glassfish-ejb-jar.xml` - Payara Server's proprietary deployment descriptor for assembling enterprise beans. For a detailed description, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in Payara Server Application Deployment Guide.
+* `sun-cmp-mappings.xml` - The mapping deployment descriptor file, which describes the mapping of CMP beans to tables in a database. For a detailed description, see "xref:docs:application-deployment-guide:dd-files.adoc#the-sun-cmp-mappings.xml-file[The sun-cmp-mappings.xml File]" in Payara Server Application Deployment Guide.
 
-The `sun-cmp-mappings.xml` file can be automatically generated and does not have to exist prior to deployment. For details,
-see xref:docs:application-development-guide:container_managed-persistence.adoc#generation-options-for-cmp[Generation Options for CMP].
+The `sun-cmp-mappings.xml` file can be automatically generated and does not have to exist prior to deployment. For details, see xref:docs:application-development-guide:container_managed-persistence.adoc#generation-options-for-cmp[Generation Options for CMP].
 
-The `sun-cmp-mappings.xml` file maps CMP fields and CMR fields (relationships) to the database. A primary table must be selected for each CMP bean, and optionally, multiple secondary tables. CMP fields are mapped to columns in either the primary or secondary table(s).
-CMR fields are mapped to pairs of column lists (normally, column lists are the lists of columns associated with primary and foreign keys).
+The `sun-cmp-mappings.xml` file maps CMP fields and CMR fields (relationships) to the database. A primary table must be selected for each CMP bean, and optionally, multiple secondary tables. CMP fields are mapped to columns in either the primary or secondary table(s). CMR fields are mapped to pairs of column lists (normally, column lists are the lists of columns associated with primary and foreign keys).
 
-NOTE: Table names in databases can be case-sensitive. Make sure that the table names in the `sun-cmp-mappings.xml` file match the names in the database. +
-Relationships should always be mapped to the primary key field(s) of the related table.
+NOTE: Table names in databases can be case-sensitive. Make sure that the table names in the `sun-cmp-mappings.xml` file match the names in the database. Relationships should always be mapped to the primary key field(s) of the related table.
 
 The `sun-cmp-mappings.xml` file conforms to the `sun-cmp-mapping_1_2.dtd` file and is packaged with the user-defined bean classes in the EJB JAR file under the `META-INF` directory.
 
-The Payara Server creates the mappings in the `sun-cmp-mappings.xml` file automatically during deployment if the file is not present. 
+NOTE: Payara Server creates the mappings in the `sun-cmp-mappings.xml` file automatically during deployment if the file is not present.
 
-To map the fields and relationships of your entity beans manually, edit the `sun-cmp-mappings.xml` deployment descriptor. Only do this if you are proficient in editing XML.
+To map the fields and relationships of your entity beans manually, edit the `sun-cmp-mappings.xml` deployment descriptor.
 
-The mapping information is developed in conjunction with the database schema (`.dbschema`) file, which can be automatically captured when you deploy the bean
-(see xref:docs:application-development-guide:container_managed-persistence.adoc#automatic-database-schema-capture[Automatic Database Schema Capture]).
+The mapping information is developed in conjunction with the database schema (`.dbschema`) file, which can be automatically captured when you deploy the bean (see xref:docs:application-development-guide:container_managed-persistence.adoc#automatic-database-schema-capture[Automatic Database Schema Capture]).
+
 You can manually generate the schema using the `capture-schema` utility (xref:docs:application-development-guide:container_managed-persistence.adoc#using-the-capture-schema-utility[Using the `capture-schema` Utility]).
 
 [[mapping-considerations]]
 === Mapping Considerations
 
-The data types used in automatic schema generation are also suggested for manual mapping. These data types are described in
-xref:docs:application-development-guide:container_managed-persistence.adoc#supported-data-types-for-cmp[Supported Data Types for CMP].
+The data types used in automatic schema generation are also suggested for manual mapping. These data types are described in xref:docs:application-development-guide:container_managed-persistence.adoc#supported-data-types-for-cmp[Supported Data Types for CMP].
 
 [[join-tables-and-relationships]]
-==== *Join Tables and Relationships*
+==== Join Tables and Relationships
 
 Use of join tables in the database schema is supported for all types of relationships, not just many-to-many relationships.
-For general information about relationships, see section 10.3.7 of the Enterprise JavaBeans Specification, v2.1.
 
 [[automatic-primary-key-generation]]
 ==== *Automatic Primary Key Generation*
 
-The Payara Server supports automatic primary key generation for EJB 1.1, 2.0, and 2.1 CMP beans. To specify automatic primary key generation,
-give the `prim-key-class` element in the `ejb-jar.xml` file the value `java.lang.Object`. CMP beans with automatically generated primary keys can participate
-in relationships with other CMP beans. The Payara Server does not support database-generated primary key values.
+The Payara Server supports automatic primary key generation for EJB 1.1, 2.0, and 2.1 CMP beans. To specify automatic primary key generation, give the `prim-key-class` element in the `ejb-jar.xml` file the value `java.lang.Object`. CMP beans with automatically generated primary keys can participate in relationships with other CMP beans. Payara Server does not support database-generated primary key values.
 
-If the database schema is created during deployment, the Payara Server creates the schema with the primary key column, then generates unique values for the primary key column at runtime.
+If the database schema is created during deployment, Payara Server creates the schema with the primary key column, then generates unique values for the primary key column at runtime.
 
-If the database schema is not created during deployment, the primary key column in the mapped table must be of type `NUMERIC` with a precision of 19 or more, and must not
-be mapped to any CMP field. The Payara Server generates unique values for the primary key column at runtime.
+If the database schema is not created during deployment, the primary key column in the mapped table must be of type `NUMERIC` with a precision of `19` or more, and must not be mapped to any CMP field. Payara Server generates unique values for the primary key column at runtime.
 
 [[fixed-length-char-primary-keys]]
-==== *Fixed Length CHAR Primary Keys*
+==== Fixed Length CHAR Primary Keys
 
-If an existing database table has a primary key column in which the values vary in length, but the type is `CHAR` instead of `VARCHAR`,
-the Payara Server automatically trims any extra spaces when retrieving primary key values. It is not a good practice to use a fixed length `CHAR` column as a primary key.
+If an existing database table has a primary key column in which the values vary in length, but the type is `CHAR` instead of `VARCHAR`, Payara Server automatically trims any extra spaces when retrieving primary key values. It is not a good practice to use a fixed length `CHAR` column as a primary key.
+
 Use this feature with schemas that cannot be changed, such as a schema inherited from a legacy application.
 
 [[managed-fields]]
-==== *Managed Fields*
+==== Managed Fields
 
-A managed field is a CMP or CMR field that is mapped to the same database column as another CMP or CMR field. CMP fields mapped to the same column and CMR fields mapped to exactly
-the same column lists always have the same value in memory. For CMR fields that share only a subset of their mapped columns, changes to the columns
-affect the relationship fields in memory differently. Basically, the Payara Server always tries to keep the state of the objects in memory synchronized with the database.
+A managed field is a CMP or CMR field that is mapped to the same database column as another CMP or CMR field. CMP fields mapped to the same column and CMR fields mapped to exactly the same column lists always have the same value in memory. For CMR fields that share only a subset of their mapped columns, changes to the columns affect the relationship fields in memory differently. Basically, Payara Server always tries to keep the state of the objects in memory synchronized with the database.
 
-A managed field can have any `fetched-with` subelement. If the `fetched-with` subelement is `<default/>`, the `-DAllowManagedFieldsInDefaultFetchGroup` flag must be set to
-`true`. See xref:docs:application-development-guide:container_managed-persistence.adoc#default-fetch-group-flags[Default Fetch Group Flags]
-and "xref:docs:application-deployment-guide:dd-elements.adoc#fetched-with[fetched-with]" in Payara Server Application Deployment Guide.
+A managed field can have any `fetched-with` sub-element. If the `fetched-with` sub-element is `<default/>`, the `-DAllowManagedFieldsInDefaultFetchGroup` flag must be set to
+`true`. See xref:docs:application-development-guide:container_managed-persistence.adoc#default-fetch-group-flags[Default Fetch Group Flags] and "xref:docs:application-deployment-guide:dd-elements.adoc#fetched-with[fetched-with]" in the Payara Server Application Deployment Guide.
 
 [[blob-support]]
-==== *BLOB Support*
+==== BLOB Support
 
-Binary Large Object (BLOB) is a data type used to store values that do not correspond to other types such as numbers, strings, or dates. Java fields whose types
-implement java.io.Serializable or are represented as `byte[]` can be stored as BLOBs.
+Binary Large Object (BLOB) is a data type used to store values that do not correspond to other types such as numbers, strings, or dates. Java fields whose types implement `java.io.Serializable` or are represented as `byte[]` can be stored as BLOBs.
 
-If a CMP field is defined as Serializable, it is serialized into a `byte[]` before being stored in the database. Similarly, the value fetched from the database
-is deserialized. However, if a CMP field is defined as `byte[]`, it is stored directly instead of being serialized and deserialized when stored and fetched, respectively.
+If a CMP field is defined as `Serializable`, it is serialized into a `byte[]` before being stored in the database. Similarly, the value fetched from the database is deserialized. However, if a CMP field is defined as `byte[]`, it is stored directly instead of being serialized and deserialized when stored and fetched, respectively.
 
-To enable BLOB support in the Payara Server environment, define a CMP field of type `byte[]` or a user-defined type that implements the java.io.Serializable interface.
-If you map the CMP bean to an existing database schema, map the field to a column of type BLOB.
+To enable BLOB support in the server's environment, define a CMP field of type `byte[]` or a user-defined type that implements the `java.io.Serializable` interface. If you map the CMP bean to an existing database schema, map the field to a column of type BLOB.
 
-To use BLOB or CLOB data types larger than 4 KB for CMP using the Inet Oraxo JDBC Driver for Oracle Databases, you must set the `streamstolob` property value to `true`.
+For configurations of supported drivers, see "xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in Payara Server Administration Guide.
 
-For configurations of supported and other drivers, see
-"xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in Payara Server Administration Guide.
-
-For automatic mapping, you might need to change the default BLOB column length for the generated schema using the `schema-generator-properties` element in `glassfish-ejb-jar.xml`. See your database vendor documentation to determine whether you need to specify the length. For example:
+For automatic mapping, you might need to change the default BLOB column length for the generated schema using the `schema-generator-properties` element in the `glassfish-ejb-jar.xml` file. See your database vendor documentation to determine whether you need to specify the length. For example:
 
 [source,xml]
 ----
@@ -171,19 +143,15 @@ For automatic mapping, you might need to change the default BLOB column length f
 ----
 
 [[clob-support]]
-==== *CLOB Support*
+==== CLOB Support
 
 Character Large Object (CLOB) is a data type used to store and retrieve very long text fields. CLOBs translate into long strings.
 
-To enable CLOB support in the Payara Server environment, define a CMP field of type `java.lang.String`. If you map the CMP bean to an existing database schema,
-map the field to a column of type CLOB.
-
-To use BLOB or CLOB data types larger than 4 KB for CMP using the Inet Oraxo JDBC Driver for Oracle Databases, you must set the `streamstolob` property value to `true`.
+To enable CLOB support in the Payara Server environment, define a CMP field of type `java.lang.String`. If you map the CMP bean to an existing database schema, map the field to a column of type CLOB.
 
 For configurations of supported and other drivers, see "xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in Payara Server Administration Guide.
 
-For automatic mapping, you might need to change the default CLOB column length for the generated schema using the `schema-generator-properties` element in
-`glassfish-ejb-jar.xml`. See your database vendor documentation to determine whether you need to specify the length. For example:
+For automatic mapping, you might need to change the default CLOB column length for the generated schema using the `schema-generator-properties` element in the `glassfish-ejb-jar.xml` file. See your database vendor documentation to determine whether you need to specify the length. For example:
 
 [source,xml]
 ----
@@ -203,14 +171,10 @@ For automatic mapping, you might need to change the default CLOB column length f
 [[automatic-schema-generation-for-cmp]]
 == Automatic Schema Generation for CMP
 
-The automatic schema generation feature provided in the Payara Server defines database tables based on the fields in entity beans and the
-relationships between the fields. This insulates developers from many of the database related aspects of development, allowing them to focus on
-entity bean development. The resulting schema is usable as-is or can be given to a database administrator for tuning with respect to performance, security, and so on.
+The automatic schema generation feature provided in Payara Server defines database tables based on the fields in entity beans and the relationships between the fields. This insulates developers from many of the database related aspects of development, allowing them to focus on entity bean development. The resulting schema is usable as-is or can be given to a database administrator for tuning with respect to performance, security, and so on.
 
-NOTE: Automatic schema generation is supported on an all-or-none basis: it expects that no tables exist in the database before it
-is executed. It is not intended to be used as a tool to generate extra tables or constraints. +
-Deployment won't fail if all tables are not created, and undeployment won't fail if not all tables are dropped. This is done to allow you to investigate the problem and fix it
-anually. You should not rely on the partially created database schema to be correct for running the application.
+IMPORTANT: Automatic schema generation is supported on an all-or-none basis: it expects that no tables exist in the database before it is executed. It is not intended to be used as a tool to generate extra tables or constraints. +
+Deployment won't fail if all tables are not created, and un-deployment won't fail if not all tables are dropped. This is done to allow you to investigate the problem and fix it manually. You should not rely on the partially created database schema to be correct for running the application.
 
 [[supported-data-types-for-cmp]]
 === Supported Data Types for CMP
@@ -220,10 +184,7 @@ BIGINT, BIT, BLOB, CHAR, CLOB, DATE, DECIMAL, DOUBLE, FLOAT, INTEGER, NUMERIC, R
 
 The following table contains the mappings of Java types to JDBC types when automatic mapping is used.
 
-[[table-9-1-java-type-to-jdbc-type-mapping-for-cmp]]
-.Table 9-1 Java Type to JDBC Type Mappings for CMP
-
-[width="100%",cols="39%,40%,21%",options="header",]
+[width="100%",,options="header",]
 |===
 |Java Type |JDBC Type |Nullability
 
@@ -329,16 +290,11 @@ The following table contains the mappings of Java types to JDBC types when autom
 
 |===
 
-NOTE: Java types assigned to CMP fields must be restricted to Java primitive types, Java Serializable types, `java.util.Date`, `java.sql.Date`, `java.sql.Time`,
-or `java.sql.Timestamp`. An entity bean local interface type (or a collection of such) can be the type of a CMR field.
+NOTE: Java types assigned to CMP fields must be restricted to Java primitive types, Java Serializable types, `java.util.Date`, `java.sql.Date`, `java.sql.Time`, or `java.sql.Timestamp`. An entity bean local interface type (or a collection of such) can be the type of CMR field.
 
-The following table contains the mappings of JDBC types to database vendor-specific types when automatic mapping is used.
-For configurations of supported and other drivers, see "xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in Payara Server Administration Guide.
+The following table contains the mappings of JDBC types to database vendor-specific types when automatic mapping is used. For configurations of supported and other drivers, see "xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in the Payara Server Administration Guide.
 
-[[table-9-2-mapping-of-jdbc-types-to-database-vendor-specific-types-for-cmp]]
-.Table 9-2 Mappings of JDBC Types to Database Vendor Specific Types for CMP
-
-[width="100%",cols="15%,17%,17%,17%,17%,17%",options="header",]
+[width="100%",,options="header",]
 |===
 
 |JDBC Type |Apache Derby, CloudScape |Oracle |DB2 |Sybase ASE 12.5 |MS-SQL Server
@@ -442,34 +398,26 @@ For configurations of supported and other drivers, see "xref:docs:administration
 
 |===
 
-
 [[generation-options-for-cmp]]
 === Generation Options for CMP
 
 Deployment descriptor elements or `asadmin` command line options can control automatic schema generation by the following:
 
 * Creating tables during deployment
-* Dropping tables during undeployment
+* Dropping tables during un-deployment
 * Dropping and creating tables during redeployment
 * Specifying the database vendor
 * Specifying that table names are unique
 * Specifying type mappings for individual CMP fields
 
-
 NOTE: Before using these options, make sure you have a properly configured CMP resource. See xref:docs:application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource]. +
-For a read-only bean, do not create the database schema during deployment. Instead, work with your database administrator to populate the data into the tables.
-See xref:docs:application-development-guide:ejb.adoc#using-read-only-beans[Using Read-Only Beans]. +
-Automatic schema generation is not supported for beans with version column consistency checking. Instead, work with your database administrator to create the schema and
-add the required triggers. See xref:docs:application-development-guide:container_managed-persistence.adoc#version-column-consistency-checking[Version Column Consistency Checking].
+For a read-only bean, do not create the database schema during deployment. Instead, work with your database administrator to populate the data into the tables.See xref:docs:application-development-guide:ejb.adoc#using-read-only-beans[Using Read-Only Beans]. +
+Automatic schema generation is not supported for beans with version column consistency checking. Instead, work with your database administrator to create the schema and add the required triggers. See xref:docs:application-development-guide:container_managed-persistence.adoc#version-column-consistency-checking[Version Column Consistency Checking].
 
+The following optional data sub-elements of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file control the automatic creation of database
+tables at deployment. For more information about the `cmp-resource` element, see "xref:docs:application-deployment-guide:dd-elements.adoc#cmp-resource[cmp-resource]" in the Payara Server Application Deployment Guide and xref:docs:application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource].
 
-The following optional data subelements of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file control the automatic creation of database
-tables at deployment. For more information about the `cmp-resource` element, see "xref:docs:application-deployment-guide:dd-elements.adoc#cmp-resource[cmp-resource]" in Payara Server Application Deployment Guide and xref:docs:application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource].
-
-[[table-9-3]]
-.Table 9-3 The `glassfish-ejb-jar.xml` Generation Elements
-
-[width="172%",cols="35%,15%,50%",options="header",]
+[width="172%", cols="30%,15%,55% a",options="header",]
 |===
 |Element |Default |Description
 
@@ -479,19 +427,20 @@ tables at deployment. For more information about the `cmp-resource` element, see
 
 |xref:docs:application-deployment-guide:dd-elements.adoc#drop-tables-at-undeploy[`drop-tables-at-undeploy`]
 |`false` 
-|If `true`, causes database tables that were automatically created when the bean(s) were last deployed to be dropped when the bean(s) are undeployed. If `false`,does not drop tables.
+|If `true`, causes database tables that were automatically created when the bean(s) were last deployed to be dropped when the bean(s) are un-deployed. If `false`,does not drop tables.
 
 |xref:docs:application-deployment-guide:dd-elements.adoc#database-vendor-name[`database-vendor-name`] 
 |none 
 |Specifies the name of the database vendor for which tables are created. Allowed values are `javadb`, `db2`, `mssql`, `mysql`, `oracle`, `postgresql`, `pointbase`, `derby` (also for CloudScape), and `sybase`,case-insensitive.
-If no value is specified, a connection is made to the resource specified by the `jndi-name` subelement of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file,
-and the database vendor name is read. If the connection cannot be established, or if the value is not recognized, SQL-92 compliance is presumed.
+If no value is specified, a connection is made to the resource specified by the `jndi-name` sub-element of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file, and the database vendor name is read. If the connection cannot be established, or if the value is not recognized, `SQL-92` compliance is presumed.
 
 |xref:docs:application-deployment-guide:dd-elements.adoc#schema-generator-properties[`schema-generator-properties`]
 |none 
-|Specifies field-specific column attributes in `property` subelements. Each property name is of the following format:
+|Specifies field-specific column attributes in `property` sub-elements. Each property name is of the following format:
 
+----
 bean-name`.`field-name`.`attribute
+----
 
 For example:
 
@@ -505,12 +454,7 @@ For further information and an example, see "xref:docs:application-deployment-gu
 
 The following options of the `asadmin deploy` or `asadmin deploydir` command control the automatic creation of database tables at deployment.
 
-[[table-9-4]]
-.Table 9-4 The `asadmin deploy` and `asadmin deploydir` Generation
-
-Options for CMP
-
-[width="172%",cols="35%,14%,50%",options="header",]
+[width="100%",cols="30%,15%,55%",options="header",]
 |===
 
 |Option |Default |Description
@@ -537,31 +481,27 @@ used.
 
 If not specified, the value of the `database-vendor-name` attribute in `glassfish-ejb-jar.xml` is used.
 
-If no value is specified, a connection is made to the resource specified by the `jndi-name` subelement of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file, and the database vendor name is read. If the connection cannot be established, or if the value is not recognized, SQL-92 compliance is presumed.
+If no value is specified, a connection is made to the resource specified by the `jndi-name` sub-element of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file, and the database vendor name is read. If the connection cannot be established, or if the value is not recognized, SQL-92 compliance is presumed.
 
 |===
 
+If one or more of the beans in the module are manually mapped, and you use any of the `asadmin deploy` or `asadmin deploydir` options, the deployment is not harmed in any way, but the options have no effect, and a warning is written to the server log.
 
-If one or more of the beans in the module are manually mapped and you use any of the `asadmin deploy` or `asadmin deploydir` options, the deployment is not harmed in any way, but the options have no effect, and a warning is written to the server log. 
+The following options of the `asadmin undeploy` command control the automatic removal of database tables at un-deployment.
 
-The following options of the `asadmin undeploy` command control the automatic removal of database tables at undeployment.
-
-[[table-9-5]]
-Table 9-5 The `asadmin undeploy` Generation Options for CMP
-
-[width="172%",cols="44%,10%,46%",options="header",]
+[width="100%",cols="30%,15%,55%",options="header",]
 |===
 
 |Option |Default |Description
 
 |`--droptables` 
 |none
-|If `true`, causes database tables that were automatically created when the bean(s) were last deployed to be dropped when the bean(s) are undeployed. If `false`, does not drop tables.
+|If `true`, causes database tables that were automatically created when the bean(s) were last deployed to be dropped when the bean(s) are un-deployed. If `false`, does not drop tables.
 If not specified, the value of the `drop-tables-at-undeploy` attribute in `glassfish-ejb-jar.xml` is used.
 
 |===
 
-When command line and `glassfish-ejb-jar.xml` options are both specified, the `asadmin` options take precedence.
+When command line and `glassfish-ejb-jar.xml` options are both specified, the `asadmin` command options take precedence.
 
 [[schema-capture]]
 == Schema Capture
@@ -570,12 +510,9 @@ When command line and `glassfish-ejb-jar.xml` options are both specified, the `a
 
 === Automatic Database Schema Capture
 
-You can configure a CMP bean in Payara Server to automatically capture the database metadata and save it in a `.dbschema` file during deployment. If the `sun-cmp-mappings.xml`
-file contains an empty `<schema/>` entry, the `cmp-resource` entry in the `glassfish-ejb-jar.xml` file is used to get a connection to the database, and automatic generation
-of the schema is performed.
+You can configure a CMP bean in Payara Server to automatically capture the database metadata and save it in a `.dbschema` file during deployment. If the `sun-cmp-mappings.xml` file contains an empty `<schema/>` entry, the `cmp-resource` entry in the `glassfish-ejb-jar.xml` file is used to get a connection to the database, and automatic generation of the schema is performed.
 
-NOTE: Before capturing the database schema automatically, make sure you have a properly configured CMP resource.
-See xref:docs:application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource].
+WARNING: Before capturing the database schema automatically, make sure you have a properly configured CMP resource. See xref:docs:application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource].
 
 [[using-the-capture-schema-utility]]
 === Using the `capture-schema` Utility
@@ -591,20 +528,18 @@ Keep the following in mind when using the `capture-schema` command:
 * The schema name must be upper case.
 * Table names in databases are case-sensitive. Make sure that the table name matches the name in the database.
 * PostgreSQL databases internally convert all names to lower case. Before running the `capture-schema` command on a PostgreSQL database, make sure table and column names are lower case in the `sun-cmp-mappings.xml` file.
-* An Oracle database user running the `capture-schema` command needs ANALYZE ANY TABLE privileges if that user does not own the schema. These privileges are granted to the user by the database administrator.
+* An Oracle database user running the `capture-schema` command needs `ANALYZE ANY TABLE` privileges if that user does not own the schema.
 
 [[configuring-the-cmp-resource]]
 == Configuring the CMP Resource
 
-An EJB module that contains CMP beans requires the JNDI name of a JDBC resource in the `jndi-name` subelement of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file.
-Set `PersistenceManagerFactory` properties as properties of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file.
-See "xref:docs:application-deployment-guide:dd-elements.adoc#cmp-resource[cmp-resource]" in Payara Server Application Deployment Guide.
+An EJB module that contains CMP beans requires the JNDI name of a JDBC resource in the `jndi-name` sub-element of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file. Set `PersistenceManagerFactory` properties as properties of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file.See "xref:docs:application-deployment-guide:dd-elements.adoc#cmp-resource[cmp-resource]" in Payara Server Application Deployment Guide.
 
-In the Administration Console, open the Resources component, then select JDBC. Click the Help button in the Administration Console for information on creating a new JDBC resource.
+In the Administration Console, open the _Resources_ component, then select _JDBC_.
 
 For example, if the JDBC resource has the JNDI name `jdbc/MyDatabase`, set the CMP resource in the `glassfish-ejb-jar.xml` file as follows:
 
-[source,xml]
+[source, xml]
 ----
 <cmp-resource>
    <jndi-name>jdbc/MyDatabase</jndi-name>
@@ -614,40 +549,36 @@ For example, if the JDBC resource has the JNDI name `jdbc/MyDatabase`, set the C
 [[performance-related-features]]
 == Performance-Related Features
 
-The Payara Server provides the following features to enhance performance or allow more fine-grained data checking. These features are supported only for entity beans with container managed persistence.
+Payara Server provides the following features to enhance performance or allow more fine-grained data checking. These features are supported only for entity beans with container managed persistence.
 
-NOTE: Use of any of these features results in a non-portable application.
+IMPORTANT: Use any of these features results in a non-portable application.
 
 [[version-column-consistency-checking]]
 === Version Column Consistency Checking
 
-The version consistency feature saves the bean state at first transactional access and caches it between transactions. The state is copied from the cache instead of
-being read from the database. The bean state is verified by primary key and version column values at flush for custom queries (for dirty instances only) and at commit
-(for clean and dirty instances).
+The version consistency feature saves the bean state at first transactional access and caches it between transactions. The state is copied from the cache instead of being read from the database. The bean state is verified by primary key and version column values at flush for custom queries (for dirty instances only) and at commit (for clean and dirty instances).
 
 [[to-use-version-consistency]]
 ==== To Use Version Consistency
 
-.  Create the version column in the primary table.
-.  Give the version column a numeric data type.
-.  Provide appropriate update triggers on the version column. These triggers must increment the version column on each update of the specified row.
-.  Specify the version column. This is specified in the `check-version-of-accessed-instances` subelement of the `consistency` element in the `sun-cmp-mappings.xml` file.
-See "xref:docs:application-deployment-guide:dd-elements.adoc#consistency[consistency]" in Payara Server Application Deployment Guide.
-.  Map the CMP bean to an existing schema. Automatic schema generation is not supported for beans with version column consistency checking. Instead, work with your database
-administrator to create the schema and add the required triggers.
+. Create the version column in the primary table.
+. Give the version column a numeric data type.
+. Provide appropriate update triggers on the version column. These triggers must increment the version column on each update of the specified row.
+. Specify the version column. This is specified in the `check-version-of-accessed-instances` sub-element of the `consistency` element in the `sun-cmp-mappings.xml` file.
+See "xref:docs:application-deployment-guide:dd-elements.adoc#consistency[consistency]" in the Payara Server Application Deployment Guide.
+. Map the CMP bean to an existing schema. Automatic schema generation is not supported for beans with version column consistency checking. Instead, work with your database administrator to create the schema and add the required triggers.
 
 [[relationship-prefetching]]
 === Relationship Prefetching
 
-In many cases when an entity bean's state is fetched from the database, its relationship fields are always accessed in the same transaction.
-Relationship prefetching saves database round trips by fetching data for an entity bean and those beans referenced by its CMR fields in a single database round trip.
+In many cases when an entity bean's state is fetched from the database, its relationship fields are always accessed in the same transaction. Relationship prefetching saves database round trips by fetching data for an entity bean and those beans referenced by its CMR fields in a single database round trip.
 
-To enable relationship prefetching for a CMR field, use the `default` subelement of the `fetched-with` element in the `sun-cmp-mappings.xml`file.
-By default, these CMR fields are prefetched whenever `findByPrimaryKey` or a custom finder is executed for the entity, or when the entity is navigated to from a relationship.
-(Recursive prefetching is not supported, because it does not usually enhance performance.) See "xref:docs:application-deployment-guide:dd-elements.adoc#fetched-with[fetched-with]" in Payara Server Application Deployment Guide.
+To enable relationship prefetching for a CMR field, use the `default` sub-element of the `fetched-with` element in the `sun-cmp-mappings.xml`file.
+
+By default, these CMR fields are prefetched whenever `findByPrimaryKey` or a custom finder is executed for the entity, or when the entity is navigated to from a relationship. (Recursive prefetching is not supported, because it does not usually enhance performance.) See "xref:docs:application-deployment-guide:dd-elements.adoc#fetched-with[fetched-with]" in the Payara Server Application Deployment Guide.
 
 To disable prefetching for specific custom finders, use the `prefetch-disabled` element in the `glassfish-ejb-jar.xml` file.
-See "xref:docs:application-deployment-guide:dd-elements.adoc#prefetch-disabled[prefetch-disabled]" in Payara Server Application Deployment Guide.
+See "xref:docs:application-deployment-guide:dd-elements.adoc#prefetch-disabled[prefetch-disabled]" in the Payara Server Application Deployment Guide.
 
 Multilevel relationship prefetching is supported for CMP 2.1 entity beans. To enable multilevel relationship prefetching, set the following property using the `asadmin  create-jvm-options` command:
 
@@ -659,14 +590,13 @@ asadmin create-jvm-options -Dcom.sun.jdo.spi.persistence.support.sqlstore.MULTIL
 [[read-only-beans]]
 === Read-Only Beans
 
-Another feature that the Payara Server provides is the read-only bean, an entity bean that is never modified by an EJB client. Read-only beans avoid database updates completely.
+Another feature that Payara Server provides is the read-only bean, an entity bean that is never modified by an EJB client. Read-only beans avoid database updates completely.
 
-NOTE: Read-only beans are specific to the Payara Server and are not part of the Enterprise JavaBeans Specification, v2.1. Use of this feature for an EJB 2.1 bean results in a  on-portable application.
+NOTE: Read-only beans are specific to Payara Server and are not part of the Jakarta Enterprise Beans specification. Use of this feature for an EJB 2.1 bean results in a non-portable application.
 
 A read-only bean can be used to cache a database entry that is frequently accessed but rarely updated (externally by other beans). When the data that is cached by a read-only bean is updated by another bean, the read-only bean can be notified to refresh its cached data. 
 
-The Payara Server provides a number of ways by which a read-only bean's state can be refreshed. By setting the `refresh-period-in-seconds` element in the `glassfish-ejb-jar.xml` file
-and the `trans-attribute` element (or `@TransactionAttribute` annotation) in the `ejb-jar.xml` file, it is easy to configure a read-only bean that is one of the following:
+Payara Server provides a number of ways by which a read-only bean's state can be refreshed. By setting the `refresh-period-in-seconds` element in the `glassfish-ejb-jar.xml` file and the `trans-attribute` element (or `@TransactionAttribute` annotation) in the `ejb-jar.xml` file, it is easy to configure a read-only bean that is one of the following:
 
 * Always refreshed
 * Periodically refreshed
@@ -682,15 +612,11 @@ Read-only beans are best suited for situations where the underlying data never c
 
 Using the following flags can improve performance.
 
-Setting `-DAllowManagedFieldsInDefaultFetchGroup=true` allows CMP fields that by default cannot be placed into the default fetch group to be
-loaded along with all other fields that are fetched when the CMP state is loaded into memory. These could be multiple fields mapped to the same column in the database table,
-for example, an instance field and a CMR. By default this flag is set to `false`.
+Setting `-DAllowManagedFieldsInDefaultFetchGroup=true` allows CMP fields that by default cannot be placed into the default fetch group to be loaded along with all other fields that are fetched when the CMP state is loaded into memory. These could be multiple fields mapped to the same column in the database table, for example, an instance field and a CMR. By default, this flag is set to `false`.
 
 For additional information, see "xref:docs:application-deployment-guide:dd-elements.adoc#level[level]" in Payara Server Application Deployment Guide.
 
-Setting `-DAllowMediatedWriteInDefaultFetchGroup` specifies how updated CMP fields are written back to the database. If the flag is `false`, all fields in the CMP bean
-are written back to the database if at least one field in the default fetch group has been changed in a transaction. If the flag is `true`, only fields modified by the bean
-are written back to the database. Specifying `true` can improve performance, particularly on database tables with many columns that have not been updated. By default this flag
+Setting `-DAllowMediatedWriteInDefaultFetchGroup` specifies how updated CMP fields are written back to the database. If the flag is `false`, all fields in the CMP bean are written back to the database if at least one field in the default fetch group has been changed in a transaction. If the flag is `true`, only fields modified by the bean are written back to the database. Specifying `true` can improve performance, particularly on database tables with many columns that have not been updated. By default, this flag
 is set to `false`.
 
 To set one of these flags, use the `asadmin create-jvm-options` command.
@@ -707,15 +633,14 @@ asadmin create-jvm-options -DAllowManagedFieldsInDefaultFetchGroup=true
 [[about-jdoql-queries]]
 === About JDOQL Queries
 
-The Enterprise JavaBeans Specification, v1.1 does not specify the format of the finder method description. The Payara Server uses an extension of Java Data Objects Query
-Language (JDOQL) queries to implement finder and selector methods. You can specify the following elements of the underlying JDOQL query:
+The Enterprise JavaBeans Specification, v1.1 does not specify the format of the finder method description. Payara Server uses an extension of *Java Data Objects Query Language (JDOQL)* queries to implement finder and selector methods. You can specify the following elements of the underlying JDOQL query:
 
-* Filter expression - A Java-like expression that specifies a condition that each object returned by the query must satisfy. Corresponds to the WHERE clause in EJB QL.
+* Filter expression - A Java-like expression that specifies a condition that each object returned by the query must satisfy. Corresponds to the `WHERE` clause in EJB QL.
 * Query parameter declaration - Specifies the name and the type of one or more query input parameters. Follows the syntax for formal parameters in the Java language.
 * Query variable declaration - Specifies the name and type of one or more query variables. Follows the syntax for local variables in the Java language. A query filter might use query variables to implement joins.
 * Query ordering declaration - Specifies the ordering expression of the query. Corresponds to the ORDER BY clause of EJB QL.
 
-The Payara Server specific deployment descriptor (`glassfish-ejb-jar.xml`) provides the following elements to store the EJB 1.1 finder method settings:
+Payara Server specific deployment descriptor (`glassfish-ejb-jar.xml`) provides the following elements to store the EJB 1.1 finder method settings:
 
 [source,text]
 ----
@@ -725,30 +650,25 @@ query-variables
 query-ordering
 ----
 
-The bean developer uses these elements to construct a query. When the finder method that uses these elements executes, the values of these elements are used
-to execute a query in the database. The objects from the JDOQL query result set are converted into primary key instances to be returned by the EJB 1.1 `ejbFind` method.
+The bean developer uses these elements to construct a query. When the finder method that uses these elements executes, the values of these elements are used to execute a query in the database. The objects from the JDOQL query result set are converted into primary key instances to be returned by the EJB 1.1 `ejbFind` method.
 
-The JDO specification, http://jcp.org/en/jsr/detail?id=12[JSR 12] (`http://jcp.org/en/jsr/detail?id=12`), provides a comprehensive description of JDOQL.
-The following information summarizes the elements used to define EJB 1.1 finders.
+NOTE: `The JDO specification, http://jcp.org/en/jsr/detail?id=12[JSR 12] (`http://jcp.org/en/jsr/detail?id=12`), provides a comprehensive description of JDOQL.
 
 [[query-filter-expression]]
 === Query Filter Expression
 
-The filter expression is a String containing a Boolean expression evaluated for each instance of the candidate class. If the filter is not specified,
-it defaults to true. Rules for constructing valid expressions follow the Java language, with the following differences:
+The filter expression is a `String` containing a `Boolean` expression evaluated for each instance of the candidate class. If the filter is not specified, it defaults to true. Rules for constructing valid expressions follow the Java language, with the following differences:
 
 * Equality and ordering comparisons between primitives and instances of wrapper classes are valid.
-* Equality and ordering comparisons of Date fields and Date parameters are valid.
-* Equality and ordering comparisons of String fields and String parameters are valid.
+* Equality and ordering comparisons of `Date` fields and `Date` parameters are valid.
+* Equality and ordering comparisons of `String` fields and `String` parameters are valid.
 * White space (non-printing characters space, tab, carriage return, and line feed) is a separator and is otherwise ignored.
-* The following assignment operators are not supported.
-
+* The following assignment operators are not supported:
 ** Comparison operators such as =, +=, and so on
-
 ** Pre- and post-increment
-
 ** Pre- and post-decrement
 * Methods, including object construction, are not supported, except for these methods.
++
 [source,java]
 ----
 Collection.contains(Object o)
@@ -756,7 +676,9 @@ Collection.isEmpty()
 String.startsWith(String s)
 String.endsWith(String e)
 ----
-In addition, the Payara Server supports the following nonstandard JDOQL methods. 
++
+In addition, Payara Server supports the following non-standard JDOQL methods:
++
 [source,java]
 ----
 String.like(String pattern)
@@ -770,8 +692,7 @@ Math.sqrt(double d)
 ----
 * Navigation through a null-valued field, which throws a `NullPointerException`, is treated as if the sub-expression returned `false`.
 
-NOTE: Comparisons between floating point values are by nature inexact. Therefore, equality comparisons (== and !=) with floating point values should be used with caution. Identifiers in the
-expression are considered to be in the name space of the candidate class, with the addition of declared parameters and variables. As in the Java language, `this` is a reserved word, and refers to the current instance being evaluated.
+NOTE: Comparisons between floating point values are by nature inexact. Therefore, equality comparisons (== and !=) with floating point values should be used with caution. Identifiers in the expression are considered to be in the name space of the candidate class, with the addition of declared parameters and variables. As in the Java language, `this` is a reserved word, and refers to the current instance being evaluated.
 
 The following expressions are supported.
 
@@ -783,7 +704,7 @@ The following expressions are supported.
 * Cast operator
 * Promotion of numeric operands for comparisons and arithmetic operations
 
-The rules for promotion follow the Java rules extended by BigDecimal, BigInteger, and numeric wrapper classes. See the numeric promotions of the Java language specification.
+The rules for promotion follow the Java rules extended by `BigDecimal`, `BigInteger`, and numeric wrapper classes.
 
 [[query-parameters]]
 === Query Parameters
@@ -803,9 +724,9 @@ This section provides a few query examples.
 [[example-1]]
 .Example 1
 
-The following query returns all players called Michael. It defines a filter that compares the name field with a string literal:
+The following query returns all players called *Michael*. It defines a filter that compares the name field with a string literal:
 
-[source,text]
+[source, text]
 ----
 name == "Michael"
 ----
@@ -839,7 +760,7 @@ The `finder` element of the `glassfish-ejb-jar.xml` file looks like this:
 <finder>
    <method-name>findInRange</method-name>
    <query-params>double low, double high</query-params>
-   <query-filter>low &lt; price &amp;&amp; price &lt high</query-filter>
+   <query-filter>low &lt; price &amp;&amp; price &lt; high</query-filter>
    <query-ordering>price ascending</query-ordering>
 </finder>
 ----
@@ -847,19 +768,18 @@ The `finder` element of the `glassfish-ejb-jar.xml` file looks like this:
 [[example-3]]
 .Example 3
 
-This query returns all players having a higher salary than the player with the specified name. It defines a query parameter for the name `java.lang.String name`. Furthermore, it
-defines a variable to which the player's salary is compared. It has the type of the persistence capable class that corresponds to the bean:
+This query returns all players having a higher salary than the player with the specified name. It defines a query parameter for the name `java.lang.String name`. Furthermore, it defines a variable to which the player's salary is compared. It has the type of the persistence capable class that corresponds to the bean:
 
 [source,text]
 ----
-    mypackage.PlayerEJB_170160966_JDOState player
+mypackage.PlayerEJB_170160966_JDOState player
 ----
 
 The filter compares the salary of the current player denoted by the `this` keyword with the salary of the player with the specified name:
 
 [source,text]
 ----
-    (this.salary> player.salary) && (player.name == name)
+(this.salary> player.salary) && (player.name == name)
 ----
 
 The `finder` element of the `glassfish-ejb-jar.xml` file looks like this:
@@ -886,12 +806,9 @@ This section discusses restrictions and performance optimizations that pertain t
 [[disabling-order-by-validation]]
 === Disabling ORDER BY Validation
 
-EJB QL as defined in the EJB 2.1 Specification defines certain restrictions for the SELECT clause of an ORDER BY query (see section 11.2.8 ORDER BY Clause).
-This ensures that a query does not order by a field that is not returned by the query. By default, the EJB QL compiler checks the above restriction and throws
-an exception if the query does not conform.
+EJBQL as defined in the EJB 2.1 specification defines certain restrictions for the `SELECT` clause of an `ORDER BY` query. This ensures that a query does not order by a field that is not returned by the query. By default, the EJB QL compiler checks the above restriction and throws an exception if the query does not conform.
 
-However, some databases support SQL statements with an ORDER BY column that is not included in the SELECT clause. To disable the validation of the ORDER BY clause against
-the SELECT clause, set the `DISABLE_ORDERBY_VALIDATION` JVM option as follows:
+However, some databases support SQL statements with an ORDER BY column that is not included in the `SELECT` clause. To disable the validation of the `ORDER BY` clause against the `SELECT` clause, set the `DISABLE_ORDERBY_VALIDATION` JVM option as follows:
 
 [source,shell]
 ----
@@ -901,17 +818,10 @@ asadmin create-jvm-options
 
 The `DISABLE_ORDERBY_VALIDATION` option is set to `false` by default. Setting it to `true` results in a non-portable module or application.
 
-[[setting-the-heap-size-on-db2]]
-=== Setting the Heap Size on DB2
-
-On DB2, the database configuration parameter `APPLHEAPSZ` determines the heap size. If you are using the Oracle or DataDirect database driver,
-set this parameter to at least `2048` for CMP. For more information, see `http://publib.boulder.ibm.com/infocenter/db2luw/v8/index.jsp?topic=/com.ibm.db2.udb.doc/opt/tsbp2024.html`.
-
 [[eager-loading-of-field-state]]
 === Eager Loading of Field State
 
-By default, the EJB container loads the state for all persistent fields (excluding relationship, BLOB, and CLOB fields) before invoking the `ejbLoad` method of the
-abstract bean. This approach might not be optimal for entity objects with large state if most business methods require access to only parts of the state.
+By default, the EJB container loads the state for all persistent fields (excluding relationship, BLOB, and CLOB fields) before invoking the `ejbLoad` method of the abstract bean. This approach might not be optimal for entity objects with large state if most business methods require access to only parts of the state.
 
 Use the `fetched-with` element in `sun-cmp-mappings.xml` for fields that are used infrequently. See "xref:docs:application-deployment-guide:dd-elements.adoc#fetched-with[fetched-with]" in Payara Server Application Deployment Guide.
 
@@ -920,8 +830,7 @@ Use the `fetched-with` element in `sun-cmp-mappings.xml` for fields that are use
 
 The following restrictions apply to the remote interface of an EJB 2.1 bean that uses CMP:
 
-* Do not expose the `get` and `set` methods for CMR fields or the persistence collection classes that are used in container-managed relationships through the remote interface of the bean.
-However, you are free to expose the `get` and `set` methods that correspond to the CMP fields of the entity bean through the bean's remote interface.
+* Do not expose the `get` and `set` methods for CMR fields or the persistence collection classes that are used in container-managed relationships through the remote interface of the bean. However, you are free to expose the `get` and `set` methods that correspond to the CMP fields of the entity bean through the bean's remote interface.
 * Do not expose the container-managed collection classes that are used for relationships through the remote interface of the bean.
 * Do not expose local interface types or local home interface types through the remote interface or remote home interface of the bean.
 
@@ -932,21 +841,20 @@ Dependent value classes can be exposed in the remote interface or remote home in
 
 Case-sensitive behavior cannot be achieved for PostgreSQL databases. PostgreSQL databases internally convert all names to lower case, which  makes the following workarounds necessary:
 
-* In the CMP 2.1 runtime, PostgreSQL table and column names are not quoted, which makes these names case insensitive.
+* In the CMP 2.1 runtime, PostgreSQL table and column names are not quoted, which makes these names case-insensitive.
 * Before running the `capture-schema` command on a PostgreSQL database, make sure table and column names are lower case in the `sun-cmp-mappings.xml` file.
 
 [[no-support-for-lock-when-loaded-on-sybase]]
 === No Support for `lock-when-loaded` on Sybase
 
-For EJB 2.1 beans, the `lock-when-loaded` consistency level is implemented by placing update locks on the data corresponding to a bean when the data is loaded from the database.
-There is no suitable mechanism available on Sybase databases to implement this feature. Therefore, the `lock-when-loaded` consistency level is not supported on Sybase databases.
-See "xref:docs:application-deployment-guide:dd-elements.adoc#consistency[consistency]" in Payara Server Application Deployment Guide.
+For EJB 2.1 beans, the `lock-when-loaded` consistency level is implemented by placing update locks on the data corresponding to a bean when the data is loaded from the database. There is no suitable mechanism available on Sybase databases to implement this feature. Therefore, the `lock-when-loaded` consistency level is not supported on Sybase databases.
+
+See "xref:docs:application-deployment-guide:dd-elements.adoc#consistency[consistency]" in the Payara Server Application Deployment Guide.
 
 [[sybase-finder-limitation]]
 === Sybase Finder Limitation
 
-If a finder method with an input greater than 255 characters is executed and the primary key column is mapped to a VARCHAR column, Sybase attempts to convert type VARCHAR to
-type TEXT and generates the following error:
+If a finder method with an input greater than 255 characters is executed and the primary key column is mapped to a `VARCHAR` column, Sybase attempts to convert type `VARCHAR` to type `TEXT` and generates the following error:
 
 [source,text]
 ----
@@ -958,8 +866,7 @@ To avoid this error, make sure the finder method input is less than 255 characte
 [[date-and-time-fields]]
 === Date and Time Fields
 
-If a field type is a Java date or time type (`java.util.Date`, `java.sql.Date`, `java.sql.Time`, `java.sql.Timestamp`), make sure that the field value exactly matches the value
-in the database.
+If a field type is a Java date or time type (`java.util.Date`, `java.sql.Date`, `java.sql.Time`, `java.sql.Timestamp`), make sure that the field value exactly matches the value in the database.
 
 For example, the following code uses a `java.sql.Date` type as a primary key field:
 
@@ -969,28 +876,25 @@ java.sql.Date myDate = new java.sql.Date(System.currentTimeMillis())
 BeanA.create(myDate, ...);
 ----
 
-For some databases, this code results in only the year, month, and date portion of the field value being stored in the database. Later if the client tries to find
-this bean by primary key as follows, the bean is not found in the database because the value does not match the one that is stored in the database.
+For some databases, this code results in only the year, month, and date portion of the field value being stored in the database. Later if the client tries to find this bean by primary key as follows, the bean is not found in the database because the value does not match the one that is stored in the database.
 
 [source,java]
 ----
 myBean = BeanA.findByPrimaryKey(myDate);
 ----
 
-Similar problems can happen if the database truncates the timestamp value while storing it, or if a custom query has a date or time value comparison in its WHERE clause.
+Similar problems can happen if the database truncates the timestamp value while storing it, or if a custom query has a date or time value comparison in its `WHERE` clause.
 
-For automatic mapping to an Oracle database, fields of type `java.util.Date`, `java.sql.Date`, and `java.sql.Time` are mapped to Oracle's DATE data type. Fields of type
-`java.sql.Timestamp` are mapped to Oracle's `TIMESTAMP(9)` data type.
+For automatic mapping to an Oracle database, fields of type `java.util.Date`, `java.sql.Date`, and `java.sql.Time` are mapped to Oracle's DATE data type. Fields of type `java.sql.Timestamp` are mapped to Oracle's `TIMESTAMP` data type.
 
 [[set-recursive_triggers-to-false-on-mssql]]
 === Set `RECURSIVE_TRIGGERS` to `false` on MSSQL
 
-For version consistency triggers on MSSQL, the property `RECURSIVE_TRIGGERS` must be set to `false`, which is the default. If set to `true`, triggers throw a
-`java.sql.SQLException`.
+For version consistency triggers on MSSQL, the property `RECURSIVE_TRIGGERS` must be set to `false`, which is the default. If set to `true`, it will throw a `java.sql.SQLException`.
 
 Set this property as follows:
 
-[source,roomsql]
+[source,tsql]
 ----
 EXEC sp_dboption 'database-name', 'recursive triggers', 'FALSE'
 go
@@ -998,7 +902,7 @@ go
 
 You can test this property as follows:
 
-[source,roomsql]
+[source,tsql]
 ----
 SELECT DATABASEPROPERTYEX('database-name', 'IsRecursiveTriggersEnabled')
 go
@@ -1012,18 +916,18 @@ The following restrictions apply when you use a MySQL database with the Payara S
 * MySQL treats `int1` and `int2` as reserved words. If you want to define `int1` and `int2` as fields in your table, use `\`int1\`` and `\`int2\`` field names in your SQL file.
 * When `VARCHAR` fields get truncated, a warning is displayed instead of an error. To get an error message, start the MySQL database in strict SQL mode.
 * The order of fields in a foreign key index must match the order in the explicitly created index on the primary table.
-* The `CREATE TABLE` syntax in the SQL file must end with the following line. 
-[source,roomsql]
+* The `CREATE TABLE` syntax in the SQL file must end with the following line:
++
+[source, mysql]
 ----
 )  Engine=InnoDB;
 ----
-
++
 `InnoDB` provides MySQL with a transaction-safe (ACID compliant) storage engine having commit, rollback, and crash recovery capabilities.
 
-* For a `FLOAT` type field, the correct precision must be defined. By default, MySQL uses four bytes to store a `FLOAT` type that does not have an explicit precision definition.
-For example, this causes a number such as 12345.67890123 to be rounded off to 12345.7 during an `INSERT`. To prevent this, specify `FLOAT(10,2)` in the DDL file,
-which forces the database to use an eight-byte double-precision column. For more information, see `http://dev.mysql.com/doc/mysql/en/numeric-types.html`.
-* To use `||` as the string concatenation symbol, start the MySQL server with the `--sql-mode="PIPES_AS_CONCAT"` option. For more information, see `http://dev.mysql.com/doc/refman/5.0/en/server-sql-mode.html` and `http://dev.mysql.com/doc/mysql/en/ansi-mode.html`.
+* For a `FLOAT` type field, the correct precision must be defined. By default, MySQL uses four bytes to store a `FLOAT` type that does not have an explicit precision definition. For example, this causes a number such as `12345.67890123` to be rounded off to `12345.7` during an `INSERT`. To prevent this, specify `FLOAT(10,2)` in the DDL file,
+which forces the database to use an eight-byte double-precision column.
+* To use `||` as the string concatenation symbol, start the MySQL server with the `--sql-mode="PIPES_AS_CONCAT"` option.
 * MySQL always starts a new connection when `autoCommit==true` is set. This ensures that each SQL statement forms a single transaction on its own. If you try to rollback or commit an SQL statement, you get an error message.
 +
 [source,text]
@@ -1034,11 +938,12 @@ Can't call rollback when autocommit=true
 javax.transaction.SystemException: java.sql.SQLException: 
 Error open transaction is not closed
 ----
-To resolve this issue, add `relaxAutoCommit=true` to the JDBC URL. For more information, see `http://forums.mysql.com/read.php?39,31326,31404`.
++
+To resolve this issue, add `relaxAutoCommit=true` to the JDBC URL.
 
 * Change the trigger create format from the following:
 +
-[source,roomsql]
+[source,mysql]
 ----
 CREATE TRIGGER T_UNKNOWNPKVC1 
 BEFORE UPDATE ON UNKNOWNPKVC1
@@ -1051,7 +956,7 @@ END;
 ----
 To the following:
 +
-[source,roomsql]
+[source,mysql]
 ----
 DELIMITER |
 CREATE TRIGGER T_UNKNOWNPKVC1
@@ -1064,11 +969,10 @@ END
 |
 DELIMITER ;
 ----
-For more information, see `http://dev.mysql.com/doc/mysql/en/create-trigger.html`.
 
-* MySQL does not allow a `DELETE` on a row that contains a reference to itself. Here is an example that illustrates the issue. 
+* MySQL does not allow a `DELETE` on a row that contains a reference to itself. Here is an example that illustrates the issue:
 +
-[source,roomsql]
+[source, mysql]
 ----
 create table EMPLOYEE (
         empId   int         NOT NULL,
@@ -1081,16 +985,17 @@ create table EMPLOYEE (
         insert into Employee values (1, 1234.34, 1);
         delete from Employee where empId = 1;
 ----
-This example fails with the following error message.
+This example fails with the following error message:
 +
-[source,shell]
+[source,text]
 ----
 ERROR 1217 (23000): Cannot delete or update a parent row: 
 a foreign key constraint fails
 ----
++
 To resolve this issue, change the table creation script to the following:
 +
-[source,roomsql]
+[source,mysql]
 ----
 create table EMPLOYEE (
         empId   int         NOT NULL,
@@ -1104,31 +1009,30 @@ create table EMPLOYEE (
         insert into Employee values (1, 1234.34, 1);
         delete from Employee where empId = 1;
 ----
-This can be done only if the foreign key field is allowed to be null. For more information, see `http://dev.mysql.com/doc/mysql/en/innodb-foreign-key-constraints.html`.
+This can be done only if the foreign key field is allowed to be `null`.
 
-* When an SQL script has foreign key constraints defined, `capture-schema` fails to capture the table information correctly. To work around the problem, remove the constraints and then run `capture-schema`. Here is an example that illustrates the issue. 
+* When an SQL script has foreign key constraints defined, `capture-schema` fails to capture the table information correctly. To work around the problem, remove the constraints and then run `capture-schema`. Here is an example that illustrates the issue:
 +
-[source,roomsql]
+[source,mysql]
 ----
 CREATE TABLE ADDRESSBOOKBEANTABLE (ADDRESSBOOKNAME VARCHAR(255) 
     NOT NULL PRIMARY KEY, 
-CONNECTEDUSERS              BLOB NULL, 
-OWNER                       VARCHAR(256), 
-FK_FOR_ACCESSPRIVILEGES     VARCHAR(256), 
-CONSTRAINT FK_ACCESSPRIVILEGE FOREIGN KEY (FK_FOR_ACCESSPRIVILEGES) 
-    REFERENCES ACCESSPRIVILEGESBEANTABLE (ROOT) 
+    CONNECTEDUSERS  BLOB NULL,
+    OWNER   VARCHAR(256),
+    FK_FOR_ACCESSPRIVILEGES VARCHAR(256),
+    CONSTRAINT FK_ACCESSPRIVILEGE FOREIGN KEY(FK_FOR_ACCESSPRIVILEGES)
+    REFERENCES ACCESSPRIVILEGESBEANTABLE(ROOT)
 ) ENGINE=InnoDB;  
 ----
++
 To resolve this issue, change the table creation script to the following: 
 +
-[source,roomsql]
+[source,mysql]
 ----
 CREATE TABLE ADDRESSBOOKBEANTABLE (ADDRESSBOOKNAME VARCHAR(255) 
     NOT NULL PRIMARY KEY, 
-CONNECTEDUSERS              BLOB NULL, 
-OWNER                       VARCHAR(256), 
-FK_FOR_ACCESSPRIVILEGES     VARCHAR(256) 
+    CONNECTEDUSERS  BLOB NULL,
+    OWNER   VARCHAR(256),
+    FK_FOR_ACCESSPRIVILEGES VARCHAR(256)
 ) ENGINE=InnoDB;
 ----
-
-
