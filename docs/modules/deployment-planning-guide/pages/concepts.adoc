@@ -33,7 +33,7 @@ The Jakarta EE platform provides services for applications, including:
 
 Clients can access a Jakarta EE application as a remote web service in addition to accessing it through HTTP, RMI/IIOP, and JMS. Web services are implemented using the Java API for XML-based web services (JAX-WS). A Jakarta EE application can also act as a client to web services, which would be typical in network applications.
 
-Web Services Description Language (WSDL) is an XML format that describes web service interfaces. Web service consumers can dynamically parse a WSDL document to determine the operations a web service provides and how to execute them. Payara Server distributes web services interface descriptions using a registry that other applications can access through the Java API for XML Registries (JAXR).
+Web Services Description Language (WSDL) is an XML format that describes web service interfaces. Web service consumers can dynamically parse a WSDL document to determine the operations a web service provides and how to execute them. Payara Server distributes web services interface descriptions using a registry that other applications can access through the Java API for XML Registries (JAX-R).
 
 [[client-access]]
 === Client Access
@@ -68,7 +68,7 @@ The administration tools, such as the browser-based Administration Console, comm
 [[server-instances]]
 === Server Instances
 
-A server instance is a Payara Server running in a single Java Virtual Machine (JVM) process. The supported platforms for Payara Server are described in the following article: xref:docs:ROOT:General Info/Supported Platforms.adoc[Supported Platforms].
+A server instance is a Payara Server running in a single Java Virtual Machine (JVM) process. The supported platforms for Payara Server are described in this following article: xref:docs:ROOT:General Info/Supported Platforms.adoc[Supported Platforms].
 
 It is usually sufficient to create a single server instance on a machine, since Payara Server and accompanying JVM are both designed to scale to multiple processors. However, it can be beneficial to create multiple instances on one machine for application isolation and rolling upgrades. In some cases, a large server with multiple instances can be used in more than one administrative domain. The administration tools makes it easy to create, delete, and manage server instances across multiple machines.
 
@@ -87,7 +87,7 @@ NOTE: All hosts in a domain on which the DAS and Payara Server instances are run
 
 A domain has one Domain Administration Server (DAS), a specially designated Payara Server instance that hosts the administrative applications. The DAS authenticates the administrator, accepts requests from administration tools, and communicates with server instances in the domain to carry out the requests.
 
-The administration tools are the `asadmin` command-line tool and the browser-based Administration Console. Payara Server also provides a RESTful API for server administration. The administrator can view and manage a single domain at a time, thus enforcing secure separation.
+The administration tools are the `asadmin` command-line tool and the browser-based Administration Console. Payara Server also provides a REST-ful API for server administration. The administrator can view and manage a single domain at a time, thus enforcing secure separation.
 
 The DAS is also sometimes referred to as the admin server or default server. It is referred to as the default server because it is the default target for some administrative operations.
 
@@ -95,14 +95,16 @@ Since the DAS is a Payara Server instance, it can also host Jakarta EE applicati
 
 The DAS keeps a repository containing the configuration of its domain and all the deployed applications. If the DAS is inactive or down, there is no impact on the performance or availability of active server instances, however administrative changes cannot be made. In certain cases, for security purposes, it may be useful to intentionally stop the DAS process, for example to reboot the host operating system to install a kernel patch or a hardware upgrade.
 
-Administrative commands are provided in order to backup and restore the domain configuration and applications. With the standard backup and restore procedures, you can quickly restore working configurations. If the DAS host fails, you must create a new DAS installation to restore the previous domain configuration. For instructions, see "xref:docs:administration-guide:domains.adoc#administering-domains[Administering Domains]" in Payara Server Administration Guide.
+Administrative commands are provided in order to back up and restore the domain configuration and applications. With the standard backup and restore procedures, you can quickly restore working configurations. If the DAS host fails, you must create a new DAS installation to restore the previous domain configuration. For instructions, see "xref:docs:administration-guide:domains.adoc#administering-domains[Administering Domains]" in the Payara Server Administration Guide.
 
 [[clusters]]
 === Clusters
 
+//TODO - Add disclaimer that clusters are deprecated in favor of deployment groups
+
 A cluster is a named collection of server instances that share the same applications, resources, and configuration information. You can group server instances on different machines into one logical cluster and administer them as one unit. You can easily control the lifecycle of a multi-machine cluster with the DAS.
 
-Clusters enable horizontal scalability, load balancing, and failover protection. By definition, all the instances in a cluster have the same resource and application configuration. When a server instance or a machine in a cluster fails, the load balancer detects the failure, redirects traffic from the failed instance to other instances in the cluster, and recovers the user session state. Since the same applications and resources are on all instances in the cluster, an instance can failover to any other instance in the cluster.
+Clusters enable horizontal scalability, load balancing, and failover protection. By definition, all the instances in a cluster have the same resource and application configuration. When a server instance or a machine in a cluster fails, the load balancer detects the failure, redirects traffic from the failed instance to other instances in the cluster, and recovers the user session state. Since the same applications and resources are on all instances in the cluster, an instance can fail over to any other instance in the cluster.
 
 NOTE: All hosts in a cluster on which the DAS and Payara Server instances are running must have the same operating system.
 
@@ -112,6 +114,8 @@ Clusters, domains, and instances are related as follows:
 * A cluster has one or more server instances.
 * A cluster belongs to a single domain.
 
+// TODO - Add section to document concepts for deployment groups
+
 [[named-configurations]]
 === Named Configurations
 
@@ -119,29 +123,9 @@ A named configuration is an abstraction that encapsulates Payara Server property
 
 To apply configuration changes, you simply change the property settings of the named configuration, and all the clusters and stand-alone instances that reference it pick up the changes. You can only delete a named configuration when all references to it have been removed. A domain can contain multiple named configurations.
 
-Payara Server comes with a default configuration, called default-config. The default configuration is optimized for developer productivity.
+Payara Server comes with a default configuration, called `default-config`. The default configuration is optimized for developer productivity.
 
 You can create your own named configuration based on the default configuration that you can customize for your own purposes. Use the Administration Console and `asadmin` command line utility to create and manage named configurations.
-
-[[http-load-balancer-plug-in]]
-=== HTTP Load Balancer Plug-in
-
-The load balancer distributes the workload among multiple physical machines, thereby increasing the overall throughput of the system. The Payara Server includes the load balancer plug-ins for Oracle iPlanet Web Server, Oracle HTTP Server, Apache Web Server, and Microsoft Internet Information Server.
-
-The load balancer plug-in accepts HTTP and HTTPS requests and forwards them to one of the Payara Server instances in the cluster. Should an instance fail, become unavailable (due to network faults), or become unresponsive, requests are redirected to existing, available machines. The load balancer can also recognize when a failed instance has recovered and redistribute the load accordingly.
-
-For simple stateless applications, a load-balanced cluster may be sufficient. However, for mission-critical applications with session state, use load balanced clusters with replicated session persistence.
-
-To set up a system with load balancing, in addition to Payara Server, you must install a web server and the load-balancer plug-in. Then you must:
-
-* Create Payara Server clusters that you want to participate in load balancing.
-* Deploy applications to these load-balanced clusters.
-
-Server instances and clusters participating in load balancing have a homogenous environment. Usually that means that the server instances reference the same server configuration, can access the same physical resources, and have the same applications deployed to them. Homogeneity enables configuration consistency, and improves the ability to support a production deployment.
-
-Use the `asadmin` command-line tool to create a load balancer configuration, add references to clusters and server instances to it, enable the clusters for reference by the load balancer, enable applications for load balancing, optionally create a health checker, generate the load balancer configuration file, and finally copy the load balancer configuration file to your web server `config` directory. An administrator can create a script to automate this entire process.
-
-For more details and complete configuration instructions, see "xref:docs:ha-administration-guide:http-load-balancing.adoc#configuring-http-load-balancing[Configuring HTTP Load Balancing]" in Payara Server High Availability Administration Guide.
 
 [[session-persistence]]
 === Session Persistence
@@ -149,21 +133,21 @@ For more details and complete configuration instructions, see "xref:docs:ha-admi
 Jakarta EE applications typically have significant amounts of session state data. A web shopping cart is the classic example of a session state. Also, an application can cache frequently-needed data in the session object. In fact, almost all applications with significant user interactions need to maintain a session state. Both HTTP sessions and stateful session beans (SFSBs) have session state data.
 
 While the session state is not as important as the transactional state stored in a database, preserving the session state across server failures can be important to end users.
-Payara Server provides the capability to save, or persist, this session state in a repository.
-If the Payara Server instance that is hosting the user session experiences a failure, the session state can be recovered. The session can continue without loss of information.
+
+Payara Server provides the capability to save, or persist, this session state in a repository. If the Payara Server instance that is hosting the user session experiences a failure, the session state can be recovered. The session can continue without loss of information.
 
 Payara Server supports the following session persistence types:
 
-* Memory
-* Replicated
-* File
+* `memory`
+* `hazelcast` (Data Grid)
+* `file`
 
-With memory persistence, the state is always kept in memory and does not survive failure.
-With replicated persistence, Payara Server uses other server instances in the cluster as the persistence store for both HTTP and SFSB sessions. With file persistence, Payara Server serializes session objects and stores them to the file system location specified by session manager properties. For SFSBs, if replicated persistence is not specified, Payara Server stores state information in the session-store subdirectory of this location.
+With `memory` persistence, the state is always kept in memory and does not survive failure.
 
+With `hazelcast` persistence, Payara Server stores session data in the Data Grid, implemented internally using a Hazelcast cluster. For SFSBs, if `hazelcast` persistence is not specified, Payara Server stores state information in the `session-store` subdirectory of its corresponding instance.
 
-Checking an SFSB's state for changes that need to be saved is called checkpointing.
-When enabled, checkpointing generally occurs after any transaction involving the SFSB is completed, even if the transaction rolls back. For more information on developing stateful session beans,see "xref:docs:application-development-guide:ejb.adoc#using-session-beans[Using Session Beans]" in Payara Server Application Development Guide. For more information on enabling SFSB failover, see "xref:docs:application-development-guide:ejb.adoc#stateful-session-bean-failover[Stateful Session Bean Failover]" in Payara Server High Availability Administration Guide.
+Checking an SFSB state for changes that need to be saved is called *checkpointing*.
+When enabled, checkpointing generally occurs after any transaction involving the SFSB is completed, even if the transaction rolls back. For more information on developing stateful session beans,see "xref:docs:application-development-guide:ejb.adoc#using-session-beans[Using Session Beans]" in the Payara Server Application Development Guide. For more information on enabling SFSB failover, see "xref:docs:application-development-guide:ejb.adoc#stateful-session-bean-failover[Stateful Session Bean Failover]" in the Payara Server High Availability Administration Guide.
 
 Apart from the number of requests being served by Payara Server, the session persistence configuration settings also affect the session information in each request.
 
@@ -172,27 +156,28 @@ For more information on configuring session persistence, see "xref:docs:ha-admin
 [[iiop-load-balancing-in-a-cluster]]
 === IIOP Load Balancing in a Cluster
 
+//TODO - Review terminology here and verify context of "clusters"
+
 With IIOP load balancing, IIOP client requests are distributed to different server instances or name servers. The goal is to spread the load evenly across the cluster, thus providing scalability. IIOP load balancing combined with EJB clustering and availability features in Payara Server provides not only load balancing but also EJB failover.
 
-There are two steps to IIOP failover and load balancing. The first step, bootstrapping, is the process by which the client sets up the initial naming context with one ORB in the cluster. The client attempts to connect to one of the IIOP endpoints. When launching an application client using the `appclient` script, you specify these endpoints using the `-targetserver` option on the command line or `target-server` elements in the `sun-acc.xml` configuration file. The client randomly chooses one of these endpoints and tries to connect to it, trying other endpoints if needed until one works.
+There are two steps to IIOP failover and load balancing. The first step, bootstrapping, is the process by which the client sets up the initial naming context with one ORB in the cluster. The client attempts to connect to one of the IIOP endpoints. When launching an application client using the `appclient` script, you specify these endpoints using the `-targetserver` option on the command line or `target-server` elements in the `sun-acc.xml` deployment descriptor. The client randomly chooses one of these endpoints and tries to connect to it, trying other endpoints if needed until one works.
 
-The second step concerns sending messages to a specific EJB. By default, all naming look-ups,
-and therefore all EJB accesses, use the cluster instance chosen during bootstrapping. The client exchanges messages with an EJB through the client ORB and server ORB. As this happens, the server ORB updates the client ORB as servers enter and leave the cluster. Later, if the client loses its connection to the server from the previous step, the client fails over to some other server using its list of currently active members. In particular, this cluster member might have joined the cluster after the client made the initial connection.
+The second step concerns sending messages to a specific EJB. By default, all naming look-ups, and therefore all EJB accesses, use the cluster instance chosen during bootstrapping. The client exchanges messages with an EJB through the client ORB and server ORB. As this happens, the server ORB updates the client ORB as servers enter and leave the cluster. Later, if the client loses its connection to the server from the previous step, the client fails over to some other server using its list of currently active members. In particular, this cluster member might have joined the cluster after the client made the initial connection.
 
-When a client performs a JNDI lookup for an object, the Naming Service creates an  InitialContext` (IC) object associated with a particular server instance. From then on, all lookup requests made using that IC object are sent to the same server instance. All `EJBHome` objects looked up with that `InitialContext` are hosted on the same target server. Any bean references obtained henceforth are also created on the same target host. This effectively provides load balancing, since all clients randomize the list of live target servers when creating `InitialContext` objects. If the target server instance goes down, the lookup or EJB method invocation will failover to another server instance.
+When a client performs a JNDI lookup for an object, the Naming Service creates an  InitialContext` (IC) object associated with a particular server instance. From then on, all lookup requests made using that IC object are sent to the same server instance. All `EJBHome` objects looked up with that `InitialContext` are hosted on the same target server. Any bean references obtained henceforth are also created on the same target host. This effectively provides load balancing, since all clients randomize the list of live target servers when creating `InitialContext` objects. If the target server instance goes down, the lookup or EJB method invocation will fail over to another server instance.
 
 Adding or deleting new instances to the cluster does not update the existing client's view of the cluster. You must manually update the endpoints list on the client side.
 
 [[message-queue-and-jms-resources]]
 === Message Queue and JMS Resources
 
-The Open Message Queue (MQ) provides reliable, asynchronous messaging for distributed applications. Message Queue is an enterprise messaging system that implements the Java Message Service (JMS) standard. Message Queue provides messaging for Jakarta EE application components such as message-driven beans (MDBs).
+The Open Message Queue (MQ) software provides reliable, asynchronous messaging for distributed applications. Message Queue is an enterprise messaging system that implements the Java Message Service (JMS) standard. Message Queue provides messaging for Jakarta EE application components such as message-driven beans (MDBs).
 
 Payara Server implements the Java Message Service (JMS) API by integrating Message Queue into Payara Server. Payara Server includes the Enterprise version of Message Queue which has failover, clustering and load balancing features.
 
-For basic JMS administration tasks, use the Payara Server Administration Console and `asadmin` command-line utility.
+For basic JMS administration tasks, use the Administration Console and `asadmin` command-line utility.
 
-For advanced tasks, including administering a Message Queue cluster, use the tools provided in the  s-install`/mq/bin` directory.
+For advanced tasks, including administering a Message Queue cluster, use the tools provided in the `as-install/mq/bin` directory.
 
 For information on deploying JMS applications and Message Queue clustering for message failover, see xref:docs:deployment-planning-guide:planning.adoc#planning-your-deployment[Planning Message Queue Broker Deployment].
 
@@ -213,18 +198,24 @@ The following procedure lists the major tasks for configuring Payara Server for 
 . Install Payara Server
 
 . If you plan to administer your clusters centrally, set up secure shell (SSH) for centralized administration.
-. Configure domains, nodes, clusters, Payara Server instances, and virtual servers as required. +
+. Configure domains, nodes, clusters/deployment groups, instances, and virtual servers as required.
++
 For more information, see the following documentation:
-* "xref:docs:administration-guide:domains.adoc#administering-domains[Administering Domains]" in Payara Server Administration Guide
++
+* "xref:docs:administration-guide:domains.adoc#administering-domains[Administering Domains]" in the Payara Server Administration Guide
 * "xref:docs:ha-administration-guide:nodes.adoc#administering-payara-server-nodes[Administering Payara Server Nodes]" in Payara Server High Availability Administration Guide
 * "xref:docs:ha-administration-guide:clusters.adoc#administering-payara-server-clusters[Administering Payara Server Clusters]" in Payara Server High Availability Administration Guide
 * "xref:docs:ha-administration-guide:instances.adoc#administering-payara-server-instances[Administering Payara Server Instances]" in Payara Server High Availability Administration Guide
 * "xref:docs:administration-guide:http_https.adoc#administering-virtual-servers[Administering Virtual Servers]" in Payara Server Administration Guide
 
-. Configure your load balancer. For more information, see "xref:docs:administration-guide:webapps.adoc#administering-mod_jk[Administering mod_jk]" in Payara Server Administration Guide.
+. Configure your load balancer, tentatively, using Apache Mod JK. For more information, see "xref:docs:administration-guide:webapps.adoc#administering-mod_jk[Administering mod_jk]" in the Payara Server Administration Guide.
+
 . Configure the web container and EJB container for replicated session persistence. +
-For more information, see "xref:docs:ha-administration-guide:session-persistence-and-failover.adoc#configuring-high-availability-session-persistence-and-failover[Configuring High Availability Session Persistence and Failover]" in Payara Server High Availability Administration Guide.
-. If you are using messaging extensively, configure Java Message Service (JMS) clusters for failover . +
+For more information, see "xref:docs:ha-administration-guide:session-persistence-and-failover.adoc#configuring-high-availability-session-persistence-and-failover[Configuring High Availability Session Persistence and Failover]" in the Payara Server High Availability Administration Guide.
+
+. If you are using messaging extensively, configure Java Message Service (JMS) clusters for failover.
++
 For more information, see the following documentation:
++
 * xref:docs:deployment-planning-guide:planning.adoc#planning-message-queue-broker-deployment[Planning Message Queue Broker Deployment]
-* "xref:docs:ha-administration-guide:jms.adoc#configuring-java-message-service-high-availability[Configuring Java Message Service High Availability]" in Payara Server High Availability Administration Guide. Deploy applications and configure them for high availability and session failover.
+* "xref:docs:ha-administration-guide:jms.adoc#configuring-java-message-service-high-availability[Configuring Java Message Service High Availability]" in the Payara Server High Availability Administration Guide

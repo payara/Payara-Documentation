@@ -75,12 +75,9 @@ T~response~ = n/r - T~think~
 
 where
 
-* n is the number of concurrent users
-* r is the number requests per second the server receives
-* T~think~ is the average think time (in seconds) +
-To obtain an accurate response time result, always include think time in the equation.
-
-[[example-2-1]]
+* `n` is the number of concurrent users
+* `r` is the number requests per second the server receives
+* `T~think~` is the average think time (in seconds) to obtain an accurate response time result, always include think time in the equation.
 
 *Calculation of Response Time*
 
@@ -103,17 +100,16 @@ After the system's response time has been calculated, particularly at peak load,
 
 If you know the number of concurrent users at any given time, the response time of their requests, and the average user think time, then you can calculate the number of requests per minute. Typically, start by estimating the number of concurrent users that are on the system.
 
-For example, after running website performance software, the administrator concludes that the average number of concurrent users submitting requests on an online banking website is 3,000. This number depends on the number of users who have signed up to be members of the online bank, their banking transaction behavior, the time of the day or week they choose to submit requests, and so on.
+For example, after running website performance software, the administrator concludes that the average number of concurrent users submitting requests on an online banking website is `3,000`. This number depends on the number of users who have signed up to be members of the online bank, their banking transaction behavior, the time of the day or week they choose to submit requests, and so on.
 
 Therefore, knowing this information enables you to use the requests per minute formula described in this section to calculate how many requests per minute your system can handle for this user base. Since requests per minute and response time become inversely proportional at peak load, decide if fewer requests per minute is acceptable as a trade-off for better response time, or alternatively, if a slower response time is acceptable as a trade-off for more requests per minute.
 
 Experiment with the requests per minute and response time thresholds that are acceptable as a starting point for fine-tuning system performance. Thereafter, decide which areas of the system require adjustment.
 
-Solving for r in the equation in the previous section gives:
+Solving for `r` in the equation in the previous section gives:
 
 r = n/(T~response~ + T~think~)
 
-[[example-2-2]]
 *Calculation of Requests Per Second*
 
 Consider the following example:
@@ -124,7 +120,6 @@ Consider the following example:
 
 The calculation for the number of requests per second is:
 
-[source,text]
 ----
 r = 2800 / (1+3) = 700
 ----
@@ -142,18 +137,19 @@ When planning how to integrate the Payara Server into the network, estimate the 
 
 To decide on the desired size and bandwidth of the network, first determine the network traffic and identify its peak. Check if there is a particular hour, day of the week, or day of the month when overall volume peaks, and then determine the duration of that peak.
 
-During peak load times, the number of packets in the network is at its highest level. In general, if you design for peak load, scale your system with the goal of handling 100 percent of peak volume. Bear in mind, however, that any network behaves unpredictably and that despite your scaling efforts, it might not always be able handle 100 percent of peak volume.
+During peak load times, the number of packets in the network is at its highest level. In general, if you design for peak load, scale your system with the goal of handling 100 percent of peak volume. Bear in mind, however, that any network behaves unpredictably and that despite your scaling efforts, it might not always be able to handle 100 percent of peak volume.
 
 For example, assume that at peak load, five percent of users occasionally do not have immediate network access when accessing applications deployed on Payara Server. Of that five percent, estimate how many users retry access after the first attempt. Again, not all of those users might get through, and of that unsuccessful portion, another percentage will retry. As a result, the peak appears longer because peak use is spread out over time as users continue to attempt access.
 
 [[calculating-bandwidth-required]]
 === Calculating Bandwidth Required
 
+//TODO - Some of these calculations may be out of date
+
 Based on the calculations made in xref:planning.adoc#establishing-performance-goals[Establishing Performance Goals], determine the additional bandwidth required for deploying Payara Server at your site.
 
-Depending on the method of access (T-1 lines, ADSL, cable modem, and so on), calculate the amount of increased bandwidth required to handle your estimated load. For example, suppose your site uses T-1 or higher-speed T-3 lines. Given their bandwidth, estimate how many lines are needed on the network, based on the average number of requests generated per second at your site and the maximum peak load. Calculate these figures using a web site analysis and monitoring tool.
+Depending on the method of access (T-1 lines, ADSL, cable modem, and so on), calculate the amount of increased bandwidth required to handle your estimated load. For example, suppose your site uses T-1 or higher-speed T-3 lines. Given their bandwidth, estimate how many lines are needed on the network, based on the average number of requests generated per second at your site and the maximum peak load. Calculate these figures using a website analysis and monitoring tool.
 
-[[example-2-3]]
 *Calculation of Bandwidth Required*
 
 A single T-1 line can handle 1.544 Mbps. Therefore, a network of four T-1 lines can handle approximately 6 Mbps of data. Assuming that the average HTML page sent back to a client is 30 kilobytes (KB), this network of four T-1 lines can handle the following traffic per second:
@@ -169,7 +165,6 @@ With traffic of 25 pages per second, this system can handle 90,000 pages per hou
 
 Having an even load throughout the day is probably not realistic. You need to determine when the peak load occurs, how long it lasts, and what percentage of the total load is the peak load.
 
-[[example-2-4]]
 *Calculation of Peak Load*
 
 If the peak load lasts for two hours and takes up 30 percent of the total load of 2,160,000 pages, this implies that 648,000 pages must be carried over the T-1 lines during two hours of the day.
@@ -181,11 +176,6 @@ Therefore, to accommodate peak load during those two hours, increase the number 
 5,400 pages per minute/60 seconds = 90 pages per second
 
 If four lines can handle 25 pages per second, then approximately four times that many pages requires four times that many lines, in this case 16 lines. The 16 lines are meant for handling the realistic maximum of a 30 percent peak load. Obviously, the other 70 percent of the load can be handled throughout the rest of the day by these many lines.
-
-[[choosing-network-cards]]
-=== Choosing Network Cards
-
-For greater bandwidth and optimal network performance, use at least 100 Mbps Ethernet cards or, preferably, 1 Gbps Ethernet cards between servers hosting Payara Server.
 
 [[planning-for-availability]]
 == Planning for Availability
@@ -202,7 +192,7 @@ To realize a good return on investment, it often makes sense to identify availab
 [[using-clusters-to-improve-availability]]
 === Using Clusters to Improve Availability
 
-At the most basic level, a cluster is a group of Payara Server clients as a single instance. This provides horizontal scalability as well as higher availability than a single instance on a single machine. This basic level of clustering works in conjunction with the HTTP load balancer plug-in, which accepts HTTP and HTTPS requests and forwards them to one of the instances in the cluster. The ORB and integrated JMS brokers also perform load balancing to Payara Server clusters. If an instance fails, becomes unavailable (due to network faults), or becomes unresponsive, requests are redirected only to existing, available machines. The load balancer can also recognize when a failed instance has recovered and redistribute load accordingly.
+At the most basic level, a cluster is a group of Payara Server clients as a single instance. This provides horizontal scalability as well as higher availability than a single instance on a single machine. The ORB and integrated JMS brokers also perform load balancing to Payara Server clusters. If an instance fails, becomes unavailable (due to network faults), or becomes unresponsive, requests are redirected only to existing, available machines.
 
 [[adding-redundancy-to-the-system]]
 === Adding Redundancy to the System
@@ -263,9 +253,9 @@ The default `admin-thread-pool` size of 50 should be adequate for most cluster d
 [[planning-message-queue-broker-deployment]]
 == Planning Message Queue Broker Deployment
 
-The Java Message Service (JMS) API is a messaging standard that allows Jakarta EE applications and components to create, send, receive, and read messages. It enables distributed communication that is loosely coupled, reliable, and asynchronous. Message Queue, which implements JMS, is integrated with Payara Server, enabling you to create components that send and receive JMS messages, including message-driven beans (MDBs).
+The Jakarta Messaging (JMS) API is a messaging standard that allows Jakarta EE applications and components to create, send, receive, and read messages. It enables distributed communication that is loosely coupled, reliable, and asynchronous. Message Queue, which implements JMS, is integrated with Payara Server, enabling you to create components that send and receive JMS messages, including message-driven beans (MDBs).
 
-Message Queue is integrated with Payara Server using a resource adapter also known as a connector module. A resource adapter is a Jakarta EE component defined according to the Jakarta EE Connector Architecture (JCA) Specification. This specification defines a standardized way in which application servers such as Payara Server can integrate with enterprise information systems such as JMS providers. Payara Server includes a resource adapter that integrates with its own JMS provider, Message Queue. To use a different JMS provider, you must obtain and deploy a suitable resource adapter that is designed to integrate with it.
+Message Queue is integrated with Payara Server using a resource adapter also known as a connector module. A resource adapter is a Jakarta EE component defined according to the Jakarta Connectors (JCA) Specification. This specification defines a standardized way in which application servers such as Payara Server can integrate with enterprise information systems such as JMS providers. Payara Server includes a resource adapter that integrates with its own JMS provider, Message Queue. To use a different JMS provider, you must obtain and deploy a suitable resource adapter that is designed to integrate with it.
 
 Creating a JMS resource in Payara Server using the Administration Console creates a  reconfigured connector resource that uses the Message Queue resource adapter. To create JMS Resources that use any other resource adapter (including `GenericJMSRA`), you must create them under the Connectors node in the Administration Console.
 
@@ -300,7 +290,7 @@ In a cluster configuration, the broker to which each message producer is directl
 
 Whenever an administrator creates or destroys a destination on a broker, this information is automatically propagated to all other brokers in a cluster. Similarly, whenever a message consumer is registered with its home broker, or whenever a consumer is disconnected from its home broker—either explicitly or because of a client or network failure, or because its home broker goes down—the relevant information about the consumer is propagated throughout the cluster. In a similar fashion, information about durable subscriptions is also propagated to all brokers in a cluster.
 
-A shared database of cluster change records can be configured as an alternative to using a master broker. For more information, "xref:docs:ha-administration-guide:jms.adoc#using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server]" in Payara Server High Availability Administration Guide.
+A shared database of cluster change records can be configured as an alternative to using a master broker. For more information, "xref:docs:ha-administration-guide:jms.adoc#using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server]" in the Payara Server High Availability Administration Guide.
 
 [[configuring-payara-server-to-use-message-queue-brokers]]
 === Configuring Payara Server to Use Message Queue Brokers
@@ -314,39 +304,39 @@ In Payara Server, a JMS host refers to a Message Queue broker. The Payara Server
 [[java-message-service-type]]
 ==== *Java Message Service Type*
 
-There are three types of integration between Payara Server and Message Queue brokers: embedded, local, and remote. You can set this type attribute on the Administration Console's Java Message Service page.
+There are three types of integration between Payara Server and Message Queue brokers: `embedded`, `local`, and `remote`. You can set this type attribute on the Administration Console's Java Message Service page.
 
 [[embedded-java-message-service]]
 === Embedded Java Message Service
 
-If the Type attribute is EMBEDDED, Payara Server and the JMS broker are colocated in the same virtual machine. The JMS Service is started in-process and managed by Payara Server. In EMBEDDED mode, JMS operations on stand-alone server instances bypass the networking stack, which leads to performance optimization. The EMBEDDED type is most suitable for stand-alone Payara Server instances. EMBEDDED mode is not supported for enhanced broker clusters.
+If the Type attribute is `EMBEDDED`, Payara Server and the JMS broker are co-located in the same virtual machine. The JMS Service is started in-process and managed by Payara Server. In `EMBEDDED` mode, JMS operations on stand-alone server instances bypass the networking stack, which leads to performance optimization. The `EMBEDDED` type is most suitable for stand-alone Payara Server instances. `EMBEDDED` mode is not supported for enhanced broker clusters and not recommended for production environments.
 
-With the EMBEDDED type, use the Start Arguments attribute to specify Message Queue broker startup parameters.
+With the `EMBEDDED` type, use the *Start Arguments* attribute to specify Message Queue broker startup parameters.
 
-With the EMBEDDED type, make sure the Java heap size is large enough to allow Payara Server and Message Queue to run in the same virtual machine.
+With the `EMBEDDED` type, make sure the Java heap size is large enough to allow Payara Server and Message Queue to run in the same virtual machine.
 
 [[local-java-message-service]]
 ==== *Local Java Message Service*
 
-If the Type attribute is LOCAL, Payara Server starts and stops the Message Queue broker. When Payara Server starts up, it starts the Message Queue broker specified as the Default JMS host. Likewise, when the Payara Server instance shuts down, it shuts down the Message Queue broker. The LOCAL type is most suitable for use with enhanced broker clusters, and for other cases where the administrator prefers the use of separate JVMs.
+If the Type attribute is `LOCAL`, Payara Server starts and stops the Message Queue broker. When Payara Server starts up, it starts the Message Queue broker specified as the Default JMS host. Likewise, when the Payara Server instance shuts down, it shuts down the Message Queue broker. The `LOCAL` type is most suitable for use with enhanced broker clusters, and for other cases where the administrator prefers the use of separate JVMs.
 
-With the LOCAL type, use the Start Arguments attribute to specify Message Queue broker startup parameters.
+With the `LOCAL` type, use the *Start Arguments* attribute to specify Message Queue broker startup parameters.
 
 [[remote-java-message-service]]
 ==== *Remote Java Message Service*
 
-If the Type attribute is REMOTE, Payara Server uses an externally configured broker or broker cluster. In this case, you must start and stop Message Queue brokers separately from Payara Server, and use Message Queue tools to configure and tune the broker or broker cluster. The REMOTE type is most suitable for brokers running on different machines from the server instances (to share the load among more machines or for higher availability), or for using a different number of brokers and server instances.
+If the Type attribute is `REMOTE`, Payara Server uses an externally configured broker or broker cluster. In this case, you must start and stop Message Queue brokers separately from Payara Server, and use Message Queue tools to configure and tune the broker or broker cluster. The `REMOTE` type is most suitable for brokers running on different machines from the server instances (to share the load among more machines or for higher availability), or for using a different number of brokers and server instances.
 
-With the REMOTE type, you must specify Message Queue broker startup parameters using Message Queue tools. The Start Arguments attribute is ignored.
+With the `REMOTE` type, you must specify Message Queue broker startup parameters using the Message Queue tools. The *Start Arguments* attribute is ignored.
 
 [[managing-jms-with-the-administration-console]]
 ==== *Managing JMS with the Administration Console*
 
-In the Administration Console, you can set JMS properties using the Java Message Service node for a particular configuration. You can set properties such as Reconnect Interval and Reconnect Attempts. For more information, see "xref:docs:administration-guide:jms.adoc#administering-the-java-message-service-jms[Administering the Java Message Service (JMS)]" in Payara Server Administration Guide.
+In the Administration Console, you can set JMS properties using the Java Message Service node for a particular configuration. You can set properties such as *Reconnect Interval* and *Reconnect Attempts*. For more information, see "xref:docs:administration-guide:jms.adoc#administering-the-java-message-service-jms[Administering the Java Message Service (JMS)]" in the Payara Server Administration Guide.
 
-The JMS Hosts node under the Java Message Service node contains a list of JMS hosts. You can add and remove hosts from the list. For each host, you can set the host name, port number, and the administration username and password. By default, the JMS Hosts list contains one Message Queue broker, called "default_JMS_host," that represents the local Message Queue broker integrated with Payara Server.
+The JMS Hosts node under the Java Message Service node contains a list of JMS hosts. You can add and remove hosts from the list. For each host, you can set the host name, port number, and the administration username and password. By default, the JMS Hosts list contains one Message Queue broker, called `default_JMS_host`, that represents the local Message Queue broker integrated with Payara Server.
 
-In REMOTE mode, configure the JMS Hosts list to contain all the Message Queue brokers in the cluster. For example, to set up a cluster containing three Message Queue brokers, add a JMS host within the Java Message Service for each one. Message Queue clients use the configuration information in the Java Message Service to communicate with Message Queue broker.
+In `REMOTE` mode, configure the JMS Hosts list to contain all the Message Queue brokers in the cluster. For example, to set up a cluster containing three Message Queue brokers, add a JMS host within the Java Message Service for each one. Message Queue clients use the configuration information in the Jakarta Messaging system to communicate with the Message Queue broker.
 
 [[managing-jms-with-asadmin]]
 ==== *Managing JMS with asadmin*
@@ -355,26 +345,21 @@ In addition to the Administration Console, you can use the `asadmin` command-lin
 
 * Configuring Java Message Service attributes: `asadmin set`
 * Managing JMS hosts:
-
 ** `asadmin create-jms-host`
-
 ** `asadmin delete-jms-host`
-
 ** `asadmin list-jms-hosts`
+
 * Managing JMS resources:
-
 ** `asadmin create-jms-resource`
-
 ** `asadmin delete-jms-resource`
-
-** `asadmin list-jms-resources` +
+** `asadmin list-jms-resources`
 
 [[default-jms-host]]
 ==== *Default JMS Host*
 
-You can specify the default JMS Host in the Administration Console Java Message Service page. If the Java Message Service type is LOCAL, Payara Server starts the default JMS host when the Payara Server instance starts. If the Java Message Service type is EMBEDDED, the default JMS host is started lazily when needed.
+You can specify the default JMS Host in the Administration Console Java Message Service page. If the Java Message Service type is `LOCAL`, Payara Server starts the default JMS host when the Payara Server instance starts. If the Java Message Service type is `EMBEDDED`, the default JMS host is started lazily when needed.
 
-In REMOTE mode, to use a Message Queue broker cluster, delete the default JMS host, then add all the Message Queue brokers in the cluster as JMS hosts. In this case, the default JMS host becomes the first JMS host in the JMS host list.
+In `REMOTE` mode, to use a Message Queue broker cluster, delete the default JMS host, then add all the Message Queue brokers in the cluster as JMS hosts. In this case, the default JMS host becomes the first JMS host in the JMS host list.
 
 You can also explicitly set the default JMS host to one of the JMS hosts. When the Payara Server uses a Message Queue cluster, the default JMS host executes Message Queue-specific commands. For example, when a physical destination is created for a Message Queue broker cluster, the default JMS host executes the command to create the physical destinations, but all brokers in the cluster use the physical destination.
 
@@ -388,23 +373,23 @@ For best availability, deploy Message Queue brokers and Payara Servers on differ
 [[default-deployment]]
 === Default Deployment
 
-Installing the Payara Server automatically creates a domain administration server (DAS). By default, the Java Message Service type for the DAS is EMBEDDED. So, starting the DAS also starts its default Message Queue broker.
+Installing the Payara Server automatically creates a domain administration server (DAS). By default, the Java Message Service type for the DAS is `EMBEDDED`. So, starting the DAS also starts its default Message Queue broker.
 
-Creating a new domain also creates a new broker. By default, when you add a stand-alone server instance or a cluster to the domain, its Java Message Service is configured as EMBEDDED and its default JMS host is the broker started by the DAS.
+Creating a new domain also creates a new broker. By default, when you add a stand-alone server instance or a cluster to the domain, its Java Message Service is configured as `EMBEDDED` and its default JMS host is the broker started by the DAS.
 
 [[using-a-message-queue-broker-cluster-with-a-payara-server-cluster]]
 ==== *Using a Message Queue Broker Cluster with a Payara Server Cluster*
 
-In EMBEDDED or LOCAL mode, when a Payara Server is configured, a Message Queue broker cluster is autoconfigured with each Payara Server instance associated with a Message Queue broker instance.
+In `EMBEDDED` or `LOCAL` mode, when a Payara Server is configured, a Message Queue broker cluster is autoconfigured with each Payara Server instance associated with a Message Queue broker instance.
 
-In REMOTE mode, to configure a Payara Server cluster to use a Message Queue broker cluster, add all the Message Queue brokers as JMS hosts in the Payara Server's Java Message Service. Any JMS connection factories created and MDBs deployed then uses the JMS configuration specified.
+In `REMOTE` mode, to configure a Payara Server cluster to use a Message Queue broker cluster, add all the Message Queue brokers as JMS hosts in the Payara Server's Java Message Service. Any JMS connection factories created and MDBs deployed then uses the JMS configuration specified.
 
 [[specifying-an-application-specific-message-queue-broker-cluster]]
 ==== *Specifying an Application-Specific Message Queue Broker Cluster*
 
 In some cases, an application may need to use a different Message Queue broker cluster than the one used by the Payara Server cluster. To do so, use the `AddressList` property of a JMS connection factory or the `activation-config` element in an MDB deployment descriptor to specify the Message Queue broker cluster.
 
-For more information about configuring connection factories, see "xref:docs:administration-guide:jms.adoc#administering-jms-connection-factories-and-destinations[Administering JMS Connection Factories and Destinations]" in Payara Server Administration Guide. For more information about MDBs, see "xref:docs:application-development-guide:ejb.adoc#using-message-driven-beans[Using Message-Driven Beans]" in Payara Server Application Development Guide.
+For more information about configuring connection factories, see "xref:docs:administration-guide:jms.adoc#administering-jms-connection-factories-and-destinations[Administering JMS Connection Factories and Destinations]" in Payara Server Administration Guide. For more information about MDBs, see "xref:docs:application-development-guide:ejb.adoc#using-message-driven-beans[Using Message-Driven Beans]" in the Payara Server Application Development Guide.
 
 [[application-clients]]
 ==== *Application Clients*
