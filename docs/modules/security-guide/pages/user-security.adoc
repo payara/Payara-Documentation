@@ -1,217 +1,167 @@
 [[administering-user-security]]
 = Administering User Security
 
-This chapter provides instructions for administering user security in the Payara Server environment by using the `asadmin`
-command-line utility. Payara Server enforces its authentication and authorization policies upon realms, users, and groups. This chapter
-assumes that you are familiar with security features such as authentication, authorization, and certificates. If you are not, see
-xref:system-security.adoc#administering-system-security[Administering System Security].
+This chapter provides instructions for administering user security in the Payara Server environment by using the `asadmin` command-line utility. Payara Server enforces its authentication and authorization policies upon realms, users, and groups. This chapter assumes that you are familiar with security features such as authentication, authorization, and certificates. If you are not, see xref:system-security.adoc#administering-system-security[Administering System Security].
 
 Instructions for accomplishing these tasks by using the Administration Console are contained in the Administration Console online help.
 
-NOTE: JSR-375 defines the concept of an Identity Store, and an SPI interface for writing providers that can authenticate users against Identity
-Stores. It also provides two built-in providers. This mechanism is conceptually similar to Authentication Realms, but can be configured and
-managed by applications. See https://javaee.github.io/tutorial/security-intro005a.html#working-with-identity-stores[Working
-with Identity Stores] in The Java EE Tutorial for more information about Identity Stores.
+NOTE: Jakarta Security defines the concept of an Identity Store, and an SPI interface for writing providers that can authenticate users against Identity Stores. It also provides multiple built-in providers +
+See https://eclipse-ee4j.github.io/jakartaee-tutorial/#working-with-identity-stores[Working with Identity Stores] in The Jakarta EE Tutorial for more information about Identity Stores.
 
-[[administering-authentication-realms]]
-== Administering Authentication Realms
+[[administering-security-realms]]
+== Administering Security Realms
 
-[[overview-of-authentication-realms]]
-=== Overview of Authentication Realms
+[[overview-of-security-realms]]
+=== Overview of Security Realms
 
-An authentication realm, also called a security policy domain or security domain, is a scope over which the Payara Server defines and
-enforces a common security policy. Payara Server is preconfigured with the file, certificate, and administration realms. In addition, you
-can set up LDAP, JDBC, digest, Oracle Solaris, or custom realms. An application can specify which realm to use in its deployment descriptor.
-If the application does not specify a realm, Payara Server uses its default realm (`file`).
+A *security authentication realm*, also called a *security policy domain* or *security domain*, is a scope over which the Payara Server defines and enforces a common security policy. Payara Server is preconfigured with the file, certificate, and administration realms. In addition, you can set up LDAP, JDBC, digest, or custom realms. An application can specify which security realm to use in its deployment descriptors.
 
-File realm::
-  Payara Server stores user credentials locally in a file named `keyfile`. The file realm is the initial default realm.
-Administration realm::
-  The administration realm is also a file realm and stores administrator user credentials locally in a file named `admin-keyfile`.
-Certificate realm::
-  Payara Server stores user credentials in a certificate database.
-  When using the certificate realm, the server uses certificates with the HTTPS protocol to authenticate web clients.
-LDAP realm::
-  Payara Server can get user credentials from a Lightweight Directory Access Protocol (LDAP) server such as Oracle Virtual Directory (OVD)
-  (`http://www.oracle.com/technetwork/middleware/id-mgmt/overview/index.html`),
-  Oracle Internet Directory (OID) (`http://www.oracle.com/technetwork/indexes/products/index.html`), and
-  Oracle Directory Server Enterprise Edition (`http://www.oracle.com/us/products/middleware/identity-management/oracle-directory-services/index.html`).
-  LDAP is a protocol for enabling anyone to locate organizations, individuals, and other resources such as files and devices in a
-  network, whether on the public Internet or on a corporate intranet. +
-  See xref:user-security.adoc#to-configure-ldap-authentication-with-oid[To Configure LDAP Authentication with OID] for instructions on configuring Payara Server to work with an OVD/OID
-  LDAP provider. +
+If the application does not specify a security realm, Payara Server uses its default realm (`file`).
 
-NOTE: By default, Payara Server performs LDAP group search. If you have not created any groups in LDAP, the search fails. +
-To disable LDAP group search in LDAP user name search, set the `com.oracle.enterprise.security.auth.realm.ldap.DISABLEGROUP_SEARCH`
-Java system property to `true` in the required Payara Server instance or cluster configurations: +
-`asadmin>` `create-jvm-options --target=`target +
-`-Dcom.oracle.enterprise.security.auth.realm.ldap.DISABLEGROUP_SEARCH=true` +
-where target is the Payara Server instance or cluster for which you are disabling LDAP group search. For more information about the
-`create-jvm-options` subcommand, see the link:../reference-manual/toc.html#GSRFM[Payara Server Open Source Edition Reference Manual].
+File realm:: Payara Server stores user credentials locally in a file named `keyfile`. This is the default realm.
+
+Administration realm:: The administration realm is also a file realm and stores administrator user credentials locally in a file named `admin-keyfile`.
+
+Certificate realm:: Payara Server stores user credentials in a certificate keystore. When using the certificate realm, the server uses certificates with the HTTPS protocol to authenticate web clients exclusively.
+
+LDAP realm:: Payara Server can get user credentials from a Lightweight Directory Access Protocol (LDAP) server.
 
 JDBC realm::
   Payara Server gets user credentials from a database. The server uses the database information and the enabled JDBC realm option in the configuration file.
-Digest realm::
-  Digest Authentication authenticates a user based on a user name and a password. However, the authentication is performed by transmitting the
-  password in an encrypted form.
-Oracle Solaris realm::
-  Payara Server gets user credentials from the Oracle Solaris operating system. This realm is supported on the Oracle Solaris 9 and
-  Oracle Solaris 10 operating systems. Consult your Oracle Solaris documentation for information about managing users and groups in the
-  Oracle Solaris realm.
-PAM realm::
-  A Pluggable Authentication Module (PAM) realm allows applications deployed on Payara Server to authenticate users against a native
-  Unix (Solaris/Linux/Mac OS) users list. PAM realms use the class name `com.sun.enterprise.security.auth.realm.pam.PamRealm` and the JAAS Context `pamRealm`. +
-  This realm is supported on all Unix Operating Systems, including the Oracle Solaris 9 and Oracle Solaris 10 operating systems
-Custom realm::
-  You can create other repositories for user credentials, such as a relational database or third-party components. For more information
-  about custom realms, see the Administration Console online help. For instructions on creating a custom realm, see
-  "xref:docs:application-development-guide:securing-apps.adoc#creating-a-custom-realm[Creating a Custom Realm]" in Payara Server Open Source Edition Application Development Guide.
 
-The Payara Server authentication service can govern users in multiple realms.
+Digest realm::
+  Digest Authentication authenticates a user based on a username and a password. However, the authentication is performed by transmitting the password in an encrypted manner using a digest algorithm.
+
+Oracle Solaris realm::
+  Payara Server gets user credentials directly from the Oracle Solaris operating system user accounts.
++
+IMPORTANT: This realm supports both Oracle Solaris 9 and 10 versions only.
+
+PAM realm::
+  A Pluggable Authentication Module (PAM) realm allows applications deployed on Payara Server to authenticate users against a native Unix users list. PAM realms are implemented through the `com.sun.enterprise.security.auth.realm.pam.PamRealm` class and the JAAS Context `pamRealm`.
+
+Custom realm::
+  You can create custom realms that retrieve user credentials from other type of repositories for user credentials, such as a NoSQL database or a third-party user management system. For more information about custom realms, see
+  "xref:docs:application-development-guide:securing-apps.adoc#creating-a-custom-realm[Creating a Custom Realm]" in the Payara Server Application Development Guide.
+
+TIP: The Payara Server authentication service can govern users in multiple realms.
 
 [[to-create-an-authentication-realm]]
 === To Create an Authentication Realm
 
 Use the `create-auth-realm` subcommand in remote mode to create an authentication realm.
 
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. Create a realm by using the xref:reference-manual:create-auth-realm.adoc[`create-auth-realm`] subcommand. +
-Information about properties for this subcommand is included in this help page.
+. Ensure that the server is running.
+. Create a realm by using the xref:reference-manual:create-auth-realm.adoc[`create-auth-realm`] subcommand.
 
-[[example-1]]
-.Example 1 Creating a Realm
-
-This example creates a realm named `db`.
+The following example creates a realm named `custom-dbRealm` by using a customized realm implementation class named `fish.payara.security.auth.realm.DB.DatabaseRealm`:
 
 [source,shell]
 ----
-asadmin> create-auth-realm --classname com.iplanet.ias.security.
-auth.realm.DB.Database --property defaultuser=admin:Password=admin db
+asadmin create-auth-realm --classname=fish.payara.security.auth.realm.DB.DatabaseRealm --property=group-name-column=groupname:user-name-column=username:group-table=user_groups:user-table=users:datasource-jndi=jdbc\/userDS:password-column=password:jaas-context=custom-db: --login-module=fish.payara.support.SaltedSupportJDBCLoginModule custom-dbRealm
+
 Command create-auth-realm executed successfully.
 ----
 
-*See Also*
+TIP: You can use the `--login-module` option to automatically register the JAAS login module in the server's policy file when the security realm is created.
 
-You can also view the full syntax and options of the subcommand by typing `asadmin help create-auth-realm` at the command line.
+[[listing-authentication-realms]]
+=== Listing Authentication Realms
 
-For information on creating a custom realm, see
-"xref:docs:application-development-guide:securing-apps.adoc#creating-a-custom-realm[Creating a Custom Realm]" in Payara Server Open Source Edition Application Development Guide.
+Use the `list-auth-realms` subcommand in remote mode to list existing authentication realms.
 
-[[to-list-authentication-realms]]
-=== To List Authentication Realms
-
-Use the `list-auth-realms` subcommand in remote mode to list the existing authentication realms.
-
-. Ensure that the server is running. +
-Remote subcommands require a running server.
+. Ensure that the server is running.
 . List realms by using the xref:reference-manual:list-auth-realms.adoc[`list-auth-realms`] subcommand.
 
-[[example-2]]
-.Example 2 Listing Realms
-
-This example lists the authentication realms on `localhost`.
+The following example lists the authentication realms registered on the DAS:
 
 [source,shell]
 ----
-asadmin> list-auth-realms
+asadmin list-auth-realms
+
 db
 certificate
 file
 admin-realm
+
 Command list-auth-realms executed successfully.
 ----
 
-*See Also*
+[[updating-an-authentication-realm]]
+=== Updating an Authentication Realm
 
-You can also view the full syntax and options of the subcommand by typing `asadmin help list-auth-realms` at the command line.
+Use the `set` subcommand to modify an existing authentication realm. You can only modify the realm's configuration properties.
 
-[[to-update-an-authentication-realm]]
-=== To Update an Authentication Realm
+The following example shows how to change the properties of a custom realm named `custom-db-realm`:
 
-Use the `set` subcommand to modify an existing authentication realm.
+[source, shell]
+----
+asadmin set configs.config.server-config.security-service.auth-realm.custom-dbRealm.property.group-table=user_name_groups
 
-NOTE: A custom realm does not require server restart.
+asadmin set configs.config.server-config.security-service.auth-realm.custom-dbRealm.property.group-name-column=db_group
+----
 
-. List realms by using the xref:reference-manual:list-auth-realms.adoc[`list-auth-realms`] subcommand.
-. Modify the values for the specified thread pool by using the xref:reference-manual:set.adoc[`set`] subcommand. +
-The thread pool is identified by its dotted name.
-. To apply your changes, restart Payara Server. +
-See "xref:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain]" in Payara Server Open Source Edition Administration Guide.
+WARNING: The realm's name and class name cannot be modified once its created.
 
-[[to-delete-an-authentication-realm]]
-=== To Delete an Authentication Realm
+[[delete-an-authentication-realm]]
+=== Delete an Authentication Realm
 
 Use the `delete-auth-realm` subcommand in remote mode to delete an existing authentication realm.
 
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. List realms by using the link:../reference-manual/list-auth-realms.html#GSRFM00150[`list-auth-realms`]
-subcommand.
-. If necessary, notify users that the realm is being deleted.
-. Delete the realm by using the link:../reference-manual/delete-auth-realm.html#GSRFM00066[`delete-auth-realm`]
-subcommand.
-. To apply your changes, restart Payara Server. See "xref:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain]" in Payara Server Open Source
-Edition Administration Guide.
+. Ensure that the server is running,
+. Delete the realm by using the `delete-auth-realm` subcommand.
 
-[[example-3]]
-.Example 3 Deleting a Realm
-
-This example deletes an authentication realm named `db`.
+This example deletes the security realm named `custom-dbRealm`.
 
 [source,shell]
 ----
-asadmin> delete-auth-realm db
+asadmin delete-auth-realm custom-dbRealm
+
 Command delete-auth-realm executed successfully.
 ----
-
-*See Also*
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help delete-auth-realm` at the command line.
 
 [[to-configure-a-jdbc-or-digest-authentication-realm]]
 === To Configure a JDBC or Digest Authentication Realm
 
-Payara Server enables you to specify a user's credentials (user name and password) in the JDBC realm instead of in the connection pool. Using
-the `jdbc` type realm instead of the connection pool prevents other applications from browsing the database tables for user credentials.
+Payara Server enables you to specify a database user's credentials (username and password) in the JDBC realm settings directly instead of in the settings of a JDBC resource and its corresponding connection pool. Using the `jdbc` type realm instead of the connection pool prevents other applications from browsing the database tables for user credentials.
 
-NOTE: By default, storage of passwords as clear text is not supported in the JDBC realm. Under normal circumstances, passwords should not be stored
-as clear text.
+TIP: The user password credential should be stored using a password alias for better security.
 
-. Create the database tables in which to store user credentials for the realm. +
+. Create the database tables in which to store user credentials for the realm.
++
 How you create the database tables depends on the database that you are using.
-. Add user credentials to the database tables that you created. +
+
+. Add user credentials to the database tables that you created.
++
 How you add user credentials to the database tables depends on the database that you are using.
-. Create a JDBC connection pool for the database. +
-See "xref:administration-guide:jdbc.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool]" in Payara Server Open Source Edition Administration Guide.
-. Create a JDBC resource for the database. +
-"xref:administration-guide:jdbc.adoc#to-create-a-jdbc-resource[To Create a JDBC Resource]" in Payara Server Open
-Source Edition Administration Guide.
-. Create a realm. +
-For instructions, see xref:user-security.adoc#to-create-an-authentication-realm[To Create an Authentication Realm]. +
 
-NOTE: The JAAS context should be `jdbcDigestRealm` for digest authentication or `jdbcRealm` for other authentication types.
+. Create a JDBC connection pool for the database.
++
+See "xref:administration-guide:jdbc.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool]" in the Payara Server Administration Guide.
 
-. Modify the deployment descriptor to specify the `jdbc` realm. +
-Modify the deployment descriptor that is associated with your application.
-* For an enterprise application in an Enterprise Archive (EAR) file, modify the `sun-application.xml` file.
+. Create a JDBC resource for the database.
++
+See "xref:administration-guide:jdbc.adoc#to-create-a-jdbc-resource[To Create a JDBC Resource]" in the Payara Server Administration Guide.
+
+. Create a new JDBC security realm.
++
+WARNING: The JAAS context should be `jdbcDigestRealm` for digest authentication or `jdbcRealm` for other authentication types.
+
+. Modify the corresponding deployment descriptor that is associated with your application to specify the `jdbc` realm.
++
+* For an enterprise application in an Enterprise Archive (EAR) file, modify the `glassfish-application.xml` file.
 * For a web application in a Web Application Archive (WAR) file, modify the `web.xml` file.
-* For an enterprise bean in an EJB JAR file, modify the `sun-ejb-jar.xml` file. +
-For more information about how to specify a realm, see "xref:docs:application-development-guide:securing-apps.adoc#how-to-configure-a-realm[How to Configure a Realm]" in Payara Server Open
-Source Edition Application Development Guide.
-. Assign security roles to users in the realm. +
+* For an enterprise bean in an EJB JAR file, modify the `glassfish-ejb-jar.xml` file.
++
+For more information about how to specify a security realm, see "xref:docs:application-development-guide:securing-apps.adoc#how-to-configure-a-realm[How to Configure a Realm]" in Payara Server Application Development Guide.
+
+. Assign security roles to users in the realm.
++
 To assign a security role to a user, add a `security-role-mapping` element to the deployment descriptor that you modified.
-. Verify that the database is running. +
-If needed, see "xref:docs:administration-guide:jdbc.adoc#to-start-the-database[To Start the Database]" in Payara Server Open Source Edition Administration Guide.
-. To apply the authentication, restart the server. +
-See "xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain]" in Payara Server Open Source Edition Administration Guide.
 
-[[example-4]]
-.Example 4 Assigning a Security Role
+This example shows a `security-role-mapping` element that assigns the security role `Employee` to a user account named `Calvin`:
 
-This example shows a `security-role-mapping` element that assigns the security role `Employee` to user `Calvin`
-
-[source,xml]
+[source, xml]
 ----
 <security-role-mapping>
     <role-name>Employee</role-name>
@@ -219,136 +169,16 @@ This example shows a `security-role-mapping` element that assigns the security r
   </security-role-mapping>
 ----
 
-[[to-configure-ldap-authentication-with-oid]]
-=== To Configure LDAP Authentication with OID
-
-This procedure explains how to configure Payara Server to use LDAP authentication with Oracle Internet Directory.
-
-. Install Oracle Enterprise Manager 11g and the latest Enterprise Manager patches, if they are not installed already. +
-Instructions for installing Oracle Enterprise Manager are provided in the Oracle Enterprise Manager (`http://docs.oracle.com/cd/E11857_01/index.html`) documentation set.
-. Install the Oracle Identity Management Suite (IDM) 11g and Patch Set
-2 or later, if they are not installed already. +
-Instructions for installing the Oracle Identity Management suite are provided in Oracle Fusion Middleware Installation Guide for Oracle Identity Management
-(`http://docs.oracle.com/cd/E12839_01/install.1111/e12002/toc.html`).
-. Configure SSL for Oracle Internet Directory (OID), if it is not configured already. Configure the OID instance in the server
-authentication mode and with the protocol version set to SSLv3 +
-Instructions for configuring SSL for OID are provided in the SSL chapter of Oracle Internet Directory Administrator's Guide
-(`http://docs.oracle.com/cd/B14099_19/idmanage.1012/b14082/ssl.html`).
-. Using Oracle Wallet Manager, export an SSL self-signed certificate you want to use with Payara Server. +
-Instructions for using Oracle Wallet Manager to create and export SSL certificates are provided in the "Configure Oracle Internet Directory
-for SSL" (`http://docs.oracle.com/cd/B14099_19/idmanage.1012/b14082/ssl.html#CHDCADIJ`)
-section of the SSL chapter in Oracle Internet Directory Administrator's Guide
-(`http://docs.oracle.com/cd/B14099_19/idmanage.1012/b14082/ssl.html`).
-. On the Payara Server side, use the `keytool` command import the certificate you exported with Oracle Wallet Manager. +
-The `keytool` command is available in the `$JAVA_HOME/bin` directory. Use the following syntax:
-+
-[source,shell]
-----
-keytool -importcert -alias "alias-name" -keystore domain-dir/config/cacerts.jks 
--file cert-name
-----
-where the variables are defined as follows:::
-alias-name::
-  Name of an alias to use for the certificate
-domain-dir::
-  Name of the domain for which the certificate is used
-cert-name::
-  Path to the certificate that you exported with Oracle Wallet Manager. +
-For example, to import a certificate named `oi.cer` for a Payara Server domain in `/glassfishv3/glassfish/domains/domain1`, using an
-alias called "OID self-signed certificate," you would use the following command:
-+
-[source,shell]
-----
-keytool -importcert -alias "OID self signed certificate" -keystore \
-/glassfishv3/glassfish/domains/domain1/config/cacerts.jks -file oid.cer
-----
-. Restart the Payara Server domain. +
-See "xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain]" in Payara Server Open
-Source Edition Administration Guide.
-. Use the Oracle Enterprise Manager `ldapmodify` command to enable Anonymous Bind for OID. +
-For example:
-+
-[source,shell]
-----
-ldapmodify -D cn=orcladmin -q -p portNum -h hostname -f ldifFile
-----
-In this example, the LDIF file might contain the following:
-+
-[source,shell]
-----
-dn: cn=oid1,cn=osdldapd,cn=subconfigsubentry
-changetype: modify
-replace: orclAnonymousBindsFlag
-orclAnonymousBindsFlag: 1
-----
-To disable all anonymous binds, you would use a similar LDIF file with
-the last line changed to:
-+
-[source,oac_no_warn]
-----
-orclAnonymousBindsFlag: 0
-----
-See "Managing Anonymous Binds" (`http://docs.oracle.com/cd/E14571_01/oid.1111/e10029/authentication.html#CACJEJDA`)
-in Oracle Fusion Middleware Administrator's Guide for Oracle Internet
-Directory (`http://docs.oracle.com/cd/E14571_01/oid.1111/e10029/toc.html`) for
-complete instructions on the `ldapmodify` command.
-
-[[to-configure-ldap-authentication-with-ovd]]
-=== To Configure LDAP Authentication with OVD
-
-This procedure explains how to configure Payara Server to use LDAP authentication with Oracle Virtual Directory.
-
-. Create the OVD adapter, as described in the "Creating and Configuring Oracle Virtual Directory Adapters"
-(`http://docs.oracle.com/cd/E12839_01/oid.1111/e10046/basic_adapters.html#BABCBGJA`)
-chapter of Administrator's Guide for Oracle Virtual Directory (`http://docs.oracle.com/cd/E12839_01/oid.1111/e10046/toc.html`).
-. Configure SSL for Oracle Virtual Directory (OVD), if it is not configured already. For instructions on configuring SSL for OVD, see the
-section "Enable SSL for Oracle Virtual Directory Using Fusion Middleware Control" in SSL Configuration in Oracle Fusion Middleware
-(`http://docs.oracle.com/cd/E12839_01/core.1111/e10105/sslconfig.html#ASADM1800`). +
-Also, configure the SSL for the OVD listener in server authentication mode.
-. Export the certificate from JKS keystore you want to use with Payara Server. See "Exporting a Keystore Using Fusion Middleware
-Control" (`http://docs.oracle.com/cd/E16764_01/core.1111/e10105/wallets.html#CIHECAIB`)
-for information.
-. On the Payara Server side, use the `keytool` command to import the certificate you exported from the JKS keystore. +
-The `keytool` command is available in the `$JAVA_HOME/bin` directory. Use the following syntax:
-+
-[source,shell]
-----
-keytool -importcert -alias "alias-name" -keystore domain-dir/config/cacerts.jks 
--file cert-name
-----
-where the variables are defined as follows:::
-alias-name::
-  Name of an alias to use for the certificate
-domain-dir::
-  Name of the domain for which the certificate is used
-cert-name::
-  Path to the certificate that you exported from the keystore. +
-For example, to import a certificate named `ovd.cer` for a Payara Server domain in `/glassfishv3/glassfish/domains/domain1`, using an
-alias called "OVD self-signed certificate," you would use the following command:
-+
-[source,shell]
-----
-keytool -importcert -alias "OVD self signed certificate" -keystore \
-/glassfishv3/glassfish/domains/domain1/config/cacerts.jks -file ovd.cer
-----
-. Restart the Payara Server domain. +
-See "xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain]" in Payara Server Open
-Source Edition Administration Guide.
-
 [[to-enable-ldap-authentication-on-the-payara-server-das]]
 === To Enable LDAP Authentication on the Payara Server DAS
 
-This procedure explains how to enable LDAP authentication for logins to the Payara Server Domain Administration Server (DAS). Logging in to
-the DAS is typically only performed by Payara Server administrators who want to use the Payara Server Administration Console or `asadmin`
-command. See xref:user-security.adoc#to-configure-ldap-authentication-with-oid[To Configure LDAP Authentication with OID] for instructions on enabling general LDAP authentication for Payara Server.
+This procedure explains how to enable LDAP authentication to account for user logins to the Payara Server Domain Administration Server (DAS). Login in to the DAS is typically only performed by Payara Server administrators who want to use the Administration Console or the Asadmin CLI.
 
-*Before You Begin*
-
-Ensure that you have followed the configuration instructions in xref:user-security.adoc#to-configure-ldap-authentication-with-oid[To Configure LDAP Authentication with OID]
+NOTE: Ensure that you have properly configured an LDAP server that will host the user credentials with the administrators that will log in to the server's DAS.
 
 Use the `asadmin configure-ldap-for-admin` subcommand to enable user authentication to the Payara Server DAS.
 
-Use the following syntax:
+The command uses following syntax:
 
 [source,shell]
 ----
@@ -356,187 +186,130 @@ asadmin configure-ldap-for-admin --basedn "dn-list" --url [ldap|ldaps]://ldap-ur
 --ldap-group group-name
 ----
 
-where the variables are defined as follows:
+Where the arguments are defined as follows:
 
-dn-list::
-  basedn parameters
-ldap-url::
-  URL and port number for the LDAP server; can use standard (`ldap`) or
-  secure (`ldaps`) protocol
-group-name::
-  LDAP group name for allowed users, as defined on the LDAP server.
+dn-list:: LDAP BaseDN parameters
+ldap-url:: URL and port number for the LDAP server; can use standard (`ldap`) or secure (`ldaps`) protocol
+group-name:: LDAP group name for allowed users, as defined on the LDAP server.
 
 For example:
 
 [source,shell]
 ----
-asadmin configure-ldap-for-admin --basedn "dc=red,dc=iplanet,dc=com" \
---url ldap://interopoel54-1:3060 --ldap-group sqestaticgroup
+asadmin configure-ldap-for-admin --basedn "dc=fish,dc=payara" \
+--url ldap://payara.fish:3060 --ldap-group das-admins
 
-asadmin configure-ldap-for-admin --basedn "dc=red,dc=iplanet,dc=com" \
---url ldaps://interopoel54-1:7501 --ldap-group sqestaticgroup
+asadmin configure-ldap-for-admin --basedn "dc=fish,dc=payara" \
+--url ldaps://payara.fish:7501 --ldap-group das-admins
 ----
 
-*See Also*
-
-See xref:reference-manual:configure-ldap-for-admin.adoc[`configure-ldap-for-admin`] for more information about the `configure-ldap-for-admin subcommand`.
+IMPORTANT: Be careful when running this command as once LDAP access is set up in this manner, it will prove challenging to revert this configuration, so it is encouraged to properly test these settings before running them in a production environment.
 
 [[administering-file-users]]
 == Administering File Users
 
-A user is an individual (or application program) identity that is defined in Payara Server. A user who has been authenticated is
-sometimes called a principal.
+When using a file security realm, as its administrator, you are responsible for integrating users into the Payara Server environment so that their credentials are securely established, and they can access the applications and services that they are entitled to use.
 
-As the administrator, you are responsible for integrating users into the Payara Server environment so that their credentials are securely
-established and they are provided with access to the applications and services that they are entitled to use.
+NOTE: The file security realm is a good solution to consider when the user base of a business domain is sufficiently small and user identity administration doesn't require a complex setup. However, for most production environments it is recommended to use a robust solution using either an LDAP or relational database storage.
 
 [[to-create-a-file-user]]
 === To Create a File User
 
-Use the `create-file-user` subcommand in remote mode to create a new user by adding a new entry to the `keyfile`. The entry includes the user
-name, password, and any groups for the user. Multiple groups can be specified by separating the groups with colons (:).
+Use the `create-file-user` subcommand in remote mode to create a new user by adding a new entry to the `keyfile`. The entry includes the username, password, and any groups that the user belongs to.
 
-NOTE: If secure administration is enabled as described in xref:administrative-security.adoc#running-secure-admin[Running Secure Admin], you cannot
-create an administrative user with a blank password.
+TIP: Multiple groups can be specified by using a colon(`:`) separated string.
 
+NOTE: If secure administration is enabled as described in xref:administrative-security.adoc#running-secure-admin[Running Secure Admin], you cannot create an administrative user using a blank password.
 
 Creating a new `file` realm user is a dynamic event and does not require server restart.
 
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. If the user will belong to a particular group, see the current groups by using the xref:reference-manual:list-file-groups.adoc[`list-file-groups`] subcommand.
+. Ensure that the server is running.
+. Review the current groups of the security realm by using the xref:reference-manual:list-file-groups.adoc[`list-file-groups`] subcommand.
 . Create a file user by using the xref:reference-manual:create-file-user.adoc[`create-file-user`] subcommand.
 
-[[example-5]]
-.Example 5 Creating a User
+This example create user `jennifer` on the default realm `file` (no groups are specified).
 
-This example create user `Jennifer` on the default realm `file` (no groups are specified).
-
-The `asadmin` `--passwordfile` option specifies the name of a file that contains the password entries in a specific format. The entry for a
-password must have the `AS_ADMIN_` prefix followed by the password name in uppercase letters, an equals sign, and the password. See
-xref:reference-manual:asadmin.adoc[`asadmin`(1M)] for more information.
+The `asadmin` `--passwordfile` option specifies the name of a file that contains the password entries in a specific format. The entry for a password must have the `AS_ADMIN_` prefix followed by the password name in uppercase letters, an equals sign, and the password. See the xref:reference-manual:asadmin.adoc[`asadmin`] documentation for more information.
 
 [source,shell]
 ----
-asadmin> create-file-user --user admin 
---passwordfile=c:\tmp\asadminpassword.txt Jennifer
+asadmin create-file-user --user admin --passwordfile=asadminpassword.txt jennifer
+
 Command create-file-user executed successfully.
 ----
-
-*See Also*
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help create-file-user` at the command line.
 
 [[to-list-file-users]]
 === To List File Users
 
 Use the `list-file-users` subcommand in remote mode to list the users that are in the `keyfile`.
 
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. List users by using the xref:reference-manual:list-file-users.adoc[`list-file-users`] subcommand.
-
-[[example-6]]
-*Example 6 Listing File Users*
-
-This example lists file users on the default `file` realm file.
+This example lists file users on the default `file` realm file:
 
 [source,shell]
 ----
-asadmin> list-file-users
-Jennifer
+asadmin list-file-users
+
+jennifer
+
 Command list-file-users executed successfully.
 ----
-
-*See Also*
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help list-file-users` at the command line.
 
 [[to-list-file-groups]]
 === To List File Groups
 
-A group is a category of users classified by common traits, such as job title or customer profile. For example, users of an e-commerce
-application might belong to the `customer` group, and the big spenders might also belong to the `preferred` group. Categorizing users into
-groups makes it easier to control the access of large numbers of users. A group is defined for an entire server and realm. A user can be
-associated with multiple groups of users.
+A group is a category of users classified by common traits, such as job title or customer profile. For example, users of an e-commerce application might belong to the `customer` group, and the big spenders might also belong to the `preferred` group. Categorizing users into groups makes it easier to control the access of large numbers of users.
 
-A group is different from a role in that a role defines a function in an application, while a group is a set of users who are related in some
-way. For example, in the personnel application there might be groups such as `full-time`, `part-time`, and `on-leave`. Users in these groups
-are all employees (the `employee` role). In addition, each user has its own designation that defines an additional level of employment.
+A group is different from a role in that a role defines a function in an application, while a group is a set of users who are related in some way. For example, in the personnel application there might be groups such as `full-time`, `part-time`, and `on-leave`.
 
-Use the `list-file-groups` subcommand in remote mode to list groups for a file user, or all file groups if the `--name` option is not specified.
+Users in these groups are all employees (the `employee` role). In addition, each user has its own designation that defines an additional level of employment.
 
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. List file groups by using the xref:reference-manual:list-file-groups.adoc[`list-file-groups`] subcommand.
+Use the `list-file-groups` subcommand in remote mode to list groups for a specific user, or all file groups if the `--name` option is not specified.
 
-[[example-7]]
-.Example 7 Listing Groups for a User
-
-This example lists the groups for user `joesmith`.
+This example lists the groups for user `joe`.
 
 [source,shell]
 ----
-asadmin> list-file-groups --name joesmith
+asadmin> list-file-groups --name joe
+
 staff
 manager
+
 Command list-file-groups executed successfully
 ----
 
 [[to-update-a-file-user]]
 === To Update a File User
 
-Use the `update-file-user` subcommand in remote mode to modify the information in the `keyfile` for a specified user.
+Use the `update-file-user` subcommand in remote mode to modify the information for a specified user.
 
-NOTE: If secure administration is enabled as described in xref:administrative-security.adoc[Running Secure Admin], you cannot
-update an administrative user to have a blank password.
+NOTE: If secure administration is enabled as described in xref:administrative-security.adoc[Running Secure Admin], you cannot update an administrative user to have a blank password.
 
-. Ensure that the server is running. +
-Remote subcommands require a running server.
+. Ensure that the server is running.
 . Update the user information by using the xref:reference-manual:update-file-user.adoc[`update-file-user`] subcommand.
-. To apply your changes, restart Payara Server. +
-See "xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain]" in Payara Server Open Source Edition Administration Guide.
 
-[[example-8]]
-.Example 8 Updating a User
-
-The following subcommand updates the groups for user `Jennifer`.
+The following command updates the groups for user `jennifer`:
 
 [source,shell]
 ----
-asadmin> update-file-user --passwordfile c:\tmp\asadminpassword.txt --groups 
-staff:manager:engineer Jennifer
+asadmin update-file-user --passwordfile asadminpassword.txt --groups staff:manager:engineer Jennifer
+
 Command update-file-user executed successfully.
 ----
-
-*See Also*
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help update-file-user` at the command line.
 
 [[to-delete-a-file-user]]
 === To Delete a File User
 
-Use the `delete-file-user` subcommand in remote mode to remove a user entry from the `keyfile` by specifying the user name. You cannot delete
-yourself, that is, the user you are logged in as cannot be deleted during your session.
+Use the `delete-file-user` subcommand in remote mode to remove a user entry from the `keyfile` by specifying the username.
 
-. Ensure that the server is running. +
-Remote subcommands require a running server.
+. Ensure that the server is running.
 . List users by using the xref:reference-manual:list-file-users.adoc[`list-file-users`] subcommand.
 . Delete the user by using the xref:reference-manual:delete-file-user.adoc[`delete-file-user`] subcommand.
 
-[[example-9]]
-.Example 9 Deleting a User
-
-This example deletes user `Jennifer` from the default `file` realm.
+This example deletes user `jennifer` from the default `file` realm.
 
 [source,shell]
 ----
-asadmin> delete-file-user Jennifer
+asadmin> delete-file-user jennifer
+
 Command delete-file-user executed successfully.
 ----
-
-*See Also*
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help delete-file-user` at the command line.
-
-
