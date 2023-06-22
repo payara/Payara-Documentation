@@ -7,9 +7,10 @@ Instructions for manually recovering transactions are also included.
 Instructions for accomplishing the tasks in this chapter by using the Administration Console are contained in the Administration Console online help.
 
 For more information about the Java Transaction API (JTA) and Java Transaction Service (JTS), see the following sites:
-`http://www.oracle.com/technetwork/java/javaee/tech/jta-138684.html` and `https://docs.oracle.com/cd/E19920-01/820-5584/ahsbo/index.html`.
+https://jakarta.ee/specifications/transactions/2.0/jakarta-transactions-spec-2.0.html#jakarta-transactions-api[Jakarta Transactions API]
+and https://jakarta.ee/specifications/transactions/2.0/jakarta-transactions-spec-2.0.html#java-transaction-service[Java Transaction Service].
 
-You might also want to read https://javaee.github.io/tutorial/transactions.html[Transactions] in The Jakarta EE 8 Tutorial.
+You might also want to read https://jakarta.ee/specifications/transactions/2.0/[Transactions].
 
 [[about-transactions]]
 == About Transactions
@@ -29,7 +30,7 @@ These steps together are considered a single transaction.
 
 If all the steps complete successfully, the transaction is committed. If any step fails, all changes from the preceding steps are rolled back, and
 the checking account and savings account are returned to the states they were in before the transaction started.
-This type of event is called a rollback. A normal transaction ends in either a committed state or a rolled back state.
+This type of event is called a `rollback`. A normal transaction ends in either a committed state or a rolled back state.
 
 The following elements contribute to reliable transaction processing by implementing various APIs and functionalities:
 
@@ -190,7 +191,7 @@ the `unfreeze-transaction-service` subcommand.
 . Ensure that the server is running. Remote subcommands require a running server.
 . Stop the transaction service by using the xref:docs:reference-manual:freeze-transaction-service.adoc[`freeze-transaction-service`] subcommand.
 
-.Example 19-1 Stopping the Transaction Service
+==== Example 19-1 Stopping the Transaction Service
 
 This example stops the transaction service.
 [source,shell]
@@ -226,7 +227,7 @@ asadmin> get --monitor instance1.server.transaction-service.activeids-current
 . Roll back the transaction by using the xref:docs:reference-manual:rollback-transaction.adoc[`rollback-transaction`] subcommand. +
 The transaction is not rolled back at the time of this command's execution, but only marked for rollback. The transaction is rolled back when it is completed.
 
-.Example 19-2 Rolling Back a Transaction
+==== Example 19-2 Rolling Back a Transaction
 
 This example rolls back the transaction with transaction ID `0000000000000001_00`.
 
@@ -245,7 +246,7 @@ transaction service after it has been frozen.
 . Ensure that the server is running. Remote subcommands require a running server.
 . Restart the suspended transaction service by using the xref:docs:reference-manual:unfreeze-transaction-service.adoc[`unfreeze-transaction-service`] subcommand.
 
-.Example 19-3 Restarting the Transaction Service
+==== Example 19-3 Restarting the Transaction Service
 
 This example restarts the transaction service after it has been frozen.
 
@@ -309,8 +310,7 @@ When you execute `recover-transactions` in non-delegated mode, you can recover t
 To use manual transaction recovery in this way, the following conditions must be met:
 
 * The `recover-transactions` command should be executed after the resource is restarted.
-* Connection validation should be enabled so the connection pool is refreshed when the resource is accessed after the recovery. For more information,
-see xref:docs:performance-tuning-guide:tuning-glassfish.adoc#connection-validation-settings[Connection Validation Settings] in Payara Server Performance Tuning Guide.
+* Connection validation should be enabled so the connection pool is refreshed when the resource is accessed after the recovery.
 
 If commit fails during recovery, a message is written to the server log.
 
@@ -320,7 +320,7 @@ You can list in-doubt Open Message Queue transactions using the `imqcmd list txn
 . Ensure that the server is running. Remote subcommands require a running server.
 . Manually recover transactions by using the xref:docs:reference-manual:recover-transactions.adoc[`recover-transactions`] subcommand.
 
-.Example 19-4 Manually Recovering Transactions
+==== Example 19-4 Manually Recovering Transactions
 
 This example performs manual recovery of transactions on `instance1`, saving them to `instance2`.
 
