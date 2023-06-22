@@ -6,7 +6,7 @@ Syntax for using periods to separate name elements.
 [[description]]
 == Description
 
-A dotted name is an identifier for a particular Payara Server element, such as a configurable or a monitorable object. A dotted name uses the period (.), known as dot, as a delimiter to separate the parts of an element name. The period in a dotted name is similar to the slash (/) character that delimits the levels in the absolute path name of a file in the UNIX file system.
+A dotted name is an identifier for a particular Payara Server element, such as a configurable or a monitorable object. A dotted name uses the period (`.`), known as dot, as a delimiter to separate the parts of an element name. The period in a dotted name is similar to the slash (`/`) character that delimits the levels in the absolute path name of a file in the UNIX file system.
 
 The subcommands of the `asadmin` utility use dotted names as follows:
 
@@ -16,34 +16,44 @@ The subcommands of the `asadmin` utility use dotted names as follows:
 
 The configuration hierarchy is loosely based on the domain's schema document, and the attributes are modifiable. The attributes of the monitoring hierarchy are read-only.
 
-The following format is used for configuration dotted names (italic indicates replaceable):
+The following format is used for configuration dotted names:
 
-`config-name`.`config-element-name`.`primary-key`.`attribute-name` `|` instance-name`.`config-element-name`.`primary-key`.`attribute-name
+----
+config-name.config-element-name.primary-key.attribute-name | instance-name.config-element-name.primary-key.attribute-name
+----
 
-The following format is used for resource dotted names (italic indicates replaceable):
+The following format is used for resource dotted names:
 
-`server-name`.`resource-name`.`primary-key`.`attribute-name`| domain.resources.`resource-name`.`primary-key`.`attribute-name`
+----
+server-name.resource-name.primary-key.attribute-name | domain.resources.resource-name.primary-key.attribute-name
+----
 
 The following rules apply to forming dotted names:
 
 * The top-level is configuration, server, or domain name. For example, `server-config` (default configuration), `server` (default server), or `domain1` (default domain).
 * A dot (.) always separates two sequential parts of the name.
 * A part of the name usually identifies a server subsystem or its specific instance. For example, `web-container`, `log-service`, `thread-pool-1`.
-* If any part of the name itself contains a dot (.), then the dot must be escaped with a leading `\` (backslash) so that the `.` (dot) does not act like a delimiter. For further information on escape characters, see the xref:asadmin.adoc#asadmin-1m[`asadmin`] help page.
-* An `\*` (asterisk) character can be used anywhere in the dotted name and acts like the wildcard character in regular expressions. Additionally, an `\*` can collapse all the parts of the dotted name. For example, a long dotted name such as `this.is.really.long.hierarchy` can be abbreviated to `th*.hierarchy`. The `.` (dot) always delimits the parts of the dotted name. +
+* If any part of the name itself contains a dot (`.`), then the dot must be escaped with a leading `\` (backslash) so that the `.` (dot) does not act like a delimiter. For further information on escape characters, see the xref:asadmin.adoc#asadmin-1m[`asadmin`] help page.
+* An `\*` (asterisk) character can be used anywhere in the dotted name and acts like the wildcard character in regular expressions. Additionally, an `\*` can collapse all the parts of the dotted name.
++
+For example, a long dotted name such as `this.is.really.long.hierarchy` can be abbreviated to `th*.hierarchy`. The `.` (dot) always delimits the parts of the dotted name. +
++
+NOTE: Characters that have special meaning to the shell or command interpreter, such as `\*` (asterisk), should be quoted or escaped as appropriate to the shell, for example, by enclosing the argument in quotes. In multimode, quotes are needed only for arguments that include spaces, quotes, or backslash.
 
-NOTE: Characters that have special meaning to the shell or command interpreter, such as * (asterisk), should be quoted or escaped as appropriate to the shell, for example, by enclosing the argument in quotes. In multimode, quotes are needed only for arguments that include spaces, quotes, or backslash.
-
-* The `--monitor` option of the `get` and `list` subcommands selects the monitoring or configuration hierarchy. If the subcommand specifies `--monitor``=false` (the default), the configuration hierarchy is selected. If the subcommand specifies `--monitor``=true`, the monitoring hierarchy is selected.
+* The `--monitor` option of the `get` and `list` subcommands selects the monitoring or configuration hierarchy. If the subcommand specifies `--monitor=false` (the default), the configuration hierarchy is selected. If the subcommand specifies `--monitor=true`, the monitoring hierarchy is selected.
 * If you know the complete dotted name and do not need to use a wildcard, the `list`, `get`, and `set` subcommands treat the name differently:
 
-** The `list` subcommand treats a complete dotted name as the name of a parent node in the abstract hierarchy. When you specify this name to the `list` subcommand, the names of the immediate children at that level are returned. For example, the following command lists all the web modules deployed to the domain or the default server: +
+** The `list` subcommand treats a complete dotted name as the name of a parent node in the abstract hierarchy. When you specify this name to the `list` subcommand, the names of the immediate children at that level are returned. For example, the following command lists all the web modules deployed to the domain or the default server:
++
 [source,shell]
 ----
 asadmin> list server.applications.web-module
 ----
 
-** The`get` and `set` subcommands treat a complete dotted name as the fully qualified name of the attribute of a node (whose dotted name itself is the name that you get when you remove the last part of this dotted name). When you specify this name to the `get` or `set` subcommand, the subcommand acts on the value of that attribute, if such an attribute exists. You will never start with this case because in order to find out the names of attributes of a particular node in the hierarchy, you must use the * wildcard character . For example, the following dotted name returns the context root of the web application deployed to the domain or default server: +
+** The`get` and `set` subcommands treat a complete dotted name as the fully qualified name of the attribute of a node (whose dotted name itself is the name that you get when you remove the last part of this dotted name). When you specify this name to the `get` or `set` subcommand, the subcommand acts on the value of that attribute, if such an attribute exists. You will never start with this case because in order to find out the names of attributes of a particular node in the hierarchy, you must use the * wildcard character.
++
+For example, the following dotted name returns the context root of the web application deployed to the domain or default server:
++
 [source,shell]
 ----
 server.applications.web-module.JSPWiki.context-root
@@ -64,7 +74,7 @@ asadmin> list *
 
 Output similar to the following is displayed:
 
-[source,shell]
+[source,text]
 ----
 applications
 configs
@@ -128,7 +138,7 @@ asadmin> list --monitor *
 
 Output similar to the following is displayed:
 
-[source,shell]
+[source,text]
 ----
 server
 server.jvm
@@ -161,5 +171,3 @@ Command list executed successfully.
 * xref:get.adoc#get[`get`],
 * xref:list.adoc#list[`list`],
 * xref:set.adoc#set[`set`]
-
-
