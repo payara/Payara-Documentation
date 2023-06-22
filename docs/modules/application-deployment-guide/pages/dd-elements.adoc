@@ -216,7 +216,7 @@ For example, if `archive-name` is `foo.ear`, the default application name is `fo
 [[superelements-6]]
 === Superelements
 
-xref:dd-elements.adoc#payara-application[`payara-application`] (`payara-application.xml`)
+xref:dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`)
 
 [[subelements-6]]
 === Subelements
@@ -768,7 +768,7 @@ This element is not implemented. Do not use.
 === Superelements
 
 
-xref:dd-elements.adoc#beasd[`consistency`] (`sun-cmp-mappings.xml`)
+xref:dd-elements.adoc#consistency[`consistency`] (`sun-cmp-mappings.xml`)
 
 [[bearm]][[GSDPG00106]][[check-modified-at-commit]]
 
@@ -1338,14 +1338,14 @@ none - contains data
 == `compatibility`
 
 Specifies the Payara Server release with which to be backward compatible in terms of JAR visibility requirements for applications.
-The current allowed value is `v2`, which refers to Payara Server version 2 or Payara Server version 9.1 or 9.1.1.
+The current allowed value is `v2`, which refers to older runtimes from where Payara Server is based from.
 Starting in Java EE 6, the Java EE specification imposes stricter requirements than Java EE 5 did on which JAR files can be visible to various modules within an EAR file.
 Setting this element to `v2` removes these Java EE 6 and later restrictions.
 
 [[superelements-37]]
 === Superelements
 
-xref:dd-elements.adoc#payara-application[`payara-application`] (`payara-application.xml`),
+xref:dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`),
 xref:dd-elements.adoc#glassfish-ejb-jar[`glassfish-ejb-jar`] (`glassfish-ejb-jar.xml`)
 
 [[subelements-35]]
@@ -2461,7 +2461,6 @@ If the web server is listening at `http://localhost:8080`, the following `endpoi
 
 results in the following target endpoint address:
 
-[source,xml]
 ----
 http://localhost:8080/StockQuoteService/StockQuotePort
 ----
@@ -3228,11 +3227,10 @@ If `true`, resources in this web application that are symbolic links are served.
 Web applications on the virtual server that do not define this property use the virtual server's value.
 For details, see xref:docs:reference-manual:create-virtual-server.adoc[`create-virtual-server`(1)].
 
-Caution: Setting this property to `true` on Windows systems exposes JSP source code.
+CAUTION: Setting this property to `true` on Windows systems exposes JSP source code.
 
 |`alternatedocroot_n` |none a|
-Specifies an alternate document root (docroot), where n is a positive integer that allows specification of more than one.
-Alternate docroots allow web applications to serve requests for certain resources from outside their own docroot, based on whether those requests match one (or more) of the URI patterns of the web application's alternate docroots. +
+Specifies an alternate document root (docroot), where n is a positive integer that allows specification of more than one. Alternate docroots allow web applications to serve requests for certain resources from outside their own docroot, based on whether those requests match one (or more) of the URI patterns of the web application's alternate docroots. +
 
 If a request matches an alternate docroot's URI pattern, it is mapped to the alternate docroot by appending the request URI (minus the web application's context root) to the alternate docroot's physical location (directory).
 If a request matches multiple URI patterns, the alternate docroot is determined according to the following precedence order:
@@ -3246,12 +3244,11 @@ The URI pattern of the first alternate docroot uses an exact match, whereas the 
 
 [source,xml]
 ----
-<property name="alternatedocroot_1" 
-   value="from=/my.jpg dir=/srv/images/jpg"/>
-<property name="alternatedocroot_2" 
-   value="from=*.jpg dir=/srv/images/jpg"/>
-<property name="alternatedocroot_3" 
-   value="from=/jpg/* dir=/src/images"/>
+<glassfish-web-app>
+    <property name="alternatedocroot_1"  value="from=/my.jpg dir=/srv/images/jpg"/>
+    <property name="alternatedocroot_2"  value="from=*.jpg dir=/srv/images/jpg"/>
+    <property name="alternatedocroot_3" value="from=/jpg/* dir=/src/images"/>
+</glassfish-web-app>
 ----
 
 The `value` of each alternate docroot has two components: The first component, `from`, specifies the alternate docroot's URI pattern,
@@ -4053,13 +4050,11 @@ The following table describes properties for the `jsp-config` element.
 |`classpath` |created dynamically based on the current web application |Specifies the classpath to use when compiling generated servlets.
 
 |`compiler` |`javac` a| Specifies the compiler Ant uses to compile JSP files. See the Ant
-documentation for more information: `http://antinstaller.sourceforge.net/manual/manual/`
+documentation for more information: https://ant.apache.org/manual/index.html
 
 |`compilerSourceVM` |Depends on Payara Server's Java runtime a| Specifies the JDK release with which source compatibility of the generated servlets is provided. Same as the `-source` release option of `javac`.
-For more information, see `http://docs.oracle.com/javase/7/docs/technotes/tools/solaris/javac.html#options`.
 
 |`compilerTargetVM` |Depends on Payara Server's Java runtime a| Specifies the Virtual Machine for the Java platform (JVM software) version for which the servlet class files are generated. Same as the `-target` release option of `javac`.
-For more information, see `http://docs.oracle.com/javase/7/docs/technotes/tools/solaris/javac.html#options`.
 
 |`defaultBufferNone` |`false` |If `true`, the default for the `buffer` attribute of the `page` directive is `none`.
 
@@ -4135,7 +4130,7 @@ To preserve active state data, Payara Server serializes the data and saves it in
 [[superelements-95]]
 === Superelements
 
-xref:dd-elements.adoc#payara-application[`payara-application`] (`glassfish-application.xml`),
+xref:dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`),
 xref:dd-elements.adoc#glassfish-web-app[`glassfish-web-app`] (`glassfish-web-app.xml`),
 xref:dd-elements.adoc#glassfish-ejb-jar[`glassfish-ejb-jar`] (`glassfish-ejb-jar.xml`)
 
@@ -4541,18 +4536,17 @@ For example, to define the property `mail.password` in a Jakarta Mail Session ob
 
 [source,xml]
 ----
-...
- <mail-resource jndi-name="mail/Session" ...>
-     <property name="mail-password" value="adminadmin"/>
- </mail-resource>
- ...
+<mail-resource jndi-name="mail/Session">
+    <property name="mail-password" value="adminadmin"/>
+    <property name="mail-password" value="adminadmin"/>
+</mail-resource>
 ----
 
 After getting the Jakarta Mail `Session` object, get the `mail.password` property to retrieve the value `adminadmin`, as follows:
 
-[source,java]
+[source, java]
 ----
-String password = session.getProperty("mail.password");
+var password = session.getProperty("mail.password");
 ----
 
 For more information about Jakarta Mail properties, see ttps://jakarta.ee/specifications/mail[Jakarta Mail API Documentation] (`https://jakarta.ee/specifications/mail`).
@@ -5289,7 +5283,7 @@ If `pass-by-reference` is used at both the bean and application level, the bean 
 [[superelements-135]]
 === Superelements
 
-xref:dd-elements.adoc#payara-application[`payara-application`] (`payara-application.xml`),
+xref:dd-elements.adoc#glassfish-application[`glassfish-application`] (`payara-application.xml`),
 xref:dd-elements.adoc#ejb[`ejb`] (`glassfish-ejb-jar.xml`)
 
 [[subelements-128]]
@@ -5824,7 +5818,7 @@ For more information about realms, see "xref:docs:application-development-guide:
 [[superelements-155]]
 === Superelements
 
-xref:dd-elements.adoc#payara-application[`payara-application`] (`payara-application.xml`), xref:dd-elements.adoc#as-context[`as-context`],  xref:dd-elements.adoc#login-config[`login-config`] (`glassfish-ejb-jar.xml`)
+xref:dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`), xref:dd-elements.adoc#as-context[`as-context`],  xref:dd-elements.adoc#login-config[`login-config`] (`glassfish-ejb-jar.xml`)
 
 [[subelements-147]]
 === Subelements
@@ -6444,7 +6438,10 @@ none - contains data
 [source,xml]
 ----
 <schema/> <!-- use automatic schema generation -->
+----
 
+[source,xml]
+----
 <schema>CompanySchema</schema> <!-- use "CompanySchema.dbschema" -->
 ----
 
@@ -6658,7 +6655,7 @@ To be useful, there must be at least one user in that realm who belongs to that 
 [[superelements-181]]
 === Superelements
 
-xref:dd-elements.adoc#payara-application[`payara-application`] (`payara-application.xml`),
+xref:dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`),
 xref:dd-elements.adoc#glassfish-web-app[`glassfish-web-app`] (`glassfish-web.xml` and `payara-web.xml`),
 xref:dd-elements.adoc#glassfish-ejb-jar[`glassfish-ejb-jar`] (`glassfish-ejb-jar.xml`)
 
@@ -7441,7 +7438,7 @@ Contains the unique ID for the application. This value is automatically updated 
 [[superelements-205]]
 === Superelements
 
-xref:dd-elements.adoc#payara-application[`payara-application`] (`payara-application.xml`),
+xref:dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`),
 xref:dd-elements.adoc#enterprise-beans[`enterprise-beans`] (`glassfish-ejb-jar.xml`)
 
 [[subelements-197]]
@@ -7509,6 +7506,7 @@ xref:dd-elements.adoc#call-property[`call-property`], xref:dd-elements.adoc#stub
 
 none - contains data
 
+//TODO - Would be good to remove valve elements once Catalina is removed
 [[valve]]
 == `valve`
 
@@ -7551,8 +7549,7 @@ The following table describes attributes for the `valve` element.
 
 |`name` |none |Specifies a unique name for the valve.
 
-|`class-name` |none |Specifies the fully qualified class name of the valve. The valve class must implement the org.apache.catalina.Valve
-interface from Tomcat or previous Payara Server releases, or the org.glassfish.web.valve.GlassFishValve interface from the current Payara Server release.
+|`class-name` |none |Specifies the fully qualified class name of the valve. The valve class must implement the `org.apache.catalina.Valve` interface from Tomcat or previous Payara Server releases, or the `org.glassfish.web.valve.GlassFishValve` interface from the current Payara Server release.
 
 |===
 
@@ -7561,7 +7558,7 @@ interface from Tomcat or previous Payara Server releases, or the org.glassfish.w
 
 [source,xml]
 ----
-><valve name="MyValve" classname="org.glassfish.extension.Valve">
+<valve name="MyValve" classname="org.glassfish.extension.Valve">
    <property name="MyProperty1" value="MyValue1" />
    <property name="MyProperty2" value="MyValue2" />
 </valve> 
@@ -7626,7 +7623,7 @@ Contains version information for an application or module. For more information 
 [[superelements-212]]
 === Superelements
 
-xref:dd-elements.adoc#payara-application[`payara-application`] (`payara-application.xml`),
+xref:dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`),
 xref:dd-elements.adoc#glassfish-web-app[`glassfish-web-app`] (`glassfish-web-app.xml`),
 xref:dd-elements.adoc#glassfish-ejb-jar[`glassfish-ejb-jar`] (`glassfish-ejb-jar.xml`),
 xref:dd-elements.adoc#glassfish-application-client[`glassfish-application-client`] (`glassfish-application-client.xml`)
@@ -7678,7 +7675,7 @@ Specifies the application's web tier configuration.
 [[superelements-214]]
 === Superelements
 
-xref:dd-elements.adoc#payara-application[`payara-application`] (`payara-application.xml`)
+xref:dd-elements.adoc#glassfish-application[`glassfish-application`] (`payara-application.xml`)
 
 [[subelements-206]]
 === Subelements
@@ -7895,10 +7892,13 @@ none - contains data
 
 [source,xml]
 ----
-// available via HTTP
+<!-- available via HTTP -->
 <wsdl-override>http://localhost:8000/myservice/myport?WSDL</wsdl-override>
+----
 
-// in a file
+[source,xml]
+----
+<!-- in a file -->
 <wsdl-override>file:/home/user1/myfinalwsdl.wsdl</wsdl-override>
 ----
 

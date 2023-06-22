@@ -1,31 +1,14 @@
 [[deploying-applications]]
 = Deploying Applications
 
-This chapter provides procedures and guidelines for deploying applications and modules in the Payara Server environment by using the `asadmin`
-command-line utility.
-
-The following topics are addressed here:
-
-* xref:deploying-applications-and-modules[Deploying Applications and Modules]
-* xref:to-deploy-an-application-or-module[Modifying the Configuration of a Web Application or Module]
-* xref:web-module-deployment-guidelines[Web Module Deployment Guidelines]
-* xref:ejb-module-deployment-guidelines[EJB Module Deployment Guidelines]
-* xref:deploying-a-connector-module[Deploying a Connector Module]
-* xref:assembling-and-deploying-an-application-client-module[Assembling and Deploying an Application Client Module]
-* xref:lifecycle-module-deployment-guidelines[Lifecycle Module Deployment Guidelines]
-* xref:web-module-deployment-guidelines[Web Service Deployment Guidelines]
-* xref:osgi-bundle-deployment-guidelines[OSGi Bundle Deployment Guidelines]
-* xref:transparent-jdbc-connection-pool-reconfiguration[Transparent JDBC Connection Pool Reconfiguration]
-* xref:application-scoped-resources[Application-Scoped Resources]
-
-Instructions for accomplishing these tasks by using the Administration Console are contained in the Administration Console online help.
+This chapter provides procedures and guidelines for deploying applications and modules in the Payara Server environment by using the `asadmin`command-line utility.
 
 [[deploying-applications-and-modules]]
 == Deploying Applications and Modules
 
 Application deployment is a dynamic process, which means that deployed applications and modules become available without requiring you to restart the server instance.
-Dynamic deployment can be useful in production environments to bring new applications and modules online easily. If you do restart the server, all deployed components
-are still deployed and available.
+
+Dynamic deployment can be useful in production environments to bring new applications and modules online easily. If you do restart the server, all deployed components are still deployed and available.
 
 The following topics are addressed here:
 
@@ -46,20 +29,15 @@ Instructions for accomplishing these tasks by using the Administration Console a
 [[to-deploy-an-application-or-module]]
 ===  To Deploy an Application or Module
 
-Use the `deploy` subcommand in remote mode to deploy an assembled application or module to Payara Server. If an error occurs during deployment, the application or module
-is not deployed. If a module within an application contains an error, the entire application is not deployed. These failures prevent a partial deployment
+Use the `deploy` subcommand in remote mode to deploy an assembled application or module to Payara Server. If an error occurs during deployment, the application or module is not deployed. If a module within an application contains an error, the entire application is not deployed. These failures prevent a partial deployment
 that could leave the server in an inconsistent state.
 
-By default, the deployment target is the default server instance, `server`. To deploy only to the default server instance, specify no target.
-If you deploy the application or module only to the domain target, it exists in the domain central repository, but no server instances or clusters
-can reference the component unless you add references.
+By default, the deployment target is the default server instance, `server`. To deploy only to the default server instance, specify no target. If you deploy the application or module only to the domain target, it exists in the domain central repository, but no server instances or clusters can reference the component unless you add references.
 
 You can also deploy a component to a specific stand-alone server instance or cluster.
-When you deploy to server instances or clusters, the application or module exists in the domain's central repository and is referenced by any clusters or
-server instances that you deployed to. For a cluster, the preselected deployment target is `server`.
+When you deploy to server instances or clusters, the application or module exists in the domain's central repository and is referenced by any clusters or server instances that you deployed to. For a cluster, the preselected deployment target is `server`.
 
-If the component is already deployed or already exists, you can forcefully redeploy if you set the `--force` option of the `deploy` subcommand to true.
-The `redeploy` subcommand also accomplishes this. See xref:example-2-10[Example 2-10].
+If the component is already deployed or already exists, you can forcefully redeploy if you set the `--force` option of the `deploy` subcommand to true. The `redeploy` subcommand also accomplishes this. See xref:example-2-10[Example 2-10].
 You can see the enabled or disabled status of an application or module by using the xref:docs:reference-manual:show-component-status.adoc[`show-component-status`] subcommand.
 
 For information about how the application or module name is derived, see link:overview.adoc#naming-standards[Naming Standards].
@@ -806,13 +784,13 @@ For information about HTTP session persistence, see the __Payara Server High Ava
 option of the `deploy` subcommand.
 +
 You can keep the generated source for JSP files by adding the `keepgenerated` flag to the `jsp-config` element in `glassfish-web.xml` or `payara-web.xml`.
-For example: +
+For example:
++
 [source,xml]
 ----
 <glassfish-web-app>
-   ...
    <jsp-config>
-      <property name=keepgenerated value=true />
+      <property name="keepgenerated" value="true" />
    </jsp-config>
 </glassfish-web-app>
 ----
@@ -836,7 +814,7 @@ For more information about JSP precompilation, see xref:docs:application-deploym
 [[ejb-module-deployment-guidelines]]
 == EJB Module Deployment Guidelines
 
-NOTE: The Payara Server Web Profile supports the Jakarta Enterprise Beans 4.0 Lite specification, which allows enterprise beans within web applications, among other features.
+NOTE: The Payara Server Web Profile supports the Jakarta Enterprise Beans 4.0 Lite specification, which allows enterprise beans within web applications, among other features. +
 The Payara Server Full Platform Profile supports the entire Jakarta Enterprise Beans 4.0 specification. For details, see https://jakarta.ee/specifications/enterprise-beans/[Jakarta Enterprise Beans]
 
 The following guidelines apply to deploying an EJB module in Payara Server:
@@ -860,9 +838,11 @@ Other examples would be changes to EJB names, or adding or removing EJBs to or f
 
 * *Stubs and Ties*. — Use the xref:docs:reference-manual:get-client-stubs.adoc[`get-client-stubs`] subcommand in remote mode to retrieve stubs and ties.
 
-* *Compatibility of JAR Visibility Requirements*. — Use the `compatibility` element of the `glassfish-application.xml` or `glassfish-ejb-jar.xml` file to specify the Payara Server release
-with which to be backward compatible in terms of JAR visibility requirements for applications. The current allowed value is `v2`, which refers to Payara Server version 2 or Payara Server version 9.1 or 9.1.1.
-Starting in Java EE 6, the Java EE specification imposes stricter requirements than Java EE 5 did on which JAR files can be visible to various modules within an EAR file. Setting this element to `v2` removes these Java EE 6 and later restrictions.
+* *Compatibility of JAR Visibility Requirements*. — Use the `compatibility` element of the `glassfish-application.xml` or `glassfish-ejb-jar.xml` file to specify the Payara Server release with which to be backward compatible in terms of JAR visibility requirements for applications.
++
+The current allowed value is `v2`, which refers to older runtimes from where Payara Server is based from.
++
+NOTE: Starting in Java EE 6, the Java EE specification imposes stricter requirements than Java EE 5 did on which JAR files can be visible to various modules within an EAR file. Setting this element to `v2` removes these Java EE 6 and later restrictions.
 
 [[deploying-a-connector-module]]
 == Deploying a Connector Module
@@ -884,8 +864,7 @@ For more information, see xref:docs:application-deployment-guide:deploying-appli
 . Ensure that the server is running. Remote commands require a running server.
 . Deploy the connector module by using the xref:docs:reference-manual:deploy.adoc#deploy[`deploy`] subcommand.
 . Configure connector connection pools for the deployed connector module. +
-Use the `create-connector-connection-pool` subcommand. For procedures, see "xref:docs:administration-guide:connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool]" in
-__Payara Server Administration Guide__.
+Use the `create-connector-connection-pool` subcommand. For procedures, see "xref:docs:administration-guide:connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool]" in the __Payara Server Administration Guide__.
 . Configure connector resources for the connector connection pools.
 +
 Use the `create-resource-adapter-config` subcommand. For procedures, see "xref:docs:administration-guide:connectors.adoc#to-create-configuration-information-for-a-resource-adapter[To Create Configuration Information for a Resource Adapter]" in __Payara Server Administration Guide__.
@@ -972,7 +951,8 @@ You can use either the `get-client-stubs` subcommand or the `--retrieve` option 
 * If Java Web Start is enabled for the application client, use the Launch link on the Application Client Modules.
 * Run an application client by using the `appclient` script. +
 The `appclient` script is located in the `as-install/bin` directory. +
-If you are using the default server instance, the only required option is `-client`, which points to the client JAR file. For example: +
+If you are using the default server instance, the only required option is `-client`, which points to the client JAR file. For example:
++
 [source,shell]
 ----
 appclient -client converterClient.jar
@@ -1121,8 +1101,7 @@ For JDBC connection pools that are not application-scoped, use the `set` subcomm
 
 [source,shell]
 ----
-asadmin> set myserver.resources.jdbc-connection-pool.mypool.property.
-dynamic-reconfiguration-wait-timeout-in-seconds=30
+asadmin> set myserver.resources.jdbc-connection-pool.mypool.property.dynamic-reconfiguration-wait-timeout-in-seconds=30
 ----
 
 [[application-scoped-resources]]
@@ -1134,7 +1113,7 @@ An application-scoped resource has the following characteristics:
 
 * It is available only to the module or application that defines it.
 * It cannot be referenced or looked up by other modules or applications.
-* It is created during deployment, destroyed during undeployment, and recreated during redeployment.
+* It is created during deployment, destroyed during un-deployment, and recreated during redeployment.
 * It is free from unexpected resource starvation or delay in acquiring connections because no other application or module competes for accesses to it.
 
 The following resource types can be application-scoped:
