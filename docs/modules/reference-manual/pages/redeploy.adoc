@@ -86,12 +86,9 @@ asadmin-options::
   If a directory filepath is specified, this option is ignored.
 `--retrieve`::
   Retrieves the client stub JAR file from the server machine to the local directory.
+//TODO - Consider removing JavaDB/Derby support
 `--dbvendorname`::
-  Specifies the name of the database vendor for which tables are created. Supported values include `db2`, `mssql`, `oracle`, `derby`,
-  `javadb`, `postgresql`, and `sybase`, case-insensitive. If not specified, the value of the `database-vendor-name` attribute in
-  `glassfish-ejb-jar.xml` is used. If no value is specified, a connection is made to the resource specified by the `jndi-name`
-  subelement of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file, and the database vendor name is read. If
-  the connection cannot be established, or if the value is not recognized, SQL-92 compliance is presumed.
+  Specifies the name of the database vendor for which tables are created. Supported values include `h2`, `db2`, `mssql`, `oracle`, `derby`, `javadb`, `postgresql`, and `sybase`, case-insensitive. If not specified, the value of the `database-vendor-name` attribute in `glassfish-ejb-jar.xml` is used. If no value is specified, a connection is made to the resource specified by the `jndi-name` subelement of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file, and the database vendor name read. If the connection cannot be established, or if the value is not valid, SQL-92 compliance is presumed.
 `--createtables`::
   If specified as true, creates tables at deployment of an application with unmapped CMP beans. If specified as false, tables are not
   created. If not specified, the value of the `create-tables-at-deploy` entry in the `cmp-resource` element of the `glassfish-ejb-jar.xml`
@@ -116,11 +113,7 @@ asadmin-options::
   descriptor packaged in the archive. For example, for an EAR, the `--altdd` option overrides `application.xml`. For a standalone module,
   the `--altdd` option overrides the top-level module descriptor such as `web.xml`.
 -`-runtimealtdd`::
-  Deploys the application using a Payara Server runtime deployment descriptor that resides outside of the application archive. Specify an
-  absolute path or a relative path to the alternate deployment descriptor file. The alternate deployment descriptor overrides the
-  top-level deployment descriptor packaged in the archive. For example, for an EAR, the `--runtimealtdd` option overrides
-  `glassfish-application.xml`. For a standalone module, the `--runtimealtdd` option overrides the top-level module descriptor such
-  as `glassfish-web.xml` or `payara-web.xml`. Applies to Payara Server deployment descriptors only (`glassfish-*.xml`/`payara-*.xml`); the name of the alternate
+  Deploys the application using a Payara Server runtime deployment descriptor that resides outside of the application archive. Specify an absolute path or a relative path to the alternate deployment descriptor file. The alternate deployment descriptor overrides the top-level deployment descriptor packaged in the archive. For example, for an EAR, the `--runtimealtdd` option overrides `glassfish-application.xml`. For a standalone module, the `--runtimealtdd` option overrides the top-level module descriptor such as `glassfish-web.xml` or `payara-web.xml`. Applies to Payara Server deployment descriptors only (`glassfish-*.xml`/`payara-*.xml`); the name of the alternate
   deployment descriptor file must begin with `glassfish-` (or `payara-` in specific cases). Does not apply to `sun-*.xml` deployment descriptors, which are deprecated.
 `--deploymentorder`::
   Specifies the deployment order of the application. This is useful if the application has dependencies and must be loaded in a certain order
@@ -142,12 +135,10 @@ asadmin-options::
   application, web application, or EJB module. If set to true, the specified application or module is enabled for high-availability. Set
   this option to true only if high availability is configured and enabled at higher levels, such as the server and container levels.
 `--asyncreplication`::
-  This option controls whether web session and SFSB states for which high availability is enabled are first buffered and then replicated
-  using a separate asynchronous thread. If set to true (default), performance is improved but availability is reduced. If the instance
-  where states are buffered but not yet replicated fails, the states are lost. If set to false, performance is reduced but availability is
-  guaranteed. States are not buffered but immediately transmitted to other instances in the cluster.
+  This option controls whether web session and SFSB states for which high availability is enabled are first buffered and then replicated using a separate asynchronous thread. If set to `true` (default), performance is improved but availability is reduced. If the instance where states are buffered but not yet replicated fails, the states are lost. If set to `false`, performance is reduced but availability is guaranteed. States are not buffered but immediately transmitted to other instances in the cluster.
+
 `--lbenabled`::
-  This option controls whether the deployed application is available for load balancing. The default is true.
+  This option controls whether the deployed application is available for load balancing. The default is `true`.
 `--keepstate`::
   This option controls whether web sessions, SFSB instances, and persistently created EJB timers are retained between redeployments. +
   The default is false. This option is supported only on the default server instance, named `server`. It is not supported and ignored for any other target. +

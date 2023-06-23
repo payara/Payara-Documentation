@@ -1877,7 +1877,7 @@ none - contains data
 == `custom-resource`
 
 Defines a custom resource, which specifies a custom server-wide resource object factory.
-Such object factories implement the javax.naming.spi.ObjectFactory interface.
+Such object factories implement the `javax.naming.spi.ObjectFactory` interface.
 
 [[superelements-47]]
 === Superelements
@@ -1935,6 +1935,7 @@ server.
 enabled at runtime.
 |===
 
+//TODO - Consider removing JavaDB/Derby support
 
 [[database-vendor-name]]
 == `database-vendor-name`
@@ -4592,13 +4593,13 @@ This is also the interval at which sessions are passivated if `maxSessions` is e
 If `persistenceFrequency` is set to `time-based`, active sessions are stored at this interval. +
 
 To prevent data inconsistency, set this value lower than the frequency at which session data changes.
-For example, this value should be as low as possible (`1` second) for a hit counter servlet on a frequently accessed web site, or the last few hits might be lost each time the server is restarted. +
+For example, this value should be as low as possible (`1` second) for a hit counter servlet on a frequently accessed website, or the last few hits might be lost each time the server is restarted. +
 
-Applicable only if the `persistence-type` attribute of the parent xref:dd-elements.adoc#session-manager[`session-manager`] element is `file` or `replicated`.
+Applicable only if the `persistence-type` attribute of the parent xref:dd-elements.adoc#session-manager[`session-manager`] element is `file`.
 
 |`maxSessions` |`-1` a| Specifies the maximum number of sessions that are permitted in the cache, or `-1` for no limit. After this, an attempt to create a new session causes an `IllegalStateException` to be thrown. +
 
-If the `persistence-type` attribute of the parent xref:dd-elements.adoc#session-manager[`session-manager`] element is `file` or `replicated`, the session manager passivates sessions to the persistent store when this maximum is reached.
+If the `persistence-type` attribute of the parent xref:dd-elements.adoc#session-manager[`session-manager`] element is `file`, the session manager passivates sessions to the persistent store when this maximum is reached.
 
 |`sessionFilename` |empty string a| Specifies the absolute or relative path to the directory in which the session state is preserved between application restarts, if preserving the state is possible.
 A relative path is relative to the temporary directory for this web module, one of the following:
@@ -4616,11 +4617,12 @@ xref:dd-elements.adoc#session-manager[`session-manager`] element is `memory`.
 
 * `web-method` - The session state is stored at the end of each web request prior to sending a response back to the client.
 This mode provides the best guarantee that the session state is fully updated in case of failure.
+//TODO - Verify if this setting applies to `hazelcast` type
 * `time-based` - The session state is stored in the background at the frequency set by `reapIntervalSeconds`.
 This mode provides less of a guarantee that the session state is fully updated.
-However, it can provide a significant performance improvement because the state is not stored after each request. +
-
-Applicable only if the `persistence-type` attribute of the parent xref:dd-elements.adoc#session-manager[`session-manager`] element is `replicated`.
+However, it can provide a significant performance improvement because the state is not stored after each request.
++
+Applicable only if the `persistence-type` attribute of the parent xref:dd-elements.adoc#session-manager[`session-manager`] element is `hazelcast`.
 
 |===
 
@@ -6950,8 +6952,7 @@ element.
 |===
 |Attribute |Default |Description
 
-|`persistence-type` |`memory` a| (optional) Specifies the session persistence mechanism. Allowed values are `memory`, `file`, and `replicated`.
-If you have installed and configured Coherence*Web, the `coherence-web persistence` type is also available. For more information, see Using Coherence*Web with Payara Server.
+|`persistence-type` |`memory` a| (optional) Specifies the session persistence mechanism. Allowed values are `memory`, `file`, and `hazelcast`.
 
 |===
 
@@ -7115,9 +7116,10 @@ Applicable only if the `persistence-type` attribute of the parent xref:dd-elemen
 * `modified-session` - The entire session state is stored if it has been modified.
 A session is considered to have been modified if `HttpSession.setAttribute()` or `HttpSession.removeAttribute()` was called.
 You must guarantee that `setAttribute` is called every time an attribute is changed. This is not a Jakarta EE specification requirement, but it is required for this mode to work properly.
+//TODO - Verify if this setting applies to `hazelcast` type
 * `modified-attribute` - Only modified session attributes are stored. For this mode to work properly, you must follow some guidelines, which are explained immediately following this table.
 
-Applicable only if the `persistence-type` attribute of the parent xref:dd-elements.adoc#session-manager[`session-manager`] element is `replicated`.
+Applicable only if the `persistence-type` attribute of the parent xref:dd-elements.adoc#session-manager[`session-manager`] element is `hazelcast`.
 
 |===
 
@@ -7162,6 +7164,8 @@ a| xref:dd-elements.adoc#value[`value`]
 === Properties
 
 The following table describes properties for the `stub-property` element.
+
+//TODO - Review whether this property is still supported as a feature
 
 .`stub-property` properties
 [cols="3,2,6",options="header"]

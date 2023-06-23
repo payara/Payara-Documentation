@@ -163,9 +163,12 @@ This example shows code for creating an Embedded Payara Server.
 ----
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
-    GlassFish glassfish = GlassFishRuntime.bootstrap().newGlassFish();
-    glassfish.start();
+public class EmbeddedRunner{
+
+    public static void main(String... args){
+        var server = GlassFishRuntime.bootstrap().newGlassFish();
+        server.start();
+    }
 }
 ----
 
@@ -177,17 +180,19 @@ This example shows code for creating an Embedded Payara Server using the existin
 ----
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
+public class EmbeddedRunner{
+    public static void main(String... args){
 
-    var bootstrapProperties = new BootstrapProperties();
-    bootstrapProperties.setInstallRoot("C:\\samples\\test\\applicationserver");
-    GlassFishRuntime glassfishRuntime = GlassFishRuntime.bootstrap(bootstrapProperties);
+        var bootstrapProperties = new BootstrapProperties();
+        bootstrapProperties.setInstallRoot("C:\\samples\\test\\applicationserver");
+        GlassFishRuntime glassfishRuntime = GlassFishRuntime.bootstrap(bootstrapProperties);
 
-    var glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setInstanceRoot("C:\\samples\\test\\applicationserver\\domains\\domain1");
-    var server = glassfishRuntime.newGlassFish(glassfishProperties);
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setInstanceRoot("C:\\samples\\test\\applicationserver\\domains\\domain1");
+        var server = glassfishRuntime.newGlassFish(glassfishProperties);
 
-    server.start();
+        server.start();
+    }
 }
 ----
 
@@ -214,13 +219,14 @@ This example shows code for setting the port of an embedded Payara Server.
 
 [source,java]
 ----
-...
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
-    var glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 8080);
-    glassfishProperties.setPort("https-listener", 8181);
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 8080);
+        glassfishProperties.setPort("https-listener", 8181);
+    }
 }
 ----
 
@@ -233,16 +239,17 @@ This example shows code for setting the port and starting an embedded Payara Ser
 
 [source,java]
 ----
-
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
-    var glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 8080);
-    glassfishProperties.setPort("https-listener", 8181);
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 8080);
+        glassfishProperties.setPort("https-listener", 8181);
 
-    var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
-    server.start();
+        var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
+        server.start();
+    }
 }
 ----
 
@@ -266,10 +273,12 @@ import java.io.BufferedReader;
 
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
-    System.out.println("Press Enter to stop server");
-    // wait for Enter
-    server.stop(); // Stop Embedded GlassFish Server
+public class EmbeddedRunner{
+    public static void main(String... args){
+        System.out.println("Press Enter to stop server");
+        // wait for Enter
+        server.stop();
+    }
 }
 ----
 
@@ -304,18 +313,20 @@ This example shows code for deploying an application from the archive file `c:\s
 import java.io.File;
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
-    var glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 8080);
-    glassfishProperties.setPort("https-listener", 8181);
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 8080);
+        glassfishProperties.setPort("https-listener", 8181);
 
-    var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
-    server.start();
+        var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
+        server.start();
 
-    var war = new File("c:\\samples\\simple.war");
-    var deployer = server.getDeployer();
-    deployer.deploy(war, "--name=simple", "--contextroot=simple", "--force=true");
-    // deployer.deploy(war) can be invoked instead. Other parameters are optional.
+        var war = new File("c:\\samples\\simple.war");
+        var deployer = server.getDeployer();
+        deployer.deploy(war, "--name=simple", "--contextroot=simple", "--force=true");
+        // deployer.deploy(war) can be invoked instead. Other parameters are optional.
+    }
 }
 ----
 
@@ -336,8 +347,11 @@ This example shows code for un-deploying the application that was deployed in th
 ----
 
 import org.glassfish.embeddable.*;
-public static void main(String... args){
-    deployer.undeploy(war, "--droptables=true", "--cascade=true");
+
+public class EmbeddedRunner{
+    public static void main(String... args){
+        deployer.undeploy(war, "--droptables=true", "--cascade=true");
+    }
 }
 ----
 
@@ -416,28 +430,30 @@ This example shows code for creating a WAR file and using the `addClassPath` and
 import java.io.File;
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
-    var glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 9090);
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 9090);
 
-    var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
-    server.start();
+        var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
+        server.start();
 
-    var deployer = glassfish.getDeployer();
-    var archive = new ScatteredArchive("testapp", ScatteredArchive.Type.WAR);
-    // target/classes directory contains complied servlets
-    archive.addClassPath(new File("target", "classes"));
-    // resources/payara-web.xml is the WEB-INF/payara-web.xml
-    archive.addMetadata(new File("resources", "payara-web.xml"));
-    // resources/web.xml is the WEB-INF/web.xml
-    archive.addMetadata(new File("resources", "web.xml"));
+        var deployer = glassfish.getDeployer();
+        var archive = new ScatteredArchive("testapp", ScatteredArchive.Type.WAR);
+        // target/classes directory contains complied servlets
+        archive.addClassPath(new File("target", "classes"));
+        // resources/payara-web.xml is the WEB-INF/payara-web.xml
+        archive.addMetadata(new File("resources", "payara-web.xml"));
+        // resources/web.xml is the WEB-INF/web.xml
+        archive.addMetadata(new File("resources", "web.xml"));
 
-    // Deploy the scattered web archive.
-    var appName = deployer.deploy(archive.toURI(), "--contextroot=hello");
+        // Deploy the scattered web archive.
+        var appName = deployer.deploy(archive.toURI(), "--contextroot=hello");
 
-    deployer.undeploy(appName);
-    server.stop();
-    server.dispose();
+        deployer.undeploy(appName);
+        server.stop();
+        server.dispose();
+    }
 }
 ----
 
@@ -524,43 +540,45 @@ This example shows code for creating an EAR file and using the `addArchive` and 
 import java.io.File;
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
-    var glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 9090);
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 9090);
 
-    var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
-    server.start();
+        var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
+        server.start();
 
-    var deployer = glassfish.getDeployer();
+        var deployer = glassfish.getDeployer();
 
-    // Create a scattered web application.
-    var webmodule = new ScatteredArchive("testweb", ScatteredArchive.Type.WAR);
-    // target/classes directory contains my complied servlets
-    webmodule.addClassPath(new File("target", "classes"));
-    // resources/payara-web.xml is my WEB-INF/payara-web.xml
-    webmodule.addMetadata(new File("resources", "payara-web.xml"));
+        // Create a scattered web application.
+        var webmodule = new ScatteredArchive("testweb", ScatteredArchive.Type.WAR);
+        // target/classes directory contains my complied servlets
+        webmodule.addClassPath(new File("target", "classes"));
+        // resources/payara-web.xml is my WEB-INF/payara-web.xml
+        webmodule.addMetadata(new File("resources", "payara-web.xml"));
 
-    // Create a scattered enterprise archive.
-    var archive = new ScatteredEnterpriseArchive("testapp");
-    // src/application.xml is my META-INF/application.xml
-    archive.addMetadata(new File("src", "application.xml"));
-    // Add scattered web module to the scattered enterprise archive.
-    // src/application.xml references Web module as "scattered.war".
-    //Hence specify the name while adding the archive.
-    archive.addArchive(webmodule.toURI(), "scattered.war");
-    // lib/mylibrary.jar is a library JAR file.
-    archive.addArchive(new File("lib", "mylibrary.jar"));
-    // target/ejbclasses contain my compiled EJB module.
-    // src/application.xml references EJB module as "ejb.jar".
-    //Hence specify the name while adding the archive.
-    archive.addArchive(new File("target", "ejbclasses"), "ejb.jar");
+        // Create a scattered enterprise archive.
+        var archive = new ScatteredEnterpriseArchive("testapp");
+        // src/application.xml is my META-INF/application.xml
+        archive.addMetadata(new File("src", "application.xml"));
+        // Add scattered web module to the scattered enterprise archive.
+        // src/application.xml references Web module as "scattered.war".
+        //Hence specify the name while adding the archive.
+        archive.addArchive(webmodule.toURI(), "scattered.war");
+        // lib/mylibrary.jar is a library JAR file.
+        archive.addArchive(new File("lib", "mylibrary.jar"));
+        // target/ejbclasses contain my compiled EJB module.
+        // src/application.xml references EJB module as "ejb.jar".
+        //Hence specify the name while adding the archive.
+        archive.addArchive(new File("target", "ejbclasses"), "ejb.jar");
 
-    // Deploy the scattered enterprise archive.
-    var appName = deployer.deploy(archive.toURI());
+        // Deploy the scattered enterprise archive.
+        var appName = deployer.deploy(archive.toURI());
 
-    deployer.undeploy(appName);
-    server.stop();
-    server.dispose();
+        deployer.undeploy(appName);
+        server.stop();
+        server.dispose();
+    }
 }
 ----
 
@@ -579,12 +597,14 @@ This example shows code for running an `asadmin create-jdbc-resource` command:
 ----
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
-    var command = "create-jdbc-resource";
-    var poolid = "--connectionpoolid=DerbyPool";
-    var dbname = "jdbc/DerbyPool";
-    var commandRunner = glassfish.getCommandRunner();
-    var commandResult = commandRunner.run(command, poolid, dbname);
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var command = "create-jdbc-resource";
+        var poolId = "--connectionpoolid=DerbyPool";
+        var dbname = "jdbc/DerbyPool";
+        var commandRunner = glassfish.getCommandRunner();
+        var commandResult = commandRunner.run(command, poolId, dbname);
+    }
 }
 ----
 
@@ -594,11 +614,13 @@ This example shows code for running an `asadmin set-log-level` command:
 ----
 import org.glassfish.embeddable.*;
 
-public static void main(String... args){
-    var command = "set-log-level";
-    var level = "javax.enterprise.system.container.web=FINE";
-    var commandRunner = glassfish.getCommandRunner();
-    var commandResult = commandRunner.run(command, level);
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var command = "set-log-level";
+        var level = "javax.enterprise.system.container.web=FINE";
+        var commandRunner = glassfish.getCommandRunner();
+        var commandResult = commandRunner.run(command, level);
+    }
 }
 ----
 
@@ -619,8 +641,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.glassfish.embeddable.*;
 
-public class Main {
-
+public class EmbeddedRunner {
     public static void main(String[] args) {
         var configFile = new File ("c:\\myapp\\embeddedserver\\domains\\domain1\\config\\domain.xml");
         var war = new File("c:\\samples\\simple.war");
@@ -751,20 +772,22 @@ This example shows how to set log levels using the `getLogger` method in the API
 ----
 import org.glassfish.embeddable.*;
 
-private static void main(String... args){
-    // Create Embedded server
-    var server = GlassFishRuntime.bootstrap().newGlassFish();
+public class EmbeddedRunner{
+    private static void main(String... args){
+        // Create Embedded server
+        var server = GlassFishRuntime.bootstrap().newGlassFish();
 
-    // Set the log levels. For example, set 'deployment' log levels to FINEST
-    Logger.getLogger("javax.enterprise.system.tools.deployment").setLevel(Level.FINEST);
+        // Set the log levels. For example, set 'deployment' log levels to FINEST
+        Logger.getLogger("javax.enterprise.system.tools.deployment").setLevel(Level.FINEST);
 
-    // Start Embedded server and deploy an application.
-    // You will see all the FINEST logs printed on the console.
-    server.start();
-    server.getDeployer().deploy(new File("sample.war"));
+        // Start Embedded server and deploy an application.
+        // You will see all the FINEST logs printed on the console.
+        server.start();
+        server.getDeployer().deploy(new File("sample.war"));
 
-    // Dispose Embedded server
-    server.dispose();
+        // Dispose Embedded server
+        server.dispose();
+    }
 }
 ----
 

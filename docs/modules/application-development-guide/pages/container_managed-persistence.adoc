@@ -294,6 +294,8 @@ NOTE: Java types assigned to CMP fields must be restricted to Java primitive typ
 
 The following table contains the mappings of JDBC types to database vendor-specific types when automatic mapping is used. For configurations of supported and other drivers, see "xref:docs:administration-guide:jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in the Payara Server Administration Guide.
 
+//TODO - Consider removing Apache Derby information and replacing it with H2
+
 [width="100%",,options="header",]
 |===
 
@@ -429,9 +431,11 @@ tables at deployment. For more information about the `cmp-resource` element, see
 |`false` 
 |If `true`, causes database tables that were automatically created when the bean(s) were last deployed to be dropped when the bean(s) are un-deployed. If `false`,does not drop tables.
 
+//TODO - Consider removing JavaDB/Derby support
+
 |xref:docs:application-deployment-guide:dd-elements.adoc#database-vendor-name[`database-vendor-name`] 
 |none 
-|Specifies the name of the database vendor for which tables are created. Allowed values are `javadb`, `db2`, `mssql`, `mysql`, `oracle`, `postgresql`, `pointbase`, `derby` (also for CloudScape), and `sybase`,case-insensitive.
+|Specifies the name of the database vendor for which tables are created. Allowed values are `javadb`, `db2`, `mssql`, `mysql`, `oracle`, `postgresql`, `pointbase`, `derby` (also for CloudScape), `sybase` and `h2`,case-insensitive.
 If no value is specified, a connection is made to the resource specified by the `jndi-name` sub-element of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file, and the database vendor name is read. If the connection cannot be established, or if the value is not recognized, `SQL-92` compliance is presumed.
 
 |xref:docs:application-deployment-guide:dd-elements.adoc#schema-generator-properties[`schema-generator-properties`]
@@ -475,13 +479,15 @@ If `false`, settings of `create-tables-at-deploy` or `drop-tables-at-undeploy` i
 |If `true`, specifies that table names are unique within each Payara Server domain. If not specified, the value of the `use-unique-table-names` property in `glassfish-ejb-jar.xml` is
 used.
 
+//TODO - Consider removing JavaDB/Derby support
+
 |`--dbvendorname` 
 |none 
-|Specifies the name of the database vendor for which tables are created. Allowed values are `javadb`, `db2`, `mssql`, `oracle`, `postgresql`, `pointbase`, `derby` (also for CloudScape), and `sybase`, case-insensitive.
+|Specifies the name of the database vendor for which tables are created. Allowed values are `javadb`, `db2`, `mssql`, `oracle`, `postgresql`, `pointbase`, `derby` (also for CloudScape), `sybase` and `h2`, case-insensitive.
 
 If not specified, the value of the `database-vendor-name` attribute in `glassfish-ejb-jar.xml` is used.
 
-If no value is specified, a connection is made to the resource specified by the `jndi-name` sub-element of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file, and the database vendor name is read. If the connection cannot be established, or if the value is not recognized, SQL-92 compliance is presumed.
+If no value is specified, a connection is made to the resource specified by the `jndi-name` sub-element of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file, and the database vendor name read. If the connection cannot be established, or if the value is not valid, SQL-92 compliance is presumed.
 
 |===
 
