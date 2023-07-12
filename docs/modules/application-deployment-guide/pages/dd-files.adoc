@@ -1,22 +1,20 @@
 [[payara-server-deployment-descriptor-files]]
 = Payara Server Deployment Descriptor Files
 
-This appendix describes the element hierarchies in the Payara Server
-deployment descriptors that are included in this release of the Payara Server software.
+This appendix describes the element hierarchies in the Payara Server deployment descriptors that are included in this release of the Payara Server software.
 
 [[about-the-payara-server-deployment-descriptors]]
 == About the Payara Server Deployment Descriptors
 
-Each deployment descriptor XML file has a corresponding Document Type Definition (DTD) file, which defines the elements, data, and attributes that
-the deployment descriptor file can contain.
-For example, the `glassfish-application_6_0-1.dtd` file defines the structure of the `glassfish-application.xml` file.
-The DTD files for the Payara Server deployment descriptors are located in the as-install`/lib/dtds` directory.
+Each deployment descriptor XML file has a corresponding Document Type Definition (DTD) file, which defines the elements, data, and attributes that the deployment descriptor file can contain.
 
-The Payara Server deployment descriptor files must be readable and writable by the file owners.
-In each deployment descriptor file, sub-elements must be defined in the order in which they are listed under each Sub-elements heading, unless otherwise noted.
+For example, the `glassfish-application_6_0-1.dtd` file defines the structure of the `glassfish-application.xml` file. The DTD files for the Payara Server deployment descriptors are located in the `as-install/lib/dtds` directory.
+
+The Payara Server deployment descriptor files must be readable and writable by the file owners. In each deployment descriptor file, sub-elements must be defined in the order in which they are listed under each Sub-elements heading, unless otherwise noted.
+
 For general information about DTD files and XML, see the XML specification at `http://www.w3.org/TR/REC-xml`.
 
-NOTE: Do not edit the DTD files; their contents change only with new versions of Payara Server.
+IMPORTANT: Do not edit the DTD files; their contents change only with new versions of Payara Server.
 
 The following table lists the Payara Server deployment descriptors and their DTD files.
 
@@ -506,8 +504,7 @@ glassfish-ejb-jar
 .  version-identifier
 ----
 
-NOTE: If any configuration information for an enterprise bean is not specified in the `glassfish-ejb-jar.xml` file, it defaults to a corresponding setting in
-the EJB container if an equivalency exists.
+NOTE: If any configuration information for an enterprise bean is not specified in the `glassfish-ejb-jar.xml` file, it defaults to a corresponding setting in the EJB container if an equivalency exists.
 
 .A sample `glassfish-ejb-jar.xml` file:
 [source,xml]
@@ -516,31 +513,30 @@ the EJB container if an equivalency exists.
 DTD GlassFish Application Server 3.1 EJB 3.1//EN" 
 "http://glassfish.org/dtds/glassfish-ejb-jar_3_1-1.dtd">
 <glassfish-ejb-jar>
-<display-name>First Module</display-name>
-<enterprise-beans>
-    <ejb>
-        <ejb-name>CustomerEJB</ejb-name>
-        <jndi-name>customer</jndi-name>
-        <bean-pool>
-            <steady-pool-size>10</steady-pool-size>
-            <resize-quantity>10</resize-quantity>
-            <max-pool-size>100</max-pool-size>
-            <pool-idle-timeout-in-seconds>600</pool-idle-timeout-in-seconds>
-        </bean-pool>
-        <bean-cache>
-            <max-cache-size>100</max-cache-size>
-            <resize-quantity>10</resize-quantity>
-            <removal-timeout-in-seconds>3600</removal-timeout-in-seconds>
-            <victim-selection-policy>LRU</victim-selection-policy>
-        </bean-cache>
-    </ejb>
-    <cmp-resource>
-        <jndi-name>jdbc/__default</jndi-name>
-        <create-tables-at-deploy>true</create-tables-at-deploy>
-        <drop-tables-at-undeploy>true</drop-tables-at-undeploy>
-    </cmp-resource>
-</enterprise-beans>
-<keep-state>true</keep-state>
+    <enterprise-beans>
+        <ejb>
+            <ejb-name>CustomerEJB</ejb-name>
+            <jndi-name>customer</jndi-name>
+            <bean-pool>
+                <steady-pool-size>10</steady-pool-size>
+                <resize-quantity>10</resize-quantity>
+                <max-pool-size>100</max-pool-size>
+                <pool-idle-timeout-in-seconds>600</pool-idle-timeout-in-seconds>
+            </bean-pool>
+            <bean-cache>
+                <max-cache-size>100</max-cache-size>
+                <resize-quantity>10</resize-quantity>
+                <removal-timeout-in-seconds>3600</removal-timeout-in-seconds>
+                <victim-selection-policy>LRU</victim-selection-policy>
+            </bean-cache>
+        </ejb>
+        <cmp-resource>
+            <jndi-name>jdbc/__default</jndi-name>
+            <create-tables-at-deploy>true</create-tables-at-deploy>
+            <drop-tables-at-undeploy>true</drop-tables-at-undeploy>
+        </cmp-resource>
+    </enterprise-beans>
+    <keep-state>true</keep-state>
 </glassfish-ejb-jar>
 ----
 
@@ -590,7 +586,8 @@ sun-cmp-mappings
 ----
 
 .A sample database schema definition:
-[source,roomsql]
+
+[source, sql]
 ----
 create table TEAMEJB (
    TEAMID varchar2(256) not null,
@@ -598,35 +595,32 @@ create table TEAMEJB (
    CITY char(30) not null,
    LEAGUEEJB_LEAGUEID varchar2(256) null,
    constraint PK_TEAMEJB primary key (TEAMID)
-)
+);
+
 create table PLAYEREJB (
    POSITION varchar2(15) null,
    PLAYERID varchar2(256) not null,
    NAME char(64) null,
    SALARY number(10, 2) not null,
    constraint PK_PLAYEREJB primary key (PLAYERID)
-)
+);
+
 create table LEAGUEEJB (
    LEAGUEID varchar2(256) not null,
    NAME varchar2(256) null,
    SPORT varchar2(256) null,
-   constraint PK_LEAGUEEJB primary key (LEAGUEID)
-)
+);
+
 create table PLAYEREJBTEAMEJB (
    PLAYEREJB_PLAYERID varchar2(256) null,
    TEAMEJB_TEAMID varchar2(256) null
-)
-alter table TEAMEJB
-   add constraint FK_LEAGUE foreign key (LEAGUEEJB_LEAGUEID)
-   references LEAGUEEJB (LEAGUEID)
+);
 
-alter table PLAYEREJBTEAMEJB
-   add constraint FK_TEAMS foreign key (PLAYEREJB_PLAYERID)
-   references PLAYEREJB (PLAYERID)
+alter table TEAMEJB add constraint FK_LEAGUE foreign key (LEAGUEEJB_LEAGUEID) references LEAGUEEJB (LEAGUEID);
 
-alter table PLAYEREJBTEAMEJB
-   add constraint FK_PLAYERS foreign key (TEAMEJB_TEAMID)
-   references TEAMEJB (TEAMID)
+alter table PLAYEREJBTEAMEJB add constraint FK_TEAMS foreign key (PLAYEREJB_PLAYERID) references PLAYEREJB (PLAYERID);
+
+alter table PLAYEREJBTEAMEJB add constraint FK_PLAYERS foreign key (TEAMEJB_TEAMID) references TEAMEJB (TEAMID);
 ----
 
 .A corresponding sample `sun-cmp-mappings.xml` file:
@@ -809,9 +803,8 @@ glassfish-application-client
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE glassfish-application-client PUBLIC ""-//GlassFish.org//DTD 
-GlassFish Application Server 3.1 Application Client 6.0//EN"" 
-"http://glassfish.org/dtds/glassfish-application-client_6_0-1.dtd">
+<!DOCTYPE glassfish-application-client
+"http://glassfish.org/dtds/glassfish-application-client_6_0-2.dtd">
 <glassfish-application-client>
   <message-destination-ref>
     <message-destination-ref-name>ClientQueue</message-destination-ref-name>
@@ -824,7 +817,8 @@ GlassFish Application Server 3.1 Application Client 6.0//EN""
 == The sun-acc.xml File
 
 The `sun-acc.xml` file configures the Application Client Container. This is more of a configuration file than a deployment descriptor.
-Payara Server provides a default file in the domain-dir`/config` directory. Specifying a different file is optional. The element hierarchy is as follows:
+
+Payara Server provides a default file in the `domain-dir/config` directory. Specifying a different file is optional. The element hierarchy is as follows:
 
 [source,text]
 ----
@@ -901,20 +895,22 @@ resources
 .  .  group-map
 ----
 
+//TODO - Assess whether such support should be properly removed in the future
+
 [[weblogic-server-deployment-descriptor-support-in-payara-server]]
 == WebLogic Server Deployment Descriptor Support in Payara Server
 
 Payara Server offers limited support for the `weblogic-application.xml`, `weblogic.xml`, and `weblogic-webservices.xml` deployment descriptor files.
 
-The only element in `weblogic-application.xml` that Payra Server supports is `security`. The equivalent element in the `glassfish-application.xml` file is `security-role-mapping`.
+The only element in `weblogic-application.xml` that Payara Server supports is `security`. The equivalent element in the `glassfish-application.xml` file is `security-role-mapping`.
 
-The elements of `weblogic.xml` that GlassFish Server supports are explained in the following table.
+The elements of `weblogic.xml` that Payara Server supports are explained in the following table.
 
 .`weblogic.xml` Support in Payara Server
 
 [cols="2,6",options="header"]
 |===
-| `weblogic.xml` Element Name | Payara Server Support
+| *`weblogic.xml` Element Name* | *Payara Server Support*
 
 | `role-name` under `security-role-assignment`
 | `role-name` under `security-role-mapping` `glassfish-web.xml` equivalent
@@ -1005,17 +1001,16 @@ The elements of `weblogic.xml` that GlassFish Server supports are explained in t
 
 |===
 
-
 The elements of `weblogic-webservices.xml` that Payara Server supports are explained in the following table.
 
 .`weblogic-webservices.xml` Support in Payara Server
 [cols="3,6",options="header"]
 |===
-| `weblogic-webservices.xml` Element Name | Payara Server Support
+| *`weblogic-webservices.xml` Element Name* | *Payara Server Support*
 
 | `webservice-type`
-| Possible values are `JAXRPC` or `JAXWS`. Payara Server does not support JAX-RPC web services with JSR 181 annotations.
-The use of this element is limited, because the container can find out if the type is JAX-WS or JAX-RPC based on presence of JSR 181 annotations.
+| Possible values are `JAXRPC` or `JAXWS`. Payara Server does not support JAX-RPC web services with Jakarta Web Services Metadata annotations.
+The use of this element is limited, because the container can find out if the type is JAX-WS or JAX-RPC based on presence of Jakarta Web Services Metadata annotations.
 
 | `wsdl-publish-file`
 | Same as `wsdl-publish-location` in `glassfish-web.xml`

@@ -1,7 +1,7 @@
 [[create-service]]
 = create-service
 
-configures the starting of a DAS or a \{product---name} instance on an unattended boot
+configures the starting of a DAS or a Payara Server instance on an unattended boot
 
 [[synopsis]]
 == Synopsis
@@ -21,7 +21,7 @@ asadmin [asadmin-options] create-service [--help]
 [[description]]
 == Description
 
-The `create-service` subcommand configures the starting of a domain administration server (DAS) or a \{product---name} instance on an
+The `create-service` subcommand configures the starting of a domain administration server (DAS) or a Payara Server instance on an
 unattended boot on Windows, Linux, and Oracle Solaris systems.
 
 If no operand is specified and the domains directory contains only one domain, the subcommand configures the starting of the DAS for the
@@ -35,37 +35,37 @@ The subcommand contains internal logic to determine whether the supplied operand
 
 This subcommand is supported in local mode only.
 
-Behavior of `create-service` on Windows Systems
+*Behavior of `create-service` on Windows Systems*
 
 On Windows systems, the `create-service` subcommand creates a Windows service to represent the DAS or instance. The service is created in the
 disabled state. After this subcommand creates the service, you must use the Windows Services Manager or the Windows Services Wrapper to start, stop, uninstall, or install the service.
 
 On Windows systems, this subcommand must be run as the OS-level administrator user.
 
-The subcommand creates the following Windows Services Wrapper files for the service in the domain-dir`\bin` directory or the instance-dir`\bin` directory:
+The subcommand creates the following Windows Services Wrapper files for the service in the `domain-dir\bin` directory or the `instance-dir\bin` directory:
 
-* Configuration file: service-name`Service.xml`
-* Executable file: service-name`Service.exe`
+* Configuration file: service-name `Service.xml`
+* Executable file: service-name `Service.exe`
 
 On Windows systems, this subcommand requires the http://www.microsoft.com/net/[Microsoft .NET Framework] (http://www.microsoft.com/net/). Otherwise, the subcommand fails.
 
-Behavior of `create-service` on Linux Systems
+*Behavior of `create-service` on Linux Systems*
 
 On Linux systems, the `create-service` subcommand creates a System-V-style initialization script
-`/etc/init.d/GlassFish_`domain-or-instance-name and installs a link to this script in the `/etc/rc?.d` directories. After this subcommand
+`/etc/init.d/GlassFish_`domain-or-instance-name` and installs a link to this script in the `/etc/rc?.d` directories. After this subcommand
 creates the script, you must use this script to start, stop, or restart the domain or instance.
 
 On Linux systems, this subcommand must be run as the OS-level root user.
 
-Behavior of `create-service` on Oracle Solaris Systems
+*Behavior of `create-service` on Oracle Solaris Systems*
 
 On Oracle Solaris systems, the `create-service` subcommand creates a Service Management Facility (SMF) service to represent the DAS or
 instance. The service is created in the disabled state. After this subcommand creates the service, you must use SMF commands to start,
 enable, disable, delete, or stop the service. For more information about SMF, see the following documentation for the Oracle Solaris operating system:
 
-* "http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=SYSADV1hbrunlevels-25516[Managing
-Services (Overview)]" in System Administration Guide: Basic Administration
-* "http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=SYSADV1faauf[Managing Services (Tasks)]" in System Administration Guide: Basic Administration
+* http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=SYSADV1hbrunlevels-25516[Managing
+Services (Overview)] in System Administration Guide: Basic Administration
+* http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=SYSADV1faauf[Managing Services (Tasks)] in System Administration Guide: Basic Administration
 
 On Oracle Solaris systems, this subcommand must be run as the OS-level user with superuser privileges. The configuration file for the DAS or
 instance must be stored in a directory to which the superuser has access and cannot be stored on a network file system. The service that is
@@ -79,19 +79,19 @@ On Oracle Solaris systems, the manifest file is created in the following directo
 ----
 
 To run this subcommand, you must have `solaris.smf.*` authorization. For information about how to grant authorizations to users, see the
-http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Museradd-1m[`useradd`(1M)]
-and http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Musermod-1m[`usermod`(1M)] man pages.
+http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Museradd-1m[`useradd`]
+and http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Musermod-1m[`usermod`] man pages.
 
 To run these commands as non-root user, the system administrator must be
 contacted so that the relevant authorizations are granted. You must also ensure that the following conditions are met:
 
-* Oracle Solaris 10 administration commands such as http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Msvccfg-1m[`svccfg`(1M)],
+* Oracle Solaris 10 administration commands such as http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Msvccfg-1m[`svccfg`],
 http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1svcs-1[`svcs`], and
 http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1auths-1[`auths`]
 are available through the `PATH` statement, so that these commands can be executed. A simple test to do so is to run the command `which svccfg` in the shell.
 * You must have write permission for the path `/var/svc/manifest/application/GlassFish`. Usually, the superuser has write permission to this path.
 
-If you delete a service that you created by using the `create-service`subcommand, you must delete the directory that contains the manifest
+If you delete a service that you created by using the `create-service` subcommand, you must delete the directory that contains the manifest
 file and the entire contents of the directory. Otherwise, an attempt to re-create the service by using the `create-service` subcommand fails.
 The Oracle Solaris command `svccfg` does not delete this directory.
 
@@ -124,8 +124,8 @@ asadmin-options::
   `false`;;
     The service is not created (default).
 `--serviceuser`::
-  (Linux systems only) The user that is to run the \{product---name} software when the service is started. The default is the user that is
-  running the subcommand. Specify this option if the \{product---name} software is to be run by a user other than the root user.
+  (Linux systems only) The user that is to run the Payara Server software when the service is started. The default is the user that is
+  running the subcommand. Specify this option if the Payara Server software is to be run by a user other than the root user.
 `--domaindir`::
   The absolute path of the directory on the disk that contains the configuration of the domain. If this option is specified, the operand must specify a domain.
 `--nodedir`::
@@ -147,6 +147,8 @@ domain-or-instance-name::
 *Example 1 Creating a Service on a Windows System*
 
 This example creates a service for the default domain on a system that is running Windows.
+
+//TODO - Verify if the output of the create service command prints out GlassFish Server in the display name
 
 [source,shell]
 ----
@@ -232,12 +234,12 @@ Command create-service executed successfully.
 
 *See Also*
 
-* xref:asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:asadmin.adoc#asadmin-1m[`asadmin`],
 * http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1auths-1[`auths`],
 * http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1svcs-1[`svcs`]
-* http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Msvccfg-1m[`svccfg`(1M)],
-* http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Museradd-1m[`useradd`(1M)],
-* http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Musermod-1m[`usermod`(1M)]
+* http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Msvccfg-1m[`svccfg`],
+* http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Museradd-1m[`useradd`],
+* http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Musermod-1m[`usermod`]
 * "http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=SYSADV1hbrunlevels-25516[Managing Services (Overview)]" in System Administration Guide: Basic Administration,
 * "http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=SYSADV1faauf[Managing Services (Tasks)]" in System Administration Guide: Basic Administration Microsoft .NET Framework (`http://www.microsoft.com/net/`)
 

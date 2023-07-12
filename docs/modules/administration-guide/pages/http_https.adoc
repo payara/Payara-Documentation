@@ -1,7 +1,7 @@
 [[administering-internet-connectivity]]
 = Administering Internet Connectivity
 
-This chapter provides procedures for performing internet connectivity tasks in the Payara Server 5.0 environment by using the `asadmin` command-line utility.
+This chapter provides procedures for performing internet connectivity tasks in the Payara Server environment by using the `asadmin` command-line utility.
 
 Instructions for accomplishing the tasks in this chapter by using the Administration Console are contained in the Administration Console online help.
 
@@ -139,7 +139,7 @@ Remote subcommands require a running server.
 Information about options and properties for the subcommand are included in this help page.
 
 [[example-to-create-a-protocol]]
-.Example
+=== Example 13-1 Creating an HTTP Protocol
 
 This example creates a protocol named `http-1` with security enabled.
 
@@ -162,7 +162,7 @@ HTTP protocols.
 . List the existing protocols by using the xref:docs:reference-manual:list-protocols.adoc[`list-protocols`] subcommand.
 
 [[example-to-list-protocols]]
-.Example
+Example 13-2 Listing the Protocols
 
 This example lists the existing protocols.
 
@@ -188,7 +188,7 @@ protocol.
 . Delete a protocol by using the xref:docs:reference-manual:delete-protocol.adoc[`delete-protocol`] subcommand
 
 [[example-to-delete-a-protocol]]
-.Example
+==== Example 13-3 Deleting a Protocol
 
 This example deletes the protocol named `http-1`.
 
@@ -207,7 +207,7 @@ Each HTTP listener has an HTTP configuration, which is created either by using t
 configurations that are applied when you follow the instructions in xref:docs:administration-guide:http_https.adoc#to-create-an-http-network-listener[To Create an HTTP Network Listener].
 
 [[to-create-an-http-configuration]]
-==== To Create an HTTP Configuration
+==== *To Create an HTTP Configuration*
 
 Use the `create-http` subcommand in remote mode to create a set of HTTP parameters for a protocol. This set of parameters configures one or more
 network listeners,
@@ -217,7 +217,7 @@ network listeners,
 Information about options and properties for the subcommand are included in this help page.
 
 [[example-to-create-an-http-configuration]]
-.Example
+==== Example 13-4 Creating an HTTP Configuration
 
 This example creates an HTTP parameter set for the protocol named `http-1`.
 
@@ -230,7 +230,7 @@ Command create-http executed successfully.
 You can also view the full syntax and options of the subcommand by typing `asadmin help create-http` at the command line.
 
 [[to-delete-an-http-configuration]]
-==== To Delete an HTTP Configuration
+==== *To Delete an HTTP Configuration*
 
 Use the `delete-http` subcommand in remote mode to remove HTTP parameters from a protocol.
 
@@ -238,7 +238,7 @@ Use the `delete-http` subcommand in remote mode to remove HTTP parameters from a
 . Delete the HTTP parameters from a protocol by using the xref:docs:reference-manual:delete-http.adoc[`delete-http`] subcommand.
 
 [[example-to-delete-an-http-configuration]]
-.Example
+==== Example 13-5 Deleting an HTTP Configuration
 
 This example deletes the HTTP parameter set from a protocol named `http-1`.
 
@@ -262,11 +262,11 @@ transports that are applied when you follow the instructions in xref:docs:admini
 Use the `create-transport` subcommand in remote mode to create a transport for a network listener,
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. reate a transport by using the xref:docs:reference-manual:create-transport.adoc[`create-transport`]
+. Create a transport by using the xref:docs:reference-manual:create-transport.adoc[`create-transport`]
 subcommand. Information about options and properties for the subcommand are includedin this help page.
 
 [[example-to-create-a-transport]]
-.Example
+==== Example 13-6 Creating a Transport
 
 This example creates a transport named `http1-trans` that uses a non-default number of acceptor threads.
 
@@ -287,18 +287,31 @@ Use the `list-transports` subcommand in remote mode to list the existing HTTP tr
 . List the existing transports by using the xref:docs:reference-manual:list-transports.adoc[`list-transports`] subcommand.
 
 [[example-to-list-transports]]
-.Example
+==== Example 13-7 Listing HTTP Transports
 
 This example lists the existing transports.
 
 [source,shell]
 ----
 asadmin> list-transports
+Enter the value for the target operand> server
 http1-trans
 tcp
 Command list-transports executed successfully.
 ----
 
+The values for target operand are as follows:
+
+target::
+Restricts the listing to transports for a specified target. Valid values are as follows: +
+`server`;;
+Lists the transports for the default server instance. This is the default value.
+configuration-name;;
+Lists the transports for the specified configuration.
+cluster-name;;
+Lists the transports for all server instances in the specified cluster.
+instance-name;;
+Lists the transports for the specified server instance.
 You can also view the full syntax and options of the subcommand by typing `asadmin help list-transports` at the command line.
 
 [[to-delete-a-transport]]
@@ -310,7 +323,7 @@ Use the `delete-transport` subcommand in remote mode to remove a transport.
 . Delete a transport by using the xref:docs:reference-manual:delete-transport.adoc[`delete-transport`] subcommand.
 
 [[example-to-delete-a-transport]]
-.Example
+==== Example 13-8D eleting a Transport
 
 This example deletes he transport named `http1-trans`.
 
@@ -341,7 +354,7 @@ xref:docs:reference-manual:create-http-listener.adoc[`create-http-listener`] sub
 xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[exampleto-create-an-http-network-listener]]
-.Example
+==== Example 13-9 Creating an HTTP Listener
 
 This example creates an HTTP listener named `sampleListener` that uses a non-default number of acceptor threads. Security is not enabled at runtime.
 
@@ -355,7 +368,7 @@ Command create-http-listener executed successfully.
 ----
 
 [[exampleto-create-an-http-network-listener-2]]
-.Example
+==== Example 13-10 Creating a Network Listener
 
 This example a network listener named `sampleListener` that is not enabled at runtime:
 
@@ -378,7 +391,7 @@ Use the `list-http-listeners` subcommand or the `list-network-listeners` subcomm
 xref:docs:reference-manual:list-network-listeners.adoc[`list-network-listeners`] subcommand.
 
 [[example-to-list-http-network-listeners]]
-.Example Listing HTTP Listeners*
+==== Example 13-11 Listing HTTP Listeners*
 
 This example lists the HTTP listeners. The same output is given if you use the `list-network-listeners` subcommand.
 
@@ -402,7 +415,8 @@ xref:docs:reference-manual:list-network-listeners.adoc[`list-network-listeners`]
 The listener is identified by its dotted name.
 
 [[example-to-update-an-http-network-listener]]
-.Example
+==== Example 13-12 Updating an HTTP Network Listener
+
 This example changes `security-enabled` to `false` on `http-listener-2`.
 
 [source,shell]
@@ -424,7 +438,7 @@ xref:docs:reference-manual:delete-network-listener.adoc[`delete-network-listener
 . To apply your changes, restart Payara Server. See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-to-delete-an-http-network-listener]]
-.Example
+==== Example 13-13 Deleting an HTTP Listener
 
 This example deletes the HTTP listener named `sampleListener`:
 
@@ -449,7 +463,7 @@ Remote subcommands require a running server.
 . To apply your changes, restart Payara Server. See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-to-configure-an-http-listener-for-ssl]]
-.Example
+==== Example 13-14 Configuring an HTTP Listener for SSL
 
 This example enables the HTTP listener named `http-listener-1` for SSL:
 
@@ -499,7 +513,7 @@ Remote subcommands require a running server.
 . To apply your changes, restart Payara Server. See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-to-delete-ssl-from-an-http-listener]]
-.Example
+==== Example 13-15 Deleting SSL From an HTTP Listener
 
 This example disables SSL for the HTTP listener named `http-listener-1`:
 
@@ -530,7 +544,7 @@ A virtual server is a virtual web server that serves content targeted for a spec
 
 When you first install Payara Server, a default virtual server is created. You can assign a default virtual server to each new HTTP listener you create.
 
-Web applications and Java EE applications containing web components (web modules) can be assigned to virtual servers during deployment. A web module can be assigned to more than one virtual server, and a virtual server can have more than one web module assigned to it. If you deploy a web application and don't specify any assigned virtual servers, the web application is assigned to all currently defined virtual servers. If you then create additional virtual servers and want to assign existing web applications to them, you must redeploy the web applications. For more information about deployment, see the xref:docs:application-deployment-guide:overview.adoc[Payara Server Application Deployment Guide].
+Web applications and Jakarta EE applications containing web components (web modules) can be assigned to virtual servers during deployment. A web module can be assigned to more than one virtual server, and a virtual server can have more than one web module assigned to it. If you deploy a web application and don't specify any assigned virtual servers, the web application is assigned to all currently defined virtual servers. If you then create additional virtual servers and want to assign existing web applications to them, you must redeploy the web applications. For more information about deployment, see the xref:docs:application-deployment-guide:overview.adoc[Payara Server Application Deployment Guide].
 
 You can define virtual server properties using the `asadmin set` command. For example:
 
@@ -566,16 +580,18 @@ used by another virtual server, create at least one HTTP listener before creatin
 Remote subcommands require a running server.
 . Create a virtual server by using the xref:docs:reference-manual:create-virtual-server.adoc[`create-virtual-server`] subcommand. +
 Information about properties for this subcommand is included in this help page.
-. To apply your changes, restart Payara Server. +See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
+. To apply your changes, restart Payara Server. +
+See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-to-create-a-virtual-server]]
-.Example
+==== Example 13-16 Creating a Virtual Server
 
 This example creates a virtual server named `sampleServer` on `localhost`.
 
 [source,shell]
 ----
-asadmin> create-virtual-server sampleServer
+asadmin> create-virtual-server --hosts pigeon,localhost
+--property authRealm=ldap sampleServer
 Command create-virtual-server executed successfully.
 ----
 
@@ -590,7 +606,7 @@ Use the `list-virtual-servers` subcommand in remote mode to list the existing vi
 . List virtual servers by using the xref:docs:reference-manual:list-virtual-servers.adoc[`list-virtual-servers`] subcommand.
 
 [[example-to-list-virtual-servers]]
-.Example
+==== Example 13-17 Listing Virtual Servers
 
 This example lists the virtual servers for `localhost`.
 
@@ -625,7 +641,7 @@ Use the `delete-virtual-server` subcommand in remote mode to delete an existing 
 . To apply your changes, restart Payara Server. See xref:docs:administration-guide:domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-to-delete-a-virtual-server]]
-.Example
+==== Example 13-18 Deleting a Virtual Server
 
 This example deletes the virtual server named `sampleServer` from `localhost`.
 
@@ -649,7 +665,7 @@ http://myvserver:3184/
 ----
 
 A virtual server with no default web module assigned serves HTML or JavaServer Pages ( JSP) content from its document root, which is usually
-domain-dir`/docroot`. To access this HTML or JSP content, point your browser to the URL for the virtual server, do not supply a context root,
+`domain-dir/docroot`. To access this HTML or JSP content, point your browser to the URL for the virtual server, do not supply a context root,
 but specify the target file.
 
 For example:

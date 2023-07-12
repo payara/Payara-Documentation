@@ -1,49 +1,55 @@
 [[deploying-applications]]
 = Deploying Applications
 
-This chapter provides procedures and guidelines for deploying applications and modules in the Payara Server Open Source Edition environment by using the `asadmin`
-command-line utility.
-
-Instructions for accomplishing these tasks by using the Administration Console are contained in the Administration Console online help.
+This chapter provides procedures and guidelines for deploying applications and modules in the Payara Server environment by using the `asadmin`command-line utility.
 
 [[deploying-applications-and-modules]]
 == Deploying Applications and Modules
 
 Application deployment is a dynamic process, which means that deployed applications and modules become available without requiring you to restart the server instance.
-Dynamic deployment can be useful in production environments to bring new applications and modules online easily. If you do restart the server, all deployed components
-are still deployed and available.
+
+Dynamic deployment can be useful in production environments to bring new applications and modules online easily. If you do restart the server, all deployed components are still deployed and available.
+
+The following topics are addressed here:
+
+* xref:to-deploy-an-application-or-module[To Deploy an Application or Module]
+* xref:to-change-targets-for-a-deployed-application-or-module[To Change Targets for a Deployed application or Module]
+* xref:to-list-deployed-applications-or-modules[To List Deployed Applications or Modules]
+* xref:to-redeploy-an-application-or-module[To Redeploy an Application or Module]
+* xref:to-disable-an-application-or-module[To Disable an Application or Module]
+* xref:to-enable-an-application-or-module[To Enable an Application or Module]
+* xref:to-undeploy-an-application-or-module[To Undeploy an Application or Module]
+* xref:to-reload-changes-to-applications-or-modules-dynamically[To Reload Changes to Applications or Modules Dynamically]
+* xref:to-deploy-an-application-or-module-automatically[To Deploy an Application or Module Automatically]
+* xref:to-deploy-an-application-or-module-by-using-a-deployment-plan[To Deploy an Application or Module by Using a Deployment Plan]
+* xref:to-deploy-an-application-or-module-in-a-directory-format[To Deploy an Application or Module in a Directory Format]
 
 Instructions for accomplishing these tasks by using the Administration Console are contained in the Administration Console online help.
 
 [[to-deploy-an-application-or-module]]
 ===  To Deploy an Application or Module
 
-Use the `deploy` subcommand in remote mode to deploy an assembled application or module to Payara Server. If an error occurs during deployment, the application or module
-is not deployed. If a module within an application contains an error, the entire application is not deployed. These failures prevent a partial deployment
+Use the `deploy` subcommand in remote mode to deploy an assembled application or module to Payara Server. If an error occurs during deployment, the application or module is not deployed. If a module within an application contains an error, the entire application is not deployed. These failures prevent a partial deployment
 that could leave the server in an inconsistent state.
 
-By default, the deployment target is the default server instance, `server`. To deploy only to the default server instance, specify no target.
-If you deploy the application or module only to the domain target, it exists in the domain central repository, but no server instances or clusters
-can reference the component unless you add references.
+By default, the deployment target is the default server instance, `server`. To deploy only to the default server instance, specify no target. If you deploy the application or module only to the domain target, it exists in the domain central repository, but no server instances or clusters can reference the component unless you add references.
 
 You can also deploy a component to a specific stand-alone server instance or cluster.
-When you deploy to server instances or clusters, the application or module exists in the domain's central repository and is referenced by any clusters or
-server instances that you deployed to. For a cluster, the preselected deployment target is `server`.
+When you deploy to server instances or clusters, the application or module exists in the domain's central repository and is referenced by any clusters or server instances that you deployed to. For a cluster, the preselected deployment target is `server`.
 
-If the component is already deployed or already exists, you can forcefully redeploy if you set the `--force` option of the `deploy` subcommand to true.
-The `redeploy` subcommand also accomplishes this. See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2-10[Example 2-10].
+If the component is already deployed or already exists, you can forcefully redeploy if you set the `--force` option of the `deploy` subcommand to true. The `redeploy` subcommand also accomplishes this. See xref:example-2-10[Example 2-10].
 You can see the enabled or disabled status of an application or module by using the xref:docs:reference-manual:show-component-status.adoc[`show-component-status`] subcommand.
 
-For information about how the application or module name is derived, see xref:docs:application-deployment-guide:overview.adoc#naming-standards[Naming Standards].
+For information about how the application or module name is derived, see link:overview.adoc#naming-standards[Naming Standards].
 
 Use the `--altdd` or `--runtimealtdd` options of the `deploy` (and `redeploy`) subcommand to deploy an application or module using a top-level alternate deployment descriptor.
-The `--altdd` option specifies a top-level alternate Java EE standard deployment descriptor. The `--runtimealtdd` option specifies a top-level alternate Payara Server runtime deployment descriptor.
-See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2-3[Example 2-3].
+The `--altdd` option specifies a top-level alternate Jakarta EE standard deployment descriptor. The `--runtimealtdd` option specifies a top-level alternate Payara Server runtime deployment descriptor.
+See xref:example-2-3[Example 2-3].
 For more information about deployment descriptors associated with Payara Server, see xref:docs:application-deployment-guide:overview.adoc#deployment-descriptors-and-annotations[Deployment Descriptors and Annotations].
 
 You can also specify the deployment order of an application by using the `--deploymentorder` option of the `deploy` (and `redeploy`) subcommand.
 This is useful for applications that must be loaded in a certain order at server startup. Applications with lower deployment order numbers are loaded first.
-See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2-4[Example 2-4].
+See xref:example-2-4[Example 2-4].
 If a deployment order is not specified at the time an application is deployed, the default deployment order of 100 is assigned.
 If two applications have the same deployment order, the application that was deployed first is loaded first at server startup.
 
@@ -78,7 +84,7 @@ Command deploy executed successfully
 ----
 
 [[example-2-3]]
-==== *Example 2-3* Using an Alternate Java EE Standard Deployment Descriptor
+==== *Example 2-3* Using an Alternate Jakarta EE Standard Deployment Descriptor
 
 This example deploys an application using an alternate Jakarta EE standard deployment descriptor file that resides outside of an application archive.
 Specify an absolute path or a relative path to the alternate deployment descriptor file.
@@ -179,11 +185,15 @@ Use the `redeploy` subcommand in remote mode to overwrite a previously-deployed 
 option of the `deploy` subcommand. Whenever a redeployment is done, the HTTP and SFSB sessions in transit at that time, and the EJB timers,
 become invalid unless you use the `--keepstate=true` option of the `redeploy` subcommand.
 
-Before You Begin, You must remove a preconfigured resource before it can be updated.
+*Before You Begin* +
+You must remove a preconfigured resource before it can be updated.
 
-. Ensure that the server is running. Remote commands require a running server.
+. Ensure that the server is running.
++
+Remote commands require a running server.
 . Redeploy an application or module by using the
-xref:docs:reference-manual:redeploy.adoc[`redeploy`] subcommand or the xref:docs:reference-manual:deploy.adoc[`deploy`] subcommand with the `--force` option. +
+xref:docs:reference-manual:redeploy.adoc[`redeploy`] subcommand or the xref:docs:reference-manual:deploy.adoc[`deploy`] subcommand with the `--force` option.
++
 Information about the options and properties of these commands is included in these help pages.
 
 [[example-2-8]]
@@ -385,7 +395,7 @@ Automatic deployment is enabled by default, and is available only on the default
 This sets the interval at which applications and modules are checked for code changes and dynamically reloaded. The default is `2`.
 . Use the xref:docs:reference-manual:set.adoc[`set`] subcommand to enable JSP precompilation.
 . Copy your archive file to the auto-deploy directory. +
-The default location is domain-dir`/autodeploy`. The application will be deployed at the next interval. +
+The default location is `__domain-dir__/autodeploy`. The application will be deployed at the next interval. +
 To undeploy an automatically deployed application or module, remove its archive file from the auto-deploy directory. +
 
 NOTE: Deployment directories might change between Payara Server releases.
@@ -419,7 +429,7 @@ TIP: You can also view the full syntax and options of the subcommand by typing `
 === To Deploy an Application or Module by Using a Deployment Plan
 
 In the deployment plan for an EAR file, the `glassfish-application.xml` file is located at the root.
-The deployment descriptor for each module is stored according to this syntax: module-name.gf-dd-name, where the gf-dd-name depends on the module type.
+The deployment descriptor for each module is stored according to this syntax: __module-name.gf-dd-name__, where the __gf-dd-name__ depends on the module type.
 If a module named `MyModule` contains a CMP mappings file, the file is named `MyModule.sun-cmp-mappings.xml`. A `.dbschema` file is stored at the root level.
 Each `/` (forward slash) is replaced by a `#` (pound sign).
 
@@ -473,9 +483,6 @@ $ jar r -tvf myotherplan.jar
 84805 Thu Mar 13 15:24:20 PST 2003 RosterSchema.dbschema
 ----
 
-The deployment plan is part of the implementation of JSR 88. For more information about JSR 88, see
-xref:overview.adoc#jsr-88-client[JSR 88 Client] and the JSR 88 page at `http://jcp.org/en/jsr/detail?id=88`.
-
 [[to-deploy-an-application-or-module-in-a-directory-format]]
 === To Deploy an Application or Module in a Directory Format
 
@@ -486,12 +493,12 @@ An expanded directory, also known as an exploded directory, contains an unassemb
 To deploy a directory format instead of an archive, file, use the `asadmin deploy` subcommand in remote mode and specify a path to a directory instead of to an archive file.
 The contents of the directory must be the same as the contents of a corresponding archive file, with one exception.
 An application archive file contains archive files for its modules, for example `myUI.war` and `myEJB.jar`.
-The expanded application directory contains expanded directories for the modules, for example `myUI_war` and `myEJB_jar`, instead. .
+The expanded application directory contains expanded directories for the modules, for example `myUI_war` and `myEJB_jar`, instead.
 
 You can change deployment descriptor files directly in the expanded directory.
 
 If your environment is configured to use dynamic reloading, you can also dynamically reload applications or modules that are deployed from the directory. For instructions,
-see xref:docs:application-deployment-guide:deploying-applications.adoc#to-reload-changes-to-applications-or-modules-dynamically[To Reload Changes to Applications or Modules Dynamically].
+see xref:to-reload-changes-to-applications-or-modules-dynamically[To Reload Changes to Applications or Modules Dynamically].
 
 Unlike archive file deployment, directory deployment does not copy the directory contents to the remote hosts.
 This means that for deployment to a cluster, the directory path may exist for both the DAS and the remote server instances but may not actually correspond to the same physical location.
@@ -499,7 +506,8 @@ If any target server instance cannot see the deployed directory, or finds that i
 
 Integrated development environments (IDEs) typically use directory deployment, so you do not need to deal directly with the expanded format.
 
-Before You Begin, on each cluster or stand-alone server instance to which the application or module is deployed,
+*Before You Begin* +
+On each cluster or stand-alone server instance to which the application or module is deployed,
 the directory must be accessible and must contain the same files as found by the DAS.
 
 On Windows, if you are deploying a directory on a mapped drive, you must be running Payara Server as the same user to which the mapped drive is assigned. This enables Payara Server to access the directory.
@@ -534,6 +542,15 @@ The instructions in this section enable you to change the configuration of a dep
 descriptors and repackage and redeploy the application. If the application or module entry is unset, its value reverts to the value, if any,
 that is set in the application's deployment descriptor.
 
+The following topics are addressed here:
+
+* xref:to-set-a-web-context-parameter[To Set a Web Context Parameter]
+* xref:to-unset-a-web-context-parameter[To Unset a Web Context Parameter]
+* xref:to-list-web-context-parameters[To List Web Context Parameters]
+* xref:to-set-a-web-environment-entry[To Set a Web Environment Entry]
+* xref:to-unset-a-web-environment-entry[To Unset a Web Environment Entry]
+* xref:to-list-web-environment-entries[To List Web Environment Entries]
+
 [[to-set-a-web-context-parameter]]
 === To Set a Web Context Parameter
 
@@ -549,20 +566,24 @@ This subcommand sets a servlet context-initialization parameter of one of the fo
 * A deployed web application
 * A web module in a deployed Jakarta EE application
 
-Before You Begin, the application must already be deployed. Otherwise, an error occurs.
+*Before You Begin* +
+The application must already be deployed. Otherwise, an error occurs.
 
-. Ensure that the server is running. Remote commands require a running server.
-.  Set a servlet context-initialization parameter by using the xref:docs:reference-manual:set-web-context-param.adoc[`set-web-context-param`] subcommand. +
+. Ensure that the server is running.
++
+Remote commands require a running server.
+. Set a servlet context-initialization parameter by using the xref:docs:reference-manual:set-web-context-param.adoc[`set-web-context-param`] subcommand.
++
 Information about the options for the subcommand is included in this help page.
 
 [[example-2-22]]
 ==== *Example 2-22* Setting a Servlet Context-Initialization Parameter for a Web Application
 
-This example sets the servlet context-initialization parameter `javax.faces.STATE_SAVING_METHOD` of the web application `basic-ezcomp` to client.
+This example sets the servlet context-initialization parameter ` jakarta.faces.STATE_SAVING_METHOD` of the web application `basic-ezcomp` to client.
 
 [source,shell]
 ----
-asadmin> set-web-context-param --name=javax.faces.STATE_SAVING_METHOD
+asadmin> set-web-context-param --name= jakarta.faces.STATE_SAVING_METHOD
 --description="The location where the application?s state is preserved"
 --value=client basic-ezcomp
 Command set-web-context-param executed successfully.
@@ -584,21 +605,25 @@ This subcommand unsets an environment entry for one of the following items:
 When an entry is unset, its value reverts to the value, if any, that is set in the application's deployment descriptor. This subcommand cannot be used to change the value of an environment entry that is set in an application's deployment descriptor.
 Instead, use the xref:docs:reference-manual:set-web-context-param.adoc[`set-web-context-param`] subcommand for this purpose.
 
-Before You Begin, the application must already be deployed, and the entry must have previously been set by using the `set-web-env-entry` subcommand. Otherwise, an error occurs.
+*Before You Begin* +
+The application must already be deployed, and the entry must have previously been set by using the `set-web-env-entry` subcommand. Otherwise, an error occurs.
 
-. Ensure that the server is running. Remote commands require a running server.
-. Unset an environment entry by using the xref:docs:reference-manual:unset-web-context-param.adoc[`unset-web-context-param`] subcommand. +
+. Ensure that the server is running.
++
+Remote commands require a running server.
+. Unset an environment entry by using the xref:docs:reference-manual:unset-web-context-param.adoc[`unset-web-context-param`] subcommand.
++
 Information about the options for the subcommand is included in this help page.
 
 [[example-2-23]]
 ==== *Example 2-23* Unsetting a Servlet Context-Initialization Parameter for a Web Application
 
-This example unsets the servlet context-initialization parameter `javax.faces.STATE_SAVING_METHOD` of the web application `basic-ezcomp`.
+This example unsets the servlet context-initialization parameter ` jakarta.faces.STATE_SAVING_METHOD` of the web application `basic-ezcomp`.
 
 [source,shell]
 ----
 asadmin> unset-web-context-param
---name=javax.faces.STATE_SAVING_METHOD basic-ezcomp
+--name= jakarta.faces.STATE_SAVING_METHOD basic-ezcomp
 Command unset-web-context-param executed successfully.
 ----
 
@@ -615,21 +640,23 @@ The subcommand does not list parameters that are set only in the application's d
 * The value of the `--ignoreDescriptorItem` option of the `set-web-context-param` subcommand that was specified when the parameter was set
 * The description of the parameter or `null` if no description was specified when the parameter was set
 
-. Ensure that the server is running. Remote commands require a running server.
+. Ensure that the server is running.
++
+Remote commands require a running server.
 . List servlet context-initialization parameters by using the xref:docs:reference-manual:list-web-context-param.adoc[`list-web-context-param`] subcommand.
 
 [[example-2-24]]
 ==== *Example 2-24* Listing Servlet Context-Initialization Parameters for a Web Application
 
 This example lists all servlet context-initialization parameters of the web application `basic-ezcomp` that have been set by using the `set-web-context-param` subcommand.
-Because no description was specified when the javax.faces.PROJECT_STAGE parameter was set, null is displayed instead of a description for this parameter.
+Because no description was specified when the  jakarta.faces.PROJECT_STAGE parameter was set, null is displayed instead of a description for this parameter.
 
 [source,shell]
 ----
 asadmin> list-web-context-param basic-ezcomp
-javax.faces.STATE_SAVING_METHOD = client ignoreDescriptorItem=false
+ jakarta.faces.STATE_SAVING_METHOD = client ignoreDescriptorItem=false
 //The location where the application's state is preserved
-javax.faces.PROJECT_STAGE = null ignoreDescriptorItem=true //null
+ jakarta.faces.PROJECT_STAGE = null ignoreDescriptorItem=true //null
 Command list-web-context-param executed successfully.
 ----
 
@@ -651,10 +678,14 @@ This subcommand sets an environment entry for one of the following items:
 * A deployed web application
 * A web module in a deployed Jakarta EE application
 
-Before You Begin, the application must already be deployed. Otherwise, an error occurs.
+*Before You Begin* +
+The application must already be deployed. Otherwise, an error occurs.
 
-. Ensure that the server is running. Remote commands require a running server.
-. Set an environment entry for a deployed web application or module by using the xref:docs:reference-manual:set-web-env-entry.adoc[`set-web-env-entry`] subcommand. +
+. Ensure that the server is running.
++
+Remote commands require a running server.
+. Set an environment entry for a deployed web application or module by using the xref:docs:reference-manual:set-web-env-entry.adoc[`set-web-env-entry`] subcommand.
++
 Information about the options for the subcommand is included in this help page.
 
 [[example-2-25]]
@@ -677,8 +708,11 @@ TIP: You can also view the full syntax and options of the subcommand by typing `
 
 Use the `unset-web-env-entry` subcommand in remote mode to unset an environment entry for a deployed web application or module.
 
-. Ensure that the server is running. Remote commands require a running server.
-. Unset a web environment entry by using the xref:docs:reference-manual:unset-web-env-entry.adoc[`unset-web-env-entry`] subcommand. +
+. Ensure that the server is running.
++
+Remote commands require a running server.
+. Unset a web environment entry by using the xref:docs:reference-manual:unset-web-env-entry.adoc[`unset-web-env-entry`] subcommand.
++
 Information about the options for the subcommand is included in this help page.
 
 [[example-2-26]]
@@ -703,7 +737,9 @@ Use the `list-web-env-entry` subcommand to list environment entries for a deploy
 * The description of the entry or null if no description was specified when the entry was set
 * The value of the `--ignoreDescriptorItem` option of the `set-web-env-entry` subcommand that was specified when the entry was set
 
-. Ensure that the server is running. Remote commands require a running server.
+. Ensure that the server is running.
++
+Remote commands require a running server.
 . List the environment entries by using the xref:docs:reference-manual:list-web-env-entry.adoc[`list-web-env-entry`] subcommand.
 
 [[example-2-27]]
@@ -720,15 +756,16 @@ Hello Port (java.lang.Integer) = null ignoreDescriptorItem=true //null
 Command list-web-env-entry executed successfully.
 ----
 
+TIP: You can also view the full syntax and options of the subcommand by typing asadmin help `list-web-env-entry` at the command line.
+
 [[web-module-deployment-guidelines]]
 == Web Module Deployment Guidelines
 
 The following guidelines apply to deploying a web module in Payara Server:
 
-* *Context Root*. When you deploy a web module, if you do not specify a context root, the default is the name of the WAR file without the `.war` extension.
-The web module context root must be unique within the server instance. +
-The domain administration server (DAS) in Payara Server versions 2.1.1 and later supports the deployment of multiple web applications
-using the same web context root as long as those applications are deployed to different Payara Server stand-alone instances.
+* *Context Root*. When you deploy a web module, if you do not specify a context root, the default is the name of the WAR file without the `.war` extension. The web module context root must be unique within the server instance.
++
+The domain administration server (DAS) in Payara Server supports the deployment of multiple web applications using the same web context root as long as those applications are deployed to different Payara Server stand-alone instances.
 Deploying multiple applications using the same context root within a single instance produces an error.
 * *Data Source*. If a web application accesses a `DataSource` that is not specified in a `resource-ref` in `glassfish-web.xml` or `payara-web.xml`, or there is no `glassfish-web.xml` or `payara-web.xml` files,
 the `resource-ref-name` defined in `web.xml` is used.
@@ -739,70 +776,84 @@ If you then create additional virtual servers and want to assign existing web ap
 * *HTTP Sessions*. If a web application is undeployed, all its HTTP sessions will be invalidated and removed,
 unless the application is being undeployed as part of a redeployment and the `--keepstate` deployment option was set to true. This option is not supported and
 ignored in a clustered environment.
-See xref:docs:application-deployment-guide:deploying-applications.adoc#example-2-8[Example 2-8].
-* *Load Balancing*.
+See xref:#example-2-8[Example 2-8].
++
+For information about HTTP session persistence, see the __Payara Server High Availability Administration Guide__.
+* *Load Balancing*. See the __Payara Server High Availability Administration Guide__ for information about load balancing
 * *JSP Precompilation*. You can precompile JSP files during deployment by checking the appropriate box in the Administration Console, or by using the `--precompilejsp`
-option of the `deploy` subcommand. +
+option of the `deploy` subcommand.
++
 You can keep the generated source for JSP files by adding the `keepgenerated` flag to the `jsp-config` element in `glassfish-web.xml` or `payara-web.xml`.
-For example: +
+For example:
++
 [source,xml]
 ----
 <glassfish-web-app>
-   ...
    <jsp-config>
-      <property name=keepgenerated value=true />
+      <property name="keepgenerated" value="true" />
    </jsp-config>
 </glassfish-web-app>
 ----
 
-If you include this property when you deploy the WAR file, the generated source is kept in domain-dir`/generated/jsp/`app-name`/`module-name for
-an application, or domain-dir`/generated/jsp/`module-name for an individually-deployed web module. +
+If you include this property when you deploy the WAR file, the generated source is kept in `domain-dir/generated/jsp/app-name/module-name` for
+an application, or `domain-dir/generated/jsp/module-name` for an individually-deployed web module.
+
 For more information about JSP precompilation, see xref:docs:application-deployment-guide:dd-elements.adoc#jsp-config[`jsp-config`].
 
-* Web Context Parameters. You can set web context parameters after deployment. See the following sections:
+* *Web Context Parameters*. You can set web context parameters after deployment. See the following sections:
 
-** xref:docs:application-deployment-guide:deploying-applications.adoc#to-set-a-web-context-parameter[To Set a Web Context Parameter]
+** xref:to-set-a-web-context-parameter[To Set a Web Context Parameter]
+** xref:to-unset-a-web-context-parameter[To Unset a Web Context Parameter]
+** xref:to-list-web-context-parameters[To List Web Context Parameters] +
+* *Web Environment Entries*. You can set web environment entries after deployment. See the following sections:
 
-** xref:docs:application-deployment-guide:deploying-applications.adoc#to-unset-a-web-context-parameter[To Unset a Web Context Parameter]
-
-** xref:docs:application-deployment-guide:deploying-applications.adoc#to-list-web-context-parameters[To List Web Context Parameters] +
-* Web Environment Entries. You can set web environment entries after deployment. See the following sections:
-
-** xref:docs:application-deployment-guide:deploying-applications.adoc#to-set-a-web-environment-entry[To Set a Web Environment Entry]
-
-** xref:docs:application-deployment-guide:deploying-applications.adoc#to-unset-a-web-environment-entry[To Unset a Web Environment Entry]
-
-** xref:docs:application-deployment-guide:deploying-applications.adoc#to-list-web-environment-entries[To List Web Environment Entries]
+** xref:to-set-a-web-environment-entry[To Set a Web Environment Entry]
+** xref:to-unset-a-web-environment-entry[To Unset a Web Environment Entry]
+** xref:to-list-web-environment-entries[To List Web Environment Entries]
 
 [[ejb-module-deployment-guidelines]]
 == EJB Module Deployment Guidelines
 
-NOTE: The Payara Server Web Profile supports the EJB 3.1 Lite specification, which allows enterprise beans within web applications, among other features.
-The Payara Server Full Platform Profile supports the entire EJB 3.1 specification. For details, see http://jcp.org/en/jsr/detail?id=318[JSR 318]
+NOTE: The Payara Server Web Profile supports the Jakarta Enterprise Beans 4.0 Lite specification, which allows enterprise beans within web applications, among other features. +
+The Payara Server Full Platform Profile supports the entire Jakarta Enterprise Beans 4.0 specification. For details, see https://jakarta.ee/specifications/enterprise-beans/[Jakarta Enterprise Beans]
 
 The following guidelines apply to deploying an EJB module in Payara Server:
 
 * *JNDI Name*. — If no JNDI name for the EJB JAR module is specified in the `jndi-name` element immediately under the `ejb` element in `glassfish-ejb-jar.xml`, or there is no `glassfish-ejb-jar.xml`
-file, a default, non-clashing JNDI name is derived. A warning message is logged, recording the JNDI name used to look up the EJB JAR module. +
-Because the EJB 3.1 specification defines portable EJB JNDI names, there is less need for Payara Server specific JNDI names. By default, Payara Server specific default
+file, a default, non-clashing JNDI name is derived. A warning message is logged, recording the JNDI name used to look up the EJB JAR module.
++
+Because the Jakarta Enterprise Beans 4.0 specification defines portable EJB JNDI names, there is less need for Payara Server specific JNDI names. By default, Payara Server specific default
 JNDI names are applied automatically for backward compatibility.
 To disable Payara Server specific JNDI names for an EJB module, set the value of the `<disable-nonportable-jndi-names>` element in the `glassfish-ejb-jar.xml` file to `true`.
 The default is `false`.
+
 * *Stateful Session Bean and Timer State*. — Use the `--keepstate` option of the xref:docs:reference-manual:redeploy.adoc[`redeploy`] subcommand or the `<keepstate>` element
 in the `glassfish-ejb-jar.xml` file to retain stateful session bean instances and persistently created EJB timers across redeployments.
-The `--keepstate` option of the `redeploy` subcommand takes precedence. The default for both is `false`. This option is not supported and ignored in a clustered environment. +
+The `--keepstate` option of the `redeploy` subcommand takes precedence. The default for both is `false`. This option is not supported and ignored in a clustered environment.
++
 Some changes to an application between redeployments can prevent this feature from working properly. For example, do not change the set of instance variables in the SFSB bean class.
 Other examples would be changes to EJB names, or adding or removing EJBs to or from an application.
+
 * *EJB Singletons*. — EJB Singletons are created for each server instance in a cluster, and not once per cluster.
+
 * *Stubs and Ties*. — Use the xref:docs:reference-manual:get-client-stubs.adoc[`get-client-stubs`] subcommand in remote mode to retrieve stubs and ties.
-* *Compatibility of JAR Visibility Requirements*. — Use the `compatibility` element of the `glassfish-application.xml` or `glassfish-ejb-jar.xml` file to specify the Payara Server release
-with which to be backward compatible in terms of JAR visibility requirements for applications. The current allowed value is `v2`, which refers to Payara Server version 2 or Payara Server version 9.1 or 9.1.1.
-Starting in Java EE 6, the Java EE specification imposes stricter requirements than Java EE 5 did on which JAR files can be visible to various modules within an EAR file. Setting this element to `v2` removes these Java EE 6 and later restrictions.
+
+* *Compatibility of JAR Visibility Requirements*. — Use the `compatibility` element of the `glassfish-application.xml` or `glassfish-ejb-jar.xml` file to specify the Payara Server release with which to be backward compatible in terms of JAR visibility requirements for applications.
++
+The current allowed value is `v2`, which refers to older runtimes from where Payara Server is based from.
++
+NOTE: Starting in Java EE 6, the Java EE specification imposes stricter requirements than Java EE 5 did on which JAR files can be visible to various modules within an EAR file. Setting this element to `v2` removes these Java EE 6 and later restrictions.
 
 [[deploying-a-connector-module]]
 == Deploying a Connector Module
 
 Deploying a stand-alone connector module allows multiple deployed Jakarta EE applications to share the connector module. A resource adapter configuration is automatically created for the connector module.
+
+The following topics are addressed here:
+
+* xref:to-deploy-and-configure-a-stand-alone-connector-module[To Deploy and Configure a Stand-Alone Connector Module]
+* xref:redeploying-a-stand-alone-connector-module[Redeploying a Stand-Alone Connector Module]
+* xref:deploying-and-configuring-an-embedded-resource-adapter[Deploying and Configuring an Embedded Resource Adapter]
 
 [[to-deploy-and-configure-a-stand-alone-connector-module]]
 === To Deploy and Configure a Stand-Alone Connector Module
@@ -813,19 +864,22 @@ For more information, see xref:docs:application-deployment-guide:deploying-appli
 . Ensure that the server is running. Remote commands require a running server.
 . Deploy the connector module by using the xref:docs:reference-manual:deploy.adoc#deploy[`deploy`] subcommand.
 . Configure connector connection pools for the deployed connector module. +
-Use the `create-connector-connection-pool` subcommand. For procedures, see "xref:docs:administration-guide:connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool]" in
-Payara Server Open Source Edition Administration Guide.
-. Configure connector resources for the connector connection pools. +
-Use the `create-resource-adapter-config` subcommand. For procedures, see "xref:docs:administration-guide:connectors.adoc#to-create-configuration-information-for-a-resource-adapter[To Create Configuration Information for a Resource Adapter]" in Payara Server Open Source Edition Administration Guide.
-If needed, you can override the default configuration properties of a resource adapter. +
-This step associates a connector resource with a JNDI name.
-. Configure a resource adapter. +
-Use the `create-resource-adapter-config` subcommand. For procedures, see
-"xref:docs:administration-guide:connectors.adoc#to-create-configuration-information-for-a-resource-adapter[To Create Configuration Information for a Resource Adapter]" in Payara Server Open Source Edition Administration Guide.
+Use the `create-connector-connection-pool` subcommand. For procedures, see "xref:docs:administration-guide:connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool]" in the __Payara Server Administration Guide__.
+. Configure connector resources for the connector connection pools.
++
+Use the `create-resource-adapter-config` subcommand. For procedures, see "xref:docs:administration-guide:connectors.adoc#to-create-configuration-information-for-a-resource-adapter[To Create Configuration Information for a Resource Adapter]" in __Payara Server Administration Guide__.
 If needed, you can override the default configuration properties of a resource adapter.
-. If needed, create an administered object for an inbound resource adapter. +
++
+This step associates a connector resource with a JNDI name.
+. Configure a resource adapter.
++
+Use the `create-resource-adapter-config` subcommand. For procedures, see
+"xref:docs:administration-guide:connectors.adoc#to-create-configuration-information-for-a-resource-adapter[To Create Configuration Information for a Resource Adapter]" in __Payara Server Administration Guide__.
+If needed, you can override the default configuration properties of a resource adapter.
+. If needed, create an administered object for an inbound resource adapter.
++
 Use the `create-admin-object` subcommand. For procedures, see
-"xref:docs:administration-guide:connectors.adoc#to-create-an-administered-object[To Create an Administered Object]" in Payara Server Open Source Edition Administration Guide.
+"xref:docs:administration-guide:connectors.adoc#to-create-an-administered-object[To Create an Administered Object]" in __Payara Server Administration Guide__.
 
 [[redeploying-a-stand-alone-connector-module]]
 === Redeploying a Stand-Alone Connector Module
@@ -836,7 +890,7 @@ You do not need to reconfigure any of these resources.
 However, you should redeploy any dependent modules. A dependent module uses or refers to a connector resource of the redeployed connector module.
 Redeployment of a connector module results in the shared class loader reloading the new classes.
 Other modules that refer to the old resource adapter classes must be redeployed to gain access to the new classes.
-For more information about class loaders, see "xref:docs:application-development-guide:class-loaders.adoc#class-loaders[Class Loaders]" in Payara Server Open Source Edition Application Development Guide.
+For more information about class loaders, see "xref:docs:application-development-guide:class-loaders.adoc#class-loaders[Class Loaders]" in __Payara Server Application Development Guide__.
 
 During connector module redeployment, the server log provides a warning indicating that all dependent applications should be redeployed.
 Client applications or application components using the connector module's resources may throw class cast exceptions if dependent applications are not redeployed after connector module redeployment.
@@ -849,10 +903,10 @@ To disable automatic redeployment, set the `--force` option to `false`. In this 
 A connector module can be deployed as a Jakarta EE component in a Jakarta EE application.
 Such connectors are only visible to components residing in the same Jakarta EE application. Deploy this application as you would any other Jakarta EE application.
 
-You can create new connector connection pools and connector resources for a connector module embedded within a Jakarta EE application by prefixing the connector name with app-name`#`.
+You can create new connector connection pools and connector resources for a connector module embedded within a Jakarta EE application by prefixing the connector name with `app-name#`.
 For example, if an application `appX.ear` has `jdbcra.rar` embedded within it, the connector connection pools and connector resources refer to the connector module as `appX#jdbcra`.
 
-An embedded connector module cannot be undeployed using the name app-name`#`connector-name. To undeploy the connector module, you must undeploy the application in which it is embedded.
+An embedded connector module cannot be undeployed using the name `app-name#connector-name`. To undeploy the connector module, you must undeploy the application in which it is embedded.
 
 The association between the physical JNDI name for the connector module in Payara Server and the logical JNDI name used in the application component is specified in the Payara Server-specific XML descriptor `glassfish-ejb-jar.xml`.
 
@@ -866,14 +920,28 @@ By default, Java Web Start is enabled in application clients and in Payara Serve
 
 NOTE: The Application Client Container is supported only in the Payara Server Full Platform Profile, not in the Web Profile.
 
+The following topics are addressed here:
+
+* xref:to-assemble-and-deploy-an-application-client[To Assemble and Deploy an Application Client]
+* xref:to-prepare-another-machine-for-running-an-application-client[To Prepare Another Machine for Running an Application Client]
+* xref:to-undeploy-an-application-client[To Undeploy an Application Client]
+
 [[to-assemble-and-deploy-an-application-client]]
 === To Assemble and Deploy an Application Client
 
-. Assemble the necessary client components. The client JAR file is created.
-. Assemble the EJB components that are to be accessed by the client. The EJB JAR file is created.
-. Assemble the client and EJB JAR files together in an EAR. An EAR file contains all the components of the application.
-. Deploy the application. Instructions are contained in xref:docs:application-deployment-guide:deploying-applications.adoc#to-deploy-an-application-or-module[To Deploy an Application or Module].
-. If you are using the `appclient` script to run the application client, retrieve the client files. +
+. Assemble the necessary client components.
++
+The client JAR file is created.
+. Assemble the EJB components that are to be accessed by the client.
++
+The EJB JAR file is created.
+. Assemble the client and EJB JAR files together in an EAR.
++
+An EAR file contains all the components of the application.
+. Deploy the application. +
+Instructions are contained in xref:docs:application-deployment-guide:deploying-applications.adoc#to-deploy-an-application-or-module[To Deploy an Application or Module].
+. If you are using the `appclient` script to run the application client, retrieve the client files.
++
 The client artifacts contain the ties and necessary classes for the application client. In this release of Payara Server, the client artifacts include multiple files.
 You can use either the `get-client-stubs` subcommand or the `--retrieve` option of the `deploy` subcommand, but you do not need to use both.
 
@@ -882,18 +950,19 @@ You can use either the `get-client-stubs` subcommand or the `--retrieve` option 
 . Test the client on the Payara Server machine in one of the following ways:
 * If Java Web Start is enabled for the application client, use the Launch link on the Application Client Modules.
 * Run an application client by using the `appclient` script. +
-The `appclient` script is located in the as-install`/bin` directory. +
-If you are using the default server instance, the only required option is `-client`, which points to the client JAR file. For example: +
+The `appclient` script is located in the `as-install/bin` directory. +
+If you are using the default server instance, the only required option is `-client`, which points to the client JAR file. For example:
++
 [source,shell]
 ----
 appclient -client converterClient.jar
 ----
 The -xml parameter, which specifies the location of the `sun-acc.xml` file, is also required if you are not using the default instance.
 
-For more detailed information about the `appclient` script, see xref:docs:reference-manual:appclient.adoc[`appclient`].
+TIP: For more detailed information about the `appclient` script, see xref:docs:reference-manual:appclient.adoc[`appclient`(1M)].
 
 For more detailed information about creating application clients, see
-"xref:docs:application-development-guide:java-clients.adoc[Developing Java Clients]" in Payara Server Open Source Edition Application Development Guide. This chapter includes information on the following topics:
+"xref:docs:application-development-guide:java-clients.adoc[Developing Java Clients]" in __Payara Server Application Development Guide__. This chapter includes information on the following topics:
 
 * Accessing EJB components and JMS resources from application clients
 * Connecting to a remote EJB module through a firewall
@@ -904,14 +973,14 @@ For more detailed information about creating application clients, see
 [[to-prepare-another-machine-for-running-an-application-client]]
 === To Prepare Another Machine for Running an Application Client
 
-If Java Web Start is enabled, the default URL format for an application is `http://`host:port`/`context-root. For example:
+If Java Web Start is enabled, the default URL format for an application is `http://host:port/context-root`. For example:
 
 [source,text]
 ----
 http://localhost:80/myapp
 ----
 
-The default URL format for a standalone application client module is `http://`host:port`/`module-id. For example:
+The default URL format for a standalone application client module is `http://host:port/module-id`. For example:
 
 [source,text]
 ----
@@ -921,25 +990,32 @@ http://localhost:80/myclient
 To set a different URL for an application client, set the `context-root`
 subelement of the xref:docs:application-deployment-guide:dd-elements.adoc#java-web-start-access[`java-web-start-access`] element in the `glassfish-application-client.xml` file.
 
-If the context-root or module-id is not specified during deployment, the name of the EAR or JAR file without the `.ear` or `.jar` extension is used.
+If the __context-root__ or __module-id__ is not specified during deployment, the name of the EAR or JAR file without the `.ear` or `.jar` extension is used.
 For an application, the relative path to the application client JAR file is also included.
-If the application or module is not in EAR or JAR file format, a context-root or module-id is generated. Regardless of how the context-root or module-id is determined, it is written to the server log.
+If the application or module is not in EAR or JAR file format, a __context-root__ or __module-id__ is generated. Regardless of how the __context-root__ or __module-id__ is determined, it is written to the server log.
 For details about naming, see xref:docs:application-deployment-guide:overview.adoc#naming-standards[Naming Standards].
 
-Before You Begin, this task applies if you want to use the `appclient` script to run the application client on a system other than where the server runs.
+*Before You Begin* +
+This task applies if you want to use the `appclient` script to run the application client on a system other than where the server runs.
 
-. Create the application client package JAR file. +
-Use the `package-appclient` script in the as-install`/bin` directory. This JAR file is created in the as-install`/lib/appclient` directory.
+. Create the application client package JAR file.
++
+Use the `package-appclient` script in the `as-install/bin` directory. This JAR file is created in the `as-install/lib/appclient` directory.
 . Copy the application client package JAR file to the client machine.
-. Extract the contents of the JAR file. +
-For example: `jar xf` filename`.jar`
-. Configure the `sun-acc.xml` file. +
+. Extract the contents of the JAR file.
++
+For example: `jar xf filename.jar`
+. Configure the `sun-acc.xml` file.
++
 If you used the `package-appclient` script, this file is located in the `appclient/appserv/lib/appclient` directory by default.
-. Configure the `asenv.conf` (`asenv.bat` on Windows) file. +
+. Configure the `asenv.conf` (`asenv.bat` on Windows) file.
++
 This file is located in `appclient/appserv/bin` by default if you used the `package-appclient` script.
-. Copy the client JAR file to the client machine. + You are now ready to run the client.
+. Copy the client JAR file to the client machine.
++
+You are now ready to run the client.
 
-For more detailed information about Java Web Start and the `package-appclient` script, see xref:docs:reference-manual:appclient.adoc[`appclient`].
+TIP: For more detailed information about Java Web Start and the `package-appclient` script, see xref:docs:reference-manual:appclient.adoc[`appclient`(1M)].
 
 [[to-undeploy-an-application-client]]
 === To Undeploy an Application Client
@@ -958,13 +1034,13 @@ For example, your application client can be written to detect and then recover f
 
 A lifecycle module, also called a lifecycle listener module, provides a means of running long or short Java-based tasks within the Payara Server environment, such as instantiation of singletons or RMI servers.
 Lifecycle modules are automatically initiated at server startup and are notified at various phases of the server life cycle.
-All lifecycle module interfaces are in the as-install`/modules/glassfish-api.jar` file.
+All lifecycle module interfaces are in the `as-install/modules/glassfish-api.jar` file.
 
-For general information about lifecycle modules, see  "xref:docs:application-development-guide:lifecycle-listeners.adoc#developing-lifecycle-listeners[Developing Lifecycle Listeners]" in Payara Server Open Source Edition Application Development Guide.
+For general information about lifecycle modules, see  "xref:docs:application-development-guide:lifecycle-listeners.adoc#developing-lifecycle-listeners[Developing Lifecycle Listeners]" in __Payara Server Application Development Guide__.
 
 You can deploy a lifecycle module using the `create-lifecycle-module` subcommand. Do not use `asadmin deploy` or related commands.
 
-You do not need to specify a classpath for the lifecycle module if you place it in the domain-dir`/lib` or domain-dir`/lib/classes` directory for the Domain Administration Server (DAS).
+You do not need to specify a classpath for the lifecycle module if you place it in the `domain-dir/lib` or `domain-dir/lib/classes` directory for the Domain Administration Server (DAS).
 Do not place it in the `lib` directory for a particular server instance, or it will be deleted when that instance synchronizes with the Payara Server.
 
 After you deploy a lifecycle module, you must restart the server. During server initialization, the server instantiates the module and registers it as a lifecycle event listener.
@@ -979,29 +1055,29 @@ Without the Metro add-on component, a servlet or EJB component cannot be a web s
 
 The following guidelines apply when deploying a web service in Payara Server:
 
-* Web Service Endpoint. Deploy a web service endpoint to Payara Server as you would any servlet or stateless session bean.
+* *Web Service Endpoint*. Deploy a web service endpoint to Payara Server as you would any servlet or stateless session bean.
 If the deployed application or module has a web service endpoint, the endpoint is detected automatically during deployment.
 The Payara Server -specific deployment descriptor files, `glassfish-web.xml`, `payara-web.xml` and
 `glassfish-ejb-jar.xml`, provide optional web service enhancements in their xref:docs:application-deployment-guide:dd-elements.adoc#webservice-endpoint[`webservice-endpoint`] and
 xref:docs:application-deployment-guide:dd-elements.adoc#webservice-description[`webservice-description`] elements.
 
-* Web Service Management. Web service management is fully supported in the Administration Console. After the application or module is deployed, click the Web Service component. The table in the right frame lists deployed web service endpoints.
+* *Web Service Management*. Web service management is fully supported in the Administration Console. After the application or module is deployed, click the Web Service component. The table in the right frame lists deployed web service endpoints.
 
-For more information about web services, see "xref:docs:application-development-guide:webservices.adoc#developing-web-services[Developing Web Services]" in Payara Server Open Source Edition Application Development Guide.
+For more information about web services, see "xref:docs:application-development-guide:webservices.adoc#developing-web-services[Developing Web Services]" in __Payara Server Application Development Guide__.
 
 [[osgi-bundle-deployment-guidelines]]
 == OSGi Bundle Deployment Guidelines
 
 To deploy an OSGi bundle using the Administration Console, select Other from the Type drop-down list and check the OSGI Type checkbox.
 
-To deploy an OSGi bundle using the `asadmin deploy` command, set the`--type` option to the value `osgi`. For example:
+To deploy an OSGi bundle using the `asadmin deploy` command, set the `--type` option to the value `osgi`. For example:
 
 [source,shell]
 ----
 asadmin> deploy --type=osgi MyBundle.jar
 ----
 
-To automatically deploy an OSGi bundle, copy the bundle archive to the domain-dir`/autodeploy/bundles` directory.
+To automatically deploy an OSGi bundle, copy the bundle archive to the `domain-dir/autodeploy/bundles` directory.
 
 NOTE: For components packaged as OSGi bundles (`--type=osgi`), the `deploy` subcommand accepts properties arguments to wrap a WAR file as a WAB (Web Application Bundle) at the time of deployment.
 The subcommand looks for a key named `UriScheme` and, if present, uses the key as a URL stream handler to decorate the input stream.
@@ -1025,8 +1101,7 @@ For JDBC connection pools that are not application-scoped, use the `set` subcomm
 
 [source,shell]
 ----
-asadmin> set myserver.resources.jdbc-connection-pool.mypool.property.
-dynamic-reconfiguration-wait-timeout-in-seconds=30
+asadmin> set myserver.resources.jdbc-connection-pool.mypool.property.dynamic-reconfiguration-wait-timeout-in-seconds=30
 ----
 
 [[application-scoped-resources]]
@@ -1038,7 +1113,7 @@ An application-scoped resource has the following characteristics:
 
 * It is available only to the module or application that defines it.
 * It cannot be referenced or looked up by other modules or applications.
-* It is created during deployment, destroyed during undeployment, and recreated during redeployment.
+* It is created during deployment, destroyed during un-deployment, and recreated during redeployment.
 * It is free from unexpected resource starvation or delay in acquiring connections because no other application or module competes for accesses to it.
 
 The following resource types can be application-scoped:
@@ -1051,7 +1126,7 @@ The following resource types can be application-scoped:
 * External JNDI resources
 * Custom resources
 * Admin object resources
-* JavaMail resources
+* Jakarta resources
 
 *Deployment Descriptor*. An application-scoped resource is defined in the `glassfish-resources.xml` or `payara-resources.xml` deployment descriptor file.
 This file is placed in the `META-INF` directory of the module or application archive.
@@ -1061,15 +1136,14 @@ For more information about the `glassfish-resources.xml` and `payara-resources.x
 and xref:docs:application-deployment-guide:dd-elements.adoc[Elements of the Payara Server Deployment Descriptors].
 
 *Naming*. Application-scoped resource JNDI names begin with `java:app` or `java:module`. If one of these prefixes is not specified in the JNDI name, it is added.
-For example, application-scoped databases have JNDI names in the following format: `java:app/jdbc/`DataSourceName or `java:module/jdbc/`DataSourceName.
-This is in accordance with the naming scopes introduced in the Java EE 6 Specification.
+For example, application-scoped databases have JNDI names in the following format: `java:app/jdbc/DataSourceName` or `java:module/jdbc/DataSourceName`.
 
 *Errors*. Application-scoped resource definitions with same resource name, resource type, attributes, and properties are duplicates. These generate `WARNING` level log messages and deployment continues.
 Definitions with the same resource name and type but different attributes or properties are conflicts and cause deployment failure.
 When an application or module tries to look up a scoped resource that does not belong to it, a naming exception is thrown.
 
 *Redeployment*. When an application or module is undeployed, its scoped resources are deleted. During redeployment, resources are destroyed and recreated based on changes in the `glassfish-resources.xml` or `payara-resources.xml` file.
-To preserve old resource definitions during redeployment, use the `preserveAppScopedResources` property of the `redeploy` (or `deploy` `--force=true`) subcommand. For example:
+To preserve old resource definitions during redeployment, use the `preserveAppScopedResources` property of the `redeploy` (or `deploy --force=true`) subcommand. For example:
 
 [source,shell]
 ----
@@ -1080,13 +1154,13 @@ asadmin> deploy --force=true --property preserveAppScopedResources=true MyApp.ea
 
 For more information, see xref:docs:reference-manual:redeploy.adoc[`redeploy`] and xref:docs:reference-manual:deploy.adoc[`deploy`].
 
-Listing. Use the `--resources` option of the `list-applications` subcommand to list application-scoped resources.
+*Listing*. Use the `--resources` option of the `list-applications` subcommand to list application-scoped resources.
 Use the `--subcomponents` option in addition to list scoped resources for enterprise application modules or for module subcomponents.
 To list scoped resources for subcomponents only, use the `--resources` option of the `list-subcomponents` subcommand
 
 For more information, see xref:docs:reference-manual:list-applications.adoc[`list-applications`] and xref:docs:reference-manual:list-sub-components.adoc[`list-sub-components`].
 
-Restrictions. Use of application-scoped resources is subject to the following restrictions:
+*Restrictions*. Use of application-scoped resources is subject to the following restrictions:
 
 * `resource-adapter-config` and `connector-work-security-map` — These can only be specified in the `glassfish-resources.xml` or `payara-resources.xml` file of the corresponding connector module.
 In an enterprise application, the `resource-adapter-config` or `connector-work-security-map` for an embedded connector module must be specified in the `glassfish-resources.xml` or `payara-resources.xml` file of the connector module.

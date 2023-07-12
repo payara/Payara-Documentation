@@ -1,39 +1,19 @@
 [[payara-server-embedded-server-guide]]
 = Payara Server Embedded Server Guide
 
-This document explains how to run applications in embedded Payara Server and to develop applications in which Payara Server is embedded. This document is for software developers
-who are developing applications to run in embedded Payara Server. The ability to program in the Java language is assumed.
+This document explains how to run applications in embedded Payara Server and to develop applications in which Payara Server is embedded. This document is for software developers who are developing applications to run in embedded Payara Server. The ability to program in the Java language is assumed.
 
 [[introduction-to-embedded-payara-server]]
 == Introduction to Embedded Payara Server
 
-Embedded Payara Server enables you to use Payara Server as a library. Embedded Payara Server also enables you to run Payara Server inside any Virtual Machine for the Java
-platform (Java Virtual Machine or JVMmachine).
+Embedded Payara Server enables you to use Payara Server as a library. Embedded Payara Server also enables you to run Payara Server inside any Virtual Machine for the Java platform (Java Virtual Machine or JVM).
 
-No installation or configuration of embedded Payara Server is required. The ability to run Payara Server inside applications without installation or configuration
-simplifies the process of bundling Payara Server with applications.
-
-[NOTE]
-====
-Embedded Payara Server does not run on the Java Platform, Micro Edition (Java ME platform).
-====
+No installation or configuration of embedded Payara Server is required. The ability to run Payara Server inside applications without installation or configuration simplifies the process of bundling Payara Server with applications.
 
 You can use embedded Payara Server in the following ways:
 
 * With the Embedded Server API (see xref:docs:embedded-server-guide:embedded-server-guide.adoc#including-the-payara-server-embedded-server-api-in-applications[Including the Payara Server Embedded Server API in Applications])
-* With the Maven Plug-in (see xref:docs:embedded-server-guide:embedded-server-guide.adoc#testing-applications-with-the-maven-plug-in-for-embedded-payara-server[Testing Applications with the Maven Plug-in for Embedded Payara Server])
-* With the EJB 3.1 Embeddable API (see xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-the-ejb-3.1-embeddable-api-with-embedded-payara-server[Using the EJB 3.1 Embeddable API with Embedded Payara Server])
-
-Embedded Payara Server provides a plug-in for http://maven.apache.org/[Apache Maven] (`http://maven.apache.org/`). This plug-in simplifies the testing of applications by
-enabling you to build an application and run it with Payara Server on a single system. Testing and debugging are simplified because the need for an installed and configured
-Payara Server is eliminated. Therefore, you can run unit tests automatically in every build.
-
-
-[NOTE]
-====
-For information on how to embed Payara Server in an OSGi environment,
-see the xref:docs:add-on-component-development-guide:title.adoc[Payara Server Add-On Component Development Guide].
-====
+* With the EJB Embeddable API (see xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-the-ejb-embeddable-api-with-embedded-payara-server[Using the EJB Embeddable API with Embedded Payara Server]
 
 [[embedded-payara-server-file-system]]
 == Embedded Payara Server File System
@@ -47,58 +27,34 @@ The following Embedded Payara Server directories and files are important if you 
 [[installation-root-directory]]
 === Installation Root Directory
 
-The installation root directory, represented as as-install, is the parent of the directory that embedded Payara Server uses for configuration files.
-This directory corresponds to the base directory for an installation of Payara Server. Configuration files are contained in the following directories in the base directory
-for an installation of Payara Server:
+The installation root directory, represented as `as-install`, is the parent of the directory that embedded Payara Server uses for configuration files.
+This directory corresponds to the base directory for an installation of Payara Server. Configuration files are contained in the following directories in the base directory for an installation of Payara Server:
 
 * `domains`
 * `lib`
 
-Specify the installation root directory only if you have a valid non-embedded Payara Server installation and are using `glassfish-embedded-static-shell.jar`.
-
 [[instance-root-directory]]
 === Instance Root Directory
 
-The instance root directory, represented as domain-dir, is the parent directory of a server instance directory. Embedded Payara Server uses the server instance directory
-for domain configuration files.
+The instance root directory, represented as `domain-dir`, is the parent directory of a server instance directory. Embedded Payara Server uses the server instance directory for domain configuration files.
 
-Specify the instance root directory only if you have a valid non-embedded Payara Server domain directory and are using `glassfish-embedded-static-shell.jar`.
+NOTE: If you have valid non-embedded Payara Server `as-install` and `domain-dir` directories, specify both in the `BootstrapProperties` and `GlassFishProperties` classes respectively as described in xref:docs:embedded-server-guide:embedded-server-guide.adoc#creating-and-configuring-an-embedded-payara-server[Creating and Configuring an Embedded Payara Server].
 
-
-[NOTE]
-====
-If you have valid non-embedded Payara Server as-install and domain-dir directories, specify both in the `BootstrapProperties` and `GlassFishProperties` classes respectively
-as described in xref:docs:embedded-server-guide:embedded-server-guide.adoc#creating-and-configuring-an-embedded-payara-server[Creating and Configuring an Embedded Payara Server].
-
-====
-
-If domain-dir is not specified, Payara Server creates a directory named `gfembed`random-number`tmp` in a temporary directory, where random-number is a randomly generated
-19-digit number. Payara Server then copies configuration files into this directory. The temporary directory is the value of the system property `java.io.tmpdir`. You can
-override this value by specifying the `glassfish.embedded.tmpdir` property in the `GlassFishProperties` class or as a system property.
+If domain-dir is not specified, Payara Server creates a directory named `gfembed` `random-number` `tmp` in a temporary directory, where random-number is a randomly generated 19-digit number. Payara Server then copies configuration files into this directory. The temporary directory is the value of the system property `java.io.tmpdir`. You can override this value by specifying the `glassfish.embedded.tmpdir` property in the `GlassFishProperties` class or as a system property.
 
 [[the-domain.xml-file]]
 === The `domain.xml` File
 
-Using an existing `domain.xml` file avoids the need to configure embedded Payara Server programmatically in your application. Your application obtains domain configuration
-data from an existing `domain.xml` file. You can create this file by using the administrative interfaces of an installation of non-embedded Payara Server.
-To specify an existing `domain.xml` file, invoke the `setConfigFileURI` method of the `GlassFishProperties` class as described in
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#creating-and-configuring-an-embedded-payara-server[Creating and Configuring an Embedded Payara Server].
+Using an existing `domain.xml` file avoids the need to configure embedded Payara Server programmatically in your application. Your application obtains domain configuration data from an existing `domain.xml` file. You can create this file by using the administrative interfaces of an existing Payara Server installation.
 
-
-[NOTE]
-====
-
-The built-in `domain.xml` file used by default by Embedded Payara Server can be downloaded from `http://embedded-glassfish.java.net/domain.xml`. +
-You can customize this file and pass it in using the `setConfigFileURI` method while creating an Embedded Payara Server.
-
-====
+To specify an existing `domain.xml` file, invoke the `setConfigFileURI` method of the `GlassFishProperties` class as described in xref:docs:embedded-server-guide:embedded-server-guide.adoc#creating-and-configuring-an-embedded-payara-server[Creating and Configuring an Embedded Payara Server].
 
 [[including-the-payara-server-embedded-server-api-in-applications]]
 == Including the Payara Server Embedded Server API in Applications
 
-Payara Server provides an application programming interface (API) for developing applications in which Payara Server is embedded. For details, see the
-`org.glassfish.embeddable` packages at `http://embedded-glassfish.java.net/nonav/apidocs/`.
+Payara Server provides an application programming interface (API) for developing applications in which Payara Server is embedded.
 
+//TODO - Page will have to be updated properly with paths to corresponding Maven artefacts depending of the edition in use
 
 [[setting-the-class-path]]
 === Setting the Class Path
@@ -106,33 +62,16 @@ Payara Server provides an application programming interface (API) for developing
 To enable your applications to locate the class libraries for embedded
 Payara Server, add one of the following JAR files to your class path:
 
-`glassfish-embedded-nucleus.jar`::
-  Corresponds to the nucleus distribution. Download this file from
-  `http://download.java.net/maven/glassfish/org/glassfish/extras/glassfish-embedded-nucleus/`.
-`glassfish-embedded-web.jar`::
-  Contains classes needed for deploying Java EE web applications.
-  Download this file from
-  `http://download.java.net/maven/glassfish/org/glassfish/extras/glassfish-embedded-web/`.
-`glassfish-embedded-all.jar`::
-  Contains classes needed for deploying all Java EE application types.
-  Download this file from
-  `http://download.java.net/maven/glassfish/org/glassfish/extras/glassfish-embedded-all/`.
-`glassfish-embedded-static-shell.jar`::
-  Contains references to classes needed for deploying all Java EE
-  application types. Must be used with a non-embedded installation of
-  Payara Server. Reference this file from the
-  as-install`/lib/embedded` directory of a non-embedded Payara Server
-  installation. Do not move this file, or it will not work. For an
-  explanation of as-install, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root  Directory].
+`payara-embedded-web.jar`::
+Contains classes needed for deploying strictly Jakarta EE web applications.
+Download this file from https://central.sonatype.com/artifact/fish.payara.extras/payara-embedded-web[Maven Central].
 
+`payara-embedded-all.jar`::
+Contains classes needed for deploying all Jakarta EE application types.
+Download this file from
+https://central.sonatype.com/artifact/fish.payara.extras/payara-embedded-all/[Maven Central].
 
-[NOTE]
-====
-Payara Server only supports use of the `glassfish-embedded-static-shell.jar` file. The other files are part of Payara Server and are offered without official support.
-====
-
-In addition, add to the class path any other JAR files or classes upon which your applications depend. For example, if an application uses a database other than
-Java DB, include the Java DataBase Connectivity (JDBC) driver JAR files in the class path.
+In addition, add to the class path any other JAR files or classes upon which your applications depend. For example, if an application uses a database other than H2, include the JDBC driver JAR files in the class path accordingly.
 
 [[creating-starting-and-stopping-embedded-payara-server]]
 === Creating, Starting, and Stopping Embedded Payara Server
@@ -140,7 +79,7 @@ Java DB, include the Java DataBase Connectivity (JDBC) driver JAR files in the c
 Before you can run applications, you must set up and run the embedded Payara Server.
 
 [[creating-and-configuring-an-embedded-payara-server]]
-==== Creating and Configuring an Embedded Payara Server
+==== *Creating and Configuring an Embedded Payara Server*
 
 To create and configure an embedded Payara Server, perform these tasks:
 
@@ -151,122 +90,114 @@ To create and configure an embedded Payara Server, perform these tasks:
 . Invoke any methods for configuration settings that you require. This is optional.
 . Invoke the `glassfishRuntime.newGlassFish(GlassFishProperties)` method to create a `GlassFish` object.
 
-The methods of the `BootstrapProperties` class for setting the server configuration are listed in the following table. The default value of each configuration
-setting is also listed.
+The methods of the `BootstrapProperties` class for setting the server configuration are listed in the following table. The default value of each configuration setting is also listed.
 
-[[table-1-1-methods-of-the-bootstrapproperties-class]]
-==== Table 1-1 Methods of the `BootstrapProperties` Class
-
+.Methods of the `BootstrapProperties` Class
 [width="100%",cols="<29%,<33%,<38%",options="header",]
 |===
 |Purpose |Method |Default Value
-|References an existing xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root Directory], also called as-install
+|References an existing xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root Directory], also called `as-install`
 a|
 [source,java]
 ----
 setInstallRoot(String as-install)
 ----
 
-|None. If `glassfish-embedded-static-shell.jar` is used, the ref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root Directory]
-is automatically determined and need not be specified.
+|None.
 |===
 
-The methods of the `GlassFishProperties` class for setting the server configuration are listed in the following table. The default value of each configuration setting
-is also listed.
+The methods of the `GlassFishProperties` class for setting the server configuration are listed in the following table. The default value of each configuration setting is also listed.
 
-[[table-1-2-methods-of-the-glassfishproperties-class]]
-==== Table 1-2 Methods of the `GlassFishProperties` Class
-
+.Methods of the `GlassFishProperties` Class
 [width="100%",cols="<24%,<37%,<39%",options="header",]
 |===
 |Purpose |Method |Default Value
-|References an existing xref:docs:embedded-server-guide:embedded-server-guide.adoc#instance-root-directory[Instance Root Directory], also called domain-dir
+|References an existing xref:docs:embedded-server-guide:embedded-server-guide.adoc#instance-root-directory[Instance Root Directory], also called `domain-dir`
 a|
 [source,java]
 ----
 setInstanceRoot(String domain-dir)
 ----
- a|
+a|
 In order of precedence:
 
 * `glassfish.embedded.tmpdir` property value specified in `GlassFishProperties` object
 * `glassfish.embedded.tmpdir` system property value
 * `java.io.tmp` system property value
-* as-install`/domains/domain1` if a non-embedded installation is referenced
+* `as-install/domains/domain1` if a non-embedded installation is referenced
 
-|Creates a new or references an existing configuration file a|
+|Creates a new configuration file or references an existing configuration file a|
 [source,java]
 ----
 setConfigFileURI(String configFileURI)
 ----
 
- a|
+a|
 In order of precedence:
 
-* domain-dir`/config/domain.xml` if domain-dir was set using
+* `domain-dir/config/domain.xml` if domain-dir was set using
 `setInstanceRoot`
 * built-in embedded `domain.xml`
 
-|Specifies whether the configuration file is read-only a|
+|Specifies whether the configuration file is read-only
+a|
 [source,java]
 ----
 setConfigFileReadOnly(boolean readOnly)
 ----
-
- |`true`
+|`true`
 
 |Sets the port on which Embedded Payara Server listens.
-|`setPort`(String networkListener, int port) |none
+|`setPort`(String networkListener, int port)
+|None
 |===
 
 
-[NOTE]
-====
+NOTE: Do not use `setPort` if you are using the `setInstanceRoot` or `setConfigFileURI` methods.
 
-Do not use `setPort` if you are using `setInstanceRoot` or `setConfigFileURI`.
-====
-
-
-[[example-1-1]]
-*Example 1-1 Creating an Embedded Payara Server*
+*Creating an Embedded Payara Server*
 
 This example shows code for creating an Embedded Payara Server.
 
 [source,java]
 ----
-...
 import org.glassfish.embeddable.*;
-...
-    GlassFish glassfish = GlassFishRuntime.bootstrap().newGlassFish();
-    glassfish.start();
-...
+
+public class EmbeddedRunner{
+
+    public static void main(String... args){
+        var server = GlassFishRuntime.bootstrap().newGlassFish();
+        server.start();
+    }
+}
 ----
 
-[[example-1-2]]
-*Example 1-2 Creating an Embedded Payara Server with configuration customizations*
+*Creating an Embedded Payara Server with configuration customizations*
 
-This example shows code for creating an Embedded Payara Server using the existing domain-dir `C:\samples\test\applicationserver\domains\domain1`.
+This example shows code for creating an Embedded Payara Server using the existing domain-dir `C:\samples\test\applicationserver\domains\domain1`:
 
 [source,java]
 ----
-...
 import org.glassfish.embeddable.*;
-...
-    BootstrapProperties bootstrapProperties = new BootstrapProperties();
-    bootstrapProperties.setInstallRoot("C:\\samples\\test\\applicationserver");
-    GlassFishRuntime glassfishRuntime = GlassFishRuntime.bootstrap(bootstrapProperties);
 
-    GlassFishProperties glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setInstanceRoot("C:\\samples\\test\\applicationserver\\domains\\domain1");
-    GlassFish glassfish = glassfishRuntime.newGlassFish(glassfishProperties);
+public class EmbeddedRunner{
+    public static void main(String... args){
 
-    glassfish.start();
+        var bootstrapProperties = new BootstrapProperties();
+        bootstrapProperties.setInstallRoot("C:\\samples\\test\\applicationserver");
+        GlassFishRuntime glassfishRuntime = GlassFishRuntime.bootstrap(bootstrapProperties);
 
-...
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setInstanceRoot("C:\\samples\\test\\applicationserver\\domains\\domain1");
+        var server = glassfishRuntime.newGlassFish(glassfishProperties);
+
+        server.start();
+    }
+}
 ----
 
 [[running-an-embedded-payara-server]]
-==== Running an Embedded Payara Server
+==== *Running an Embedded Payara Server*
 
 After you create an embedded Payara Server as described in xref:docs:embedded-server-guide:embedded-server-guide.adoc#creating-and-configuring-an-embedded-payara-server[Creating and Configuring an Embedded Payara Server], you can perform operations such as:
 
@@ -279,182 +210,157 @@ After you create an embedded Payara Server as described in xref:docs:embedded-se
 
 You must set the server's HTTP or HTTPS port. If you do not set the port, your application fails to start and throws an exception. You can set the port directly or indirectly.
 
-[NOTE]
-====
-Do not use `setPort` if you are using `setInstanceRoot` or `setConfigFileURI`. These methods set the port indirectly.
-====
+NOTE: Do not use `setPort` if you are using `setInstanceRoot` or `setConfigFileURI`. These methods set the port indirectly.
 
 * To set the port directly, invoke the `setPort` method of the `GlassFishProperties` object.
 * To set the port indirectly, use a `domain.xml` file that sets the port. For more information, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#the-domain.xml-file[The `domain.xml` File].
-
-[[example-1-3]]
-*Example 1-3 Setting the port of an Embedded Payara Server*
 
 This example shows code for setting the port of an embedded Payara Server.
 
 [source,java]
 ----
-...
 import org.glassfish.embeddable.*;
-...
-    GlassFishProperties glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 8080);
-    glassfishProperties.setPort("https-listener", 8181);
-...
+
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 8080);
+        glassfishProperties.setPort("https-listener", 8181);
+    }
+}
 ----
 
 [[starting-an-embedded-payara-server-from-an-application]]
 *Starting an Embedded Payara Server From an Application*
 
-To start an embedded Payara Server, invoke the `start` method of the `Payara` object.
+To start an embedded Payara Server, invoke the `start` method of the corresponding server object.
 
-[[example-1-4]]
-*Example 1-4 Starting an Embedded Payara Server*
-
-This example shows code for setting the port and starting an embedded Payara Server. This example also includes the code fromxref:docs:embedded-server-guide:embedded-server-guide.adoc#example-1-1[Example 1-1] for creating a `Payara` object.
+This example shows code for setting the port and starting an embedded Payara Server:
 
 [source,java]
 ----
-...
 import org.glassfish.embeddable.*;
-...
-    GlassFishProperties glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 8080);
-    glassfishProperties.setPort("https-listener", 8181);
-    ...
-    GlassFish glassfish = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
-    glassfish.start();
-...
+
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 8080);
+        glassfishProperties.setPort("https-listener", 8181);
+
+        var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
+        server.start();
+    }
+}
 ----
 
 [[stopping-an-embedded-payara-server-from-an-application]]
 *Stopping an Embedded Payara Server From an Application*
 
-The API for embedded Payara Server provides a method for stopping an embedded server. Using this method enables your application to stop the server in
+The API for an embedded Payara Server provides a method for stopping an embedded server. Using this method enables your application to stop the server in
 an orderly fashion by performing any necessary cleanup steps before stopping the server, for example:
 
-* Undeploying deployed applications
+* Un-deploying deployed applications
 * Releasing any resources that your application uses
 
-To stop an embedded Payara Server, invoke the `stop` method of an existing `Payara` object.
+To stop an embedded Payara Server, invoke the `stop` method of an existing server object.
 
-[[example-1-5]]
-*Example 1-5 Stopping an Embedded Payara Server*
-
-This example shows code for prompting the user to press the Enter key to stop an embedded Payara Server. Code for creating a `Payara` object is not shown
-in this example. For an example of code for creating a `Payara` object, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#example-1-1[Example 1-1].
+This example shows code for prompting the user to press the Enter key to stop an embedded Payara Server:
 
 [source,java]
 ----
-...
+
 import java.io.BufferedReader;
-...
+
 import org.glassfish.embeddable.*;
-...
-    System.out.println("Press Enter to stop server");
+
+public class EmbeddedRunner{
+    public static void main(String... args){
+        System.out.println("Press Enter to stop server");
         // wait for Enter
-    glassfish.stop(); // Stop Embedded GlassFish Server
-...
+        server.stop();
+    }
+}
 ----
 
 As an alternative, you can use the `dispose` method to stop an embedded Payara Server and dispose of the temporary file system.
 
 [[deploying-and-undeploying-an-application-in-an-embedded-payara-server]]
-=== Deploying and Undeploying an Application in an Embedded Payara Server
+=== Deploying and Un-deploying an Application in an Embedded Payara Server
 
-Deploying an application installs the files that comprise the application into Embedded Payara Server and makes the application ready to run. By default,
-an application is enabled when it is deployed.
-
-For general information about deploying applications in Payara Server, see the xref:docs:reference-manual:title.adoc[Payara Server Application Deployment Guide].
+Deploying an application installs the files that comprise the application into Embedded Payara Server and makes the application ready to run. By default, an application is enabled when it is deployed.
 
 [[to-deploy-an-application-from-an-archive-file-or-a-directory]]
 ==== *To Deploy an Application From an Archive File or a Directory*
 
-An archive file contains the resources, deployment descriptor, and classes of an application. The content of the file must be organized in the directory
-structure that the Java EE specifications define for the type of archive that the file contains. For more information,
-see "xref:docs:application-deployment-guide:deploying-applications.adoc#deploying-applications[Deploying Applications]" in Payara Server Application Deployment Guide.
+An archive file contains the resources, deployment descriptor, and classes of an application. The content of the file must be organized in the directory structure that the Jakarta EE specifications define for the type of archive that the file contains. For more information, see xref:docs:application-deployment-guide:deploying-applications.adoc#deploying-applications[Deploying Applications] in the Payara Server Application Deployment Guide.
 
-Deploying an application from a directory enables you to deploy an application without the need to package the application in an archive file.
-The contents of the directory must match the contents of the expanded Java EE archive file as laid out by the Payara Server. The directory must
-be accessible to the machine on which the deploying application runs. For more information about the requirements for deploying an application from a directory,
-see "xref:docs:application-deployment-guide:deploying-applications.adoc#to-deploy-an-application-or-module-in-a-directory-format[To Deploy an Application or Module in a Directory Format]" in
-Payara Server Application Deployment Guide.
+Deploying an application from a directory enables you to deploy an application without the need to package the application in an archive file. The contents of the directory must match the contents of the expanded Jakarta EE archive file as laid out by the Payara Server. The directory must be accessible to the machine on which the deploying application runs. For more information about the requirements for deploying an application from a directory, see xref:docs:application-deployment-guide:deploying-applications.adoc#to-deploy-an-application-or-module-in-a-directory-format[To Deploy an Application or Module in a Directory Format] in the Payara Server Application Deployment Guide.
 
 If some resources needed by an application are not under the application's directory, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#creating-a-scattered-archive[Creating a Scattered Archive].
 
-1.  Instantiate the `java.io.File` class to represent the archive file or directory.
-2.  Invoke the `getDeployer` method of the `Payara` object to get an instance of the `org.glassfish.embeddable.Deployer` class.
-3.  Invoke the `deploy``(File` archive`,` params`)` method of the instance of the `Deployer` object. +
-Specify the `java.io.File` class instance you created previously as the first method parameter. +
+. Instantiate the `java.io.File` class to represent the archive file or directory.
+. Invoke the `getDeployer` method of the server object to get an instance of the `org.glassfish.embeddable.Deployer` class.
+. Invoke the `deploy`(`File`, `archive`,`params`) method of the instance of the `Deployer` object.
++
+Specify the `java.io.File` class instance you created previously as the first method parameter.
++
 For information about optional parameters you can set, see the descriptions of the xref:docs:reference-manual:deploy.adoc[`deploy`] subcommand parameters. Simply quote each parameter in the method, for example `"--force=true"`.
 
-[[example-1-6]]
-*Example 1-6 Deploying an Application From an Archive File*
-
-This example shows code for deploying an application from the archive file `c:\samples\simple.war` and setting the name, contextroot, and force parameters.
-This example also includes the code from xref:docs:embedded-server-guide:embedded-server-guide.adoc#example-1-1[Example 1-1] for creating `GlassFishProperties` and
-`Payara` objects.
+This example shows code for deploying an application from the archive file `c:\samples\simple.war` and setting the name, context root, and force parameters.
 
 [source,java]
 ----
-...
 import java.io.File;
-...
 import org.glassfish.embeddable.*;
-...
-    GlassFishProperties glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 8080);
-    glassfishProperties.setPort("https-listener", 8181);
-    ...
-    GlassFish glassfish = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
-    glassfish.start();
-    File war = new File("c:\\samples\\simple.war");
-    Deployer deployer = glassfish.getDeployer();
-    deployer.deploy(war, "--name=simple", "--contextroot=simple", "--force=true");
-    // deployer.deploy(war) can be invoked instead. Other parameters are optional.
-...
+
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 8080);
+        glassfishProperties.setPort("https-listener", 8181);
+
+        var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
+        server.start();
+
+        var war = new File("c:\\samples\\simple.war");
+        var deployer = server.getDeployer();
+        deployer.deploy(war, "--name=simple", "--contextroot=simple", "--force=true");
+        // deployer.deploy(war) can be invoked instead. Other parameters are optional.
+    }
+}
 ----
 
 [[undeploying-an-application]]
-==== *Undeploying an Application*
+==== *Un-deploying an Application*
 
-Undeploy an application when the application is no longer required to run in Payara Server. For example, before stopping Payara Server, undeploy all
-applications that are running in Payara Server.
+Undeploy an application when the application is no longer required to run in Payara Server. For example, before stopping Payara Server, undeploy all applications that are running in Payara Server.
 
-NOTE: If you reference a non-embedded Payara Server installation using the `glassfish-embedded-static-shell.jar` file and do not undeploy your applications in the same
-server life cycle in which you deployed them, expanded archives for these applications remain under the domain-dir`/applications` directory.
+To undeploy an application, invoke the `undeploy` method of an existing `Deployer` object. In the method invocation, pass the name of the application as a parameter. This name is specified when the application is deployed.
 
-To undeploy an application, invoke the `undeploy` method of an existing`Deployer` object. In the method invocation, pass the name of the application as a parameter.
-This name is specified when the application is deployed.
-
-For information about optional parameters you can set, see the descriptions of the xref:docs:reference-manual:deploy.adoc[`deploy`] command parameters.
-Simply quote each parameter in the method, for example `"--cascade=true"`.
+For information about optional parameters you can set, see the descriptions of the xref:docs:reference-manual:deploy.adoc[`deploy`] command parameters. Simply quote each parameter in the method, for example `"--cascade=true"`.
 
 To undeploy all deployed applications, invoke the `undeployAll` method of an existing `EmbeddedDeployer` object. This method takes no parameters.
 
-[[example-1-7]]
-*Example 1-7 Undeploying an Application*
-
-This example shows code for undeploying the application that was deployed in xref:docs:embedded-server-guide:embedded-server-guide.adoc#example-1-6[Example 1-6].
+This example shows code for un-deploying the application that was deployed in the previous example:
 
 [source,java]
 ----
-...
+
 import org.glassfish.embeddable.*;
-...
-    deployer.undeploy(war, "--droptables=true", "--cascade=true");
-...
+
+public class EmbeddedRunner{
+    public static void main(String... args){
+        deployer.undeploy(war, "--droptables=true", "--cascade=true");
+    }
+}
 ----
 
 [[creating-a-scattered-archive]]
 ==== *Creating a Scattered Archive*
 
-Deploying a module from a scattered archive (WAR or JAR) enables you to deploy an unpackaged module whose resources, deployment descriptor, and classes are in any
-location. Deploying a module from a scattered archive simplifies the testing of a module during development, especially if all the items that the module requires are not
-available to be packaged.
+Deploying a module from a scattered archive (WAR or JAR) enables you to deploy an un-packaged module whose resources, deployment descriptor, and classes are in any location. Deploying a module from a scattered archive simplifies the testing of a module during development, especially if all the items that the module requires are not available to be packaged.
 
-In a scattered archive, these items are not required to be organized in a specific directory structure. Therefore, you must specify the location of the module's resources,
-deployment descriptor, and classes when deploying the module.
+In a scattered archive, these items are not required to be organized in a specific directory structure. Therefore, you must specify the location of the module's resources, deployment descriptor, and classes when deploying the module.
 
 To create a scattered archive, perform these tasks:
 
@@ -462,13 +368,9 @@ To create a scattered archive, perform these tasks:
 . Invoke the `addClassPath` and `addMetadata` methods if you require them.
 . Invoke the `toURI` method to deploy the scattered archive.
 
-The methods of this class for setting the scattered archive
-configuration are listed in the following table. The default value of
-each configuration setting is also listed.
+The methods of this class for setting the scattered archive configuration are listed in the following table. The default value of each configuration setting is also listed.
 
-[[table-1-3-constructors-and-methods-of-the-scatteredarchive-class]]
-Table 1-3 Constructors and Methods of the `ScatteredArchive` Class
-
+.Constructors and Methods of the `ScatteredArchive` Class
 [width="100%",cols="<52%,<38%,<10%",options="header",]
 |===
 |Purpose |Method |Default Value
@@ -477,21 +379,17 @@ Table 1-3 Constructors and Methods of the `ScatteredArchive` Class
 a|
 [source,java]
 ----
-ScatteredArchive(String name,
-ScatteredArchive.Type type)
+ScatteredArchive(String name, ScatteredArchive.Type type)
 ----
-
 |None
 
 |Creates and names a scattered archive based on a top-level directory.
 If the entire module is organized under the topDir, this is the only
-method necessary. The topDir can be null if other methods specify the
+method necessary. The `topDir` argument can be null if other methods specify the
 remaining parts of the module.
 a|[source,java]
 ----
-ScatteredArchive(String name,
-ScatteredArchive.Type type,
-File topDir)
+ScatteredArchive(String name, ScatteredArchive.Type type, File topDir)
 ----
 |None
 
@@ -512,8 +410,7 @@ addMetaData(File path)
 |Adds and names a metadata locator
 a|[source,java]
 ----
-addMetaData(File path,
-String name)
+addMetaData(File path, String name)
 ----
 |None
 
@@ -526,49 +423,46 @@ toURI()
 
 |===
 
-[[example-1-8]]
-*Example 1-8 Deploying an Application From a Scattered Archive*
-
-This example shows code for creating a WAR file and using the `addClassPath` and `addMetadata` methods. This example also includes the code from
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#example-1-6[Example 1-6] for deploying an application from an archive file.
+This example shows code for creating a WAR file and using the `addClassPath` and `addMetadata` methods. This example also includes the code from the previous example that showcases deploying an application from an archive file.
 
 [source,java]
 ----
-...
 import java.io.File;
-...
 import org.glassfish.embeddable.*;
-...
-    GlassFishProperties glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 9090);
-    GlassFish glassfish = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
-    glassfish.start();
-    Deployer deployer = glassfish.getDeployer();
-    ScatteredArchive archive = new ScatteredArchive("testapp", ScatteredArchive.Type.WAR);
-    // target/classes directory contains complied servlets
-    archive.addClassPath(new File("target", "classes"));
-    // resources/sun-web.xml is the WEB-INF/sun-web.xml
-    archive.addMetadata(new File("resources", "sun-web.xml"));
-    // resources/web.xml is the WEB-INF/web.xml
-    archive.addMetadata(new File("resources", "web.xml"));
-    // Deploy the scattered web archive.
-    String appName = deployer.deploy(archive.toURI(), "--contextroot=hello");
 
-    deployer.undeploy(appName);
-    glassfish.stop();
-    glassfish.dispose();
-...
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 9090);
+
+        var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
+        server.start();
+
+        var deployer = glassfish.getDeployer();
+        var archive = new ScatteredArchive("testapp", ScatteredArchive.Type.WAR);
+        // target/classes directory contains complied servlets
+        archive.addClassPath(new File("target", "classes"));
+        // resources/payara-web.xml is the WEB-INF/payara-web.xml
+        archive.addMetadata(new File("resources", "payara-web.xml"));
+        // resources/web.xml is the WEB-INF/web.xml
+        archive.addMetadata(new File("resources", "web.xml"));
+
+        // Deploy the scattered web archive.
+        var appName = deployer.deploy(archive.toURI(), "--contextroot=hello");
+
+        deployer.undeploy(appName);
+        server.stop();
+        server.dispose();
+    }
+}
 ----
 
 [[creating-a-scattered-enterprise-archive]]
-==== Creating a Scattered Enterprise Archive
+==== *Creating a Scattered Enterprise Archive*
 
-Deploying an application from a scattered enterprise archive (EAR) enables you to deploy an unpackaged application whose resources, deployment descriptor, and classes
-are in any location. Deploying an application from a scattered archive simplifies the testing of an
-application during development, especially if all the items that the application requires are not available to be packaged.
+Deploying an application from a scattered enterprise archive (EAR) enables you to deploy an un-packaged application whose resources, deployment descriptor, and classes are in any location. Deploying an application from a scattered archive simplifies the testing of an application during development, especially if all the items that the application requires are not available to be packaged.
 
-In a scattered archive, these items are not required to be organized in a specific directory structure. Therefore, you must specify the location of the application's
-resources, deployment descriptor, and classes when deploying the application.
+In a scattered archive, these items are not required to be organized in a specific directory structure. Therefore, you must specify the location of the application's resources, deployment descriptor, and classes when deploying the application.
 
 To create a scattered enterprise archive, perform these tasks:
 
@@ -576,12 +470,9 @@ To create a scattered enterprise archive, perform these tasks:
 . Invoke the `addArchive` and `addMetadata` methods if you require them.
 . Invoke the `toURI` method to deploy the scattered enterprise archive.
 
-The methods of this class for setting the scattered enterprise archive configuration are listed in the following table. The default value of each configuration setting
-is also listed.
+The methods of this class for setting the scattered enterprise archive configuration are listed in the following table. The default value of each configuration setting is also listed.
 
-[[table-1-4-constructors-and-methods-of-the-scatteredenterprisearchive-class]]
-Table 1-4 Constructors and Methods of the `ScatteredEnterpriseArchive` Class
-
+.Constructors and Methods of the `ScatteredEnterpriseArchive` Class
 [width="99%",cols="<42%,<48%,<10%",options="header",]
 |===
 |Purpose |Method |Default Value
@@ -640,124 +531,103 @@ a|[source,java]
 toURI()
 ----
 |None
-
 |===
 
-
-[[example-1-9]]
-*Example 1-9 Deploying an Application From a Scattered Enterprise Archive*
-
-This example shows code for creating an EAR file and using the `addArchive` and `addMetadata` methods. This example also includes code similar to
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#example-1-8[Example 1-8] for creating a scattered archive.
+This example shows code for creating an EAR file and using the `addArchive` and `addMetadata` methods.
 
 [source,java]
 ----
-...
 import java.io.File;
-...
 import org.glassfish.embeddable.*;
-...
-    GlassFishProperties glassfishProperties = new GlassFishProperties();
-    glassfishProperties.setPort("http-listener", 9090);
-    GlassFish glassfish = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
-    glassfish.start();
-    Deployer deployer = glassfish.getDeployer();
 
-    // Create a scattered web application.
-    ScatteredArchive webmodule = new ScatteredArchive("testweb", ScatteredArchive.Type.WAR);
-    // target/classes directory contains my complied servlets
-    webmodule.addClassPath(new File("target", "classes"));
-    // resources/sun-web.xml is my WEB-INF/sun-web.xml
-    webmodule.addMetadata(new File("resources", "sun-web.xml"));
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var glassfishProperties = new GlassFishProperties();
+        glassfishProperties.setPort("http-listener", 9090);
 
-    // Create a scattered enterprise archive.
-    ScatteredEnterpriseArchive archive = new ScatteredEnterpriseArchive("testapp");
-    // src/application.xml is my META-INF/application.xml
-    archive.addMetadata(new File("src", "application.xml"));
-    // Add scattered web module to the scattered enterprise archive.
-    // src/application.xml references Web module as "scattered.war".
-    //Hence specify the name while adding the archive.
-    archive.addArchive(webmodule.toURI(), "scattered.war");
-    // lib/mylibrary.jar is a library JAR file.
-    archive.addArchive(new File("lib", "mylibrary.jar"));
-    // target/ejbclasses contain my compiled EJB module.
-    // src/application.xml references EJB module as "ejb.jar".
-    //Hence specify the name while adding the archive.
-    archive.addArchive(new File("target", "ejbclasses"), "ejb.jar");
+        var server = GlassFishRuntime.bootstrap().newGlassFish(glassfishProperties);
+        server.start();
 
-    // Deploy the scattered enterprise archive.
-    String appName = deployer.deploy(archive.toURI());
+        var deployer = glassfish.getDeployer();
 
-    deployer.undeploy(appName);
-    glassfish.stop();
-    glassfish.dispose();
-...
+        // Create a scattered web application.
+        var webmodule = new ScatteredArchive("testweb", ScatteredArchive.Type.WAR);
+        // target/classes directory contains my complied servlets
+        webmodule.addClassPath(new File("target", "classes"));
+        // resources/payara-web.xml is my WEB-INF/payara-web.xml
+        webmodule.addMetadata(new File("resources", "payara-web.xml"));
+
+        // Create a scattered enterprise archive.
+        var archive = new ScatteredEnterpriseArchive("testapp");
+        // src/application.xml is my META-INF/application.xml
+        archive.addMetadata(new File("src", "application.xml"));
+        // Add scattered web module to the scattered enterprise archive.
+        // src/application.xml references Web module as "scattered.war".
+        //Hence specify the name while adding the archive.
+        archive.addArchive(webmodule.toURI(), "scattered.war");
+        // lib/mylibrary.jar is a library JAR file.
+        archive.addArchive(new File("lib", "mylibrary.jar"));
+        // target/ejbclasses contain my compiled EJB module.
+        // src/application.xml references EJB module as "ejb.jar".
+        //Hence specify the name while adding the archive.
+        archive.addArchive(new File("target", "ejbclasses"), "ejb.jar");
+
+        // Deploy the scattered enterprise archive.
+        var appName = deployer.deploy(archive.toURI());
+
+        deployer.undeploy(appName);
+        server.stop();
+        server.dispose();
+    }
+}
 ----
 
 [[running-asadmin-commands-using-the-payara-server-embedded-server-api]]
 === Running `asadmin` Commands Using the Payara Server Embedded Server API
 
-Running xref:docs:reference-manual:asadmin.adoc[`asadmin`] commands from an application enables the application to configure the embedded Payara Server to
-suit the application's requirements. For example, an application can run the required `asadmin` commands to create a JDBC technology connection to a database.
+Running commands from an application enables the application to configure the embedded Payara Server to suit the application's requirements. For example, an application can run the required `asadmin` commands to create a JDBC technology connection to a database.
 
-For more information about configuring embedded Payara Server, see the xref:docs:administration-guide:title.adoc[Payara Server Administration Guide].
-For detailed information about `asadmin` commands, see Section 1 of the xref:docs:reference-manual:title.adoc[Payara Server Reference Manual].
+NOTE: Ensure that your application has started an embedded Payara Server before the application attempts to run any `asadmin` commands. For more information, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#running-an-embedded-payara-server[Running an Embedded Payara Server].
 
+The `org.glassfish.embeddable` package contains classes that you can use to run `asadmin` commands. Use the following code examples as templates and change the command name, parameter names, and parameter values as needed.
 
-[NOTE]
-====
-Ensure that your application has started an embedded Payara Server before the application attempts to run `asadmin` commands. For more information,
-see xref:docs:embedded-server-guide:embedded-server-guide.adoc#running-an-embedded-payara-server[Running an Embedded Payara Server].
-====
-
-
-The `org.glassfish.embeddable` package contains classes that you can use to run `asadmin` commands. Use the following code examples as templates and change
-the command name, parameter names, and parameter values as needed.
-
-[[example-1-10]]
-*Example 1-10 Running an `asadmin create-jdbc-resource` Command*
-
-This example shows code for running an `asadmin create-jdbc-resource` command. Code for creating and starting the server is not shown in this example.
-For an example of code for creating and starting the server, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#example-1-4[Example 1-4].
+This example shows code for running an `asadmin create-jdbc-resource` command:
 
 [source,java]
 ----
-...
 import org.glassfish.embeddable.*;
-...
-    String command = "create-jdbc-resource";
-    String poolid = "--connectionpoolid=DerbyPool";
-    String dbname = "jdbc/DerbyPool";
-    CommandRunner commandRunner = glassfish.getCommandRunner();
-    CommandResult commandResult = commandRunner.run(command, poolid, dbname);
-...
+
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var command = "create-jdbc-resource";
+        var poolId = "--connectionpoolid=DerbyPool";
+        var dbname = "jdbc/DerbyPool";
+        var commandRunner = glassfish.getCommandRunner();
+        var commandResult = commandRunner.run(command, poolId, dbname);
+    }
+}
 ----
 
-[[example-1-11]]
-*Example 1-11 Running an `asadmin set-log-level` Command*
-
-This example shows code for running an `asadmin set-log-level` command. Code for creating and starting the server is not shown in this example.
-For an example of code for creating and starting the server, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#example-1-4[Example 1-4].
+This example shows code for running an `asadmin set-log-level` command:
 
 [source,java]
 ----
-...
 import org.glassfish.embeddable.*;
-...
-    String command = "set-log-level";
-    String weblevel = "jakarta.enterprise.system.container.web=FINE";
-    CommandRunner commandRunner = glassfish.getCommandRunner();
-    CommandResult commandResult = commandRunner.run(command, weblevel);
-...
+
+public class EmbeddedRunner{
+    public static void main(String... args){
+        var command = "set-log-level";
+        var level = "javax.enterprise.system.container.web=FINE";
+        var commandRunner = glassfish.getCommandRunner();
+        var commandResult = commandRunner.run(command, level);
+    }
+}
 ----
 
 For another way to change log levels, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#changing-log-levels-in-embedded-payara-server[Changing Log Levels in Embedded Payara Server].
 
 [[sample-applications]]
 === Sample Applications
-
-[[example-1-12]]
-*Example 1-12 Using an Existing `domain.xml` File and Deploying an Application From an Archive File*
 
 This example shows code for the following:
 
@@ -768,675 +638,102 @@ This example shows code for the following:
 ----
 import java.io.File;
 import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import org.glassfish.embeddable.*;
 
-public class Main {
-
-     /**
-     * @param args the command line arguments
-     */
-
+public class EmbeddedRunner {
     public static void main(String[] args) {
-        File configFile = new File ("c:\\myapp\\embeddedserver\\domains\\domain1\\config\\domain.xml");
-        File war = new File("c:\\samples\\simple.war");
+        var configFile = new File ("c:\\myapp\\embeddedserver\\domains\\domain1\\config\\domain.xml");
+        var war = new File("c:\\samples\\simple.war");
         try {
-            GlassFishRuntime glassfishRuntime = GlassFishRuntime.bootstrap();
-            ...
-            GlassFishProperties glassfishProperties = new GlassFishProperties();
+            var glassfishRuntime = GlassFishRuntime.bootstrap();
+            var glassfishProperties = new GlassFishProperties();
             glassfishProperties.setConfigFileURI(configFile.toURI());
             glassfishProperties.setConfigFileReadOnly(false);
-            ...
-            GlassFish glassfish = glassfishRuntime.newGlassFish(glassfishProperties);
-            glassfish.start();
 
-            Deployer deployer = glassfish.getDeployer();
+            var server = glassfishRuntime.newGlassFish(glassfishProperties);
+            server.start();
+
+            var deployer = server.getDeployer();
             deployer.deploy(war, "--force=true");
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        catch (Exception ex) {
+            ex.printStackTrace();
         }
 
-        System.out.println("Press Enter to stop server");
-        // wait for Enter
-        new BufferedReader(new java.io.InputStreamReader(System.in)).readLine();
-        try {
-            glassfish.dispose();
-            glassfishRuntime.shutdown();
+        System.out.println("Press Enter to stop the server");
+        try(var reader = new BufferedReader(new InputStreamReader(System.in)).readLine()) {
+            server.dispose();
+            server.shutdown();
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }
 ----
 
-[[testing-applications-with-the-maven-plug-in-for-embedded-payara-server]]
-== Testing Applications with the Maven Plug-in for Embedded Payara Server
+[[using-the-ejb-embeddable-api-with-embedded-payara-server]]
+== Using the EJB Embeddable API with Embedded Payara Server
 
-If you are using http://maven.apache.org/[Apache Maven] (`http://maven.apache.org/`), the plug-in for embedded Payara Server simplifies the
-testing of applications. This plug-in enables you to build and start an unpackaged application with a single Maven goal.
+Payara Server Embedded is not related to the EJB Embeddable API, but you can use these APIs together in some form. The EJB Embeddable API supports all EJB Lite features with addition of the EJB timer service and testing of EJB modules packaged in a WAR file.
 
-To use Maven with Embedded Payara Server and the EJB 3.1 Embeddable API, see
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-maven-with-the-ejb-3.1-embeddable-api-and-embedded-payara-server[Using Maven with the EJB 3.1 Embeddable API and Embedded Payara Server].
+For EJB modules in a WAR file (or an exploded directory), if a web application has one EJB module, and there are no other EJB modules in the classpath, those entries (libraries) are ignored. If there are other EJB modules, a temporary EAR file is created. For EJB modules in a WAR file to be tested, the client code must use EJB modules with interfaces or without annotations. Those EJB modules are not part of the classpath and can't be loaded by the client class loader.
 
-[[to-set-up-your-maven-environment]]
-=== To Set Up Your Maven Environment
+[[to-use-the-ejb-embeddable-api-with-embedded-payara-server]]
+=== To Use the EJB Embeddable API with Embedded Payara Server
 
-Setting up your Maven environment enables Maven to download the required embedded Payara Server distribution file when you build your project.
-Setting up your Maven environment also identifies the plug-in that enables you to build and start an unpackaged application with a single Maven goal.
-
-*Before You Begin*
-
-Ensure that http://maven.apache.org/[Apache Maven] (`http://maven.apache.org/`) is installed.
-
-. Identify the Maven plug-in for embedded Payara Server. Add the following `plugin` element to your POM file:
+. To specify Payara Server as the Container Provider, include the `payara-embedded-all.jar` dependency in the class path of your embeddable EJB application.
 +
-[source,xml]
-----
-...
-        ...
-        <plugins>
-            ...
-            <plugin>
-                <groupId>org.glassfish</groupId>
-                <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>version</version>
-            </plugin>
-            ...
-        </plugins>
-...
-----
-version::
-  The version to use. The version of the final promoted build for this
-  release is `3.1`. The Maven plug-in is not bound to a specific version
-  of Payara Server. You can specify the version you want to use. If
-  no version is specified, a default version, 3.1 for this release, is
-  used.
+See xref:docs:embedded-server-guide:embedded-server-guide.adoc#setting-the-class-path[Setting the Class Path] and section 17.2 of the Jakarta Enterprise Beans specification.
 
-. Configure the `embedded-glassfish` goal prefix, the application name, and other standard settings. Add the following `configuration` element to your POM file:
+. Configure any required resources.
 +
-[source,xml]
-----
-...
-        <plugins>
-            ...
-            <plugin>
-                ...
-                <configuration>
-                    <goalPrefix>embedded-glassfish</goalPrefix>
-                    ...
-                    <app>target/test.war</app>
-                    <port>8080</port>
-                    <contextRoot>test</contextRoot>
-                    <autoDelete>true</autoDelete>
-                    ...
-                </configuration>
-                ...
-            </plugin>
-            ...
-        </plugins>
-...
-----
-In the app parameter, substitute the archive file or directory for your application. The optional port, contextRoot, and autoDelete parameters
-show example values. For details, see xref:docs:embedded-server-guide:embedded-server-guide.adoc#maven-goals-for-embedded-payara-server[Maven Goals for Embedded Payara Server].
-
-. Perform advanced plug-in configuration. This step is optional. Add the following `configuration` element to your POM file:
+TIP: The `jdbc/__default` H2 database is preconfigured in all distributions of the Payara Platform.
 +
-[source,xml]
-----
-...
-        <plugins>
-            ...
-            <plugin>
-                ...
-                <configuration>
-                    <goalPrefix>embedded-glassfish</goalPrefix>
-                    <app>target/test.war</app>
-                    <name>test</name>
-                    <contextRoot>test</contextRoot>
-                    <ports>
-                        <http-listener>8080</http-listener>
-                        <https-listener>8181</https-listener>
-                    </ports>
-                    <bootstrapProperties>
-                        <property>test_key=test_value</property>
-                    </bootstrapProperties>
-                    <bootstrapPropertiesFile>bootstrap.properties</bootstrapPropertiesFile>
-                    <glassfishProperties>
-<property>embedded-glassfish-config.server.jms-service.jms-host.default_JMS_host.port=17676</property>
-                    </glassfishProperties>
-                    <glassfishPropertiesFile>glassfish.properties</glassfishPropertiesFile>
-                    <systemProperties>
-                        <property>ANTLR_USE_DIRECT_CLASS_LOADING=true</property>
-                    </systemProperties>
-                    <systemPropertiesFile>system.properties</systemPropertiesFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>start</goal>
-                            <goal>deploy</goal>
-                            <goal>undeploy</goal>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            ...
-        </plugins>
-...
-----
-. Configure Maven goals. Add `execution` elements to your POM file:
-+
-[source,xml]
-----
-...
-        <plugins>
-            ...
-            <plugin>
-                ...
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                                <goal>goal</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                ...
-            </plugin>
-            ...
-        </plugins>
-...
-----
-goal::
-  The goal to use. See xref:docs:embedded-server-guide:embedded-server-guide.adoc#maven-goals-for-embedded-payara-server[Maven Goals for Embedded Payara Server].
-. Configure the repository. Add the following `repository` element to your POM file:
-+
-[source,xml]
-----
-<pluginRepositories>
-    <pluginRepository>
-        <id>maven2-repository.dev.java.net</id>
-        <name>Java.net Repository for Maven</name>
-        <url>http://download.java.net/maven/glassfish/</url>
-    </pluginRepository>
-</pluginRepositories>
-----
-
-[[example-1-13]]
-*Example 1-13 POM File for Configuring Maven to Use Embedded Payara Server*
-
-This example shows a POM file for configuring Maven to use embedded Payara Server.
-
-[source,xml]
-----
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Line breaks in the following element are for readability purposes only
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-http://maven.apache.org/maven-v4_0_0.xsd">
-
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.glassfish</groupId>
-  <artifactId>maven-glassfish-plugin-tester</artifactId>
-  <version>3.1</version>
-  <name>Maven test</name>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.glassfish</groupId>
-        <artifactId>maven-embedded-glassfish-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <goalPrefix>embedded-glassfish</goalPrefix>
-          <app>target/test.war</app>
-          <port>8080</port>
-          <contextRoot>test</contextRoot>
-          <autoDelete>true</autoDelete>
-       </configuration>
-       <executions>
-          <execution>
-             <phase>install</phase>
-             <goals>
-                   <goal>run</goal>
-             </goals>
-          </execution>
-       </executions>
-     </plugin>
-    </plugins>
-  </build>
-  <pluginRepositories>
-      <pluginRepository>
-          <id>maven2-repository.dev.java.net</id>
-          <name>Java.net Repository for Maven</name>
-          <url>http://download.java.net/maven/glassfish/</url>
-      </pluginRepository>
-  </pluginRepositories>
-</project>
-----
-
-[[to-build-and-start-an-application-from-maven]]
-=== To Build and Start an Application From Maven
-
-If you are using Maven to manage the development of your application, you can use a Maven goal to build and start the application in embedded Payara Server.
-
-*Before You Begin*
-
-Ensure that your Maven environment is configured, as described in
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#to-set-up-your-maven-environment[To Set Up Your Maven Environment].
-
-. Include the path to the Maven executable file `mvn` in your path statement.
-. Ensure that the `JAVA_HOME` environment variable is defined.
-. Create a directory for the Maven project for your application.
-. Copy to your project directory the POM file that you created in
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#to-set-up-your-maven-environment[To Set Up Your Maven Environment].
-. Run the following command in your project directory:
-[source,shell]
-----
-mvn install
-----
-This command performs the following actions:
-* Installs the Maven repository in a directory named `.m2` under your home directory.
-* Starts Embedded Payara Server.
-* Deploys your application.
-
-The application continues to run in Embedded Payara Server until Embedded Payara Server is stopped.
-
-[[to-stop-embedded-payara-server]]
-=== To Stop Embedded Payara Server
-
-1.  Change to the root directory of the Maven project for your application.
-2.  Run the Maven goal to stop the application in embedded Payara
-Server. +
-[source,oac_no_warn]
-----
-mvn embedded-glassfish:stop
-----
-This runs the `stop` method of the `Payara` object and any other methods that are required to shut down the server in an orderly fashion.
-See xref:docs:embedded-server-guide:embedded-server-guide.adoc#stopping-an-embedded-payara-server-from-an-application[Stopping an Embedded Payara Server From an Application].
-
-[[to-redeploy-an-application-that-was-built-and-started-from-maven]]
-=== To Redeploy an Application That Was Built and Started From Maven
-
-An application that was built and started from Maven continues to run in Embedded Payara Server until Embedded Payara Server is stopped.
-While the application is running, you can test changes to the application by redeploying it.
-
-To redeploy, in the window from where the application was built and started from Maven, press Enter.
-
-[[maven-goals-for-embedded-payara-server]]
-=== Maven Goals for Embedded Payara Server
-
-You can use the following Maven goals to test your applications with embedded Payara Server:
-
-* xref:docs:embedded-server-guide:embedded-server-guide.adoc#embedded-glassfishrun-goal[`embedded-glassfish:run` Goal]
-* xref:docs:embedded-server-guide:embedded-server-guide.adoc#embedded-glassfishstart-goal[`embedded-glassfish:start` Goal]
-* xref:docs:embedded-server-guide:embedded-server-guide.adoc#embedded-glassfishdeploy-goal[`embedded-glassfish:deploy` Goal]
-* xref:docs:embedded-server-guide:embedded-server-guide.adoc#embedded-glassfishundeploy-goal[`embedded-glassfish:undeploy` Goal]
-* xref:docs:embedded-server-guide:embedded-server-guide.adoc#embedded-glassfishstop-goal[`embedded-glassfish:stop` Goal]
-* xref:docs:embedded-server-guide:embedded-server-guide.adoc#embedded-glassfishadmin-goal[`embedded-glassfish:admin` Goal]
-
-[[embedded-glassfishrun-goal]]
-==== *`embedded-glassfish:run` Goal*
-
-This goal starts the server and deploys an application. You can redeploy if you change the application. The application can be a packaged archive
-or a directory that contains an exploded application. You can set the parameters described in the following table.
-
-[[table-1-5-embeddedglassfishrun-parameters]]
-Table 1-5 `embedded-glassfish:run` Parameters
-
-[width="100%",cols="<18%,<42%,<40%",options="header",]
-|===
-|Parameter |Default |Description
-
-|app
-|None
-|The archive file or directory for the application to be deployed.
-
-|serverID
-|`maven`
-|(optional) The ID of the server to start.
-
-|containerType
-|`all`
-|(optional) The container to start: `web`, `ejb`, `jpa`, or `all`.
-
-|installRoot
-|None
-|(optional) The xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root Directory].
-
-|instanceRoot
-a|In order of precedence:
-
-* `glassfish.embedded.tmpdir` property value specified in
-`GlassFishProperties` object
-* `glassfish.embedded.tmpdir` system property value
-* `java.io.tmp` system property value
-* as-install`/domains/domain1` if a nonembedded installation is
-referenced
-|(optional) The xref:docs:embedded-server-guide:embedded-server-guide.adoc#instance-root-directory[Instance Root Directory]
-
-|configFile
-|domain-dir`/config/domain.xml`
-|(optional) The configuration file.
-
-|port
-|None. Must be set explicitly or defined in the configuration
-file.
-|The HTTP or HTTPS port.
-
-|name
-a|In order of precedence:
-
-* The `application-name` or `module-name` in the deployment descriptor.
-* The name of the archive file without the extension or the directory
-name.
-
-For more information, see "xref:docs:application-deployment-guide:overview.adoc#naming-standards[Naming Standards]" in Payara Server Application Deployment Guide.
-|(optional) The name of the application.
-
-|contextRoot
-|The name of the application.
-|(optional) The context root of the application.
-
-|precompileJsp
-|`false`
-|(optional) If `true`, JSP pages are precompiled during deployment.
-
-|dbVendorName
-|None
-|(optional) The name of the database vendor for which tables can be created. Allowed values are `javadb`, `db2`, `mssql`, `mysql`, `oracle`, `postgresql`,
-`pointbase`, `derby` (also for CloudScape), and `sybase`, case-insensitive.
-
-|createTables
-|Value of the `create-tables-at-deploy` attribute in `sun-ejb-jar.xml`.
-|(optional) If `true`, creates database tables during deployment for beans that are automatically mapped by the EJB container.
-
-|dropTables
-|Value of the `drop-tables-at-undeploy` attribute in `sun-ejb-jar.xml`.
-a|(optional) If `true`, and deployment and undeployment occur in the same JVM session, database tables that were automatically created when the bean(s) were
-deployed are dropped when the bean(s) are undeployed.
-
-If `true`, the name parameter must be specified or tables may not be dropped.
-
-|autoDelete
-|`false`
-a|(optional) If `true`, deletes the contents of the xref:docs:embedded-server-guide:embedded-server-guide.adoc#instance-root-directory[Instance Root Directory]
-when the server is stopped.
-
-Caution: Do not set `autoDelete` to `true` if you are using `installRoot` to refer to a preexisting Payara Server installation.
-
-|===
-
-[[embedded-glassfishstart-goal]]
-==== `embedded-glassfish:start` Goal
-
-This goal starts the server. You can set the parameters described in the following table.
-
-[[table-1-6-embeddedglassfishstart-parameters]]
-*Table 1-6 `embedded-glassfish:start` Parameters*
-
-[width="100%",cols="<17%,<38%,<45%",options="header",]
-|===
-|Parameter |Default |Description
-|serverID
-|`maven`
-|(optional) The ID of the server to start.
-
-|containerType
-|`all`
-|(optional) The container to start: `web`, `ejb`, `jpa`, or `all`.
-
-|installRoot
-|None
-|(optional) The xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root Directory].
-
-|instanceRoot
-a|
-In order of precedence:
-
-* `glassfish.embedded.tmpdir` system property value
-* `java.io.tmpdir` system property value
-* as-install`/domains/domain1`
-
-|(optional) The xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Instance Root Directory]
-
-|configFile
-|domain-dir`/config/domain.xml`
-|(optional) The configuration file.
-
-|port
-|None. Must be set explicitly or defined in the configuration file.
-|The HTTP or HTTPS port.
-
-|autoDelete
-|`false`
-a|(optional) If `true`, deletes the contents of the xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Instance Root Directory]
-when the server is stopped.
-
-Caution: Do not set `autoDelete` to `true` if you are using `installRoot` to refer to a preexisting Payara Server installation.
-
-|===
-
-[[embedded-glassfishdeploy-goal]]
-==== *`embedded-glassfish:deploy` Goal*
-
-This goal deploys an application. You can redeploy if you change the application. The application can be a packaged archive or a directory that contains an exploded
-application. You can set the parameters described in the following table.
-
-[[table-1-7-embeddedglassfishdeploy-parameters]]
-*Table 1-7 `embedded-glassfish:deploy` Parameters*
-
-[width="100%",cols="<18%,<39%,<43%",options="header",]
-|===
-|Parameter |Default |Description
-|app
-|None
-|The archive file or directory for the application to be deployed.
-
-|serverID
-|`maven`
-|(optional) The ID of the server to start.
-
-|name
-a|In order of precedence:
-
-* The `application-name` or `module-name` in the deployment descriptor.
-* The name of the archive file without the extension or the directory name.
-
-For more information, see "xref:docs:application-deployment-guide:overview.adoc#naming-standards[Naming Standards]" in Payara Server Application Deployment Guide.
-|(optional) The name of the application.
-
-|contextRoot
-|The name of the application.
-|(optional) The context root of the application.
-
-|precompileJsp
-|`false`
-|(optional) If `true`, JSP pages are precompiled during deployment.
-
-|dbVendorName
-|None
-|(optional) The name of the database vendor for which tables can be created. Allowed values are `javadb`, `db2`, `mssql`, `oracle`, `postgresql`, `pointbase`, `derby`
-(also for CloudScape), and `sybase`, case-insensitive.
-
-|createTables
-|Value of the `create-tables-at-deploy` attribute in `sun-ejb-jar.xml`.
-|(optional) If `true`, creates database tables during deployment for beans that are automatically mapped by the EJB container.
-|===
-
-[[embedded-glassfishundeploy-goal]]
-==== *`embedded-glassfish:undeploy` Goal*
-
-[NOTE]
-====
-If you reference a non-embedded Payara Server installation using the `glassfish-embedded-static-shell.jar` file and do not undeploy your applications in the same server
-life cycle in which you deployed them, expanded archives for these applications remain under the domain-dir`/applications` directory.
-====
-
-This goal undeploys an application. You can set the parameters described in the following table.
-
-[[table-1-8-embeddedglassfishundeploy-parameters]]
-*Table 1-8 `embedded-glassfish:undeploy` Parameters*
-
-[width="100%",cols="<14%,<34%,<52%",options="header",]
-|===
-|Parameter |Default |Description
-|name
-|If the name is omitted, all applications are undeployed.
-|The name of the application.
-
-|serverID
-|`maven`
-|(optional) The ID of the server to start.
-
-|dropTables
-|Value of the `drop-tables-at-undeploy` attribute in `sun-ejb-jar.xml`.
-a|(optional) If `true`, and deployment and undeployment occur in the same JVM session, database tables that were automatically created when the bean(s) were deployed
-are dropped when the bean(s) are undeployed.
-
-If `true`, the name parameter must be specified or tables may not be dropped.
-
-|cascade
-|`false`
-a| (optional) If `true`, deletes all connection pools and connector resources associated with the resource adapter being undeployed.
-
-If `false`, undeployment fails if any pools or resources are still associated with the resource adapter.
-
-This attribute is applicable to connectors (resource adapters) and applications with connector modules.
-
-|===
-
-[[embedded-glassfishstop-goal]]
-==== *`embedded-glassfish:stop` Goal*
-
-This goal stops the server. You can set the parameters described in the following table.
-
-[[table-1-9-embeddedglassfishstop-parameters]]
-Table 1-9 `embedded-glassfish:stop` Parameters
-
-[width="100%",cols="<16%,<17%,<67%",options="header",]
-|===
-|Parameter |Default |Description
-|serverID
-|`maven`
-|(optional) The ID of the server to stop.
-|===
-
-
-[[embedded-glassfishadmin-goal]]
-==== `embedded-glassfish:admin` Goal
-
-This goal runs a Payara Server administration command. You must use either the command and commandParameters parameters in combination or the commandLine parameter.
-For more information about administration commands, see the xref:docs:reference-manual:title.adoc[Payara Server Reference Manual].
-You can set the parameters described in the following table.
-
-[[table-1-10-embeddedglassfishstart-parameters]]
-Table 1-10 `embedded-glassfish:start` Parameters
-
-[width="100%",cols="<24%,<10%,<66%",options="header",]
-|===
-|Parameter |Default |Description
-|serverID
-|`maven`
-|(optional) The ID of the server on which to run the command.
-
-|command
-|None
-|The name of the command, for example `createJdbcResource`.
-
-|commandParameters
-|None
-|A map of the command parameters. See the `org.glassfish.embeddable.admin.CommandParameters` class at `http://glassfish.java.net/nonav/docs/v3/api/`.
-
-|commandLine
-|None
-|The full `asadmin` syntax of the command.
-|===
-
-
-[[using-the-ejb-3.1-embeddable-api-with-embedded-payara-server]]
-== Using the EJB 3.1 Embeddable API with Embedded Payara Server
-
-The EJB 3.1 Embeddable API is designed for unit testing of EJB modules. You must use this API with a pre-installed, non-embedded Payara Server instance. However, you can take
-advantage of Embedded Payara Server's ease of use by referencing the non-embedded Payara Server instance with the `glassfish-embedded-static-shell.jar` file.
-
-Embedded Payara Server is not related to the EJB 3.1 Embeddable API, but you can use these APIs together.
-
-The Maven plug-in does not apply to embeddable EJB applications. However, you can use Maven with the POM file shown in
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#using-maven-with-the-ejb-3.1-embeddable-api-and-embedded-payara-server[Using Maven with the EJB 3.1 Embeddable API and Embedded Payara Server].
-
-The EJB 3.1 Embeddable API is described in http://jcp.org/en/jsr/detail?id=318[Java Specification Request (JSR) 318] (`http://jcp.org/en/jsr/detail?id=318`).
-An `ejb-embedded` sample is included in the samples available at http://www.oracle.com/technetwork/java/javaee/downloads/index.html[Java EE 7 Downloads]
-(`http://www.oracle.com/technetwork/java/javaee/downloads/index.html`) or http://www.oracle.com/technetwork/java/javaee/documentation/index.html[Code Samples]
-(`http://www.oracle.com/technetwork/java/javaee/documentation/index.html`).
-
-The EJB 3.1 Embeddable API supports all EJB 3.1 Lite features with addition of the EJB timer service and testing of EJB modules packaged in a WAR file.
-
-For EJB modules in a WAR file (or an exploded directory), if a web application has one EJB module, and there are no other EJB modules in the classpath,
-those entries (libraries) are ignored. If there are other EJB modules, a temporary EAR file is created. For EJB modules in a WAR file to be tested,
-the client code must use EJB modules with interfaces or without annotations. Those EJB modules are not part of the classpath and can't be loaded by the client class loader.
-
-[[to-use-the-ejb-3.1-embeddable-api-with-embedded-payara-server]]
-=== To Use the EJB 3.1 Embeddable API with Embedded Payara Server
-
-.  To specify Payara Server as the Container Provider, include `glassfish-embedded-static-shell.jar` or `glassfish-embedded-all.jar` in the class path of your embeddable
-EJB application. +
-Reference the `glassfish-embedded-static-shell.jar` file from the as-install`/lib/embedded` directory of a Payara Server installation. Do not move this file, or it
-will not work. +
-See xref:docs:embedded-server-guide:embedded-server-guide.adoc#setting-the-class-path[Setting the Class Path] and Section 22.3.3 of the EJB 3.1 Specification,
-Embeddable Container Bootstrapping.
-.  Configure any required resources. +
-For more information about configuring resources, see the Administration Console Online Help. The `jdbc/__default` Java DB database is preconfigured with all distributions of
-Payara Server. However, if you are using `glassfish-embedded-static-shell.jar`, you must start the database manually. +
 If your embeddable EJB application uses Java Persistence, you do not need to specify a JDBC resource.
-See xref:docs:embedded-server-guide:embedded-server-guide.adoc#default-java-persistence-data-source-for-embedded-payara-server[Default Java Persistence Data Source for Embedded Payara Server].
-.  Invoke one of the `createEJBContainer` methods.
 +
-NOTE: Do not deploy your embeddable EJB application or any of its dependent Java EE modules before invoking one of the `createEJBContainer` methods. These methods perform deployment in the background and do not load previously deployed applications or modules.
+See xref:docs:embedded-server-guide:embedded-server-guide.adoc#default-jakarta-persistence-data-source-for-embedded-payara-server[Default Jakarta Persistence Data Source for Embedded Payara Server].
 
-.  To change the xref:docs:embedded-server-guide:embedded-server-guide.adoc#instance-root-directory[Instance Root Directory],
-set the `org.glassfish.ejb.embedded.glassfish.instance.root` system property value by using the `createEJBContainer``(Map<?, ?> properties)` method. +
-The default xref:docs:embedded-server-guide:embedded-server-guide.adoc#instance-root-directory[Instance Root Directory]
-location is as-install`/domains/domain1` if a non-embedded installation is referenced. This system property applies only to embeddable EJB applications used with non-embedded Payara Server.
+. Invoke one of the `createEJBContainer` methods.
++
+IMPORTANT: Do not deploy your embeddable EJB application or any of its dependent Jakarta EE modules before invoking one of the `createEJBContainer` methods. These methods perform deployment in the background and do not load previously deployed applications or modules.
+
+.  To change the xref:docs:embedded-server-guide:embedded-server-guide.adoc#instance-root-directory[Instance Root Directory], set the `org.glassfish.ejb.embedded.glassfish.instance.root` system property value by using the `createEJBContainer(Map<?, ?> properties)` method.
++
+The default root directory location is `as-install/domains/domain1` if a non-embedded installation is referenced. This system property applies only to embeddable EJB applications used in Payara Server.
+
 .  Close the EJB container properly to release all acquired resources and threads.
 
-[[ejb-3.1-embeddable-api-properties]]
-=== EJB 3.1 Embeddable API Properties
+[[ejb-embeddable-api-properties]]
+=== EJB Embeddable API Properties
 
 Properties that can be passed to the `EJBContainer#createEJBContainer(Properties)` method are summarized in the following table.
-All properties are in the `org.glassfish.ejb.embedded.glassfish` package. For example, the full name of the `installation.root`
-property is `org.glassfish.ejb.embedded.glassfish.installation.root`.
 
-[[table-1-11-ejb3-1-embedded-api-services]]
-Table 1-11 EJB 3.1 Embeddable API Properties
+NOTE: All properties use the `org.glassfish.ejb.embedded.glassfish` prefix. +
+For example, the full name of the `installation.root` property is `org.glassfish.ejb.embedded.glassfish.installation.root`.
 
+.EJB Embeddable API Properties
 [width="100%",cols="<30%,<39%,<31%",options="header",]
 |===
 |Property |Default |Description
 
 |`installation.root`
-|Payara Server installation location from which
-`glassfish-embedded-static-shell.jar` is referenced
+|Payara Server installation location
 |The xref:docs:embedded-server-guide:embedded-server-guide.adoc#installation-root-directory[Installation Root Directory].
 
 |`instance.root`
 a|In order of precedence:
 
-* `glassfish.embedded.tmpdir` property value specified in
-`GlassFishProperties` object
+* `glassfish.embedded.tmpdir` property value specified in `GlassFishProperties` object
 * `glassfish.embedded.tmpdir` system property value
 * `java.io.tmp` system property value
-* as-install`/domains/domain1` if a non-embedded installation is
-referenced
+* `as-install/domains/domain1` if a non-embedded installation is referenced
 |The xref:docs:embedded-server-guide:embedded-server-guide.adoc#instance-root-directory[Instance Root Directory].
 
 |`configuration.file`
-|domain-dir`/config/domain.xml`
-|The configuration file.
+|`domain-dir/config/domain.xml`
+|The server's configuration file.
 
 |`keep-temporary-files`
 |`false`
@@ -1448,189 +745,105 @@ referenced
 
 |`instance.reuse`
 |`false`
-|If `true`, no changes are made to the existing configuration file, and a temporary server instance is not created for the embedded run. Instead, execution happens against
-the existing server instance. Do not use this option if the reused server instance could be in use by the running non-embedded Payara Server.
+|If `true`, no changes are made to the existing configuration file, and a temporary server instance is not created for the embedded run. Instead, execution happens against the existing server instance. Do not use this option if the reused server instance could be in use by the running non-embedded Payara Server.
 
 |`skip-client-modules`
 |`false`
 |If `true`, omits modules from the classpath if they are not specified using `EJBContainer.MODULES` and have a manifest file with a `Main-Class` attribute.
-
 |===
-
-
-[[using-maven-with-the-ejb-3.1-embeddable-api-and-embedded-payara-server]]
-=== Using Maven with the EJB 3.1 Embeddable API and Embedded Payara Server
-
-When using Maven with the EJB 3.1 Embeddable API and Embedded Payara Server, you cannot use the features of the Maven plug-in. You must start and stop Embedded Payara
-Server manually or programmatically outside of Maven.
-
-[[example-1-14]]
-*Example 1-14 Maven POM File for Using the EJB 3.1 Embeddable API with  Embedded Payara Server*
-
-This example shows a POM file for configuring Maven to use the EJB 3.1 Embeddable API with Embedded Payara Server.
-
-[source,xml]
-----
-<!--
-Line breaks in the following element are for readability purposes only
--->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.glassfish</groupId>
-    <artifactId>my-ejb-app-tester</artifactId>
-    <version>3.1</version>
-    <name>Maven test</name>
-    <dependencies>
-        <dependency>
-            <groupId>org.glassfish.extras</groupId>
-            <artifactId>glassfish-embedded-static-shell</artifactId>
-            <version>${project.version}</version>
-            <scope>system</scope>
-            <systemPath>
-                ${env.S1AS_HOME}/lib/embedded/glassfish-embedded-static-shell.jar
-            </systemPath>
-        </dependency>
-<!--
-        The javaee-api is stripped of any code and is just used to compile your
-        application. The scope provided in Maven means that it is used for compiling,
-        but is also available when testing. For this reason, the javaee-api needs to
-        be below the embedded Payara dependency. The javaee-api can actually be
-        omitted when the embedded Payara dependency is included, but to keep your
-        project Java-EE 6 rather than GlassFish 3, specification is important.
--->
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>6.0</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/glassfish/</url>
-        </pluginRepository>
-    </pluginRepositories>
-</project>
-----
-
-If you are using `glassfish-embedded-static-shell.jar`, you can omit the `dependency` element with the `javaee-api` `artifactId` and the `pluginRepositories` element.
-
-Set the `S1AS_HOME` environment variable to the installation root directory before running the `mvn clean verify` command.
 
 [[changing-log-levels-in-embedded-payara-server]]
 == Changing Log Levels in Embedded Payara Server
 
-To change log levels in Embedded Payara Server, you can follow the steps in this section, or you can use the Embedded Server API as shown in
-xref:docs:embedded-server-guide:embedded-server-guide.adoc#example-1-11[Example 1-11]. For more information about Payara Server logging, see
-"xref:docs:administration-guide:logging.adoc#administering-the-logging-service[Administering the Logging Service]" in Payara Server Administration Guide.
+To change the JUL (Java Util Logging) log levels in Embedded Payara Server, you can follow the steps in this section, or you can use the Embedded Server API as shown in the previous examples.
+
+For more information about Payara Server logging, see xref:docs:administration-guide:logging.adoc#administering-the-logging-service[Administering the Logging Service] in the Payara Server Administration Guide.
 
 You can change log levels in Embedded Payara Server in either of the following ways:
 
 * Using the Payara Server Embedded Server API
 * Creating a custom logging configuration file
 
-Both these ways use logger names. For a list of logger names, use the xref:docs:reference-manual:list-log-levels.adoc[`list-log-levels`] subcommand.
+Both these ways require logger names. For a list of logger names, use the xref:docs:reference-manual:list-log-levels.adoc[`list-log-levels`] subcommand.
 
-[[example-1-15]]
-*Example 1-15 Using the Payara Server Embedded Server API*
-
-This example shows how to set log levels using the `getLogger` method in the API.
+This example shows how to set log levels using the `getLogger` method in the API:
 
 [source,java]
 ----
 import org.glassfish.embeddable.*;
 
-// Create Embedded GlassFish
-GlassFish glassfish = GlassFishRuntime.bootstrap().newGlassFish();
+public class EmbeddedRunner{
+    private static void main(String... args){
+        // Create Embedded server
+        var server = GlassFishRuntime.bootstrap().newGlassFish();
 
-// Set the log levels. For example, set 'deployment' and 'server' log levels to FINEST
-Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
-Logger.getLogger("jakarta.enterprise.system.tools.deployment").setLevel(Level.FINEST);
-Logger.getLogger("jakarta.enterprise.system").setLevel(Level.FINEST);
+        // Set the log levels. For example, set 'deployment' log levels to FINEST
+        Logger.getLogger("javax.enterprise.system.tools.deployment").setLevel(Level.FINEST);
 
-// Start Embedded GlassFish and deploy an application.
-// You will see all the FINEST logs printed on the console.
-glassfish.start();
-glassfish.getDeployer().deploy(new File("sample.war"));
+        // Start Embedded server and deploy an application.
+        // You will see all the FINEST logs printed on the console.
+        server.start();
+        server.getDeployer().deploy(new File("sample.war"));
 
-// Dispose Embedded GlassFish
-glassfish.dispose();
+        // Dispose Embedded server
+        server.dispose();
+    }
+}
 ----
 
-[[example-1-16]]
-*Example 1-16 Creating a Custom Logging Configuration File*
+This example shows the contents of a custom logging configuration file, `custom-logging.properties`.
 
-This example shows the contents of a custom logging configuration file, `customlogging.properties`.
-
-[source, shell]
+[source, properties]
 ----
-handlers= java.util.logging.ConsoleHandler
+handlers = java.util.logging.ConsoleHandler
 java.util.logging.ConsoleHandler.level = FINEST
-jakarta.enterprise.system.tools.deployment.level = FINEST
-jakarta.enterprise.system.level = FINEST
+javax.enterprise.system.tools.deployment.level = FINEST
+javax.enterprise.system.level = FINEST
 ----
 
-Pass the name of this custom logging configuration file to the `java` command when you invoke Embedded Payara Server. For example:
+Pass the name of this custom logging configuration file to the `java` command when you invoke the application starts the embedded server. For example:
 
 [source,shell]
 ----
-java -Djava.util.logging.config.file=customlogging.properties MyEmbeddedGlassFish
+java -Djava.util.logging.config.file=custom-logging.properties fish.payara.embedded.ServerRunner
 ----
 
-[[default-java-persistence-data-source-for-embedded-payara-server]]
-== Default Java Persistence Data Source for Embedded Payara Server
+[[default-jakarta-persistence-data-source-for-embedded-payara-server]]
+== Default Jakarta Persistence Data Source for Embedded Payara Server
 
-The `jdbc/__default` Java DB database is preconfigured with Embedded Payara Server. It is used when an application is deployed in Embedded Payara Server
-that uses Java Persistence but doesn't specify a data source. Embedded Payara Server uses the embedded Java DB database created in a temporary domain that is destroyed
-when Embedded Payara Server is stopped. You can use a Java DB database configured with non-embedded Payara Server if you explicitly specify the instance root directory
-or the configuration file.
+The `jdbc/__default` H2 database is preconfigured in any Embedded Payara Server. It is used when an application is deployed in Embedded Payara Server that uses Jakarta Persistence but doesn't specify a data source.
 
-By default, weaving is enabled when the Payara Server Embedded Server API is used. To disable weaving, set the `org.glassfish.persistence.embedded.weaving.enabled` property
-to `false`.
+Embedded Payara Server uses an embedded H2 database created in a temporary domain that is destroyed when an embedded Payara Server is stopped. You can use an H2 database configured with non-embedded Payara Server if you explicitly specify the instance root directory or through its configuration file.
 
 [[restrictions-for-embedded-payara-server]]
 == Restrictions for Embedded Payara Server
 
-The `glassfish-embedded-web.jar` file for embedded Payara Server supports only these features of non-embedded Payara Server:
+The web profile variant of the Embedded API (`payara-embedded-web.jar`) only supports the following Payara Server features:
 
-* The following web technologies of the Java EE platform:
-
-** Java Servlet API
-
-** JavaServer Pages (JSP) technology
-
-** JavaServer Faces technology
+* The following web technologies of the Jakarta EE platform:
+** Jakarta Servlet
+** Jakarta Server Pages (JSP) technology
+** Jakarta Faces technology
 * JDBC-technology connection pooling
-* Java Persistence API
-* Java Transaction API
-* Java Transaction Service
+* Jakarta Persistence
+* Jakarta Transactions
 
-The `glassfish-embedded-all.jar` and `glassfish-embedded-static-shell.jar` files support all features of nonembedded Payara Server with these exceptions:
+The full profile variant of the Embedded API (`payara-embedded-all.jar`) support all features of Payara Server with the following exceptions:
 
-* Installers
 * Administration Console
-* Update Tool
+* Upgrade Tool (Enterprise-edition only)
 * Apache Felix OSGi framework
-* The Maven plug-in for embedded Payara Server does not support application clients.
-* Applications that require ports for communication, such as remote EJB components, do not work with the EJB 3.1 Embeddable API running with embedded Payara Server if a
-non-embedded Payara Server is running in parallel.
 
-Embedded Payara Server requires no installation or configuration. As a result, the following files and directories are absent from the file system until embedded Payara Server
-is started:
+Since an Embedded Payara Server requires no installation or configuration, the following files and directories are absent from the file system until the server is properly started:
 
 * `default-web.xml` file
 * `domain.xml` file
 * Applications directory
 * Instance root directory
 
-When embedded Payara Server is started, the base installation directory that Payara Server uses depends on the options with which Payara Server is started. If necessary,
-embedded Payara Server creates a base installation directory. Embedded Payara Server then copies the following directories and their contents from the Java archive (JAR) file
-in which embedded Payara Server is distributed:
+When embedded Payara Server is started, the base installation directory that Payara Server uses depends on the options with which Payara Server is started. If necessary, an embedded Payara Server creates a base installation directory and then copies the following directories and their contents from the Java archive (JAR) file in which embedded Payara Server is distributed:
 
 * `domains`
 * `lib`
 
-If necessary, Payara Server also creates an instance root directory.
+NOTE: If necessary, Payara Server also creates an instance root directory.

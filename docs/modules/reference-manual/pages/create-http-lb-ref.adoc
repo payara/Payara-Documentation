@@ -1,7 +1,10 @@
 [[create-http-lb-ref]]
 = create-http-lb-ref
 
-adds an existing cluster or server instance to an existing load balancer configuration or load balancer
+IMPORTANT: This subcommand has been retained from Oracle GlassFish's original integration with external load balancers, but it has no proper integration functionality in Payara Server. Hence, it is not intended to be used in any way. +
+The documentation in this page may not be accurate.
+
+Adds an existing cluster or server instance to an existing load balancer configuration or load balancer.
 
 [[synopsis]]
 == Synopsis
@@ -28,8 +31,6 @@ Use the `create-http-lb-ref` subcommand to:
 * Enable all instances in the target cluster for load balancing, or use `enable-http-lb-server` to enable them individually.
 * Enable all applications deployed to the target for load balancing, or use `enable-http-lb-application` to enable them individually.
 
-NOTE: This subcommand is only applicable to Payara Server. This subcommand is not applicable to Payara Server Open Source Edition.
-
 [[options]]
 == Options
 
@@ -43,36 +44,31 @@ asadmin-options::
 `--lbname`::
   Specifies the load balancer to which to add clusters and server instances. Specify either a load balancer configuration or a load balancer. Specifying both results in an error.
 `--lbpolicy`::
-  The policy the load balancer follows. Valid values are `round-robin`, `weighted-round-robin`, and `user-defined`.
-  If you choose user-defined, specify a load balancer policy module with the
+  The policy the load balancer follows. Valid values are `round-robin`, `weighted-round-robin`, and `user-defined`. If you choose user-defined, specify a load balancer policy module with the
   `lbpolicymodule` option. If you choose `weighted-round-robin` assign weights to the server instances using the `configure-lb-weight` subcommand. The default is `round-robin`.
 `--lbpolicymodule`::
-  If your load balancer policy is `user-defined`, use this option to specify the full path and name of the shared library of your load
-  balancing policy module. The shared library needs to be in a location accessible by the web server.
+  If your load balancer policy is `user-defined`, use this option to specify the full path and name of the shared library of your load balancing policy module. The shared library needs to be in a location accessible by the web server.
 `--healthcheckerurl`::
   The URL to ping to determine whether the instance is healthy.
 `--healthcheckerinterval`::
-  The interval in seconds the health checker waits between checks of an
-  unhealthy instance to see whether it has become healthy. The default value is 30 seconds. A value of 0 disables the health checker.
+  The interval in seconds the health checker waits between checks of an unhealthy instance to see whether it has become healthy. The default value is 30 seconds. A value of 0 disables the health checker.
 `--healthcheckertimeout`::
-  The interval in seconds the health checker waits to receive a response from an instance. If the health checker has not received a response in
-  this interval, the instance is considered unhealthy. The default is 10.
+  The interval in seconds the health checker waits to receive a response from an instance. If the health checker has not received a response in this interval, the instance is considered unhealthy. The default is 10.
 `--lbenableallinstances`::
   Enables all instances in the target cluster for load balancing. If the target is a server instance, enables that instance for load balancing. The default value is true.
 `--lbenableallapplications`::
   Enables all applications deployed to the target cluster or instance for load balancing. The default value is true.
 `--lbweight`::
   The name of the instance and the weight you are assigning it.
-  The weight must be an integer. The pairs of instances and weights are separated by colons. For example `instance1=1:instance2=4` means that
-  for every five requests, one goes to instance1 and four go to instance2. A weight of 1 is the default.
+  The weight must be an integer. The pairs of instances and weights are separated by colons. For example `instance1=1:instance2=4` means that for every five requests, one goes to instance1 and four go to instance2. A weight of 1 is the default.
 
 [[operands]]
 == Operands
 
 target::
   Specifies which cluster or instance to add to the load balancer. Valid values are: +
-  * cluster_name- Specifies that requests for this cluster will be handled by the load balancer.
-  * stand-alone_instance_name- Specifies that requests for this standalone instance will be handled by the load balancer.
+  * cluster_name - Specifies that requests for this cluster will be handled by the load balancer.
+  * stand-alone_instance_name - Specifies that requests for this standalone instance will be handled by the load balancer.
 
 [[examples]]
 == Examples
