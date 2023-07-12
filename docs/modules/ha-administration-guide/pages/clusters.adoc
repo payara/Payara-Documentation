@@ -1,11 +1,19 @@
 [[administering-payara-server-clusters]]
 = Administering Payara Server Clusters
 
+IMPORTANT: Since Payara 5 cluster has been deprecated and replaced with Deployment Groups.
+
 A cluster is a collection of Payara Server instances that work together as one logical entity. A cluster provides a runtime environment
-for one or more Java Platform, Enterprise Edition (Jakarta EE) applications. A cluster provides high availability through failure protection, scalability, and load balancing.
+for one or more Jakarta Platform, Enterprise Edition (Jakarta EE) applications. A cluster provides high availability through failure protection, scalability, and load balancing.
 
 The Group Management Service (GMS) enables instances to participate in a cluster by detecting changes in cluster membership and notifying instances of the changes.
 To ensure that GMS can detect changes in cluster membership, a cluster's GMS settings must be configured correctly.
+
+The following topics are addressed here:
+
+* xref:about-payara-server-clusters[About Payara Server Clusters]
+* xref:group-management-service[Group Management Service]
+* xref:creating-listing-and-deleting-clusters[Creating, Listing, and Deleting Clusters]
 
 [[about-payara-server-clusters]]
 == About Payara Server Clusters
@@ -33,7 +41,18 @@ The Group Management Service (GMS) is an infrastructure component that is enable
 When GMS is enabled, if a clustered instance fails, the cluster and the Domain Administration Server (DAS) are aware of the failure and can take action when failure occurs. Many features of Payara Server depend upon GMS.
 For example, GMS is used by the in-memory session replication, transaction service, and timer service features.
 
-GMS is a core service of the Shoal framework. For more information about Shoal, visit the http://shoal.dev.java.net/[Project Shoal home page] (`https://shoal.dev.java.net/`).
+GMS is a core service of the Shoal framework.
+
+The following topics are addressed here:
+
+* xref:protocols-and-transports-for-gms[Protocols and Transports for GMS]
+* xref:gms-configuration-settings[GMS Configuration Settings]
+* xref:dotted-names-for-gms-settings[Dotted Names for GMS Settings]
+* xref:to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings]
+* xref:to-change-gms-settings-after-cluster-creation[To Change GMS Settings After Cluster Creation]
+* xref:to-check-the-health-of-instances-in-a-cluster[To Check the Health of Instances in a Cluster]
+* xref:discovering-a-cluster-when-multicast-transport-is-unavailable[Discovering a Cluster When Multicast Transport Is Unavailable]
+* xref:using-the-multi-homing-feature-with-gms[Using the Multi-Homing Feature With GMS]
 
 [[protocols-and-transports-for-gms]]
 === Protocols and Transports for GMS
@@ -66,33 +85,24 @@ Payara Server has the following types of GMS settings:
 The following GMS configuration settings are used in GMS for group discovery and failure detection:
 
 `group-discovery-timeout-in-millis`::
-  Indicates the amount of time (in milliseconds) an instance's GMS module will wait during instance startup for discovering other members of the group. +
-  The `group-discovery-timeout-in-millis` timeout value should be set to the default or higher. The default is 5000.
+Indicates the amount of time (in milliseconds) an instance's GMS module will wait during instance startup for discovering other members of the group. +
+The `group-discovery-timeout-in-millis` timeout value should be set to the default or higher. The default is 5000.
+
 `max-missed-heartbeats`::
-  Indicates the maximum number of missed heartbeats that the health monitor counts before the instance can be marked as a suspected failure.
-  GMS also tries to make a peer-to-peer connection with the suspected member.
-  If the maximum number of missed heartbeats is exceeded and peer-to-peer connection fails, the member is marked as a suspected failure. The default is 3.
+Indicates the maximum number of missed heartbeats that the health monitor counts before the instance can be marked as a suspected failure. GMS also tries to make a peer-to-peer connection with the suspected member. If the maximum number of missed heartbeats is exceeded and peer-to-peer connection fails, the member is marked as a suspected failure. The default is 3.
+
 `heartbeat-frequency-in-millis`::
-  Indicates the frequency (in milliseconds) at which a heartbeat is sent by each server instance to the cluster. +
-  The failure detection interval is the `max-missed-heartbeats` multiplied by the `heartbeat-frequency-in-millis`. Therefore, the combination of defaults, 3 multiplied by 2000
-  milliseconds, results in a failure detection interval of 6 seconds. +
-  Lowering the value of `heartbeat-frequency-in-millis` below the default would result in more frequent heartbeat messages being sent out from each member.
-  This could potentially result in more heartbeat messages in the network than a system needs for triggering failure detection protocols.
-  The effect of this varies depending on how   quickly the deployment environment needs to have failure detection performed.
-  That is, the (lower) number of retries with a lower heartbeat interval would make it quicker to detect failures. +
-  However, lowering this value could result in false positives because you could potentially detect a member as failed when, in fact, the member's heartbeat is reflecting the
-  network load from other parts of the server. Conversely, a higher timeout interval results in fewer heartbeats in the system because the time interval between heartbeats is longer.
-  As a result, failure detection would take a longer. In addition, a startup by a failed member during this time results in a new join notification but no failure notification, because failure detection and verification
-  were not completed. +
-  The default is 2000.
+Indicates the frequency (in milliseconds) at which a heartbeat is sent by each server instance to the cluster. +
+The failure detection interval is the `max-missed-heartbeats` multiplied by the `heartbeat-frequency-in-millis`. Therefore, the combination of defaults, 3 multiplied by 2000 milliseconds, results in a failure detection interval of 6 seconds. +
+Lowering the value of `heartbeat-frequency-in-millis` below the default would result in more frequent heartbeat messages being sent out from each member. This could potentially result in more heartbeat messages in the network than a system needs for triggering failure detection protocols. The effect of this varies depending on how quickly the deployment environment needs to have failure detection performed. That is, the (lower) number of retries with a lower heartbeat interval would make it quicker to detect failures. +
+However, lowering this value could result in false positives because you could potentially detect a member as failed when, in fact, the member's heartbeat is reflecting the network load from other parts of the server. Conversely, a higher timeout interval results in fewer heartbeats in the system because the time interval between heartbeats is longer. As a result, failure detection would take a longer. In addition, a startup by a failed member during this time results in a new join notification but no failure notification, because failure detection and verification were not completed. +
+The default is 2000.
+
 `verify-failure-waittime-in-millis`::
-  Indicates the verify suspect protocol's timeout used by the health monitor.
-  After a member is marked as suspect based on missed heartbeats and a failed peer-to-peer connection check, the verify suspect protocol is activated
-  and waits for the specified timeout to check for any further health state messages received in that time, and to see if a peer-to-peer connection can be made with the suspect
-  member. If not, then the member is marked as failed and a failure notification is sent. The default is 1500.
+Indicates the verify suspect protocol's timeout used by the health monitor. After a member is marked as suspect based on missed heartbeats and a failed peer-to-peer connection check, the verify suspect protocol is activated and waits for the specified timeout to check for any further health state messages received in that time, and to see if a peer-to-peer connection can be made with the suspect member. If not, then the member is marked as failed and a failure notification is sent. The default is 1500.
+
 `verify-failure-connect-timeout-in-millis`::
-  Indicates the time it takes for the GMS to detect a hardware or network failure of a server instance. Be careful not to set this value too low.
-  The smaller this timeout value is, the greater the chance of detecting false failures. That is, the instance has not failed but doesn't respond within the short window of time. The default is 10000.
+Indicates the time it takes for the GMS to detect a hardware or network failure of a server instance. Be careful not to set this value too low. The smaller this timeout value is, the greater the chance of detecting false failures. That is, the instance has not failed but doesn't respond within the short window of time. The default is 10000.
 
 The heartbeat frequency, maximum missed heartbeats, peer-to-peer connection-based failure detection, and the verify timeouts are all needed to ensure that failure detection is robust and reliable in Payara Server.
 
@@ -166,9 +176,8 @@ You can also set GMS cluster settings during this step. For more information, se
 +
 [source,shell]
 ----
-asadmin> create-instance --node localhost --cluster mycluster instance01
-
-asadmin> create-instance --node localhost --cluster mycluster instance02
+asadmin> create-instance --node localhost-domain1 --cluster mycluster instance01
+asadmin> create-instance --node localhost-domain1 --cluster mycluster instance02
 ----
 . Start the cluster. For example:
 +
@@ -219,7 +228,6 @@ asadmin> get configs.config.mycfg.group-management-service.group-discovery-timeo
 [source,shell]
 ----
 asadmin> stop-domain domain1
-
 asadmin> start-domain domain1
 ----
 . Restart the cluster. For example:
@@ -227,7 +235,6 @@ asadmin> start-domain domain1
 [source,shell]
 ----
 asadmin> stop-cluster mycluster
-
 asadmin> start-cluster mycluster
 ----
 
@@ -236,114 +243,27 @@ You can also view the full syntax and options of a subcommand by typing `asadmin
 [[to-check-the-health-of-instances-in-a-cluster]]
 === To Check the Health of Instances in a Cluster
 
-The `get-health` subcommand only works when GMS is enabled. This is the quickest way to evaluate the health of a cluster and to detect
+The `list-instances` is the quickest way to evaluate the health of a cluster and to detect
 if cluster is properly operating; that is, all members of the cluster are running and visible to DAS.
 
-If multicast is not enabled for the network, all instances could be running (as shown by the xref:docs:reference-manual:list-instances.adoc[`list-instances`] subcommand), yet isolated from each other.
-The `get-health` subcommand does not show the instances if they are running but cannot discover each other due to multicast not being configured properly.
-See xref:clusters.adoc#to-validate-that-multicast-transport-is-available-for-a-cluster[To Validate That Multicast Transport Is Available for a Cluster].
-
 . Ensure that the DAS and cluster are running. Remote subcommands require a running server.
-. Check whether server instances in a cluster are running by using the xref:docs:reference-manual:get-health.adoc[`get-health`] subcommand.
+. Check whether server instances in a cluster are running by using the xref:docs:reference-manual:list-instances.adoc[`list-instances`] subcommand.
 
 [[example-4-1]]
 
 Checking the Health of Instances in a Cluster
 
-This example checks the health of a cluster named `cluster1`.
+This example checks the health of a cluster named `mycluster`.
 
 [source,shell]
 ----
-asadmin> get-health cluster1
-instance1 started since Wed Sep 29 16:32:46 EDT 2010
-instance2 started since Wed Sep 29 16:32:45 EDT 2010
-Command get-health executed successfully.
+asadmin> list-instances mycluster
+instance01   running
+instance02   running
+Command list-instances executed successfully.
 ----
 
-You can also view the full syntax and options of the subcommand by typing `asadmin help get-health` at the command line.
-
-[[to-validate-that-multicast-transport-is-available-for-a-cluster]]
-=== To Validate That Multicast Transport Is Available for a Cluster
-
-To test a specific multicast address, multicast port, or bind interface address, get this information beforehand using the `get` subcommand.
-Use the following subcommand to get the multicast address and port for a cluster named `c1`:
-
-[source,shell]
-----
-asadmin> get clusters.cluster.c1
-clusters.cluster.c1.config-ref=mycfg
-clusters.cluster.c1.gms-bind-interface-address=${GMS-BIND-INTERFACE-ADDRESS-c1}
-clusters.cluster.c1.gms-enabled=true
-clusters.cluster.c1.gms-multicast-address=228.9.174.162
-clusters.cluster.c1.gms-multicast-port=5383
-clusters.cluster.c1.name=c1
-----
-
-Use the following subcommand to get the bind interface address of a server instance named `i1`that belongs to a cluster named `c1`, if this system property has been set:
-
-[source,shell]
-----
-asadmin> get servers.server.i1.system-property.GMS-BIND-INTERFACE-ADDRESS-c1
-servers.server.i1.system-property.GMS-BIND-INTERFACE-ADDRESS-c1.name=GMS-BIND-INTERFACE-ADDRESS-c1
-servers.server.i1.system-property.GMS-BIND-INTERFACE-ADDRESS-c1.value=10.12.152.30
-----
-
-For information on how to set this system property, see xref:clusters.adoc#using-the-multi-homing-feature-with-gms[Using the Multi-Homing Feature With GMS].
-
-NOTE: Do not run the `validate-multicast` subcommand using the DAS and cluster's multicast address and port values while the DAS and cluster are running. Doing so results in an error. +
-The `validate-multicast` subcommand must be run at the same time on two or more machines to validate whether multicast messages are being received between the machines.
-
-Check whether multicast transport is available for a cluster by using the xref:docs:reference-manual:validate-multicast.adoc[`validate-multicast`] subcommand.
-
-[[example-4-2]]
-
-Validating That Multicast Transport Is Available for a Cluster
-
-This example checks whether multicast transport is available for a cluster named `c1`.
-
-Run from host `sr1`:
-
-[source,shell]
-----
-asadmin> validate-multicast
-Will use port 2048
-Will use address 228.9.3.1
-Will use bind interface null
-Will use wait period 2,000 (in milliseconds)
-
-Listening for data...
-Sending message with content "sr1" every 2,000 milliseconds
-Received data from sr1 (loopback)
-Received data from sr2
-Exiting after 20 seconds. To change this timeout, use the --timeout command line option.
-Command validate-multicast executed successfully.
-----
-
-Run from host `sr2`:
-
-[source,shell]
-----
-asadmin> validate-multicast
-Will use port 2048
-Will use address 228.9.3.1
-Will use bind interface null
-Will use wait period 2,000 (in milliseconds)
-
-Listening for data...
-Sending message with content "sr2" every 2,000 milliseconds
-Received data from sr2 (loopback)
-Received data from sr1
-Exiting after 20 seconds. To change this timeout, use the --timeout command line option.
-Command validate-multicast executed successfully.
-----
-
-*Next Steps*
-
-As long as all machines see each other, multicast is validated to be working properly across the machines. If the machines are not seeing each other,
-set the `--bindaddress` option explicitly to ensure that all machines are using interface on same subnet, or increase the `--timetolive` option from the default of `4`.
-If these changes fail to resolve the multicast issues, ask the network administrator to verify that the network is configured so the multicast messages can be seen between all the machines used to run the cluster.
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help get-health` at the command line.
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-instances` at the command line.
 
 [[discovering-a-cluster-when-multicast-transport-is-unavailable]]
 === Discovering a Cluster When Multicast Transport Is Unavailable
@@ -425,7 +345,13 @@ gms-port::
 instance-name::
   The name of the instance that you are creating. +
 
-NOTE: For full instructions for adding an instance to a cluster, see xref:docs:ha-administration-guide:instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
+[NOTE]
+====
+For full instructions for adding an instance to a cluster, see the following sections:
+
+* xref:instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
+* xref:instances.adoc#to-create-an-instance-locally[To Create an Instance Locally].
+====
 
 [[example-4-3]]
 
@@ -642,6 +568,12 @@ asadmin set c1-config.network-config.network-listeners.network-listener.http-2.a
 == Creating, Listing, and Deleting Clusters
 
 Payara Server enables you to create clusters, obtain information about clusters, and delete clusters that are no longer required.
+
+The following topics are addressed here:
+
+* xref:to-create-a-cluster[To Create a Cluster]
+* xref:to-list-all-clusters-in-a-domain[To List All Clusters in a Domain]
+* xref:to-delete-a-cluster[To Delete a Cluster]
 
 [[to-create-a-cluster]]
 === To Create a Cluster

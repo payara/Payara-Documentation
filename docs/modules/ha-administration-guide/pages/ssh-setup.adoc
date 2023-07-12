@@ -1,7 +1,19 @@
 [[enabling-centralized-administration-of-payara-server-instances]]
 = Enabling Centralized Administration of Payara Server Instances
 
-Payara Server uses the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to ensure that clusters that span multiple hosts can be administered centrally.
+[IMPORTANT]
+====
+The Distributed Component Object Model (DCOM) remote protocol has been deprecated and as such may not function as intended.
+
+Initially, DCOM was recommended for remote node creation in Windows OS systems. However, over the years, DCOM has proven to be extremely unreliable and it doesn't work reliably in most complex scenarios.
+Due to the issues with DCOM and Windows officially starting to support its own native SSH server by including an OpenSSH implementation, we recommended using SSH nodes.
+
+However, at the moment of the publication of this documentation, using the natively provided SSH utilities by Windows OS doesn't work. The main reason for this is significant issues with file transfers not working correctly across nodes.
+
+After testing, we have discovered that when SSH is provided using a Cygwin-based OpenSSH and Bash shell from Cygwin is used to manage Payara Server, remote nodes can be created and operated without issues. Until the problems with natively provided OpenSSH implementation are addressed, we recommend you use SSH provided using a Cygwin-based OpenSSH toolset in production environments.
+====
+
+Payara Server uses the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to ensure that instances that span multiple hosts can be administered centrally.
 To perform administrative operations on Payara Server instances that are remote from the domain administration server (DAS), the DAS must be able to communicate with those instances.
 If an instance is running, the DAS connects to the running instance directly.
 For example, when you deploy an application to an instance, the DAS connects to the instance and deploys the application to the instance.
@@ -12,6 +24,17 @@ DCOM or SSH provides confidentiality and security for data that is exchanged bet
 
 NOTE: The use of DCOM or SSH to enable centralized administration of remote instances is optional. If the use of DCOM or SSH is not feasible in your environment, you can administer remote instances locally.
 
+The following topics are addressed here:
+
+* xref:about-centralized-administration-of-payara-server-instances[About Centralized Administration of Payara Server Instances]
+* xref:setting-up-dcom-and-testing-the-dcom-set-up[Setting Up DCOM and Testing the DCOM Set Up]
+* xref:setting-up-cygwin-ssh-on-windows[Setting Up Cygwin SSH on Windows]
+* xref:setting-up-the-mks-toolkit-on-windows[Setting Up the MKS Toolkit on Windows]
+* xref:setting-up-ssh-on-unix-and-linux-systems[Setting Up SSH on UNIX and Linux Systems]
+* xref:testing-the-ssh-setup-on-a-host[Testing the SSH Setup on a Host]
+* xref:setting-up-ssh-user-authentication[Setting Up SSH User Authentication]
+* xref:installing-and-removing-payara-server-software-on-multiple-hosts[Installing and Removing GlassFish Server Software on Multiple Hosts]
+
 [[about-centralized-administration-of-payara-server-instances]]
 == About Centralized Administration of Payara Server Instances
 
@@ -21,14 +44,13 @@ Instances local to the DAS can be administered without DCOM or SSH. If DCOM or S
 [[determining-whether-to-enable-centralized-administration]]
 === Determining Whether to Enable Centralized Administration
 
-Before setting up a Payara Server cluster, use the following considerations to determine whether to enable centralized administration of remote instances:
+Before setting up a Payara Server Deployment Group, use the following considerations to determine whether to enable centralized administration of remote instances:
 
-* If you are planning a large cluster of many instances, consider enabling centralized administration of instances in the cluster.
-Centralized administration of instances simplifies the administration of the cluster by enabling you to perform all administrative operations on the cluster and its instances from the DAS.
-* If you are planning a small cluster of few instances, consider whether enabling centralized administration requires more effort than logging in to individual hosts to administer remote instances locally.
+* If you are planning a large Deployment Groups of many instances, consider enabling centralized administration of instances in the Deployment Groups.
+Centralized administration of instances simplifies the administration of the Deployment Groups by enabling you to perform all administrative operations on the Deployment Groups and its instances from the DAS.
+* If you are planning a small Deployment Groups of few instances, consider whether enabling centralized administration requires more effort than logging in to individual hosts to administer remote instances locally.
 
-How you administer instances and the nodes on which they resides varies depending on whether and how centralized administration is enabled.
-The following table provides cross-references to instructions for administering nodes and instances depending on the protocol that is used for enabling centralized administration, if any.
+How you administer instances and the nodes on which they resides varies depending on whether and how centralized administration is enabled. The following table provides cross-references to instructions for administering nodes and instances depending on the protocol that is used for enabling centralized administration, if any.
 
 [width="100%",cols="<15%,<42%,<43%",options="header",]
 |=======================================================================
@@ -83,9 +105,9 @@ On UNIX and Linux systems, SSH software is typically installed as part of the ba
 
 However, on Windows systems, you must install one of the following SSH providers:
 
-* http://www.cygwin.com/[Cygwin] (`http://www.cygwin.com/`) release 1.7.6
+* http://www.cygwin.com/[Cygwin] (`http://www.cygwin.com/`)
 * http://www.mkssoftware.com[MKS Toolkit for Developers]
-(`http://www.mkssoftware.com`) release 9.2
+(`http://www.mkssoftware.com`)
 
 [[determining-the-ssh-user]]
 ==== *Determining the SSH User*
@@ -129,7 +151,7 @@ Setting up DCOM on a host involves the following tasks:
 * Enabling the Windows user to run scripts on the host
 * Setting up password authentication for the Windows user on the host
 
-Set up DCOM on all hosts where instances in your cluster will reside.
+Set up DCOM on all hosts where instances in your Deployment Groups will reside.
 
 After setting up DCOM on a host, test the connection over DCOM to the host.
 
@@ -167,7 +189,7 @@ Windows is configured in this way, you must modify these keys to allow full cont
 
 NOTE: Only the operating-system-level administrator user can edit the Windows registry.
 
-Perform this procedure for each Windows registry key that you are modifying on each host where instances in your cluster will reside.
+Perform this procedure for each Windows registry key that you are modifying on each host where instances in your Deployment Groups will reside.
 
 . If necessary, start the Registry Editor.
 +
@@ -244,7 +266,7 @@ alias-name::
 NOTE: When you create a `DCOM` node, pass this file as the `--passwordfile` option of the `asadmin` utility. For more information, see xref:nodes.adoc#to-create-a-dcom-node[To Create a `DCOM` Node].
 
 [[example-2-1]]
-Example 2-1 Creating an Alias for the Windows User's Password
+*_Example 2-1 Creating an Alias for the Windows User's Password_*
 
 This example creates an alias that is named `winuser-password` for the Windows user's password.
 
@@ -313,7 +335,7 @@ host-name::
   The name of the host to which you are testing the connection over DCOM.
 
 [[example-2-2]]
-Example 2-2 Testing the Connection Over DCOM to a Remote Host
+*_Example 2-2 Testing the Connection Over DCOM to a Remote Host_*
 
 This example tests the connection over DCOM to the host `wpmdl2`.
 
@@ -337,7 +359,14 @@ You can also view the full syntax and options of the subcommand by typing `asadm
 [[setting-up-cygwin-ssh-on-windows]]
 == Setting Up Cygwin SSH on Windows
 
-Set up Cygwin SSH on the DAS host and on all hosts where instances in your cluster will reside.
+Set up Cygwin SSH on the DAS host and on all hosts where instances in your Deployment Groups will reside.
+
+The following topics are addressed here:
+
+* xref:to-download-and-install-cygwin[To Download and Install Cygwin]
+* xref:to-set-the-path-for-windows-and-for-the-cygwin-shell[To Set the Path for Windows and for the Cygwin Shell]
+* xref:to-set-the-home-directory-for-the-cygwin-ssh-user[To Set the Home Directory for the Cygwin SSH User]
+* xref:to-configure-and-start-the-cygwin-ssh-server-daemon-sshd[To Configure and Start the Cygwin SSH Server Daemon sshd]
 
 [[to-download-and-install-cygwin]]
 === To Download and Install Cygwin
@@ -394,8 +423,8 @@ To ensure that all Payara Server commands can run without errors, each SSH user 
 
 Each user on a Windows host where SSH is set up potentially has two home directories:
 
-* Windows home directory. Payara Server commands, which are run in a Windows command window, use the Windows home directory.
-* SSH home directory. SSH commands, which are run in a shell such as `bash` or `ksh`, use the SSH home directory.
+* *Windows home directory*. Payara Server commands, which are run in a Windows command window, use the Windows home directory.
+* *SSH home directory*. SSH commands, which are run in a shell such as `bash` or `ksh`, use the SSH home directory.
 
 If these home directories are different, Payara Server and SSH each locate a user's `.ssh` directory in different directories.
 To simplify the set up of SSH, configure each user's home directory for SSH and Windows to be the same directory.
@@ -467,7 +496,14 @@ the host as explained in xref:ssh-setup.adoc#testing-the-ssh-setup-on-a-host[Tes
 [[setting-up-the-mks-toolkit-on-windows]]
 == Setting Up the MKS Toolkit on Windows
 
-Set up the MKS Toolkit on the DAS host and on all hosts where instances in your cluster will reside.
+Set up the MKS Toolkit on the DAS host and on all hosts where instances in your Deployment Groups will reside.
+
+The following topics are addressed here:
+
+* xref:to-install-the-mks-toolkit[To Install the MKS Toolkit]
+* xref:to-set-the-path-for-windows-and-for-the-mks-toolkit-shell[To Set the Path for Windows and for the MKS Toolkit Shell]
+* xref:to-set-the-home-directory-for-the-mks-toolkit-ssh-user[To Set the Home Directory for the MKS Toolkit SSH User]
+* xref:to-configure-and-start-the-mks-toolkit-ssh-server-daemon-sshd[To Configure and Start the MKS Toolkit SSH Server Daemon sshd]
 
 [[to-install-the-mks-toolkit]]
 === To Install the MKS Toolkit
@@ -562,7 +598,7 @@ user-name::
 . Confirm that the home directories are the same as explained in Step *1*.
 
 [[example-2-3]]
-Example 2-3 Setting the Home Directory for the MKS Toolkit User
+*_Example 2-3 Setting the Home Directory for the MKS Toolkit User_*
 
 This example sets the home directory for the MKS Toolkit user `Administrator` to `C:\Documents and Settings\Administrator`.
 
@@ -616,7 +652,7 @@ After you have completed the setup of SSH on a host, test the setup on the host 
 == Setting Up SSH on UNIX and Linux Systems
 
 Setting up SSH on UNIX and Linux systems involves verifying that the SSH server daemon `sshd` is running and, if necessary, starting this daemon.
-Set up SSH on the DAS host and on all hosts where instances in your cluster will reside.
+Set up SSH on the DAS host and on all hosts where instances in your Deployment Groups will reside.
 
 On UNIX and Linux systems, SSH software is typically installed as part of the base operating system. If SSH is not installed, download and
 install the appropriate http://www.openssh.com/[OpenSSH] (`http://www.openssh.com/`) SSH package for your operating system.
@@ -648,7 +684,7 @@ $ /usr/sbin/svcadm enable ssh
 ----
 
 [[example-2-4]]
-Example 2-4 Determining if the `sshd` Daemon Is Running on an Oracle Solaris System
+*_Example 2-4 Determining if the `sshd` Daemon Is Running on an Oracle Solaris System_*
 
 This example confirms that the SSH server daemon `sshd` is running on an Oracle Solaris system.
 
@@ -719,7 +755,7 @@ $ /sbin/service sshd start
 ----
 
 [[example-2-5]]
-Example 2-5 Determining if the `sshd` Daemon Is Running on a Linux System
+*_Example 2-5 Determining if the `sshd` Daemon Is Running on a Linux System_*
 
 This example confirms that the SSH server daemon `sshd` is running on a Linux system.
 
@@ -758,7 +794,7 @@ host-name::
 If this step succeeds, your setup of SSH is complete. +
 The first time that you connect to a host, you might be warned that the authenticity cannot be established and be asked if you want to continue connection. If you trust the host, answer `yes` to connect to the host.
 
-Troubleshooting
+*Troubleshooting*
 
 To obtain diagnostic information, use the `-v` option of the command-line SSH client and the `-d` option of the SSH server daemon
 `sshd`. How to start the SSH server daemon `sshd` manually depends on the operating system and SSH provider that you are using.
@@ -858,7 +894,7 @@ Each time a password is required to log in to a host, you are prompted for the S
 . In response to each prompt for a password, type the SSH user's password.
 
 [[example-2-6]]
-Example 2-6 Setting Up Public Key Authentication Without Encryption
+*_Example 2-6 Setting Up Public Key Authentication Without Encryption_*
 
 This example generates and sets up an SSH key for the user `gfuser` on the hosts `sua01` and `sua02`. The command is run by the user `gfuser`.
 
@@ -995,7 +1031,7 @@ alias-name::
 NOTE: When you create an `SSH` node, pass this file as the `--passwordfile` option of the `asadmin` utility. For more information, see xref:nodes.adoc#to-create-an-ssh-node[To Create an `SSH` Node].
 
 [[example-2-7]]
-Example 2-7 Setting Up Encrypted Public Key Authentication
+*_Example 2-7 Setting Up Encrypted Public Key Authentication_*
 
 This example generates an SSH key pair with an encrypted private key for the user `gfadmin` and distributes the public key to the hosts `sj01`
 and `ja02`. The example also creates an alias that is named `ssh-key-passphrase` for the private key's passphrase.
@@ -1106,7 +1142,7 @@ NOTE: When you create an `SSH` node, pass this file as the `--passwordfile`
 option of the `asadmin` utility. For more information, see xref:nodes.adoc#to-create-an-ssh-node[To Create an `SSH` Node].
 
 [[example-2-8]]
-Example 2-8 Creating an Alias for the SSH User's Password
+*_Example 2-8 Creating an Alias for the SSH User's Password_*
 
 This example creates an alias that is named `ssh-password` for the SSH user's password.
 
@@ -1191,7 +1227,7 @@ host-list::
   A space-separated list of the names of the hosts where you are copying the installation of Payara Server software.
 
 [[example2-9]]
-Example 2-9 Copying a Payara Server Installation to Multiple DCOM-Enabled Hosts
+*_Example 2-9 Copying a Payara Server Installation to Multiple DCOM-Enabled Hosts_*
 
 This example copies the Payara Server software on the host where the subcommand is run to the default location on the DCOM-enabled hosts `wpmdl1.example.com` and `wpmdl2.example.com`.
 
@@ -1226,7 +1262,7 @@ Command install-node-dcom executed successfully.
 ----
 
 [[example-2-10]]
-Example 2-10 Copying a Payara Server Installation to Multiple SSH-Enabled Hosts
+*_Example 2-10 Copying a Payara Server Installation to Multiple SSH-Enabled Hosts_*
 
 This example copies the Payara Server software on the host where the subcommand is run to the default location on the SSH-enabled hosts `sj03.example.com` and `sj04.example.com`.
 
@@ -1315,7 +1351,7 @@ host-list::
   A space-separated list of the names of the hosts from which you are removing Payara Server software.
 
 [[example-2-11]]
-Example 2-11 Removing Payara Server Software From Multiple DCO\M-Enabled Hosts
+*_Example 2-11 Removing Payara Server Software From Multiple DCO\M-Enabled Hosts_*
 
 This example removes Payara Server software on the DCOM-enabled hosts `wpmdl1.example.com` and `wpmdl2.example.com` from the default location.
 
@@ -1326,7 +1362,7 @@ Command uninstall-node-dcom executed successfully.
 ----
 
 [[example-2-12]]
-Example 2-12 Removing Payara Server Software From Multiple SSH-Enabled Hosts
+*_Example 2-12 Removing Payara Server Software From Multiple SSH-Enabled Hosts_*
 
 This example removes Payara Server software on the SSH-enabled hosts `sj03.example.com` and `sj04.example.com` from the default location.
 

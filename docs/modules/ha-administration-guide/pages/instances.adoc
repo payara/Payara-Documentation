@@ -2,10 +2,18 @@
 = Administering Payara Server Instances
 
 A Payara Server instance is a single Virtual Machine for the Java platform (Java Virtual Machine or JVM machine) on a single node in which
-Payara Server is running. A node defines the host where the Payara Server instance resides. The JVM machine must be compatible with the Java Platform, Enterprise Edition (Java EE).
+Payara Server is running. A node defines the host where the Payara Server instance resides. The JVM machine must be compatible with the Jakarta Platform, Enterprise Edition (Jakarta EE).
 
 Payara Server instances form the basis of an application deployment. An instance is a building block in the clustering, load balancing, and session persistence features of Payara Server.
 Each instance belongs to a single domain and has its own directory structure, configuration, and deployed applications. Every instance contains a reference to a node that defines the host where the instance resides.
+
+The following topics are addressed here:
+
+* xref:types-of-payara-server-instances[Types of Payara Server Instances]
+* xref:administering-payara-server-instances-centrally[Administering Payara Server Instances Centrally]
+* xref:administering-payara-server-instances-locally[Administering Payara Server Instances Locally]
+* xref:resynchronizing-payara-server-instances-and-the-das[Resynchronizing Payara Server Instances and the DAS]
+* xref:migrating-ejb-timers[Migrating EJB Timers]
 
 [[types-of-payara-server-instances]]
 == Types of Payara Server Instances
@@ -27,9 +35,9 @@ Clustered instance::
 [[administering-payara-server-instances-centrally]]
 == Administering Payara Server Instances Centrally
 
-Centralized administration requires the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to be set up.
-If DCOM or SSH is set up, you can administer clustered instances without the need to log in to hosts where remote instances reside.
-For information about setting up DCOM and SSH, see xref:ssh-setup.adoc#enabling-centralized-administration-of-payara-server-instances[Enabling Centralized Administration of Payara Server Instances].
+Centralized administration requires the secure shell (SSH) to be set up.
+If SSH is set up, you can administer clustered instances without the need to log in to hosts where remote instances reside.
+For information about setting up SSH, see xref:ssh-setup.adoc#enabling-centralized-administration-of-payara-server-instances[Enabling Centralized Administration of Payara Server Instances].
 
 Administering Payara Server instances centrally involves the following tasks:
 
@@ -61,10 +69,8 @@ Ensure that following prerequisites are met:
 * The node where the instance is to reside is either enabled for remote communication or represents the host on which the DAS is running.
 For information about how to create a node that is enabled for remote communication, see the following sections:
 
-** xref:nodes.adoc#to-create-a-dcom-node[To Create a `DCOM` Node]
-
 ** xref:nodes.adoc#to-create-an-ssh-node[To Create an `SSH` Node]
-* The user of the DAS can use DCOM or SSH to log in to the host for the node where the instance is to reside.
+* The user of the DAS can use SSH to log in to the host for the node where the instance is to reside.
 
 If any of these prerequisites is not met, create the instance locally as explained in xref:instances.adoc#to-create-an-instance-locally[To Create an Instance Locally].
 
@@ -148,7 +154,6 @@ Command create-instance executed successfully.
 
 *See Also*
 
-* xref:nodes.adoc#to-create-a-dcom-node[To Create a `DCOM` Node]
 * xref:nodes.adoc#to-create-an-ssh-node[To Create an `SSH` Node]
 * xref:instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
 * xref:docs:reference-manual:create-instance.adoc#create-instance[`create-instance`]
@@ -175,7 +180,7 @@ asadmin> list-instances
 ----
 
 [[example-5-2]]
-.Example 5-2 Listing Basic Information About All Payara Server Instances in a Domain
+*_Example 5-2 Listing Basic Information About All Payara Server Instances in a Domain_*
 
 This example lists the name and status of all Payara Server instances in the current domain.
 
@@ -192,7 +197,7 @@ Command list-instances executed successfully.
 
 [[example-5-3]]
 
-.Example 5-3 Listing Detailed Information About All Payara Server Instances in a Domain
+*_Example 5-3 Listing Detailed Information_* About All Payara Server Instances in a Domain
 
 This example lists detailed information about all Payara Server instances in the current domain.
 
@@ -255,7 +260,7 @@ instance-name::
   The name of the instance that you are deleting.
 
 [[example-5-4]]
-.Example 5-4 Deleting an Instance Centrally
+*_Example 5-4 Deleting an Instance Centrally_*
 
 This example confirms that the instance `pmd-i1` is not running and deletes the instance.
 
@@ -295,7 +300,7 @@ Starting a cluster starts all instances in the cluster that are not already runn
 Ensure that following prerequisites are met:
 
 * Each node where an instance in the cluster resides is either enabled for remote communication or represents the host on which the DAS is running.
-* The user of the DAS can use DCOM or SSH to log in to the host for any node where instances in the cluster reside.
+* The user of the DAS can useSSH to log in to the host for any node where instances in the cluster reside.
 
 If any of these prerequisites is not met, start the cluster by starting
 each instance locally as explained in xref:instances.adoc#to-start-an-individual-instance-locally[To Start an Individual Instance Locally].
@@ -310,7 +315,7 @@ cluster-name::
   The name of the cluster that you are starting.
 
 [[example-5-5]]
-.Example 5-5 Starting a Cluster
+*_Example 5-5 Starting a Cluster_*
 
 This example starts the cluster `pmdcluster`.
 
@@ -348,7 +353,7 @@ cluster-name::
   The name of the cluster that you are stopping.
 
 [[example-5-6]]
-.Example 5-6 Stopping a Cluster
+*_Example 5-6 Stopping a Cluster_*
 
 This example stops the cluster `pmdcluster`.
 
@@ -379,7 +384,7 @@ Use the `start-instance` subcommand in remote mode to start an individual instan
 Ensure that following prerequisites are met:
 
 * The node where the instance resides is either enabled for remote communication or represents the host on which the DAS is running.
-* The user of the DAS can use DCOM or SSH to log in to the host for the node where the instance resides.
+* The user of the DAS can use SSH to log in to the host for the node where the instance resides.
 
 If any of these prerequisites is not met, start the instance locally as explained in xref:instances.adoc#to-start-an-individual-instance-locally[To Start an Individual Instance Locally].
 
@@ -398,7 +403,7 @@ instance-name::
   The name of the instance that you are starting.
 
 [[example5-7]]
-.Example 5-7 Starting an Individual Instance Centrally
+*_Example 5-7 Starting an Individual Instance Centrally_*
 
 This example starts the instance `pmd-i2`, which resides on the node `sj02`. This node represents the host `sj02.example.com`.
 The configuration of the instance on this node already matched the configuration of the instance in the DAS when the instance was started.
@@ -409,8 +414,8 @@ asadmin> start-instance pmd-i2
 CLI801 Instance is already synchronized
 Waiting for pmd-i2 to start ............
 Successfully started the instance: pmd-i2
-instance Location: /export/glassfish3/glassfish/nodes/sj02/pmd-i2
-Log File: /export/glassfish3/glassfish/nodes/sj02/pmd-i2/logs/server.log
+instance Location: /export/payara6/glassfish/nodes/sj02/pmd-i2
+Log File: /export/payara6/glassfish/nodes/sj02/pmd-i2/logs/server.log
 Admin Port: 24851
 Command start-local-instance executed successfully.
 The instance, pmd-i2, was started on host sj02.example.com
@@ -438,7 +443,7 @@ When an instance is stopped, the instance stops accepting new requests and waits
 . Run the xref:docs:reference-manual:stop-instance.adoc[`stop-instance`] subcommand.
 
 [[example-5-8]]
-.Example 5-8 Stopping an Individual Instance Centrally
+*_Example 5-8 Stopping an Individual Instance Centrally_*
 
 This example stops the instance `pmd-i2`.
 
@@ -481,7 +486,7 @@ instance-name::
   The name of the instance that you are restarting.
 
 [[example5-9]]
-.Example 5-9 Restarting an Individual Instance Centrally
+*_Example 5-9 Restarting an Individual Instance Centrally_*
 
 This example restarts the instance `pmd-i2`.
 
@@ -508,7 +513,7 @@ When this option is `true`, the subcommand uses functionality of the operating s
 [[administering-payara-server-instances-locally]]
 == Administering Payara Server Instances Locally
 
-Local administration does not require DCOM or SSH to be set up. If neither DCOM nor SSH is set up, you must log in to each host where remote instances reside and administer the instances individually.
+Local administration does not require SSH to be set up. If SSH is set up, you must log in to each host where remote instances reside and administer the instances individually.
 
 Administering Payara Server instances locally involves the following tasks:
 
@@ -518,7 +523,7 @@ Administering Payara Server instances locally involves the following tasks:
 * xref:instances.adoc#to-stop-an-individual-instance-locally[To Stop an Individual Instance Locally]
 * xref:instances.adoc#to-restart-an-individual-instance-locally[To Restart an Individual Instance Locally]
 
-NOTE: Even if neither DCOM nor SSH is set up, you can obtain information about instances in a domain without logging in to each host where remote
+NOTE: Even SSH is set up, you can obtain information about instances in a domain without logging in to each host where remote
 instances reside. For instructions, see xref:instances.adoc#to-list-all-instances-in-a-domain[To List All Instances in a Domain].
 
 [[to-create-an-instance-locally]]
@@ -541,7 +546,6 @@ In this situation, Payara Server creates a `CONFIG` node for you. The name of th
 
 For information about how to create a node, see the following sections:
 
-* xref:nodes.adoc#to-create-a-dcom-node[To Create a `DCOM` Node]
 * xref:nodes.adoc#to-create-an-ssh-node[To Create an `SSH` Node]
 * xref:nodes.adoc#to-create-a-config-node[To Create a `CONFIG` Node]
 
@@ -630,7 +634,7 @@ instance-name::
   Your choice of name for the instance that you are creating.
 
 [[example-5-10]]
-.Example 5-10 Creating a Clustered Instance Locally Without Specifying a Node
+*_Example 5-10 Creating a Clustered Instance Locally Without Specifying a Node_*
 
 This example adds the instance `kui-i1` to the cluster `kuicluster` locally. The `CONFIG` node `xk01` is created automatically to represent the host `xk01.example.com`, on which this example is run.
 The DAS is running on the host `dashost.example.com` and listens for administration requests on the default port.
@@ -641,7 +645,7 @@ The commands to list the nodes in the domain are included in this example only t
 ----
 $ asadmin --host dashost.example.com list-nodes --long
 NODE NAME          TYPE    NODE HOST         INSTALL DIRECTORY   REFERENCED BY
-localhost-domain1  CONFIG  localhost         /export/glassfish3
+localhost-domain1  CONFIG  localhost         /export/payara6
 Command list-nodes executed successfully.
 $ asadmin --host dashost.example.com
 create-local-instance --cluster kuicluster kui-i1
@@ -660,13 +664,13 @@ IIOP_SSL_MUTUALAUTH_PORT=23920
 Command create-local-instance executed successfully.
 $ asadmin --host dashost.example.com list-nodes --long
 NODE NAME          TYPE    NODE HOST         INSTALL DIRECTORY   REFERENCED BY
-localhost-domain1  CONFIG  localhost         /export/glassfish3
-xk01               CONFIG  xk01.example.com  /export/glassfish3  kui-i1
+localhost-domain1  CONFIG  localhost         /export/payara6
+xk01               CONFIG  xk01.example.com  /export/payara6  kui-i1
 Command list-nodes executed successfully.
 ----
 
 [[example-5-11]]
-.Example 5-11 Creating a Clustered Instance Locally
+*_Example 5-11 Creating a Clustered Instance Locally_*
 
 This example adds the instance `yml-i1` to the cluster `ymlcluster` locally. The instance resides on the node `sj01`. The DAS is running on
 the host `das1.example.com` and listens for administration requests on the default port.
@@ -692,7 +696,6 @@ Command create-local-instance executed successfully.
 
 *See Also*
 
-* xref:nodes.adoc#to-create-a-dcom-node[To Create a `DCOM` Node]
 * xref:nodes.adoc#to-create-an-ssh-node[To Create an `SSH` Node]
 * xref:nodes.adoc#to-create-a-config-node[To Create a `CONFIG` Node]
 * xref:docs:reference-manual:create-local-instance.adoc[`create-local-instance`]
@@ -760,7 +763,7 @@ instance-name::
   The name of the instance that you are deleting.
 
 [[example-5-12]]
-.Example 5-12 Deleting an Instance Locally
+*_Example 5-12 Deleting an Instance Locally_*
 
 This example confirms that the instance `yml-i1` is not running and deletes the instance.
 
@@ -808,7 +811,7 @@ instance-name::
   The name of the instance that you are starting.
 
 [[example-5-13]]
-.Example 5-13 Starting an Individual Instance Locally
+*_Example 5-13 Starting an Individual Instance Locally_*
 
 This example starts the instance `yml-i1` locally. The instance resides on the node `sj01`.
 
@@ -817,8 +820,8 @@ This example starts the instance `yml-i1` locally. The instance resides on the n
 $ asadmin start-local-instance --node sj01 yml-i1
 Waiting for yml-i1 to start ...............
 Successfully started the instance: yml-i1
-instance Location: /export/glassfish3/glassfish/nodes/sj01/yml-i1
-Log File: /export/glassfish3/glassfish/nodes/sj01/yml-i1/logs/server.log
+instance Location: /export/payara6/glassfish/nodes/sj01/yml-i1
+Log File: /export/payara6/glassfish/nodes/sj01/yml-i1/logs/server.log
 Admin Port: 24849
 Command start-local-instance executed successfully.
 ----
@@ -853,7 +856,7 @@ instance-name::
   The name of the instance that you are stopping.
 
 [[example-5-14]]
-.Example 5-14 Stopping an Individual Instance Locally
+*_Example 5-14 Stopping an Individual Instance Locally_*
 
 This example stops the instance `yml-i1` locally. The instance resides on the node `sj01`.
 
@@ -898,7 +901,7 @@ instance-name::
   The name of the instance that you are restarting.
 
 [[example-5-15]]
-.Example 5-15 Restarting an Individual Instance Locally
+*_Example 5-15 Restarting an Individual Instance Locally_*
 
 This example restarts the instance `yml-i1` locally. The instance resides on the node `sj01`.
 
@@ -984,7 +987,7 @@ If the `config/domain.xml` file has not changed since the last resynchronization
   This directory is not resynchronized. It is created and populated as required on each instance.
 `lib`::
 `lib/classes`::
-  These directories contain common Java class files or JAR archives and ZIP archives for use by applications that are deployed to the entire
+  These directories contain common Jakarta class files or JAR archives and ZIP archives for use by applications that are deployed to the entire
   domain. Typically, these directories contain common JDBC drivers and other utility libraries that are shared by all applications in the domain. +
   The contents of these directories are loaded by the common class loader. For more information, see "xref:docs:application-development-guide:class-loaders.adoc[Using the Common Class Loader]" in Payara Server Application Development Guide. The class loader loads the contents of these directories in the following order: +
   . `lib/classes`
@@ -992,10 +995,9 @@ If the `config/domain.xml` file has not changed since the last resynchronization
   . `lib/*.zip` +
   The `lib` directory also contains the following subdirectories: +
   `applibs`;;
-    This directory contains application-specific Java class files or JAR archives and ZIP archives for use by applications that are deployed to the entire domain.
+    This directory contains application-specific Jakarta class files or JAR archives and ZIP archives for use by applications that are deployed to the entire domain.
   `ext`;;
-    This directory contains optional packages in JAR archives and ZIP archives for use by applications that are deployed to the entire domain. These archive files are loaded by using Java extension mechanism.
-    For more information, see http://download.oracle.com/javase/6/docs/technotes/guides/extensions/extensions.html[Optional Packages - An Overview] (`http://docs.oracle.com/javase/7/docs/technotes/guides/extensions/extensions.html`). +
+    This directory contains optional packages in JAR archives and ZIP archives for use by applications that are deployed to the entire domain. These archive files are loaded by using Jakarta extension mechanism.
 
 NOTE: Optional packages were formerly known as standard extensions or extensions.
 
@@ -1020,7 +1022,7 @@ instance-name::
 If the instance is stopped, the `list-instances` subcommand indicates that the instance is not running.
 . If the instance is stopped, start the instance. +
 If the instance is running, no further action is required.
-* If DCOM or SSH is set up, start the instance centrally. +
+* If SSH is set up, start the instance centrally. +
 If you require full synchronization, set the `--sync` option of the `start-instance` subcommand to `full`. If default synchronization is sufficient, omit this option. +
 [source,shell]
 ----
@@ -1032,7 +1034,7 @@ this step. For information about all the options for controlling the behavior of
 
 instance-name::
   The name of the instance that you are starting.
-* If neither DCOM nor SSH is set up, start the instance locally from the host where the instance resides. +
+* If SSH is set up, start the instance locally from the host where the instance resides. +
 If you require full synchronization, set the `--sync` option of the `start-local-instance` subcommand to `full`. If default synchronization is sufficient, omit this option. +
 [source,shell]
 ----
@@ -1048,9 +1050,9 @@ instance-name::
   The name of the instance that you are starting.
 
 [[example-5-16]]
-.Example 5-16 Resynchronizing an Instance and the DAS Online
+*_Example 5-16 Resynchronizing an Instance and the DAS Online_*
 
-This example determines that the instance `yml-i1` is stopped and fully resynchronizes the instance with the DAS. Because neither DCOM nor SSH is set up, the instance is started locally on the host where the instance resides.
+This example determines that the instance `yml-i1` is stopped and fully resynchronizes the instance with the DAS. Because SSH is set up, the instance is started locally on the host where the instance resides.
 In this example, multiple nodes are defined for the Payara Server installation that is running on the node's host.
 
 To determine whether the instance is stopped, the following command is run in multimode on the DAS host:
@@ -1070,8 +1072,8 @@ $ asadmin start-local-instance --node sj01 --sync full yml-i1
 Removing all cached state for instance yml-i1.
 Waiting for yml-i1 to start ...............
 Successfully started the instance: yml-i1
-instance Location: /export/glassfish3/glassfish/nodes/sj01/yml-i1
-Log File: /export/glassfish3/glassfish/nodes/sj01/yml-i1/logs/server.log
+instance Location: /export/payara6/glassfish/nodes/sj01/yml-i1
+Log File: /export/payara6/glassfish/nodes/sj01/yml-i1/logs/server.log
 Admin Port: 24849
 Command start-local-instance executed successfully.
 ----
@@ -1104,7 +1106,7 @@ library file as shown in the following table.
 |Common JAR archives and ZIP archives for all applications in a domain.
 |domain-dir`/lib`
 
-|Common Java class files for a domain for all applications in a domain.
+|Common Jakarta class files for a domain for all applications in a domain.
 |domain-dir`/lib/classes`
 
 |Application-specific libraries. |domain-dir`/lib/applibs`
@@ -1152,7 +1154,7 @@ domain-dir::
   The directory in which the domain's configuration is stored.
 config-name::
   The named configuration that the instance references.
-. If the instance locates the file through an option of the Java
+. If the instance locates the file through an option of the Jakarta
 application launcher, update the option.
 .  Delete the option.
 +
@@ -1182,7 +1184,7 @@ new-value::
   The new value of the option for locating the file.
 
 [[example-5-17]]
-.Example 5-17 Updating the Option for Locating a Configuration File
+*_Example 5-17 Updating the Option for Locating a Configuration File_*
 
 This example updates the option for locating the `server.policy` file to specify a custom file for the instance `pmd`.
 
@@ -1258,7 +1260,7 @@ In the `config` directory of the domain, create a plain text file that is named 
 In the `config-files` file, list each file name on a separate line.
 
 [[example-5-18]]
-Example 5-18 `config-files` File
+*_Example 5-18 `config-files` File_*
 
 This example shows the content of a `config-files` file. This file specifies that the `some-other-info` file is to be resynchronized in addition to the files that Payara Server resynchronizes by default:
 
@@ -1284,7 +1286,7 @@ some-other-info
 When the DAS resynchronizes an instance's files, the DAS deletes from the instance's cache any files that are not listed for resynchronization.
 If an application creates files in a directory that the DAS resynchronizes, these files are deleted when the DAS resynchronizes an instance with the DAS.
 
-Put the files in a subdirectory under the domain directory that is not defined by Payara Server, for example, `/export/glassfish3/glassfish/domains/domain1/myapp/myfile`.
+Put the files in a subdirectory under the domain directory that is not defined by Payara Server, for example, `/export/payara6/glassfish/domains/domain1/myapp/myfile`.
 
 [[to-resynchronize-an-instance-and-the-das-offline]]
 === To Resynchronize an Instance and the DAS Offline
@@ -1347,7 +1349,7 @@ archive-file::
   The name of the file, including the path, that contains the archive file to import.
 
 [[example-5-19]]
-Example 5-19 Resynchronizing an Instance and the DAS Offline
+*_Example 5-19 Resynchronizing an Instance and the DAS Offline_*
 
 This example resynchronizes the clustered instance `yml-i1` and the DAS offline. The instance is a member of the cluster `ymlcluster`.
 The archive file that contains the instance's configuration data is created on the host where the instance resides.
@@ -1449,7 +1451,7 @@ asadmin> migrate-timers --target target-instance source-instance
 ----
 
 [[example-5-20]]
-Example 5-20 Migrating an EJB Timer
+*_Example 5-20 Migrating an EJB Timer_*
 
 The following example show how to migrate timers from a clustered source instance named `football` to a clustered target instance named `soccer`.
 

@@ -7,7 +7,7 @@ while new users transparently get the new version of the application.
 With a rolling upgrade, users are unaware that the upgrade occurs.
 
 For more information about application versions and how they are identified, see "xref:docs:application-deployment-guide:overview.adoc#module-and-application-versions[Module and Application Versions]" in
-Payara Server Open Source Edition Application Deployment Guide.
+Payara Server Application Deployment Guide.
 
 In a clustered environment, a rolling upgrade redeploys an application with a minimal loss of service and sessions. A session is any artifact that can be replicated, for example:
 
@@ -59,17 +59,20 @@ You can perform a rolling upgrade of an application deployed to a single cluster
 === To Upgrade an Application in a Single Cluster
 
 . Deploy the upgraded application to the cluster in a disabled state
-and with a new version identifier. For example:
+and with a new version identifier.
++
+For example:
 +
 [source,shell]
 ----
 asadmin> asadmin deploy --enabled=false --target myCluster myApp:1.1
 ----
+
 . Perform the following steps for each server instance in the cluster.
 .. Quiesce one server instance in the cluster from the load balancer. +
 Follow these steps:
-...  Disable the server instance using `asadmin disable-http-lb-server.`
-...  Export the load balancer configuration file using
+... Disable the server instance using `asadmin disable-http-lb-server.`
+... Export the load balancer configuration file using
 `asadmin export-http-lb-config`.
 ... Copy the exported configuration file to the web server instance's
 configuration directory. +
@@ -77,18 +80,19 @@ For example, for Sun Java System Web Server, the location is
 web-server-install-dir`/``https-`host-name`/config/loadbalancer.xml`.
 ... Wait until the timeout has expired. +
 Monitor the load balancer's log file.
-..  Enable the upgraded application version on the quiesced server instance. +
+.. Enable the upgraded application version on the quiesced server instance. +
 For example:
 +
 [source,shell]
 ----
 asadmin> asadmin enable --target instance01 myApp:1.1
 ----
++
 Enabling the upgraded application version automatically disables the
 previous version.
-..  Test the upgraded application on the server instance to make sure it
+.. Test the upgraded application on the server instance to make sure it
 runs correctly.
-..  Re-enable the server instance in load balancer. +
+.. Re-enable the server instance in load balancer. +
 Follow these steps:
 ... Enable the server instance using `asadmin enable-http-lb-server.`
 ... Export the load balancer configuration file using

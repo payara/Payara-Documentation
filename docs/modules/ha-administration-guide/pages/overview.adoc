@@ -3,6 +3,13 @@
 
 This chapter describes the high availability features in Payara Server.
 
+The following topics are addressed here:
+
+* xref:overview-of-high-availability[Overview of High Availability]
+* xref:how-payara-server-provides-high-availability[How Payara Server Provides High Availability]
+* xref:recovering-from-failures[Recovering from Failures]
+* xref:more-information[More Information]
+
 [[overview-of-high-availability]]
 == Overview of High Availability
 
@@ -11,6 +18,12 @@ To make such reliability possible, Payara Server provides mechanisms for maintai
 Application state data, such as HTTP session data, stateful EJB sessions, and dynamic cache information, is replicated in real time across server instances.
 If any one server instance goes down, the session state is available to the next failover server, resulting in minimum application downtime and enhanced transactional security.
 
+Payara Server provides the following high availability features:
+
+* xref:load-balancing-with-the-apache-mod_jk-or-mod_proxy_ajp-module[Load Balancing With the Apache mod_jk or mod_proxy_ajp Module]
+* xref:high-availability-session-persistence[High Availability Session Persistence]
+* xref:high-availability-java-message-service[High Availability Java Message Service]
+* xref:rmi-iiop-load-balancing-and-failover[RMI-IIOP Load Balancing and Failover]
 
 [[load-balancing-with-the-apache-mod_jk-or-mod_proxy_ajp-module]]
 === Load Balancing With the Apache `mod_jk` or `mod_proxy_ajp` Module
@@ -25,7 +38,7 @@ and xref:docs:ha-administration-guide:http-load-balancing.adoc#configuring-payar
 
 Payara Server provides high availability of HTTP requests and session data (both HTTP session data and stateful session bean data).
 
-Java EE applications typically have significant amounts of session state data. A web shopping cart is the classic example of a session state.
+Jakarta EE applications typically have significant amounts of session state data. A web shopping cart is the classic example of a session state.
 Also, an application can cache frequently-needed data in the session object. In fact, almost all applications with significant user interactions need to maintain session state.
 Both HTTP sessions and stateful session beans (SFSBs) have session state data.
 
@@ -84,15 +97,14 @@ Payara Server provides high availability through the following subcomponents and
 * xref:docs:ha-administration-guide:overview.adoc#storage-for-session-state-data[Storage for Session State Data]
 * xref:docs:ha-administration-guide:overview.adoc#highly-available-clusters[Highly Available Clusters]
 
-[[gjghv]][[GSHAG00256]][[storage-for-session-state-data]]
+[[storage-for-session-state-data]]
 === Storage for Session State Data
 
 Storing session state data enables the session state to be recovered after the failover of a server instance in a cluster.
 Recovering the session state enables the session to continue without loss of information. Payara Server supports in-memory session replication on other servers
 in the cluster for maintaining HTTP session and stateful session bean data.
 
-In-memory session replication is implemented in Payara Server
-as an OSGi module. Internally, the replication module uses a consistent hash algorithm to pick a replica server instance within a cluster of instances.
+In-memory session replication is implemented in Payara Server as an OSGi module. Internally, the replication module uses a consistent hash algorithm to pick a replica server instance within a cluster of instances.
 This allows the replication module to easily locate the replica or replicated data when a container needs to retrieve the data.
 
 The use of in-memory replication requires the Group Management Service (GMS) to be enabled. For more information about GMS,
@@ -109,7 +121,7 @@ If server instances in a cluster are located on different hosts, ensure that the
 A highly available cluster integrates a state replication service with clusters and load balancer.
 
 NOTE: When implementing a highly available cluster, use a load balancer that includes session-based stickiness as part of its load-balancing algorithm. Otherwise,
-session data can be misdirected or lost. An example of a load balancer that includes session-based stickiness is the Loadbalancer Plug-In available in Payara Server.
+session data can be misdirected or lost.
 
 [[clusters-instances-sessions-and-load-balancing]]
 ==== Clusters, Instances, Sessions, and Load Balancing
@@ -131,16 +143,16 @@ Payara Server without loss of service.
 [[protocols-for-centralized-cluster-administration]]
 ==== Protocols for Centralized Cluster Administration
 
-Payara Server uses the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to ensure that clusters that span multiple hosts can be administered
+Payara Server uses the secure shell (SSH) to ensure that clusters that span multiple hosts can be administered
 centrally. To perform administrative operations on Payara Server instances that are remote from the domain administration server (DAS), the DAS must be able to communicate
 with those instances. If an instance is running, the DAS connects to the running instance directly. For example, when you deploy an application to an instance,
 the DAS connects to the instance and deploys the application to the instance.
 
 However, the DAS cannot connect to an instance to perform operations on an instance that is not running, such as creating or starting the instance. For these operations,
-the DAS uses DCOM or SSH to contact a remote host and administer instances there. DCOM or SSH provides confidentiality and security for data that is exchanged between
+the DAS uses SSH to contact a remote host and administer instances there. SSH provides confidentiality and security for data that is exchanged between
 the DAS and remote hosts.
 
-NOTE: The use of DCOM or SSH to enable centralized administration of remote instances is optional. If the use of DCOM SSH is not feasible in your environment, you can administer remote instances locally.
+NOTE: The use of SSH to enable centralized administration of remote instances is optional. If the use of SSH is not feasible in your environment, you can administer remote instances locally.
 
 For more information, see xref:docs:ha-administration-guide:ssh-setup.adoc#enabling-centralized-administration-of-payara-server-instances[Enabling Centralized Administration of Payara Server Instances].
 
@@ -148,6 +160,13 @@ For more information, see xref:docs:ha-administration-guide:ssh-setup.adoc#enabl
 == Recovering from Failures
 
 You can use various techniques to manually recover individual subcomponents after hardware failures such as disk crashes.
+
+The following topics are addressed here:
+
+* xref:recovering-the-domain-administration-server[Recovering the Domain Administration Server]
+* xref:recovering-payara-server-instances[Recovering Payara Server Instances]
+* xref:recovering-the-http-load-balancer-and-web-server[Recovering the HTTP Load Balancer and Web Server]
+* xref:recovering-message-queue[Recovering Message Queue]
 
 [[recovering-the-domain-administration-server]]
 === Recovering the Domain Administration Server
@@ -176,9 +195,6 @@ There are no explicit commands to back up only a web server configuration. Simpl
 saved backup on a new host with the same network identity. If the new host has a different IP address, update the DNS server or the routers.
 
 NOTE: This assumes that the web server is either reinstalled or restored from an image first.
-
-The Load Balancer Plug-In (`plugins` directory) and configurations are in the web server installation directory, typically `/opt/SUNWwbsvr`. +
-The web-install `/web-instance/config` directory contains the `loadbalancer.xml` file.
 
 [[recovering-message-queue]]
 === Recovering Message Queue

@@ -4,11 +4,27 @@
 This chapter describes how to configure the high availability features of the Java Message Service (JMS). It covers how to configure Message
 Queue broker clusters and how to use them to provide connection failover and load balancing, as described in the following topics:
 
+* xref:using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server]
+* xref:connection-failover[Connection Failover]
+* xref:load-balanced-delivery-to-mdbs[Load-Balanced Delivery to MDBs]
+
 [[using-message-queue-broker-clusters-with-payara-server]]
 == Using Message Queue Broker Clusters With Payara Server
 
 This section describes how the JMS service uses Message Queue broker clusters to support high-availability JMS messaging in Payara Server clusters. It describes the
 different cluster and broker types that are supported and how to configure them.
+
+The following topics are addressed here:
+
+* xref:about-message-queue-broker-clusters[About Message Queue Broker Clusters]
+* xref:configuring-payara-clusters-to-use-message-queue-broker-clusters[Configuring Payara Clusters to Use Message Queue Broker Clusters]
+* xref:to-configure-a-payara-cluster-to-use-an-embedded-or-local-conventional-broker-cluster-with-master-broker[To Configure a Payara Cluster to Use an Embedded or Local Conventional
+Broker Cluster With Master Broker]
+* xref:to-configure-a-payara-cluster-to-use-an-embedded-or-local-conventional-broker-cluster-of-peer-brokers[To Configure a Payara Cluster to Use an Embedded or Local Conventional Broker Cluster of Peer Brokers]
+* xref:to-change-the-master-broker-in-an-embedded-or-local-broker-cluster[To Change the Master Broker in an Embedded or Local Broker Cluster]
+* xref:to-migrate-between-types-of-embedded-or-local-conventional-broker-clusters[To Migrate Between Types of Embedded or Local Conventional Broker Clusters]
+* xref:to-configure-a-payara-cluster-to-use-a-local-enhanced-broker-cluster[To Configure a Payara Cluster to Use a Local Enhanced Broker Cluster]
+* xref:to-configure-a-payara-cluster-to-use-a-remote-broker-cluster[To Configure a Payara Cluster to Use a Remote Broker Cluster]
 
 [[about-message-queue-broker-clusters]]
 === About Message Queue Broker Clusters
@@ -17,25 +33,27 @@ The following discussion provides a brief overview of Message Queue broker clust
 
 Message Queue supports two clustering models both of which provide a scalable message service, but with each providing a different level of message service availability:
 
-* Conventional broker clusters. A conventional broker cluster provides for service availability. When a broker fails, clients connected to the failed broker reconnect
+* *Conventional broker clusters.* A conventional broker cluster provides for service availability. When a broker fails, clients connected to the failed broker reconnect
 to another broker in the cluster. However, messages and state information stored in the failed broker cannot be recovered until the failed broker is brought back online.
-The broker failure can therefore result in a significant delay and in JMS message order semantics not being preserved. +
+The broker failure can therefore result in a significant delay and in JMS message order semantics not being preserved.
++
 Message Queue supports two types of conventional cluster, based on where the cluster configuration change record is stored:
 
-** Conventional cluster with master broker. In a conventional cluster with a master broker, one of the brokers, designated as the master broker, stores and maintains the
+** *Conventional cluster with master broker.* In a conventional cluster with a master broker, one of the brokers, designated as the master broker, stores and maintains the
 cluster configuration change record. The other brokers in the cluster must communicate with the master broker to keep abreast of changes to the cluster configuration.
 This is the simplest broker cluster to configure, and is the type of broker cluster that Payara Server uses by default to support Payara clusters.
 
-** Conventional cluster of peer brokers. In a conventional cluster of
+** *Conventional cluster of peer brokers.* In a conventional cluster of
 peer brokers, the cluster configuration change record is stored in a
 JDBC data store accessible to all the brokers. Thus, brokers can access
 cluster configuration information whether any other brokers in the
 cluster are running or not.
-* Enhanced broker clusters. An enhanced broker cluster provides for data availability in addition to service availability.
+* *Enhanced broker clusters.* An enhanced broker cluster provides for data availability in addition to service availability.
 When a broker fails, another broker takes over the pending work of the failed broker.
 The failover broker has access to the failed broker's messages and state information. Clients connected to the failed broker reconnect to the failover broker.
 In an enhanced cluster, as compared to a conventional cluster, messages owned by the failed broker are delivered by the failover broker as soon as it takes over, and
-JMS message order semantics are preserved. +
+JMS message order semantics are preserved.
++
 By its very nature, an enhanced broker cluster is a cluster of peer brokers.
 
 NOTE: Despite the message service availability offered by both conventional and enhanced broker clusters, they do not provide a guarantee against
@@ -93,7 +111,7 @@ Failing to perform these special procedures could lead to data loss or corruptio
 [source,shell]
 ----
 > asadmin configure-jms-cluster --clustertype=conventional
---configstoretype=masterbroker glassfish-cluster-name
+--configstoretype=masterbroker payara-cluster-name
 ----
 
 *See Also*
@@ -118,7 +136,7 @@ Failing to perform these special procedures could lead to data loss or corruptio
 . Create a password file with the entry `AS_ADMIN_JMSDBPASSWORD` specifying the password of the database user. +
 For information about password file entries, see the xref:docs:reference-manual:asadmin.adoc[`asadmin`] help page.
 . Place a copy of, or a link to, the database's JDBC driver `.jar` file in the appropriate directory, depending on the JMS host type, on each host where a Payara Server cluster instance is to run:
-* Embedded: as-install-parent`/glassfish/lib/install/applications/jmsra`
+* Embedded: as-install-parent`/payara/lib/install/applications/jmsra`
 * Local: as-install-parent`/mq/lib/ext`
 . Configure the Payara Server cluster to use a Message Queue conventional broker cluster with master broker by using the
 xref:docs:reference-manual:configure-jms-cluster.adoc[`configure-jms-cluster`] subcommand:
@@ -127,7 +145,7 @@ xref:docs:reference-manual:configure-jms-cluster.adoc[`configure-jms-cluster`] s
 ----
 > asadmin --passwordfile password-file configure-jms-cluster --clustertype=conventional
 --configstoretype=shareddb --dbvendor database-vendor-name --dbuser database-user-name
---dburl database-url --property list-of-database-specific-properties glassfish-cluster-name
+--dburl database-url --property list-of-database-specific-properties payara-cluster-name
 ----
 
 *See Also*
@@ -152,7 +170,7 @@ using the `change-master-broker` command in order to avoid later internal config
 +
 [source,shell]
 ----
-> asadmin change-master-broker glassfish-clustered-instance-name
+> asadmin change-master-broker payara-clustered-instance-name
 ----
 
 *See Also*
@@ -191,7 +209,7 @@ xref:docs:reference-manual:configure-jms-cluster.adoc[`configure-jms-cluster`] s
 > asadmin --passwordfile password-file configure-jms-cluster --clustertype=enhanced
 --configstoretype=shareddb --messagestoretype=jdbc
 --dbvendor database-vendor-name --dbuser database-user-name --dburl database-url
---property list-of-database-specific-properties glassfish-cluster-name
+--property list-of-database-specific-properties payara-cluster-name
 ----
 
 *See Also*
@@ -213,13 +231,13 @@ Perform the following steps after you have:
 +
 [source,shell]
 ----
-> asadmin delete-jms-host --target glassfish-cluster-name default_JMS_host
+> asadmin delete-jms-host --target payara-cluster-name default_JMS_host
 ----
 . Create a JMS host for each broker in the broker cluster by using the xref:docs:reference-manual:create-jms-host.adoc[`create-jms-host`] subcommand. For each broker, use an `asadmin create-jms-host` of the form:
 +
 [source,shell]
 ----
-> asadmin create-jms-host --target glassfish-cluster-name --mqhost broker-host
+> asadmin create-jms-host --target payara-cluster-name --mqhost broker-host
 --mqport broker-port --mquser mq-user --mqpassword mq-user-password
 jms-host-name-for-broker
 ----

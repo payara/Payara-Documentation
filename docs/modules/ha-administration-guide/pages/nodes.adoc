@@ -4,21 +4,18 @@
 A node represents a host on which the Payara Server software is installed. A node must exist for every host on which Payara Server instances reside.
 A node's configuration contains information about the host such as the name of the host and the location where the Payara Server is installed on the host.
 
+The following topics are addressed here:
+
+* xref:types-of-payara-server-nodes[Types of Payara Server Nodes]
+* xref:creating-listing-and-deleting-config-nodes[Creating, Listing, Testing, and Deleting SSH Nodes]
+* xref:creating-listing-testing-and-deleting-ssh-nodes[Creating, Listing, and Deleting CONFIG Nodes]
+* xref:updating-and-changing-the-type-of-a-node[Updating and Changing the Type of a Node]
+
 [[types-of-payara-server-nodes]]
 == Types of payara Server Nodes
 
 Each Payara Server node is one of the following types of node:
 
-`DCOM`::
-  A `DCOM` node supports communication over the Distributed Component
-  Object Model (DCOM) remote protocol. The DCOM remote protocol is
-  available only on Windows systems. If DCOM is set up and you plan to
-  administer your Payara Server instances centrally, the instances
-  must reside on `DCOM` nodes. +
-  A `DCOM` node's configuration contains the information that is
-  required to connect to the host through DCOM. This information
-  includes, for example, the user name of the Windows user and the port
-  number for DCOM connections to the host.
 `SSH`::
   An `SSH` node supports communication over secure shell (SSH). If SSH
   is set up and you plan to administer your Payara Server instances
@@ -28,8 +25,7 @@ Each Payara Server node is one of the following types of node:
   includes, for example, the user name of the SSH user and the port
   number for SSH connections to the host.
 `CONFIG`::
-  A `CONFIG` node does not support remote communication. If neither DCOM
-  nor SSH is set up and you plan to administer your instances locally,
+  A `CONFIG` node does not support remote communication. If SSH is set up and you plan to administer your instances locally,
   the instances can reside on `CONFIG` nodes. You cannot use `CONFIG`
   nodes for instances that you plan to administer centrally. +
   Each domain contains a predefined `CONFIG` node that is named
@@ -37,235 +33,20 @@ Each Payara Server node is one of the following types of node:
   host where the domain administration server (DAS) is running, this
   node represents the local host.
 
-[[creating-listing-testing-and-deleting-dcom-nodes]]
-== Creating, Listing, Testing, and Deleting `DCOM` Nodes
-
-A `DCOM` node supports communication over DCOM. If DCOM is set up and you plan to administer your Payara Server instances centrally, the instances must reside on `DCOM` nodes.
-For information about setting up DCOM, see xref:ssh-setup.adoc#enabling-centralized-administration-of-payara-server-instances[Enabling Centralized Administration of Payara Server Instances].
-
-Payara Server enables you to create `DCOM` nodes for use by instances, obtain information about `DCOM` nodes, test if `DCOM` nodes are reachable, and delete `DCOM` nodes that are no longer required.
-
-[[to-create-a-dcom-node]]
-=== To Create a `DCOM` Node
-
-Use the `create-node-dcom` subcommand in remote mode to create a `DCOM` node.
-
-*Before You Begin*
-
-Ensure that the Windows user can use DCOM to connect to the host that the node will represent. By default, the `create-node-dcom` subcommand validates the node's parameters and the DCOM connection to the host.
-If the Windows user cannot use DCOM to connect to the host, the validation fails.
-
-NOTE: For information about how to determine whether the Windows user can use DCOM to connect to the host, see xref:ssh-setup.adoc#to-test-the-connection-over-dcom-to-a-remote-host[To Test the Connection Over DCOM to a Remote Host].
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Run the `create-node-dcom` subcommand. +
-Specify the file that contains the alias for the Windows user's password through the `--passwordfile` option of the `asadmin` utility. For more information about this file, see xref:ssh-setup.adoc#to-set-up-password-authentication-for-the-windows-user[To Set Up Password Authentication for the Windows User]. +
-
-NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for configuring the node, see the xref:docs:reference-manual:create-node-dcom.adoc[`create-node-dcom`] help page.
-
-[source,shell]
-----
-C:\> asadmin --passwordfile filename create-node-dcom
---nodehost node-host [--installdir install-dir ]
-node-name
-----
-filname::
-  The name of the file that contains the alias for the Windows user's password.
-node-host::
-  The name of the host that the node represents. The name of the host must be specified. Otherwise, an error occurs.
-install-dir::
-  The full path to the parent of the base installation directory of the Payara Server software on the host, for example, `C:\glassfish3`.
-  If the Payara Server software is installed in the same directory on the node's host and the DAS host, you can omit this option.
-node-name::
-  Your choice of name for the node that you are creating.
-
-[[example-3-1]]
-.Example 3-1 Creating a `DCOM` Node
-
-This example creates the `DCOM` node `wpmdl1` to represent the host `wpmdl1.example.com`. The Payara Server software is installed in the same directory on the DAS host and on the host `wpmdl1.example.com`.
-
-[source,shell]
-----
-C:\> asadmin --passwordfile aspwalias.txt create-node-dcom
---nodehost wpmdl1.example.com wpmdl1
-Command create-node-dcom executed successfully.
-----
-
-**See Also**
-
-* xref:docs:reference-manual:asadmin.adoc[`asadmin`]
-* xref:docs:reference-manual:create-node-dcom.adoc[`create-node-dcom`]
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help create-node-dcom` at the command line.
-
-*Next Steps*
-
-After creating a node, you can create instances on the node as explained in the following sections:
-
-* xref:instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
-* xref:instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
-
-[[to-list-dcom-nodes-in-a-domain]]
-=== To List `DCOM` Nodes in a Domain
-
-Use the `list-nodes-dcom` subcommand in remote mode to obtain information about existing `DCOM` nodes in a domain.
-
-NOTE: To obtain information about all existing nodes in a domain, use the xref:docs:reference-manual:list-nodes.adoc[`list-nodes`] subcommand.
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Run the xref:docs:reference-manual:list-nodes-dcom.adoc#list-nodes-dcom[`list-nodes-dcom`] subcommand. +
-[source,shell]
-----
-asadmin> list-nodes-dcom
-----
-
-[[example-3-2]]
-.Example 3-2 Listing Basic Information About All `DCOM` Nodes in a Domain
-
-This example lists the name, type, and host of all `DCOM` nodes in the current domain.
-
-[source,shell]
-----
-asadmin> list-nodes-dcom
-xkyd  DCOM  xkyd.example.com
-wpmdl2  DCOM  wpmdl2.example.com
-wpmdl1  DCOM  wpmdl1.example.com
-Command list-nodes-dcom executed successfully.
-----
-
-[[example-3-3]]
-.Example 3-3 Listing Detailed Information About All `DCOM` Nodes in a Domain
-
-This example lists detailed information about all `DCOM` nodes in the current domain.
-
-[source,shell]
-----
-asadmin> list-nodes-dcom --long=true
-NODE NAME    TYPE   NODE HOST            INSTALL DIRECTORY   REFERENCED BY
-xkyd         DCOM   xkyd.example.com     C:\glassfish3
-wpmdl2       DCOM   wpmdl2.example.com   C:\glassfish3       wdi2
-wpmdl1       DCOM   wpmdl1.example.com   C:\glassfish3       wdi1
-Command list-nodes-dcom executed successfully.
-----
-
-*See Also*
-
-* xref:docs:reference-manual:list-nodes.adoc[`list-nodes`]
-* xref:docs:reference-manual:list-nodes-dcom.adoc[`list-nodes-dcom`]
-
-You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
-
-* `asadmin help list-nodes`
-* `asadmin help list-nodes-dcom`
-
-[[to-test-if-a-dcom-node-is-reachable]]
-=== To Test if a `DCOM` Node is Reachable
-
-Use the `ping-node-dcom` subcommand in remote mode to test if a `DCOM` node is reachable.
-
-*Before You Begin*
-
-Ensure that DCOM is configured on the host where the DAS is running and on the host that the node represents.
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Run the `ping-node-dcom` subcommand.
-
-NOTE: Only the options that are required to complete this task are provided in
-this step. For information about all the options for testing the node, see the xref:docs:reference-manual:ping-node-dcom.adoc[`ping-node-dcom`] help page.
-
-[source,shell]
-----
-asadmin> ping-node-dcom node-name
-----
-node-name::
-  The name of the node to test.
-
-[[example-3-4]]
-.Example 3-4 Testing if a `DCOM` Node Is Reachable
-
-This example tests if the `DCOM` node `wpmdl2` is reachable.
-
-[source,shell]
-----
-asadmin> ping-node-dcom wpmdl2
-Successfully made DCOM connection to node wpmdl2 (wpmdl2.example.com)
-Command ping-node-dcom executed successfully.
-----
-
-*See Also*
-
-xref:docs:reference-manual:ping-node-dcom.adoc[`ping-node-dcom`]
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help ping-node-dcom` at the command line.
-
-[[to-delete-a-dcom-node]]
-=== To Delete a `DCOM` Node
-
-Use the `delete-node-dcom` subcommand in remote mode to delete a `DCOM` node.
-
-Deleting a node removes the node from the configuration of the DAS. The node's directories and files are deleted when the last Payara Server instance that resides on the node is deleted.
-
-*Before You Begin*
-
-Ensure that no Payara Server instances reside on the node that you are deleting. For information about how to delete an instance, see the following sections.
-
-* xref:instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
-* xref:instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Confirm that no instances reside on the node that you are deleting.
-+
-[source,shell]
-----
-asadmin> list-nodes-dcom --long=true
-----
-.  Run the xref:docs:reference-manual:delete-node-dcom.adoc[`delete-node-dcom`] subcommand.
-+
-[source,shell]
-----
-asadmin> delete-node-dcom node-name
-----
-node-name::
-  The name of the node that you are deleting.
-
-[[example-3-5]]
-.Example 3-5 Deleting a `DCOM` Node
-
-This example confirms that no instances reside on the `DCOM` node `xkyd` and deletes the node `xkyd`.
-
-[source,shell]
-----
-asadmin> list-nodes-dcom --long=true
-NODE NAME    TYPE   NODE HOST            INSTALL DIRECTORY   REFERENCED BY
-xkyd         DCOM   xkyd.example.com     C:\glassfish3
-wpmdl2       DCOM   wpmdl2.example.com   C:\glassfish3       wdi2
-wpmdl1       DCOM   wpmdl1.example.com   C:\glassfish3       wdi1
-Command list-nodes-dcom executed successfully.
-asadmin> delete-node-dcom xkyd
-Command delete-node-dcom executed successfully.
-----
-
-*See also*
-
-* xref:instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
-* xref:instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
-* xref:docs:reference-manual:delete-node-dcom.adoc[`delete-node-dcom`]
-* xref:docs:reference-manual:list-nodes-dcom.adoc[`list-nodes-dcom`]
-
-You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
-
-* `asadmin help delete-node-dcom`
-* `asadmin help list-nodes-dcom`
-
 [[creating-listing-testing-and-deleting-ssh-nodes]]
 == Creating, Listing, Testing, and Deleting `SSH` Nodes
 
 An `SSH` node supports communication over SSH. If SSH is set up and you plan to administer your Payara Server instances centrally, the
 instances must reside on `SSH` nodes. For information about setting up SSH, see xref:ssh-setup.adoc#enabling-centralized-administration-of-payara-server-instances[Enabling Centralized Administration of Payara Server Instances].
 
-NOTE: Windows systems also support communications over DCOM as an alternative to SSH.
-
 Payara Server enables you to create `SSH` nodes for use by instances, obtain information about `SSH` nodes, test if `SSH` nodes are reachable, and delete `SSH` nodes that are no longer required.
+
+The following topics are addressed here:
+
+* xref:to-create-an-ssh-node[To Create an SSH Node]
+* xref:to-list-ssh-nodes-in-a-domain[To List SSH Nodes in a Domain]
+* xref:to-test-if-an-ssh-node-is-reachable[To Test if an SSH Node is Reachable]
+* xref:to-delete-an-ssh-node[To Delete an SSH Node]
 
 [[to-create-an-ssh-node]]
 === To Create an `SSH` Node
@@ -293,12 +74,12 @@ node-host::
   The name of the host that the node represents. The name of the host must be specified. Otherwise, an error occurs.
 install-dir::
   The full path to the parent of the base installation directory of the Payara Server software on the host, for example,
-  `/export/glassfish3/`. If the Payara Server software is installed in the same directory on the node's host and the DAS host, you can omit this option.
+  `/export/payara/`. If the Payara Server software is installed in the same directory on the node's host and the DAS host, you can omit this option.
 node-name::
   Your choice of name for the node that you are creating.
 
 [[example-3-6]]
-.Example 3-6 Creating an `SSH` Node
+*_Example 3-6 Creating an `SSH` Node_*
 
 This example creates the `SSH` node `sj01` to represent the host `sj01.example.com`. The Payara Server software is installed in the same directory on the DAS host and on the host `sj01.example.com`.
 
@@ -308,7 +89,7 @@ asadmin> create-node-ssh --nodehost sj01.example.com sj01
 Command create-node-ssh executed successfully.
 ----
 
-Troubleshooting
+*Troubleshooting*
 
 The `create-node-ssh` subcommand might fail to create the node and report the error `Illegal sftp packet len`. If this error occurs, ensure
 that no the startup file on the remote host displays text for noninteractive shells. Examples of startup files are `.bashrc`, `.cshrc`, `.login`, and `.profile`.
@@ -345,7 +126,7 @@ asadmin> list-nodes-ssh
 ----
 
 [[example-3-7]]
-.Example 3-7 Listing Basic Information About All `SSH` Nodes in a Domain
+*_Example 3-7 Listing Basic Information About All `SSH` Nodes in a Domain_*
 
 This example lists the name, type, and host of all `SSH` nodes in the current domain.
 
@@ -358,7 +139,7 @@ Command list-nodes-ssh executed successfully.
 ----
 
 [[example-3-8]]
-.Example 3-8 Listing Detailed Information About All `SSH` Nodes in a Domain
+*_Example 3-8 Listing Detailed Information About All `SSH` Nodes in a Domain_*
 
 This example lists detailed information about all `SSH` nodes in the current domain.
 
@@ -366,8 +147,8 @@ This example lists detailed information about all `SSH` nodes in the current dom
 ----
 asadmin> list-nodes-ssh --long=true
 NODE NAME   TYPE   NODE HOST          INSTALL DIRECTORY    REFERENCED BY
-sj01        SSH    sj01.example.com   /export/glassfish3   pmd-i1
-sj02        SSH    sj02.example.com   /export/glassfish3   pmd-i2
+sj01        SSH    sj01.example.com   /export/payara   pmd-i1
+sj02        SSH    sj02.example.com   /export/payara   pmd-i2
 Command list-nodes-ssh executed successfully.
 ----
 
@@ -404,7 +185,7 @@ node-name::
   The name of the node to test.
 
 [[example-3-9]]
-.Example 3-9 Testing if an `SSH` Node Is Reachable
+*_Example 3-9 Testing if an `SSH` Node Is Reachable_*
 
 This example tests if the `SSH` node `sj01` is reachable.
 
@@ -452,7 +233,7 @@ node-name::
   The name of the node that you are deleting.
 
 [[example-3-10]]
-.Example 3-10 Deleting an `SSH` Node
+*_Example 3-10 Deleting an `SSH` Node_*
 
 This example confirms that no instances reside on the `SSH` node `sj01` and deletes the node `sj01`.
 
@@ -460,8 +241,8 @@ This example confirms that no instances reside on the `SSH` node `sj01` and dele
 ----
 asadmin> list-nodes-ssh --long=true
 NODE NAME   TYPE   NODE HOST          INSTALL DIRECTORY    REFERENCED BY
-sj01        SSH    sj01.example.com   /export/glassfish3
-sj02        SSH    sj02.example.com   /export/glassfish3   pmd-i2
+sj01        SSH    sj01.example.com   /export/payara
+sj02        SSH    sj02.example.com   /export/payara   pmd-i2
 Command list-nodes-ssh executed successfully.
 asadmin> delete-node-ssh sj01
 Command delete-node-ssh executed successfully.
@@ -482,11 +263,17 @@ You can also view the full syntax and options of the subcommands by typing the f
 [[creating-listing-and-deleting-config-nodes]]
 == Creating, Listing, and Deleting `CONFIG` Nodes
 
-A `CONFIG` node does not support remote communication. If neither DCOM nor SSH is set up and you plan to administer your instances locally, the
+A `CONFIG` node does not support remote communication. If SSH is set up and you plan to administer your instances locally, the
 instances can reside on `CONFIG` nodes. You cannot use `CONFIG` nodes for instances that you plan to administer centrally.
 
 Payara Server enables you to create `CONFIG` nodes for use by instances, obtain information about `CONFIG` nodes, and delete `CONFIG`
 nodes that are no longer required.
+
+The following topics are addressed here:
+
+* xref:to-create-a-config-node[To Create a CONFIG Node]
+* xref:to-list-config-nodes-in-a-domain[To List CONFIG Nodes in a Domain]
+* xref:to-delete-a-config-node[To Delete a CONFIG Node]
 
 [[to-create-a-config-node]]
 === To Create a `CONFIG` Node
@@ -510,13 +297,13 @@ node-name
 node-host::
   The name of the host that the node represents. You may omit this option. The name of the host can be determined when instances that reside on the node are created.
 install-dir::
-  The full path to the parent of the base installation directory of the Payara Server software on the host, for example, `/export/glassfish3/`. You may omit this option.
+  The full path to the parent of the base installation directory of the Payara Server software on the host, for example, `/export/payara/`. You may omit this option.
   The installation directory can be determined when instances that reside on the node are created.
 node-name::
   Your choice of name for the node that you are creating.
 
 [[example-3-11]]
-.Example 3-11 Creating a `CONFIG` Node
+*_Example 3-11 Creating a `CONFIG` Node_*
 
 This example creates the `CONFIG` node `cfg01`. The host that the node represents and the installation directory of the Payara Server
 software on the host are to be determined when instances are added to the node.
@@ -553,7 +340,7 @@ asadmin> list-nodes-config
 ----
 
 [[example-3-12]]
-.Example 3-12 Listing Basic Information About All `CONFIG` Nodes in a Domain
+*_Example 3-12 Listing Basic Information About All `CONFIG` Nodes in a Domain_*
 
 This example lists the name, type, and host of all `CONFIG` nodes in the current domain.
 
@@ -567,7 +354,7 @@ Command list-nodes-config executed successfully.
 ----
 
 [[example-3-13]]
-.Example 3-13 Listing Detailed Information About All `CONFIG` Nodes in a Domain
+*_Example 3-13 Listing Detailed Information About All `CONFIG` Nodes in a Domain_*
 
 This example lists detailed information about all `CONFIG` nodes in the current domain.
 
@@ -575,9 +362,9 @@ This example lists detailed information about all `CONFIG` nodes in the current 
 ----
 asadmin> list-nodes-config --long=true
 NODE NAME           TYPE     NODE HOST            INSTALL DIRECTORY    REFERENCED BY
-localhost-domain1   CONFIG   localhost            /export/glassfish3
-cfg01               CONFIG   cfg01.example.com    /export/glassfish3   yml-i1
-cfg02               CONFIG   cfg02.example.com    /export/glassfish3   yml-i2
+localhost-domain1   CONFIG   localhost            /export/payara
+cfg01               CONFIG   cfg01.example.com    /export/payara   yml-i1
+cfg02               CONFIG   cfg02.example.com    /export/payara   yml-i2
 Command list-nodes-config executed successfully.
 ----
 
@@ -619,7 +406,7 @@ node-name::
   The name of the node that you are deleting.
 
 [[example-3-14]]
-.Example 3-14 Deleting a `CONFIG` Node
+*_Example 3-14 Deleting a `CONFIG` Node_*
 
 This example confirms that no instances reside on the `CONFIG` node `cfg01` and deletes the node `cfg01`.
 
@@ -627,9 +414,9 @@ This example confirms that no instances reside on the `CONFIG` node `cfg01` and 
 ----
 asadmin> list-nodes-config --long=true
 NODE NAME           TYPE     NODE HOST           INSTALL DIRECTORY    REFERENCED BY
-localhost-domain1   CONFIG   localhost           /export/glassfish3
-cfg01               CONFIG   cfg01.example.com   /export/glassfish3
-cfg02               CONFIG   cfg02.example.com   /export/glassfish3   yml-i2
+localhost-domain1   CONFIG   localhost           /export/payara
+cfg01               CONFIG   cfg01.example.com   /export/payara
+cfg02               CONFIG   cfg02.example.com   /export/payara   yml-i2
 Command list-nodes-config executed successfully.
 asadmin> delete-node-config cfg01
 Command delete-node-config executed successfully.
@@ -651,49 +438,11 @@ You can also view the full syntax and options of the subcommands by typing the f
 
 Payara Server enables you to update the configuration data of any node and to change the type of a node.
 
-[[to-update-a-dcom-node]]
-=== To Update a `DCOM` Node
+The following topics are addressed here:
 
-Use the `update-node-dcom` subcommand in remote mode to update a `DCOM` node.
-
-Options of this subcommand specify the new values of the node's configuration data. If you omit an option, the existing value is unchanged.
-
-*Before You Begin*
-
-Ensure that the following prerequisites are met:
-
-* DCOM is configured on the host where the DAS is running and on the host that the node represents.
-* The node that you are updating exists.
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Run the `update-node-dcom` subcommand.
-+
-[source,shell]
-----
-asadmin> update-node-dcom options node-name
-----
-options::
-  Options of the `update-node-dcom` subcommand for changing the node's configuration data. For information about these options, see the
-xref:docs:reference-manual:update-node-ssh.adoc[`update-node-dcom`] help page.
-node-name::
-  The name of the `DCOM` node to update.
-
-[[example-3-15]]
-.Example 3-15 Updating a `DCOM` Node
-
-This example updates the host that the node `wpmdl1` represents to `wj01`.
-
-[source,shell]
-----
-asadmin> update-node-dcom --nodehost wj01 wpmdl1
-Command update-node-dcom executed successfully.
-----
-
-*See also*
-
-xref:docs:reference-manual:update-node-ssh.adoc[`update-node-dcom`]
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help update-node-dcom` at the command line.
+xref:to-update-an-ssh-node[To Update an SSH Node]
+xref:to-update-a-config-node[To Update a CONFIG Node]
+xref:to-change-the-type-of-a-node[To Change the Type of a Node]
 
 [[to-update-an-ssh-node]]
 === To Update an `SSH` Node
@@ -723,7 +472,7 @@ node-name::
   The name of the `SSH` node to update.
 
 [[example-3-16]]
-.Example 3-16 Updating an `SSH` Node
+*_Example 3-16 Updating an `SSH` Node_*
 
 This example updates the host that the node `sj01` represents to `adc01.example.com`.
 
@@ -764,7 +513,7 @@ node-name::
   The name of the `CONFIG` node to update.
 
 [[example-3-17]]
-Example 3-17 Updating a `CONFIG` Node
+*_Example 3-17 Updating a `CONFIG` Node_*
 
 This example updates the host that the node `cfg02` represents to `adc02.example.com`.
 
@@ -787,7 +536,6 @@ The subcommands for updating a node can also be used to change the type of a nod
 
 Changing the type of a `CONFIG` node enables remote communication for the node. The type of the node after the change determines the protocol over which the node is enabled for remote communication:
 
-* A `DCOM` node is enabled for communication over DCOM.
 * An `SSH` node is enabled for communication over SSH.
 
 As part of the process of changing the type of a node, you can also change other configuration data for the node.
@@ -795,11 +543,6 @@ As part of the process of changing the type of a node, you can also change other
 Options of the subcommands for updating a node specify the new values of the node's configuration data. For most options, if you omit the option,
 the existing value is unchanged. However, default values are applied in the following situations:
 
-* Any of the following options of the `update-node-dcom` subcommand is omitted:
-
-** `--windowsuser`
-
-** `--windowsdomain`
 * Any of the following options of the `update-node-ssh` subcommand is omitted:
 
 ** `--sshport`
@@ -808,53 +551,39 @@ the existing value is unchanged. However, default values are applied in the foll
 
 ** `--sshkeyfile`
 
-CAUTION: Changing a `DCOM` node or an `SSH` node to a `CONFIG` node disables remote communication for the node.
+CAUTION: Changing an `SSH` node to a `CONFIG` node disables remote communication for the node.
 
 *Before You Begin*
 
 Ensure that the following prerequisites are met:
 
-* SSH or DCOM is configured on the host where the DAS is running and on the host that the node represents.
+* SSH is configured on the host where the DAS is running and on the host that the node represents.
 * The node the type of which you are changing exists.
 
 . Ensure that the DAS is running. Remote subcommands require a running server.
 . Run the appropriate subcommand for updating a node, depending on the type of the node after the change.
-* To change the type of a node to `DCOM`, run the `update-node-dcom` subcommand on the node.
-+
-[source,shell]
-----
-asadmin> update-node-dcom [options] config-or-ssh-node-name
-----
-options::
-  Options of the `update-node-dcom` subcommand for changing the node's configuration data. For information about these options, see the
-xref:docs:reference-manual:update-node-ssh.adoc[`update-node-dcom`] help page.
+
 config-or-ssh-node-name::
   The name of the `CONFIG` node or the `SSH` node to change.
 * To change the type of a node to `SSH`, run the `update-node-ssh` subcommand on the node.
 +
-[source,shell]
-----
-asadmin> update-node-ssh [options] config-or-dcom-node-name
-----
 options::
   Options of the `update-node-ssh` subcommand for changing the node's configuration data. For information about these options, see the
 xref:docs:reference-manual:update-node-ssh001.adoc[`update-node-ssh`] help page.
-config-or-dcom-node-name::
-  The name of the `CONFIG` node or the `DCOM` node to change.
 * To change the type of a node to `CONFIG`, run the `update-node-config` subcommand on the node.
 +
 [source,shell]
 ----
-asadmin> update-node-config [options] dcom-or-ssh-node-name
+asadmin> update-node-config [options] ssh-node-name
 ----
 options::
   Options of the `update-node-config` subcommand for changing the node's configuration data. For information about these options, see the
 xref:docs:reference-manual:update-node-config.adoc[`update-node-config`] help page.
-dcom-or-ssh-node-name::
-  The name of the `DCOM` node or the `SSH` node to change.
+ssh-node-name::
+  The name of the `SSH` node to change.
 
 [[example-3-18]]
-Example 3-18 Changing a `CONFIG` Node to an `SSH` Node
+*_Example 3-18 Changing a `CONFIG` Node to an `SSH` Node_*
 
 This example changes the `CONFIG` node `cfg02` to an `SSH` node.
 
@@ -867,12 +596,10 @@ Command update-node-ssh executed successfully.
 *See also*
 
 * xref:docs:reference-manual:update-node-config.adoc[`update-node-config`]
-* xref:docs:reference-manual:update-node-ssh.adoc[`update-node-dcom`]
 * xref:docs:reference-manual:update-node-ssh001.adoc[`update-node-ssh`]
 
 You can also view the full syntax and options of the subcommand by
 typing the following commands at the command line.
 
 * `asadmin help update-node-config`
-* `asadmin help update-node-dcom`
 * `asadmin help update-node-ssh`
