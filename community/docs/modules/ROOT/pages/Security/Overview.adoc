@@ -1,34 +1,101 @@
-
 [[overview]]
 = Overview
 
-This section describes how to deal with known or unknown security issues and common vulnerabilities and exploits (CVEs) related to the Payara Platform.
+This section describes Payara's official policy for managing Payara Platform's security vulnerabilities.
 
-[[download-security-fixes]]
-== Security Fixes
+[[cve-program]]
+== The CVE Program
 
-Reported security vulnerabilities will get patched as soon as possible and delivered in a future release. For this reason, it is recommended to always stay up to date with the current release.
+Payara, a leading provider of Jakarta EE and MicroProfile runtimes, is authorized by the Common Vulnerabilities and Exposures (CVE) Program as a CVE Numbering Authority (CNA).
 
-[[locating-security-vulnerabilities]]
-== Locating Security Vulnerabilities
+Payara will publish authoritative cybersecurity vulnerability information about its products via the CVE Program. Vulnerabilities will be given a unique, alphanumeric identifier, building the CVE List that feeds into the U.S. National Vulnerability Database (NVD), and playing a role in the CVE Program’s mission to identify, define and catalogue cybersecurity vulnerabilities.
 
-To locate the release a security update has been included for a specific vulnerability, search in the xref:/Security/Security Fix List.adoc[security fixes summary] page for the specific vulnerability using its https://cve.mitre.org/cve/identifiers/[CVE identifier].
+NOTE: The CVE Program is sponsored by the Cybersecurity and Infrastructure Security Agency (CISA) of the U.S. Department of Homeland Security (DHS).
 
-For each of these security vulnerabilities, a reference to all _*Pull Requests*_ that were implemented to the main repository to fix each one of them is given for auditing purposes. If a security vulnerability has been reported but is not related or doesn't affect the Payara Platform in any way, a proper justification will be detailed in its observations. This is also done for auditing purposes, so don't feel deterred to make a vulnerability report if you are unsure that a flaw affects the Payara Platform completely.
+Developers using Payara Platform products will benefit from the collaboration, as vulnerabilities will be part of the standardized and publicly disclosed CVE List. This will result in time and cost savings for those using Payara products, as security issues can be discussed, dealt with and prevented through the use of a trusted, standardized catalogue.
 
-[[reporting-security-issues]]
-== Reporting Security Issues
+[[general-guidelines]]
+== General Guidelines
 
-Payara Services Limited is very active at identifying and fixing any detected security vulnerabilities, either internally or externally reported. Community users are encouraged to immediately report any vulnerabilities and flaws that they encounter.
+* Payara is committed to fixing any vulnerabilities and exploits identified in any Payara Platform products and distributions.
 
-To make a report, please send an email with the described flaws and vulnerabilities to mailto:security@payara.fish[security@payara.fish]. Please make sure to describe the vulnerability encountered in great detail, along with the steps to reproduce the issue and environment details like Payara Platform distribution in use (Server, Micro, Embedded, etc.), the Operating System where it was detected and what version, provider and release of the JDK is involved in the reproducer.
+* Any reported vulnerabilities will be fixed with celerity as soon as they are reported and confirmed.
 
-INFO: If the issue relates to an existing documented CVE vulnerability, you can simply link it in your report and save yourself the trouble of providing a reproducer scenario and a detailed description.
+* Security reports made to major versions that are no longer supported will be rejected.
++
+Users will be instructed to upgrade to a supported version.
 
-IMPORTANT: To report any critical non-security bugs, https://github.com/payara/Payara/issues/new/choose[raise a new issue] in the official Community Edition repository issue tracker instead. Any conventional bug reports made through this email address will be ignored.
+* Security vulnerabilities will have to be verified to affect a corresponding supported Payara Platform product before getting a CVE assigned.
 
-Keep in mind that most, if not all public networked servers are subject to denial of service (_DoS_) attacks, and thus, we will not provide fixes to generic problems (such as client applications streaming lots of data to your server, or re-requesting the same URL repeatedly). Focus on security issues that can be targeted at specific platform components like web session hacking, XSS injection, CSRF attacks and so forth.
+* Vulnerabilities not related to the Payara Platform will be ignored and not disclosed as formal CVEs. These include:
++
+** Operating system vulnerabilities
+** JVM vulnerabilities
+** Issues caused by not following recommended security practices
 
+* Keep in mind that most, if not all public networked servers are subject to denial of service (DoS) attacks, and thus, we will not provide fixes to generic problems (such as client applications streaming lots of data to your server, or re-requesting the same URL repeatedly).
+
+[[third-party-components-vulnerabilities]]
+=== Vulnerabilities on Third-party Components
+
+As the Payara Platform depends on third-party components of other software packages like Apache Guava, Jackson, Smack, etc. vulnerabilities on specific versions of these components may be reported as well. Payara is committed to analysing any reported vulnerabilities and upgrading them to a patched version whether applicable.
+
+In cases like this, reports may already reference an existing CVE record that details the vulnerability in question.
+
+[[reporting-security-vulnerabilities]]
+== Reporting Security Vulnerabilities
+
+To report a vulnerability, send an email with the described flaws and vulnerabilities to security@payara.fish. Please make sure to describe the vulnerability encountered in great detail, along with the steps to reproduce the issue and environmental details like:
+
+* Payara Platform distribution (i.e, Server, Micro, Embedded, Docker Image) and version
+* Operating System
+* JDK Version
+
+IMPORTANT: If the report is related to an existing documented CVE record (like in the case of a third-party component), please provide its ID on your report.
+
+TIP: To report any critical non-security bugs, raise a new issue in the official Community Edition repository issue tracker instead.
+
+Once the vulnerability is received, it will get assigned a CVE ID and an investigation to verify the report and the security scoring will be done to implement a fix on a future release.
+
+[[credits]]
+=== Credits
+
+If you are interested in being credited as the finder and/or reporter of the vulnerability, please let us know explicitly on your report and provide the following details:
+
+* Your *name* or an *alias*.
+* _(Optional)_ The name of an organisation you belong to and wants to be credited.
+
+=== CVE Record Rejection
+
+In some cases, the investigation of a security report may yield a result where the vulnerability in question does not warrant a fix (it cannot be reproduced, it doesn't affect the Payara Platform, or it doesn't represent a security vulnerability at all).
+
+In cases like this, the CVE record will be rejected along with a reason explaining why the vulnerability didn't require a fix.
+
+[[disclosing-security-fixes]]
+== Disclosing Security Fixes
+
+Once a security vulnerability is fixed and published in an official release of Payara Community, the following will occur:
+
+* The details of the vulnerability will be published in the release notes.
+* The CVE record will be published in the CVE index as per the CVE record workflow.
+
+[[security-advisories]]
+== Security Advisories
+
+All security reports, that correspond to either fixes to vulnerabilities that affect the Payara Platform directly or vulnerabilities to its third-party dependencies are catalogued under the xref:Security/Security Fix List.adoc[Security Advisories] page.
+
+Each vulnerability entry will contain:
+
+* Its CVE ID
+* The CVE record's link:https://nvd.nist.gov/vuln-metrics/cvss[CVSS Score]
+* The status of the vulnerability
+* The summary of the exploit
+* The release where a fix was published (if applicable)
+* A link to the *Pull Requests* that were implemented in the source code to remediate the vulnerability so that users may audit them if necessary.
+* Additional observations on the resolution of the vulnerability.
+
+[[see-also]]
 == See Also
 
-* https://cve.mitre.org/[CVE Database]
+* https://www.cve.org/[CVE Website]
+* https://www.cve.org/PartnerInformation/ListofPartners/partner/Payara[Payara's CNA Partner Profile]
