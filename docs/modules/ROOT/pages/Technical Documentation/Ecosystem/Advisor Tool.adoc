@@ -1,3 +1,195 @@
-[[advisor-tool]]
-= Advisor Tool
+[[upgrade-advisor-tool]]
+= Upgrade Advisor Tool
+
+This is a CLI (Command Line Interface) tool to advise changes added in Jakarta 10 that affect applications based on Jakarta 8 or 9. The idea of the tool is to summarize all changes that affect your application from the different Jakarta Specs with messages on the logs indicating what code was removed or changed for the different specs listed here: https://jakarta.ee/specifications/
+
+IMPORTANT: Something important to note is that not all the specs add changes between versions, that is why for the current version some specs won’t show any advises for the implementation code.
+
+[[hot-to-use]]
+== How to use
+
+[[build-local-environment]]
+=== Build on your local environment.
+
+[[prerequisites]]
+=== Prerequisites
+
+To build and run the Upgrade Advisor Tool for your project, your environment must be set up with the following:
+
+Clone Advisor Tool repository::
+
+You must first clone the repository where the plugin source code is stored. https://github.com/payara/AdvisorTool[Advisor Tool Repository].
+
+Get the Tag for version 1.0::
+
+You need to get the https://github.com/payara/AdvisorTool/releases/tag/1.0[Tag 1.0] and then build the tool.
+
+JDK 11::
+
+JDK 11 is required to build the Upgrade Advisor Tool plugin.
+
+After you build the project, you will have the dependency on your environment. Then you just need to move to the project you want to advise, and execute the following command:
+
+[source, shell]
+----
+mvn fish.payara.advisor:advisor-maven-plugin:1.0:advise
+----
+
+
+[[use-as-plugin]]
+=== Use as a plugin on your project
+
+This this another way to configure the tool by including the plugin on the build section of your pom file:
+
+[source, xml]
+----
+<pluginManagement>
+    <plugins>
+        <plugin>
+            <groupId>fish.payara.advisor</groupId>
+            <artifactId>advisor-maven-plugin</artifactId>
+            <version>1.0</version>
+        </plugin>
+    </plugins>
+</pluginManagement>
+----
+
+Additionally you need to indicate the repository to indicate where to search this plugin:
+
+[source, xml]
+----
+<pluginRepositories>
+    <pluginRepository>
+        <id>payara-artifacts</id>
+        <name>payara artifacts</name>
+        <url>https://nexus.payara.fish/repository/payara-artifacts</url>
+    </pluginRepository>
+</pluginRepositories>
+----
+
+If you follow previous steps you can call the command on the root folder of your project:
+
+[source, shell]
+----
+mvn fish.payara.advisor:advisor-maven-plugin:1.0:advise
+----
+
+and see the results from logs:
+
+image::advisor-tool/advisor-logs.png[Advisor Tool logs]
+
+[[use-directly-as-command-line]]
+=== Use as a command line directly
+
+Last but not least is to use directly the command line without configuring anything on your local environment. This is resolved by maven central because this tool was uploaded under the following link: https://mvnrepository.com/artifact/fish.payara.advisor/advisor-maven-plugin[Upgrade Advisor Tool on Maven Central]. 
+
+[source, shell]
+----
+mvn fish.payara.advisor:advisor-maven-plugin:1.0:advise
+----
+
+NOTE: Although this last option looks very simple and fast, the others were included depending on the needs of the user.
+
+[[structure-of-advisor-logs-messages]]
+=== Structure of the Upgrade Advisor logs
+
+The structure of the advisor messages include the following:
+
+|===
+|Structure | Description
+
+|line 1
+|
+
+|Kind of message
+|This can be INFO, WARNING or ERROR
+
+|Line of code
+|To indicate where to locate the occurrence of the advisory
+
+|Expression
+|The Code Expression that cause the ocurrence of the advisory, for example: method declaration, method call, annotation property, etc.
+
+|line 2
+|
+
+|Source file
+|The file name where to locate the advisory
+
+|line 3
+|
+
+|Issue message
+|Message to indicate what issue is causing the advisory
+
+|line 4
+|
+
+|How to proceed message
+|Message to indicate what is the recommended way to proceed with the advisory to make the application compatible with Jakarta 10
+
+|===
+
+IMPORTANT: The log messages for the advisors are (ASCII) colour-coded to make the user more apprehensive about what they need to change.
+
+The following are examples of each of the available kind of advisors with the different colors in their structure.
+
+[[example-1-info-message]]
+==== Example INFO message
+
+image::advisor-tool/advisor-info-message.png[Advisor INFO message]
+
+[[example-2-warning-message]]
+==== Example WARNING message
+
+image::advisor-tool/advisor-warning-message.png[Advisor WARNING message]
+
+[[example-3-error-message]]
+==== Example ERROR message
+
+image::advisor-tool/advisor-error-message.png[Advisor ERROR message]
+
+
+=== Code Example
+
+To exemplify this better, suppose you have the following code:
+
+[source, java]
+----
+package jsonb;                                      
+
+import jakarta.json.bind.annotation.JsonbProperty;
+
+public class JsonBeanTest {
+    
+    @JsonbProperty(nillable = true)
+    private String name;
+}
+----
+
+For Jakarta 10 the property nillable was marked as deprecated, as a modification for Jakarta JSON Binding 3.0, you can check here: https://jakarta.ee/specifications/jsonb/3.0/[Jakarta JSON Binding 3.0]
+
+Now with the use of the advisor we can get the advise related to this change as following:
+
+image::advisor-tool/advisor-json-binding.png[Advisor JSON Binding]
+
+From the message we can see that the recomendation is to start to use the new annotation JsonbNillable. Then we can have the following code by applying the advise from the tool:
+
+[source, java]
+----
+package jsonb;
+
+import jakarta.json.bind.annotation.JsonbNillable;
+import jakarta.json.bind.annotation.JsonbProperty;
+
+public class JsonBeanTest {
+    
+    @JsonbProperty
+    @JsonbNillable
+    private String name;
+}
+----
+
+As as conclusion this tool will help us to make our old Jakarta 8/9 applications compatible with last changes added in Jakarta 10.
+
 
