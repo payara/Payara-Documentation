@@ -1,98 +1,83 @@
 [[upgrade-advisor-tool]]
 = Upgrade Advisor Tool
 
-This is a CLI (Command Line Interface) tool to advise about changes made in Jakarta EE 10 that affect applications based on Jakarta EE 8. The purpose of the tool is to summarize all changes that affect your application from the different Jakarta EE Specs with messages on the logs indicating what code was removed or changed for the different specs listed here: https://jakarta.ee/specifications/
+The Upgrade Advisor is a special Maven Plugin utility tool that offers developer advice about specific changes introduced in Jakarta EE 10 that affect Jakarta EE 8 applications and are necessary for these applications to be upgraded successfully.
 
-[[how-to-use]]
-== How to use
+The purpose of the tool is to summarize all changes that affect your application based on breaking changes introduced in the different Jakarta EE specifications by report log entries that indicate how the code of the application is affected and how it should be modified to be in full compliance of the Jakarta EE 10 specifications.
 
-You can use the tool directly from the command line without configuring anything on your local environment. The tool is deployed to Maven Central and so no extra repositories should need to be configured: https://mvnrepository.com/artifact/fish.payara.advisor/advisor-maven-plugin[Upgrade Advisor Tool on Maven Central]. 
+[[usage]]
+== Usage
 
-You must go to the root of your project folder and execute the following command:
+As with any other Maven plugins, the upgrade advisor can be run directly from the command line without any extra configuration required.
+
+TIP: The tool is freely available in https://mvnrepository.com/artifact/fish.payara.advisor/advisor-maven-plugin[Maven Central].
+
+To run the upgrade advisor, you must go to the root of your project folder and execute the following command:
 
 [source, shell]
 ----
 mvn fish.payara.advisor:advisor-maven-plugin:1.0:advise
 ----
 
-Then you will see results from logs:
+The advisor then will output its summary details:
 
 image::advisor-tool/advisor-logs.png[Advisor Tool logs]
 
-[[structure-of-advisor-logs]]
-=== Structure of the Upgrade Advisor logs
+[[structure-of-advisor-summary]]
+== Structure of the Advisor's Summary
 
-The structure of the advisor messages include the following:
+The issues reported by the advisor's summary output will follow this structure, in order:
 
-|===
-|Structure | Description
+. On the first line:
+.. A standard message with the `[Message Type] [Line of code] [Expression]` format.
++
+Message Type:: This can be either `INFO`, `WARNING` or `ERROR`
+Line of Code:: Indicates the location of this occurrence in the code.
+Expression::
+The Java code expression or statement that triggered the occurrence of the advisory.
++
+For example:
++
+* A method declaration
+* A method call,
+* An annotation property
++
+etc.
 
-|line 1
-|[Type of message] + [Line of code] + [Expression]
+. On the second line:
+.. The source file where the occurrence of the issue is reported.
 
-|Type of message
-|This can be INFO, WARNING or ERROR
+. On the third line:
+.. A brief summary of the issue reported.
 
-|Line of code
-|To indicate where to locate the occurrence of the advisory
+. On the fourth line:
+.. A set of recommendations given by the advisor to resolve the issue.
 
-|Expression
-|The Code Expression that cause the ocurrence of the advisory, for example: method declaration, method call, annotation property, etc.
-
-|
-|
-
-|line 2
-|[Source file]
-
-|Source file
-|The file name where to locate the advisory
-
-|
-|
-
-|line 3
-|[Issue message]
-
-|Issue message
-|Message to indicate what issue is causing the advisory
-
-|
-|
-
-|line 4
-|[How to proceed message]
-
-|How to proceed message
-|Message to indicate what is the recommended way to proceed with the advisory to make the application compatible with Jakarta 10
-
-|===
-
-The following are examples of the different severity levels output by the tool.
+The following are examples of the different severity levels of findings reported by the advisor tool:
 
 [[example-1-info-message]]
-==== Example INFO message
+=== Example INFO message
 
 image::advisor-tool/advisor-info-message.png[Advisor INFO message]
 
 [[example-2-warning-message]]
-==== Example WARNING message
+=== Example WARNING message
 
 image::advisor-tool/advisor-warning-message.png[Advisor WARNING message]
 
 [[example-3-error-message]]
-==== Example ERROR message
+=== Example ERROR message
 
 image::advisor-tool/advisor-error-message.png[Advisor ERROR message]
 
+[[basic-showcase-example]]
+== Basic Showcase Example
 
-=== Code Example
-
-To exemplify this better, suppose you have the following code:
+To showcase a specific example of the analysis done by the upgrade advisor, consider the following code snippet:
 
 [source, java]
 ----
-package jsonb;                                      
+package fish.payara.upgrade;
 
 import jakarta.json.bind.annotation.JsonbProperty;
 
@@ -103,17 +88,17 @@ public class JsonBeanTest {
 }
 ----
 
-For Jakarta EE 10 the property nillable was marked as deprecated, as a modification for Jakarta JSON Binding 3.0, you can check here: https://jakarta.ee/specifications/jsonb/3.0/[Jakarta JSON Binding 3.0]
+In Jakarta EE 10 the https://jakarta.ee/specifications/jsonb/3.0/[Jakarta JSON Binding 3.0] API's `@JsonbProperty` annotation was modified: Its `nillable` attribute has been marked as deprecated.
 
-Now with the use of the Upgrade Advisor Tool we can get the advice related to this change as follows:
+The upgrade advisor will report it as such when analysing this code snippet and will present advice in what to do regarding this change:
 
 image::advisor-tool/advisor-json-binding.png[Advisor JSON Binding]
 
-From the message we can see that the recommendation is to start to use the new annotation `JsonbNillable`. Then we can have the following code by applying the advise from the tool:
+From the message we can see that the advisor recommends to use the new annotation `JsonbNillable` instead, like this:
 
 [source, java]
 ----
-package jsonb;
+package fish.payara.upgrade;
 
 import jakarta.json.bind.annotation.JsonbNillable;
 import jakarta.json.bind.annotation.JsonbProperty;
@@ -126,6 +111,4 @@ public class JsonBeanTest {
 }
 ----
 
-In conclusion this tool will help us to make our old Jakarta EE 8 applications compatible with the lastest changes made in Jakarta EE 10.
-
-
+Developers are encouraged to follow the recommendations given by the advisor to circumvent most of the challenges and pain points involved in the upgrade of any application to Jakarta EE 10.
