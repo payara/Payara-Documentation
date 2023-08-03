@@ -17,27 +17,7 @@ mvn fish.payara.advisor:advisor-maven-plugin:1.0:advise
 
 Then you will see results from logs:
 
-[source, shell]
-----
-[INFO] Showing Advisories
-[INFO] ***************
-[INFO] Line of code: 14 | Expression: public String registerConfigProvider(String s, Map map, String s1, String s2, String s3)
-Source file: TestAuthConfigFactory.java
-Jakarta Authentication 3.0 Issue # 87
- jakarta.security.auth.message.config.AuthConfigFactory.registerConfigProvider was changed from
- String registerConfigProvider(String className, Map properties, String layer, String appContext, String description)
- to
- String registerConfigProvider(String className, Map<String, String> properties, String layer, String appContext, String description)
-This issue won't affect your application.
- The recommendation is to take care of the generic version.
-[INFO] Line of code: 20 | Expression: public Class[] getSupportedMessageTypes()
-Source file: TestAuthModule.java
-Jakarta Authentication 3.0 Issue # 87
- jakarta.security.auth.message.module.ServerAuthModule.getSupportedMessageTypes was changed from
- Class[] getSupportedMessageTypes()
- to
- Class<?>[] getSupportedMessageTypes()
-----
+image::advisor-tool/advisor-logs.png[Advisor Tool logs]
 
 [[structure-of-advisor-logs]]
 === Structure of the Upgrade Advisor logs
@@ -93,35 +73,17 @@ The following are examples of the different severity levels output by the tool.
 [[example-1-info-message]]
 ==== Example INFO message
 
-[source, shell]
-----
-[INFO] Line of code: 3 | Expression: jakarta.ws.rs.ext.ContextResolver
-Source file: CustomResolverWithMapper.java
-Jakarta RESTful 3.1
- JSON-B entity providers must favor Jsonb instances provided by ContextResolver<Jsonb>
-----
+image::advisor-tool/advisor-info-message.png[Advisor INFO message]
 
 [[example-2-warning-message]]
 ==== Example WARNING message
 
-[source, shell]
-----
-[WARNING] Line of code: 32 | Expression: new NewCookie(cookie)
-Source file: HelloResource.java
-Jakarta RESTful 3.1
- Constructors for NewCookie class were deprecated.
-----
+image::advisor-tool/advisor-warning-message.png[Advisor WARNING message]
 
 [[example-3-error-message]]
 ==== Example ERROR message
 
-[source, shell]
-----
-[ERROR] Line of code: 23 | Expression: myMethodExpression.isParmetersProvided()
-Source file: TestBatchlet.java
-Jakarta Expression Language 5.0 issue 117
- MethodExpression.isParmetersProvided() has been removed.
-----
+image::advisor-tool/advisor-error-message.png[Advisor ERROR message]
 
 
 === Code Example
@@ -145,16 +107,7 @@ For Jakarta EE 10 the property nillable was marked as deprecated, as a modificat
 
 Now with the use of the Upgrade Advisor Tool we can get the advice related to this change as follows:
 
-[source, shell]
-----
-[WARNING] Line of code: 7 | Expression: @JsonbProperty(nillable = true)
-Source file: JsonBeanTest.java
-Jakarta JSON Binding 3.0
- property nillable from the JsonbProperty annotation was deprecated.
-This issue won't affect your application.
- and the recommendation is to stop use of the deprecated property nillable and
- start to use the JsonbNillable annotation.
-----
+image::advisor-tool/advisor-json-binding.png[Advisor JSON Binding]
 
 From the message we can see that the recommendation is to start to use the new annotation `JsonbNillable`. Then we can have the following code by applying the advise from the tool:
 
