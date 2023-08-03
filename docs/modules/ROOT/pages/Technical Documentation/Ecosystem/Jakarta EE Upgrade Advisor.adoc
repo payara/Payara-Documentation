@@ -1,0 +1,173 @@
+[[upgrade-advisor-tool]]
+= Upgrade Advisor Tool
+:ordinal: 4
+
+The Upgrade Advisor is a special Maven Plugin utility tool that offers developer advice about specific changes introduced in Jakarta EE 10 that affect Jakarta EE 8 applications and are necessary for these applications to be upgraded successfully.
+
+The purpose of the tool is to summarize all changes that affect your application based on breaking changes introduced in the different Jakarta EE specifications by report log entries that indicate how the code of the application is affected and how it should be modified to be in full compliance of the Jakarta EE 10 specifications.
+
+[[usage]]
+== Usage
+
+As with any other Maven plugins, the upgrade advisor can be run directly from the command line without any extra configuration required.
+
+TIP: The tool is freely available in https://mvnrepository.com/artifact/fish.payara.advisor/advisor-maven-plugin[Maven Central].
+
+To run the upgrade advisor, you must go to the root of your project folder and execute the following command:
+
+[source, shell]
+----
+mvn fish.payara.advisor:advisor-maven-plugin:1.0:advise
+----
+
+The advisor then will output its summary details:
+
+[source, log]
+----
+[INFO] Showing Advisories
+[INFO] ***************
+[INFO] Line of code: 14 | Expression: public String registerConfigProvider(String s, Map map, String s1, String s2, String s3)
+Source file: TestAuthConfigFactory.java
+Jakarta Authentication 3.0 Issue # 87
+ jakarta.security.auth.message.config.AuthConfigFactory.registerConfigProvider was changed from
+ String registerConfigProvider(String className, Map properties, String layer, String appContext, String description)
+ to
+ String registerConfigProvider(String className, Map<String, String> properties, String layer, String appContext, String description)
+This issue won't affect your application.
+ The recommendation is to take care of the generic version.
+[INFO] Line of code: 20 | Expression: public Class[] getSupportedMessageTypes()
+Source file: TestAuthModule.java
+Jakarta Authentication 3.0 Issue # 87
+ jakarta.security.auth.message.module.ServerAuthModule.getSupportedMessageTypes was changed from
+ Class[] getSupportedMessageTypes()
+ to
+ Class<?>[] getSupportedMessageTypes()
+This issue won't affect your application.
+ The recommendation is to take care of the generic version.
+----
+
+[[structure-of-advisor-summary]]
+== Structure of the Advisor's Summary
+
+The issues reported by the advisor's summary output will follow this structure, in order:
+
+. On the first line:
+.. A standard message with the `[Message Type] [Line of code] [Expression]` format.
++
+Message Type:: This can be either `INFO`, `WARNING` or `ERROR`
+Line of Code:: Indicates the location of this occurrence in the code.
+Expression::
+The Java code expression or statement that triggered the occurrence of the advisory.
++
+For example:
++
+* A method declaration
+* A method call,
+* An annotation property
++
+etc.
+
+. On the second line:
+* The source file where the occurrence of the issue is reported.
+
+. On the third line:
+* A brief summary of the issue reported.
+
+. On the fourth line:
+* A set of recommendations given by the advisor to resolve the issue.
+
+The following are examples of the different severity levels of findings reported by the advisor tool:
+
+[[example-1-info-message]]
+=== Example INFO message
+
+[source, log]
+----
+[INFO] Line of code: 27 | Expression: public Map getMap()
+Source file: TestMessageInfo.java
+Jakarta Authentication 3.0 Issue # 87
+ jakarta.security.auth.message.MessageInfo.getMap was changed from
+ Map getMap();
+ to
+ Map<String, Object> getMap();
+This issue won't affect your application.
+ The recommendation is to take care of the generic version.
+----
+
+[[example-2-warning-message]]
+=== Example WARNING message
+
+[source, log]
+----
+[WARNING] Line of code: 7 | Expression: @JsonbProperty(nillable = true)
+Source file: JsonBeanTest.java
+Jakarta JSON Binding 3.0
+ property nillable from the JsonbProperty annotation was deprecated.
+This issue won't affect your application.
+ and the recommendation is to stop use of the deprecated property nillable and
+ start to use the JsonbNillable annotation.
+----
+
+[[example-3-error-message]]
+=== Example ERROR message
+
+[source, log]
+----
+[ERROR] Line of code: 23 | Expression: myMethodExpression.isParametersProvided()
+Source file: TestBatchlet.java
+Jakarta Expression Language 5.0 issue 117
+ MethodExpression.isParametersProvided() has been removed.
+Your application won't work, please remove MethodExpression.isParametersProvided() call.
+----
+
+[[basic-showcase-example]]
+== Basic Showcase Example
+
+To showcase a specific example of the analysis done by the upgrade advisor, consider the following code snippet:
+
+[source, java]
+----
+package fish.payara.upgrade;
+
+import jakarta.json.bind.annotation.JsonbProperty;
+
+public class JsonBeanTest {
+    
+    @JsonbProperty(nillable = true)
+    private String name;
+}
+----
+
+In Jakarta EE 10 the https://jakarta.ee/specifications/jsonb/3.0/[Jakarta JSON Binding 3.0] API's `@JsonbProperty` annotation was modified: Its `nillable` attribute has been marked as deprecated.
+
+The upgrade advisor will report it as such when analysing this code snippet and will present advice in what to do regarding this change:
+
+[source, log]
+----
+[WARNING] Line of code: 7 | Expression: @JsonbProperty(nillable = true)
+Source file: JsonBeanTest.java
+Jakarta JSON Binding 3.0
+ property nillable from the JsonbProperty annotation was deprecated.
+This issue won't affect your application.
+ and the recommendation is to stop use of the deprecated property nillable and
+ start to use the JsonbNillable annotation.
+----
+
+From the message we can see that the advisor recommends to use the new annotation `JsonbNillable` instead, like this:
+
+[source, java]
+----
+package fish.payara.upgrade;
+
+import jakarta.json.bind.annotation.JsonbNillable;
+import jakarta.json.bind.annotation.JsonbProperty;
+
+public class JsonBeanTest {
+    
+    @JsonbProperty
+    @JsonbNillable
+    private String name;
+}
+----
+
+Developers are encouraged to follow the recommendations given by the advisor to circumvent most of the challenges and pain points involved in the upgrade of any application to Jakarta EE 10.
