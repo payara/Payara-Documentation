@@ -6,18 +6,58 @@ This tool can be used to upgrade an existing Payara Server installation to a new
 
 TIP: The upgrade tool can be manually installed to Payara Platform `5.20.0` and newer if needed. To do so, download the latest JAR release from Payara Nexus using https://nexus.payara.fish/#browse/browse:payara-enterprise-downloadable-artifacts:fish%2Fpayara%2Fextras%2Fpayara-upgrade-tool[this link] and then drop it into your Payara Server installation under the `payara5/glassfish/lib/asadmin` folder, replacing an older version of the artifact in case it exists.
 
-[[payara-6-upgrades]]
-== Upgrading from Payara 5 to Payara 6
+[[payara-server-6-upgrade]]
+== Upgrading to Payara Server 6
 
-It is possible to use the upgrade tool to upgrade a Payara 5 domain to Payara 6. The process should not be any different as to upgrading between different Payara 5 versions, though with the caveats detailed in this section.
+It is possible to upgrade a Payara Server `5.x` domain to version `6.x`. The process should not be any different as to upgrading between different Payara 5 minor versions, though with the following caveats:
 
-* The upgrade tool only supports upgrading to Payara 6 versions 6.x.y or higher.
-* When performing an upgrade from Payara 5 to Payara 6, make sure that you're using JDK 11 - this is the minimum JDK version required by Payara 6.
-* The upgrade tool will not adjust the default-web.xml, though this comes with some caveats to be aware of:
-** A `<servlet-class>` entry of `org.apache.jasper.servlet.JspServlet` will be converted to `org.glassfish.wasp.servlet.JspServlet`
-** The default `<system-jar-includes>` init parameter of the `'jsp'` servlet has had a change in value between Payara Server 5 and Payara Server 6, reflecting the change in modules from Jakarta EE 8 to Jakarta EE 10. For example, the `javax.servlet.jsp.jar` file changed to `wasp.jar`. You may wish to review your default-web.xml and look at updating the default value of this parameter to that of a clean Payara 6 domain if you encounter issues.
+. The upgrade tool only supports upgrading to Payara Server 6 versions `6.x.y` or higher.
+. When performing an upgrade from Payara 5 to Payara 6, make sure that you're using JDK 11 as this is the minimum JDK version required to run Payara Server 6.
+. The upgrade tool will not adjust the `default-web.xml` configuration file (located in `${as-install}/config`) for each domain, so the following changes have are required:
+.. A `<servlet-class>` entry of `org.apache.jasper.servlet.JspServlet` must be converted to `org.glassfish.wasp.servlet.JspServlet`
+.. The `<system-jar-includes>` initialization parameter of the `jsp` servlet has had a change in value between Payara Server 5 and Payara Server 6, reflecting the change in modules from Jakarta EE 8 to Jakarta EE 10.
++
+This is how the parameter looks on a standard Payara Server `6.4.0` domain configuration:
++
+[source, xml]
+----
+<init-param>
+  <param-name>system-jar-includes</param-name>
+  <param-value>
+    /lib/
+    \lib\
+    expressly.jar
+    jakarta.servlet-api.jar
+    jakarta.servlet.jsp-api.jar
+    jakarta.servlet.jsp.jstl-api.jar
+    jakarta.servlet.jsp.jstl.jar
+    jakarta.jms-api.jar
+    jakarta.faces.jar
+    wasp.jar
+    jspcaching-connector.jar
+    web-glue.jar
+    hibernate-validator.jar
+    jakarta.ejb-api.jar
+    jakarta.enterprise.deploy-api.jar
+    jakarta.activation-api.jar
+    angus-activation.jar
+    jakarta.mail-api.jar
+    angus-mail.jar
+    jakarta.persistence.jar
+    jakarta.resource-api.jar
+    jakarta.security.auth.message-api.jar
+    jakarta.security.jacc-api.jar
+    jakarta.transaction-api.jar
+    webservices-osgi.jar
+    weld-osgi-bundle.jar
+    jersey-mvc-jsp.jar
+  </param-value>
+</init-param>
+----
++
+You'll have to adjust the value of this parameter by copying the current values of a clean Payara Server 6.4.0 or newer domain after the upgrade tool completes the process.
 
-TIP: We generally recommend upgrading to the latest version of Payara 5 before attempting to upgrade to Payara 6.
+IMPORTANT: It is recommended that users should run the latest version of Payara Server 5.x before attempting to upgrade to version 6.x.
 
 [[commands]]
 == Asadmin CLI Commands
