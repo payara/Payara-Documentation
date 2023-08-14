@@ -1,0 +1,190 @@
+[[codehaus-cargo]]
+= Codehaus Cargo
+
+[[what-is-codehaus-cargo]]
+== What is Codehaus Cargo?
+
+Cargo is Maven plugin implemented as a thin wrapper that allows you to manipulate various types of application containers (J2EE, Java EE, Jakarta EE and others) in a standard way. The portion Codehaus is a reference to the open-source community which used to host Cargo when it was first created. Since then, the community has been moved to GitHub.
+
+Codehaus Cargo allows you to:
+
+* Start, stop or restart an application container
+* Deploy, undeploy or redeploy an application on local or remote instances
+
+[[how-to-use-codehaus-cargo]]
+== How to Use Codehaus Cargo
+
+[[installation]]
+=== Installation
+
+The cargo plugin can be added to any Maven project by adding the following to the <build> section of your pom:
+
+[source, xml]
+----
+<build>
+    <plugins>
+        ...
+        <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven3-plugin</artifactId>
+            <version>1.10.6</version>
+        </plugin>
+        ...
+    </plugins>
+</build>
+----
+
+[[execution-goals]]
+=== Execution Goals
+In the following table, you can find the list of the main goals provided by the Cargo plugin. For more information about the goals, please refer to the following: xref:https://codehaus-cargo.github.io/cargo/Maven+3+Plugin.html[Cargo Documentation - Maven 3 Plugin].
+
+|===
+|Goal |Description
+
+|`cargo:start`
+|Starts the container.
+
+ A container that's started with cargo:start will automatically shut down as soon as the parent Maven instance quits (i.e., you see a *BUILD SUCCESSFUL* or *BUILD FAILED* message).
+
+|`cargo:run`
+|Starts the container and waits for the user to press CTRL+C to stop the container.
+
+|`cargo:stop`
+|Stops the container.
+
+|`cargo:restart`
+|Stop and start again a container. If the container was not running before calling cargo:restart, it will simply be started.
+
+|`cargo:deployer-deploy` (aliased to `cargo:deploy`)
+|Deploy a deployable to a running container.
+
+The `cargo:start` and `cargo:run` do already deploy the deployables specified in the configuration to the container; as a result calling cargo:deploy for a container which has been started by Codehaus Cargo in the same Maven project will most likely cause a second deployment of the same deployables (and might even fail).
+
+|`cargo:deployer-undeploy` (aliased to `cargo:undeploy`)
+|Undeploy a deployable from a running container.
+|===
+
+[[local-deployment]]
+=== Local Deployment
+
+In order to use Codehaus Cargo for local deployment, you can add the following plugin and configuration to `pom.xml`:
+
+[source, xml]
+----
+<plugin>
+    <groupId>org.codehaus.cargo</groupId>
+    <artifactId>cargo-maven3-plugin</artifactId>
+    <version>1.10.6</version>
+    <configuration>
+        <container>
+            <containerId>payara</containerId>
+            <type>installed</type>
+            <home>C:\payara-server\_WORKDIR\5.48.1\payara5</home>
+        </container>
+        <configuration>
+            <type>existing</type>
+            <home>C:\payara-server\_WORKDIR\5.4.1\payara5\glassfish\domains\</home>
+            <properties>
+                <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
+            </properties>
+        </configuration>
+            
+    </configuration>
+     <!-- provides JSR88 client compatibility API to deploy on Payara -->
+    <dependencies>
+        <dependency>
+            <groupId>org.glassfish.main.deployment</groupId>
+            <artifactId>deployment-client</artifactId>
+            <version>5.0</version>
+        </dependency>
+    </dependencies>
+</plugin>
+----
+The first and second file paths described between the `<home>` tags are the full paths to Payara Server home and the full path to the `domains` directory.
+
+After modifying the paths and the domain name, you can use `mvn package cargo:run` to run the container and test the deployment.
+
+If you need to deploy a WAR to a local Payara instance, you can use the following configuration:
+
+[source, xml]
+----
+<plugin>
+    <groupId>org.codehaus.cargo</groupId>
+    <artifactId>cargo-maven3-plugin</artifactId>
+    <version>1.10.6</version>
+    <configuration>
+    ....
+        <deployables>
+                <deployable type="war"
+                url="C:\NetBeansProjects\MavenCargoTest\target\MavenCargoTest-1.0-SNAPSHOT.war"
+                context="MavenCargoTest"
+                order="1"/>
+        </deployables>
+    </configuration>
+    <!-- provides JSR88 client API to deploy on Payara -->
+    <dependencies>
+        <dependency>
+            <groupId>org.glassfish.main.deployment</groupId>
+            <artifactId>deployment-client</artifactId>
+            <version>5.0</version>
+        </dependency>
+    </dependencies>
+</plugin>
+----
+
+[[remote-deployment]]
+=== Remote Deployment
+In order to use Codehaus Cargo for remote deployment, you can add the following plugin and configuration to `pom.xml`:
+
+[source, xml]
+----
+<plugin>
+    <groupId>org.codehaus.cargo</groupId>
+    <artifactId>cargo-maven3-plugin</artifactId>
+    <version>1.10.6</version>
+    <configuration>
+        <container>
+            <containerId>payara</containerId>
+            <artifactInstaller>
+                <groupId>fish.payara.distributions</groupId>
+                <artifactId>payara</artifactId>
+                <version>5.2022.5</version>
+            </artifactInstaller>
+        </container>
+        <configuration>
+            <home>C:\payara-server\_WORKDIR\5.4.1\payara5\glassfish\domains\</home>
+            <properties>
+                <cargo.hostname>localhost</cargo.hostname>
+                <cargo.servlet.port>8080</cargo.servlet.port>
+                <cargo.glassfish.admin.port>4848</cargo.glassfish.admin
+                <cargo.remote.username>admin</cargo.remote.username>
+                <cargo.remote.password>adminadmin</cargo.remote.password>
+                <cargo.glassfish.deploy.arg.remoteUpload>--upload=true</cargo.glassfish.deploy.arg.remoteUpload>
+            </properties>
+        </configuration>
+    </configuration>
+    <!-- provides JSR88 client API to deploy on Payara -->
+    <dependencies>
+        <dependency>
+            <groupId>org.glassfish.main.deployment</groupId>
+            <artifactId>deployment-client</artifactId>
+            <version>5.0</version>
+        </dependency>
+    </dependencies>
+</plugin>
+----
+A few important points to note about this configuration:
+
+* The default username for Cargo is admin.
+* The default password is `adminadmin`. If you have no password, then use `“”` as Cargo will throw an error if the password field is empty.
+* The default admin port is *4848*.
+* The default hostname is *localhost*.
+* The start and stop execution goals cannot be used with a remote Payara Server instance; this means that the remote instance MUST be running, otherwise Maven will fail.
+
+[[see-also]]
+== See Also
+
+For more information related to the usage of the Codehaus Cargo plugin, read the official Cargo documentation:
+
+* xref:https://codehaus-cargo.github.io/cargo/Home.html[Codehaus Cargo - Getting Started]
+* xref:https://codehaus-cargo.github.io/cargo/Payara.html[Codehaus Cargo - Payara Server Container]
