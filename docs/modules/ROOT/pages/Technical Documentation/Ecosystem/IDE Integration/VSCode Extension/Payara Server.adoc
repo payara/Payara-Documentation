@@ -48,6 +48,49 @@ Deployed applications can be opened in the browser, undeployed or disabled by ri
 
 image::vscode-extension/payara-server/list-application.png[Open application homepage]
 
+
+== Deploy Application to Payara Server Docker Instance
+
+The Payara Server tools in the VS Code extension includes Docker integration, making it seamless to deploy exploded Jakarta applications to a Payara Server instance running within a local Docker container. To take advantage of this feature, follow the steps below:
+
+* Register a new Payara Server instance by performing the following:
+    ** Open the command pallet using *Ctrl + Shift + P*, type *Payara* and select the *Add Payara Server* option.
+    ** Select Remote Domain.
+    ** For Docker integration, choose the "Docker" type and provide the HOST_PATH (e.g., D:/test) and CONTAINER_PATH (e.g., /mnt/test) mapping details. This mapping should align with the exploded application path or parent path of exploded application.
+    ** Choose a name for the server.
+    ** Enter the domain name, host name, and necessary credentials.
+* Run the Payara Server Docker container using the following command:
+`docker run -p 8080:8080 -p 4848:4848 -p 9009:9009 -v HOST_PATH:CONTAINER_PATH  payara/server-full:latest`
+Replace HOST_PATH with the actual host path and CONTAINER_PATH with the desired container path. The HOST_PATH points to the location on your host machine, and CONTAINER_PATH is the corresponding location inside the container.
+* Create your web application and deploy it to the registered Payara Server instance.
+
+
+== Deploy Application to Payara Server WSL Instance
+
+Another noteworthy feature is the integration of the Payara Server tools with Windows Subsystem for Linux (WSL). This integration empowers developers to manage and deploy exploded applications to a Payara Server instance running within WSL. Here's how you can make use of this feature:
+
+* Start the Payara Server instance within WSL:
+
+    ** Run the following command to start the server:
+        `./asadmin start-domain`
+    ** Set a password for the admin user:
+        `./asadmin change-admin-password`
+    ** Enable secure admin:
+        `./asadmin enable-secure-admin`
+    ** Restart the Payara Server domain:
+        `./asadmin restart-domain`
+    ** Fetch the IP address of WSL instance using the command `hostname -I` and enter it in the `host name` field in VSCode.
+
+* Register the WSL-based Payara Server instance in VS Code:
+
+    ** Open the command pallet using *Ctrl + Shift + P*, type *Payara* and select the *Add Payara Server* option.
+    ** Select Remote Domain.
+    ** For WSL integration, choose the "WSL" instance type.
+    ** Choose a name for the server.
+    ** Enter the domain name, host name (fetched via the command `hostname -I` in WSL instance), and necessary credentials.
+
+* Create your web application and deploy it to the registered Payara Server instance.
+
 [[see-also]]
 == See Also
 xref:Technical Documentation/Ecosystem/IDE Integration/Hot Deploy and Auto Deploy.adoc[Hot Deploy and Auto Deploy]
