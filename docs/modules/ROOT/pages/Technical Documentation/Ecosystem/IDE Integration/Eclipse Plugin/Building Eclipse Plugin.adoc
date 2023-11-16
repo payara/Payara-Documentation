@@ -10,19 +10,22 @@ Before building the Payara Tools Eclipse plugin, you will need to configure your
 Clone the ecosystem-eclipse-plugin repository::
 You must first clone the repository where the plugin source code is stored. https://github.com/payara/ecosystem-eclipse-plugin[Eclipse Plugin repository]
 
-Set the `JDK_8_HOME` environment variable::
-An environment variable named `JDK_8_HOME` must be created and point to a valid JDK 8 installation
+Set the `JAVA_HOME` environment variable::
+An environment variable named JAVA_HOME must be created and point to a valid JDK 17 installation.
 
-Install Apache Ant::
-Apache Ant is the build tool for the Payara Tools Eclipse IDE Plugin and must be configured locally. https://ant.apache.org/manual/install.html[Install Apache Ant]
-
-IMPORTANT: If you are building Payara Tools for Eclipse on Windows. `Program Files` must be replaced with `PROGRA~1` and `Program Files (x86)` must be replaced with `PROGRA~2` in your `JDK_8_HOME` and `ANT_HOME` environment variables.
+Install Apache Maven::
+Apache Maven is the build tool for the Payara Tools Eclipse IDE Plugin and must be configured locally. Visit https://maven.apache.org/install.html[Apache Maven Installation] to install Maven.
 
 [[building-eclipse-plugin]]
 == Build Payara Tools
-To build Payara Tools for Eclipse, run `ant` from the root of the repository you cloned. This will begin the build job for Payara Tools.
+To build Payara Tools for Eclipse, navigate to the root directory of the cloned repository and run the following command:
 
-This build job will create a both a zip and exploded-directory format. The zip format of this build can be found in the  `[project_root]/build/packages` directory, and the exploded-directory format can be found in the `[project_root]/build/repository` directory.
+[source,shell]
+mvn clean install
+
+This command will initiate the build process for the Payara Tools Eclipse plugin using Maven.
+
+The build job will create both a zip and exploded-directory format. The zip format of this build can be found in the `[project_root]/releng/fish.payara.eclipse.update/target` directory, and the exploded-directory format can be found in the `[project_root]/releng/fish.payara.eclipse.update/target/repository` directory.
 
 [[install-compiled-eclipse-plugin]]
 === Install Payara Tools into Eclipse
@@ -31,7 +34,7 @@ After Payara Tools for Eclipse has been compiled successfully, you need to add i
 .*Adding Payara Tools to Eclipse*
 . Navigate to Help -> Install New Software...
 . Click Add -> Archive...
-. Select the zip format in `[project_root]/build/packages`
+. Select the zip format in `[project_root]/releng/fish.payara.eclipse.update/target`
 . Select the Eclipse Payara Tools checkbox
 . Click Next -> Finish
 . Select Install Anyway
