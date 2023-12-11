@@ -16,16 +16,29 @@ The Public API should be used in the following scenarios:
 [[maven-coordinates]]
 == Maven Coordinates
 
-The Public API is released as a Maven artifact in *Maven Central*. To use it in a Maven project, set the following dependency in your project's POM:
+The Public API is released as a Maven artifact in *Payara Nexus*, in the `payara-artifacts` repository. To use it in a Maven project, set the following dependencies in your project's POM:
 
-[source, xml]
+[source, xml, subs=attributes+]
 ----
-<dependency>
-    <groupId>fish.payara.api</groupId>
-    <artifactId>payara-api</artifactId>
-    <version>${payara.version}</version>
-    <scope>provided</scope>
-</dependency>
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>fish.payara.api</groupId>
+            <artifactId>payara-bom</artifactId>
+            <version>{page-version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <dependency>
+        <groupId>fish.payara.api</groupId>
+        <artifactId>payara-api</artifactId>
+        <scope>provided</scope>
+    </dependency>
+</dependencies>
 ----
 
-Where `${payara.version}` of the artifact corresponds with the oldest version of Payara Server your application should support.
+For information on the Payara BOM, please see xref:Technical Documentation/Ecosystem/Project Management Tools/Maven Bom.adoc[Maven Bom].
