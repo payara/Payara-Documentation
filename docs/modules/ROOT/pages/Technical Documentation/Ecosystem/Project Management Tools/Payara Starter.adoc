@@ -1,0 +1,197 @@
+= Payara Starter Documentation
+
+== Introduction
+
+Payara Starter is a tool designed to accelerate Jakarta EE development by simplifying the setup process. It supports both Maven and Gradle, enabling developers to swiftly create Jakarta EE projects. This allows them to focus on innovating functionalities rather than dealing with setup complexities.
+
+* GitHub Repository: https://github.com/payara/ecosystem-starter
+* Community Support Repository: https://github.com/payara/ecosystem-support
+* Maven Central Repository for Payara Starter Archetype: https://mvnrepository.com/artifact/fish.payara.starter/payara-starter-archetype
+* Web Tool: https://start.payara.fish
+
+== Key Features of Payara Starter
+
+* Build System Flexibility: Supports Maven and Gradle for seamless integration with preferred build systems.
+* Customizable Project Details: Define crucial project specifics upfront, aligning with organizational naming conventions.
+* Java and Jakarta EE Version Control: Allows selection of specific versions to ensure compatibility and leverage the latest features.
+* MicroProfile Integration: Includes options to integrate MicroProfile APIs for building resilient, scalable services.
+* Payara Platform Compatibility: Effortlessly works with the Payara Platform, ensuring readiness for deployment.
+* Docker Support: Facilitates Docker compatibility, streamlining containerization for agile deployment.
+* Test Templates: Optionally includes test templates, encouraging best testing practices from project initiation.
+* Advanced Security Configuration: Optional advanced security setup for robust authentication via Jakarta Security, facilitating secure application development from the start.
+
+== Supported Jakarta EE Profiles
+
+Payara Starter supports various Jakarta EE profiles:
+
+* Platform: `jakarta.platform:jakarta.jakartaee-api`
+* Web Profile: `jakarta.platform:jakarta.jakartaee-web-api`
+* Core Profile: `jakarta.platform:jakarta.jakartaee-core-api`
+
+== Generating a New App using Payara Starter
+
+You can generate a new application using Payara Starter in two ways:
+
+1. **Web Tool at start.payara.fish:**
+Visit https://start.payara.fish[start.payara.fish] to use the web tool for generating applications via a graphical interface.
+
+2. **Command Line Using Archetype:**
+To generate a new application using the Payara Starter archetype from the command line, use the following Maven command:
+
+[source,shell]
+----
+mvn archetype:generate -DarchetypeGroupId=fish.payara.starter -DarchetypeArtifactId=payara-starter-archetype -DarchetypeVersion=1.0-beta4 ... (other options)
+----
+This command generates a new application based on specified options. Adjust properties according to your project requirements.
+
+
+==== **Payara Starter Archetype Parameter**
+
+Payara Starter Archetype parameters allow customization of various aspects during the application generation process. Below is a table detailing each parameter, its default value, and additional notes:
+
+[cols=",,",options="header"]
+|===
+| Element 
+| Default 
+| Notes
+
+| build
+| maven
+| Specifies the preferred build system for the project. Options include: 'maven', 'gradle'.
+
+| groupId
+| fish.payara
+| Specifies the Group ID for the generated project.
+
+| artifactId
+| hello-world
+| Determines the Artifact ID for the generated project.
+
+| version
+| 0.1-SNAPSHOT
+| Sets the version of the generated project.
+
+| package
+| fish.payara
+| Defines the base package name for the project.
+
+| javaVersion
+| 17
+| Sets the Java version for the project. Available options: 8, 11, 17.
+
+| jakartaEEVersion
+| 10
+| Specifies the targeted Jakarta EE version. Valid options: 8, 9, 9.1, 10.
+
+| profile
+| full
+| Specifies the Jakarta EE profile options: 'core', 'web', or 'full'.
+
+| platform
+| server
+| Specifies the preferred build system for the project. Options include: 'maven', 'gradle'.
+
+| payaraVersion
+| 6.2023.11
+| Sets the targeted Payara version. Retrieved from Maven Central.
+
+| payaraApiVersion
+| 6.9.0
+| Specifies the targeted Payara API version.
+
+| addConcurrentApi
+| false
+| Includes Concurrent API if true.
+
+| addResourceApi
+| false
+| Includes Resource API if true.
+
+| addJBatchApi
+| false
+| Includes JBatch API if true.
+
+| addMicroprofileApi
+| true
+| Includes MicroProfile API if true.
+
+| addJcache
+| false
+| Includes JCache if true.
+
+| addPayaraApi
+| true
+| Includes Payara API if true.
+
+| deployWar
+| true
+| Deploys WAR file if true. Applicable for 'micro' platform only.
+
+| autoBindHttp
+| true
+| Enables automatic HTTP binding. Applicable for 'micro' platform only.
+
+| contextRoot
+| /
+| Sets the context root for the deployed artifact. Applicable for 'micro' platform only.
+
+| includeTests
+| false
+| Includes tests if true. Currently limited to 'maven' builds.
+
+| docker
+| false
+| Enables Docker compatibility.
+
+| mpConfig
+| false
+| Enables MicroProfile Config.
+
+| mpOpenAPI
+| false
+| Enables MicroProfile OpenAPI.
+
+| mpFaultTolerance
+| false
+| Enables MicroProfile Fault Tolerance.
+
+| mpMetrics
+| false
+| Enables MicroProfile Metrics.
+
+| auth
+| none
+| Specifies authentication type. Available choices: 'none', 'formAuthFileRealm', 'formAuthDB', 'formAuthLDAP'.
+
+|===
+
+
+== Sample Generated REST Endpoint
+
+An example of a generated REST endpoint using Payara Starter:
+
+[source,java]
+----
+package fish.payara.hello;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
+
+@Path("hello")
+public class HelloWorldResource {
+
+    @GET
+    public Response hello(@QueryParam("name") String name) {
+        if ((name == null) || name.trim().isEmpty()) {
+            name = "world";
+        }
+        return Response.ok(name).build();
+    }
+}
+----
+
+This sample demonstrates a simple REST endpoint named `hello` that accepts a query parameter `name` and responds with a greeting message.
+
+Feel free to adjust archetype parameters to tailor the generated application to your project requirements.
