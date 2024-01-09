@@ -120,7 +120,7 @@ http://localhost:8080/ejb-timer-service-app/timer
 ----
 
 To change the database used by the EJB Timer Service, set the EJB Timer Service's Timer DataSource setting to a valid JDBC resource.
-If the EJB Timer Service has already been started in a server instance, you must also create the timer database table. DDL files to create these tables are located in `${PAYARA_INSTALL}/lib/install/databases`.
+If the EJB Timer Service has already been started in a server instance, you must also create the timer database table. DDL files to create these tables are located in `${as-install}/lib/install/databases`.
 
 Using the EJB Timer Service is equivalent to interacting with a single JDBC resource manager.
 If an EJB component or application accesses a database either directly through JDBC or indirectly (for example, through an entity bean's persistence mechanism), and also interacts with the EJB Timer Service, its data source must be configured with an XA-compatible JDBC driver.
@@ -194,7 +194,7 @@ For timers to work in a clustered environment, the DAS and the clustered server 
 If you attempt to deploy an application with EJB timers without setting the timer resource correctly, the startup will fail, and you will be
 left with a marker file, named `ejb-timer-service-app`, on the DAS that will prevent the Timer Service from correctly creating the database table.
 
-The solution is to remove the marker file on the DAS, restart the DAS and the clusters or deployment groups, and then redeploy any applications that rely on the offending EJB timer. The marker file is located on the DAS in `${DOMAIN_DIR}/generated/ejb/ejb-timer-service-app`.
+The solution is to remove the marker file on the DAS, restart the DAS and the clusters or deployment groups, and then redeploy any applications that rely on the offending EJB timer. The marker file is located on the DAS in `${domain-dir}/generated/ejb/ejb-timer-service-app`.
 
 [[using-session-beans]]
 == Using Session Beans
@@ -243,7 +243,7 @@ The `max-cache-size` element specifies the maximum number of session beans that 
 
 For more information about `glassfish-ejb-jar.xml`, see "xref:docs:application-deployment-guide:dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in the Payara Server Application Deployment Guide.
 
-The passivated beans are stored on the file system. The Session Store Location setting in the EJB container allows an administrator to specify the directory where passivated beans are stored. By default, passivated stateful session beans are stored in application-specific subdirectories created under `${DOMAIN_DIR}/session-store`.
+The passivated beans are stored on the file system. The Session Store Location setting in the EJB container allows an administrator to specify the directory where passivated beans are stored. By default, passivated stateful session beans are stored in application-specific subdirectories created under `${domain-dir}/session-store`.
 
 NOTE: Make sure the `delete` option is set in the `server.policy` file, or expired file-based sessions might not be deleted properly.
 For more information about `server.policy`, see xref:docs:application-development-guide:securing-apps.adoc#the-server.policy-file[The `server.policy` File].
@@ -327,7 +327,7 @@ Other servers:: Uses other server instances in the cluster for session persisten
 
 Choose the persistence store in one of the following ways:
 
-* To use the local file system, first disable availability. Select the _Availability Service_ component under the relevant configuration in the  Administration Console. Uncheck the _Availability Service_ box. Then  select the EJB Container component and edit the Session Store Location value. The default is `${DOMAIN_DIR}/session-store`.
+* To use the local file system, first disable availability. Select the _Availability Service_ component under the relevant configuration in the  Administration Console. Uncheck the _Availability Service_ box. Then  select the EJB Container component and edit the Session Store Location value. The default is `${domain-dir}/session-store`.
 * To use other servers, select the _Availability Service_ component under the relevant configuration in the Administration Console. Check the _Availability Service_ box.
 To enable availability for the EJB container, select the EJB Container Availability tab, then check the Availability Service box.
 

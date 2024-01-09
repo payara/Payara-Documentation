@@ -28,7 +28,7 @@ This includes, but is not limited to, Jakarta EE API, Eclipse MicroProfile and t
 Parents the Common class loader.
 
 |Common 
-|The Common class loader loads JAR files in the`${PAYARA_INSTALL}/lib` directory, followed by JAR files in the `${DOMAIN_DIR}/lib` directory. Using `${DOMAIN_DIR}/lib` is recommended whenever possible, and required for custom login modules and security realms.
+|The Common class loader loads JAR files in the`${as-install}/lib` directory, followed by JAR files in the `${domain-dir}/lib` directory. Using `${domain-dir}/lib` is recommended whenever possible, and required for custom login modules and security realms.
 
 Parents the Connector class loader.
 
@@ -81,13 +81,13 @@ For a number of packages, including `java.\*` and `jakarta.\*`, symbol resolutio
 
 Optional packages are packages of Java classes and associated native code that application developers can use to extend the functionality of the core platform.
 
-To use the Java optional package mechanism, copy the JAR files into the `${DOMAIN_DIR}/lib/ext` directory and then restart the server, or use the `asadmin add-library` command with the `--type ext` option.
+To use the Java optional package mechanism, copy the JAR files into the `${domain-dir}/lib/ext` directory and then restart the server, or use the `asadmin add-library` command with the `--type ext` option.
 
 Libraries configured in this manner are loaded by the bootstrap classloader in sequence by making them part of the server instance's classpath.
 
 For more information about the `asadmin add-library` command, see the Payara Server Reference Manual.
 
-NOTE: The `${DOMAIN_DIR}/lib/ext` directory was used in previous versions of Payara Server as part of its dedicated *Extension Classloader*, which used Java's own extension library support to allow libraries to be added to an existing domain as extensions. +
+NOTE: The `${domain-dir}/lib/ext` directory was used in previous versions of Payara Server as part of its dedicated *Extension Classloader*, which used Java's own extension library support to allow libraries to be added to an existing domain as extensions. +
 The extension library mechanism was officially removed from Java 11 onwards and thus its dedicated classloader was removed but the directory has remained for backwards compatibility purposes.
 
 [[class-loader-universes]]
@@ -126,7 +126,7 @@ NOTE: None of these alternatives apply to application clients. For more informat
 
 You can update a library JAR file using dynamic reloading or by restarting (disabling and re-enabling) a module or application. To add or remove library JAR files, you can redeploy the module or application. Application libraries are included in the _Applib_ class loader. Paths to libraries can be relative or absolute.
 
-A relative path is relative to `${DOMAIN_DIR}/lib/applibs`. If the path is absolute, the path must be accessible to the domain administration server (DAS). Payara Server automatically synchronizes these libraries to all remote instances when a cluster or deployment group is restarted. However,
+A relative path is relative to `${domain-dir}/lib/applibs`. If the path is absolute, the path must be accessible to the domain administration server (DAS). Payara Server automatically synchronizes these libraries to all remote instances when a cluster or deployment group is restarted. However,
 libraries specified by absolute paths are not guaranteed to be synchronized.
 
 TIP: You can also use application-specific class loading to access different versions of a library from different applications.
@@ -146,7 +146,7 @@ To circumvent this limitation for libraries, utility classes, or individually de
 [[using-the-common-class-loader]]
 === Using the Common Class Loader
 
-To use the Common class loader, copy the JAR files into the `${DOMAIN_DIR}/lib` or `${PAYARA_INSTALL}/lib` directory and restart the server, or use the `asadmin add-library` command with the `--type common` option. For more information about the `asadmin add-library` command,
+To use the Common class loader, copy the JAR files into the `${domain-dir}/lib` or `${as-install}/lib` directory and restart the server, or use the `asadmin add-library` command with the `--type common` option. For more information about the `asadmin add-library` command,
 see the Payara Server Reference Manual.
 
 Using the Common class loader makes an application or module accessible to all applications or modules deployed on servers that share the same configuration. However, this accessibility does not extend to application clients. For more information, see xref:docs:application-development-guide:java-clients.adoc#using-libraries-with-application-clients[Using Libraries with Application Clients].

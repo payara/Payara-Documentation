@@ -118,9 +118,9 @@ All Payara Server subcommands work as expected with the default master password 
 
 The `change-master-password --savemasterpassword` option indicates whether the master password should be written to the file system in the `master-password` file for the DAS or a node. The default setting is `false`.
 
-* For a domain, the master password is kept in the `${DOMAIN_DIR}/master-password` file.
+* For a domain, the master password is kept in the `${domain-dir}/master-password` file.
 
-* For a node, the master-password file is kept in `${PAYARA_INSTALL}/nodes/<node-name>/agent/master-password`.
+* For a node, the master-password file is kept in `${as_install}/nodes/<node-name>/agent/master-password`.
 +
 You can set a master password at the node level and all instances created on that node will use that master-password file. To do this, use the `--nodedir` option and provide the corresponding node name.
 
@@ -149,7 +149,7 @@ For instructions, see xref:system-security.adoc#to-change-an-administration-pass
 
 Files that contain encoded passwords need to be protected using file system permissions. These files include the following:
 
-* `${DOMAIN_DIR}/master-password`
+* `${domain-dir}/master-password`
 +
 This file contains the encoded master password and should be protected with the default file system permissions set to `600` (in most *Nix systems).
 
@@ -205,7 +205,7 @@ Jakarta Authorization is the specification that defines an interface for pluggab
 [[working-with-the-server.policy-policy-file]]
 ==== Working With the `server.policy` Policy File
 
-Each Payara Server domain has its own global Java policy file, located in `${DOMAIN_DIR}/config`. The file is named `server.policy`.
+Each Payara Server domain has its own global Java policy file, located in `${domain-dir}/config`. The file is named `server.policy`.
 
 A sample `server.policy` file is as follows. Comments in the file describe why various permissions are granted. These permissions are described in more detail in the next section.
 
@@ -394,7 +394,7 @@ Each certificate in the chain (after the first) thus authenticates the public ke
 [[certificate-files]]
 ==== Certificate Files
 
-During Payara Server installation, a self-signed certificate is generated in Java Secure Socket Extension (JSSE) format suitable for internal testing. By default, Payara Server stores its certificate information in certificate databases in the `${DOMAIN_DIR}/config` directory:
+During Payara Server installation, a self-signed certificate is generated in Java Secure Socket Extension (JSSE) format suitable for internal testing. By default, Payara Server stores its certificate information in certificate databases in the `${domain-dir}/config` directory:
 
 Keystore file::
   The `keystore.jks` file contains the certificate, including its private key. The keystore file is protected with a password. +
@@ -501,7 +501,7 @@ After you create your LoginModule, you must plug it in to a jaas-context, which 
 
 To do this, perform the following steps:
 
-. Specify a new jaas-context for the Certificate realm in the `${DOMAIN_DIR}/config/login.conf` file. Using the previous example configuration would look like this:
+. Specify a new jaas-context for the Certificate realm in the `${domain-dir}/config/login.conf` file. Using the previous example configuration would look like this:
 +
 [source,shell]
 ----
@@ -552,7 +552,7 @@ Use the `change-master-password` subcommand in local mode to modify the master p
 
 CAUTION: If you change the master password and are not using a master password file, the `start-instance` and `start-cluster` subcommands are not able to determine the master password. In this case, you must start those instances locally by using the `start-local-instance` command.
 
-When the master password is saved, it is saved in the `${DOMAIN_DIR}/config/master-password` file.
+When the master password is saved, it is saved in the `${domain-dir}/config/master-password` file.
 
 Follow these steps to correctly change the master password on an existing domain:
 

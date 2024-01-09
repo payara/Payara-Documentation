@@ -271,10 +271,10 @@ A JAR file can be signed automatically or manually.
 [[automatically-signing-jar-files]]
 ==== Automatically Signing JAR Files
 
-Payara Server automatically creates a signed version of the required JAR file if none exists. When a Java Web Start request for the `gf-client.jar` file arrives, the Payara Server looks for the `${DOMAIN_DIR}/java-web-start/gf-client.jar` file. When a request for an application's generated application client JAR file arrives,
-the Payara Server looks in the  `${DOMAIN_DIR}/java-web-start/app-name` directory for a file with the same name as the generated JAR file created during deployment.
+Payara Server automatically creates a signed version of the required JAR file if none exists. When a Java Web Start request for the `gf-client.jar` file arrives, the Payara Server looks for the `${domain-dir}/java-web-start/gf-client.jar` file. When a request for an application's generated application client JAR file arrives,
+the Payara Server looks in the  `${domain-dir}/java-web-start/app-name` directory for a file with the same name as the generated JAR file created during deployment.
 
-In either case, if the requested signed JAR file is absent or older than its unsigned counterpart, Payara Server creates a signed version of the JAR file automatically and deposits it in the relevant directory. Whether Payara Server just signed the JAR file or not, it serves the file from the `${DOMAIN_DIR}/java-web-start` directory tree in response to the Java Web Start request.
+In either case, if the requested signed JAR file is absent or older than its unsigned counterpart, Payara Server creates a signed version of the JAR file automatically and deposits it in the relevant directory. Whether Payara Server just signed the JAR file or not, it serves the file from the `${domain-dir}/java-web-start` directory tree in response to the Java Web Start request.
 
 To sign these JAR files, by default Payara Server uses its self-signed certificate. When you create a new domain by using the `asadmin create-domain` command, the Payara Server creates a self-signed certificate and adds it to the domain's key store (the same applies to the default domains included in the server's installation bundle).
 
@@ -290,7 +290,7 @@ If you use the Payara Server Java Web Start feature or deploy applications that 
 . Stop the Payara Server domain and corresponding instances, clusters or deployment groups.
 . Replace the self-signed certificate with the trusted certificate by importing the trusted certificate into the keystore using the `s1as` alias.
 +
-By default, the keystore is located at `${DOMAIN_DIR}/config/keystore.p12`. +
+By default, the keystore is located at `${domain-dir}/config/keystore.p12`. +
 For more information about importing a trusted certificate into the
 domain keystore, see "xref:docs:security-guide:system-security.adoc#administering-jsse-certificates[Administering JSSE Certificates]" in the Payara Server Security Guide.
 
@@ -299,13 +299,13 @@ domain keystore, see "xref:docs:security-guide:system-security.adoc#administerin
 +
 [source, shell]
 ----
-rm -rf ${DOMAIN_DIR}/java_web_star
+rm -rf ${domain-dir}/java_web_star
 ----
 .. For each application that contains an application client launched using Java Web Start, type:
 +
 [source, shell]
 ----
-rm -rf ${DOMAIN_DIR}/generated/xml/app-name/signed
+rm -rf ${domain-dir}/generated/xml/app-name/signed
 ----
 . Restart the Payara Server domain and corresponding targets.
 
@@ -657,7 +657,7 @@ a|
 [[using-the-embeddable-acc]]
 === Using the Embeddable ACC
 
-You can embed the ACC into your application client. If you place the `${PAYARA_INSTALL}/lib/gf-client.jar` file in your runtime classpath, your application creates the ACC after your application code has started, then requests that the ACC start the application client portion. The basic model for coding with the embeddable ACC is as follows:
+You can embed the ACC into your application client. If you place the `${as-install}/lib/gf-client.jar` file in your runtime classpath, your application creates the ACC after your application code has started, then requests that the ACC start the application client portion. The basic model for coding with the embeddable ACC is as follows:
 
 . Create a builder object.
 . Operate on the builder to configure the ACC.
@@ -713,12 +713,12 @@ WARNING: The ACC does not prevent the calling application from creating or runni
 [[running-an-application-client-using-the-appclient-script]]
 === Running an Application Client Using the `appclient` Script
 
-To run an application client, you can launch the ACC using the `appclient` script, whether Java Web Start is enabled. This script is located in the `${PAYARA_INSTALL}/glassfish/bin` directory.
+To run an application client, you can launch the ACC using the `appclient` script, whether Java Web Start is enabled. This script is located in the `${as-install}/glassfish/bin` directory.
 
 [[using-the-package-appclient-script]]
 === Using the `package-appclient` Script
 
-You can package the Payara Server system files required to launch application clients on remote systems into a single JAR file using the `package-appclient` script. This script is located in the `${PAYARA_INSTALL}/glassfish/bin` directory.
+You can package the Payara Server system files required to launch application clients on remote systems into a single JAR file using the `package-appclient` script. This script is located in the `${as-install}/glassfish/bin` directory.
 
 [[the-client.policy-file]]
 === The `client.policy` File
@@ -857,7 +857,7 @@ TIP: In this case, you could write logic to catch an exception around the lookup
 
 The Libraries field in the Administration Console's deployment page and the `--libraries` option of the `asadmin deploy` command do not apply to application clients.
 
-Neither do the `${PAYARA_INSTALL}/lib`, `${DOMAIN_DIR}/lib`, and `${DOMAIN_DIR}/lib/classes` directories comprising the Common Class Loader.
+Neither do the `${as-install}/lib`, `${domain-dir}/lib`, and `${domain-dir}/lib/classes` directories comprising the Common Class Loader.
 These apply only to applications and modules deployed to the server. For more information, see xref:docs:application-development-guide:class-loaders.adoc#class-loaders[Class Loaders].
 
 To use libraries with an application client, package the application client in an application (EAR file).
@@ -905,10 +905,10 @@ corbaname:host1:port1,host2:port2,.../NameService#ejb/jndi-name
 +
 For more information on deployment, see "xref:docs:application-deployment-guide:overview.adoc#about-deployment-tools[About Deployment Tools]" in the Payara Server Application Deployment Guide.
 
-. Copy the `${PAYARA_INSTALL}/lib/gf-client.jar` file to the client machine and include it in the classpath on the client side.
+. Copy the `${as-install}/lib/gf-client.jar` file to the client machine and include it in the classpath on the client side.
 +
 The `gf-client.jar` file references the Payara Server JAR files in its `MANIFEST.MF` file. If there is no Payara Server installation on the
-client machine, you must also copy the `${PAYARA_INSTALL}/modules` directory to the client machine and maintain its directory structure relative to the `${PAYARA_SERVER_DIR}/lib/gf-client.jar` file. Or you can use the `package-appclient` script; see xref:java-clients.adoc#using-the-package-appclient-script[Using the `package-appclient` Script].
+client machine, you must also copy the `${as-install}/modules` directory to the client machine and maintain its directory structure relative to the `${PAYARA_SERVER_DIR}/lib/gf-client.jar` file. Or you can use the `package-appclient` script; see xref:java-clients.adoc#using-the-package-appclient-script[Using the `package-appclient` Script].
 
 . To access EJB components that are residing in a remote system, set the following system properties for the Java Virtual Machine startup options:
 +
@@ -1019,10 +1019,10 @@ For detailed instructions on developing a JMS client, see "https://eclipse-ee4j.
 For information on configuring JMS resources, see "xref:docs:administration-guide:jms.adoc#administering-jms-connection-factories-and-destinations[Administering JMS Connection Factories and Destinations]" in the Payara Server Administration Guide.
 
 . Copy the following JAR files to the client machine and include them in the classpath on the client side:
-* `gf-client.jar` - available at `${PAYARA_INSTALL}/lib`
-* `imqjmsra.jar` - available at `${PAYARA_INSTALL}/lib/install/applications/jmsra`
+* `gf-client.jar` - available at `${as-install}/lib`
+* `imqjmsra.jar` - available at `${as-install}/lib/install/applications/jmsra`
 +
-The `gf-client.jar` file references the Payara Server JAR files in its `MANIFEST.MF` file. If there is no Payara Server installation on the client machine, you must also copy the `${PAYARA_INSTALL}/modules` directory to the client machine and maintain its directory structure relative to the as-install`/lib/gf-client.jar` file. Or you can use the `package-appclient` script; see xref:java-clients.adoc#using-the-package-appclient-script[Using the `package-appclient` Script].
+The `gf-client.jar` file references the Payara Server JAR files in its `MANIFEST.MF` file. If there is no Payara Server installation on the client machine, you must also copy the `${as-install}/modules` directory to the client machine and maintain its directory structure relative to the as-install`/lib/gf-client.jar` file. Or you can use the `package-appclient` script; see xref:java-clients.adoc#using-the-package-appclient-script[Using the `package-appclient` Script].
 
 . To access EJB components that are residing in a remote system, set the following system properties for the Java Virtual Machine startup options:
 +
