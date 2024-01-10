@@ -70,6 +70,17 @@ mvn clean install -PBuildDockerImages -pl :docker-images -amd
 
 The Maven build expects that a regular build of Payara is already executed as it searches for some artifacts in the Maven repository (like SNAPSHOT builds of the server)
 
+The build configuration of the Docker images is also set up to create multiplatform images using _buildx_.
+This can be activated to by specifying at the command line the `-Ddocker.platforms` system property like so:
+
+[source, shell]
+----
+mvn clean install -PBuildDockerImages -pl :docker-images -amd -Ddocker.platforms=linux/amd64,linux/arm64
+----
+
+The JDK Docker images that Payara pull from currently only provide multiplatform images for `linux/amd64` and `linux/arm64`,
+so be aware that specifying other platforms may require editing the Dockerfiles and build config.
+
 [[additional-build-profiles]]
 == Additional Build Profiles
 
