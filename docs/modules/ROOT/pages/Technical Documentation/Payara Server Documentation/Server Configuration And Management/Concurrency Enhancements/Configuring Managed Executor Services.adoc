@@ -1,0 +1,206 @@
+[[configuring-managed-executor-services]]
+= Configuring Managed Executor Services
+
+Managed executor services are used by applications to execute submitted tasks asynchronously. Tasks are executed on threads that are started and managed by the container. The context of the container is propagated to the thread executing the task.
+
+NOTE: Jakarta Concurrency specifies that certain default resources be made available to applications, and defines specific JNDI names for these default resources. Payara Server makes these names available through the use of logical JNDI names, which map Jakarta EE JNDI names to specific Payara Server resources. +
+For managed executor services, the mapping is as follows: +
+`java:comp/DefaultManagedExecutorService` +
+This Jakarta Concurrency standard name is mapped to the `concurrent/__defaultManagedExecutorService` resource.
+
+[[create-managed-executor-service]]
+== Create a Managed Executor Service
+
+Managed Executor Services can be created by using Admin Console or Asadmin commands.
+
+To create a new Managed Executor Service in the Admin Console, go to Resources → Concurrent Resources → Managed Executor Services → New:
+
+image:concurrency/new_managed_executor_service.png[New Managed Executor Service]
+
+Alternatively, the `create-managed-executor-service` asadmin command can be used to create a managed executor service resource.
+
+Because all JNDI names are in the `java:comp/env` subcontext, when specifying the JNDI name of a managed executor service, use only the `concurrent/name` format. For example, `concurrent/Executor1`.
+
+IMPORTANT: Creating a managed executor service resource is a dynamic event and typically does not require server restart. Applications can use a resource as soon as it is created. However, if an application tried to use a resource before it was created, and that resource is created later, the application or the server must be restarted. Otherwise, the application will not be able to locate the resource.
+
+=== Usage
+----
+asadmin> create-managed-executor-service [--help]
+        [--enabled={false|true}]
+        [--contextinfoenabled={false|true}]
+        [--contextinfo={Classloader|JNDI|Security|WorkArea}]
+        [--threadpriority threadpriority]
+        [--longrunningtasks={false|true}]
+        [--useforkjoinpool={false|true}]
+        [--hungafterseconds hungafterseconds]
+        [--corepoolsize corepoolsize]
+        [--maximumpoolsize maximumpoolsize]
+        [--keepaliveseconds keepaliveseconds]
+        [--threadlifetimeseconds threadlifetimeseconds]
+        [--taskqueuecapacity taskqueuecapacity]
+        [--description description]
+        [--property property]
+        [--target target]
+        jndi_name
+----
+*Aim*::
+The `create-managed-executor-service` asadmin command creates a managed executor service resource.
+
+=== Command Options
+
+[cols="25,10,40,15,10", options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`enabled`
+|Boolean
+|Determines whether the resource is enabled at runtime.
+|true
+|No
+
+|`contextinfoenabled`
+|Boolean
+|Determines whether container contexts are propagated to threads. If set to `true`, the contexts specified in the `--contextinfo` option are propagated. If set to `false`, no contexts are propagated and the `--contextinfo` option is ignored.
+|true
+|No
+
+|`contextinfo`
+|String
+|Specifies individual container contexts to propagate to threads. Valid values are `Classloader`, `JNDI`, `Security`, and `WorkArea`. Values are specified in a comma-separated list and are case-insensitive.
+|`Classloader,JNDI,Security,WorkArea`
+|No
+
+|`threadpriority`
+|Integer
+|Specifies the priority to assign to created threads.
+|5
+|No
+
+|`longrunningtasks`
+|Boolean
+|Specifies whether the resource should be used for long-running tasks. If set to true, long-running tasks are not reported as stuck.
+|false
+|No
+
+|`useforkjoinpool`
+|Boolean
+|If enabled, a ForkJoinPool will be used instead of the default thread pool. This pool uses the Fork/Join framework, where all threads in the pool attempt to find and execute tasks, with free threads attempting to "steal" work from deques of busy threads.
+|false
+|No
+
+|`hungafterseconds`
+|Integer
+|Specifies the number of seconds that a task can execute before it is considered unresponsive.
+|0
+|No
+
+|`corepoolsize`
+|Integer
+|Specifies the number of threads to keep in a thread pool, even if they are idle. When a new task is submitted and the number of running threads is less than `corepoolsize`, a new thread is created to handle the request. When the value for `corepoolsize` is 0 (the default), new threads are never created unless the task queue is full or the resource is using direct queuing. Direct queuing occurs when `taskqueuecapacity` is 0, or when `taskqueuecapacity` is 2147483647 and `corepoolsize` is 0.
+|0
+|No
+
+|`maximumpoolsize`
+|Integer
+|Specifies the maximum number of threads that a thread pool can contain.
+|2147483647
+|No
+
+|`keepaliveseconds`
+|Integer
+|Specifies the number of seconds that threads can remain idle when the number of threads is greater than `corepoolsize`.
+|60
+|No
+
+|`threadlifetimeseconds`
+|Integer
+|Specifies the number of seconds that threads can remain in a thread pool before being purged, regardless of whether the number of threads is greater than `corepoolsize` or whether the threads are idle.
+|0
+|No
+
+|`taskqueuecapacity`
+|Integer
+|Specifies the number of submitted tasks that can be stored in the task queue awaiting execution.
+|2147483647
+|No
+
+|`description`
+|String
+|Descriptive details about the resource.
+|-
+|No
+
+|`property`
+|String
+|Optional attribute name/value pairs for configuring the resource.
+|-
+|No
+
+|`target`
+|String
+|Specifies the target for which you are creating the resource. Valid targets are: server, domain, cluster_name, instance_name
+|server
+|No
+|===
+
+=== Command Operands
+*jndi_name*::
+The JNDI name of this resource.
+
+=== Example
+
+[source, shell, subs="quotes"]
+----
+asadmin> *create-managed-executor-service* --description "Executor Service example" --useforkjoinpool concurrent/myExecutor
+Managed executor service concurrent/myExecutor created successfully.
+Command create-managed-executor-service executed successfully.
+----
+
+[[list-managed-executor-services]]
+== List Managed Executor Services
+
+The `list-managed-executor-services` asadmin command can be used to list the existing managed executor service resources.
+
+=== Listing Managed Executor Services
+This example lists managed executor service resources on the default server instance, `server`.
+[source, shell, subs="quotes"]
+----
+asadmin> *list-managed-executor-services*
+concurrent/__defaultManagedExecutorService 
+concurrent/Executor1 
+concurrent/Executor2 
+Command list-managed-executor-services executed successfully.
+----
+
+[[update-managed-executor-services]]
+== Update a Managed Executor Service
+
+You can change all of the settings for an existing managed executor service resource except its JNDI name. Use the `get` and `set` asadmin commands to view and change the values of the managed executor service attributes respectively.
+
+IMPORTANT: When a resource is updated, the existing resource is shut down and recreated. If an application used the resource prior to the update, the application or the server must be restarted.
+
+. View the attributes of a managed executor service by using the `get` asadmin command. +
+`asadmin> *get resources.managed-executor-service.{resource-JNDI-name}.**`
+. Set an attribute of the managed executor service by using the set asadmin command. +
+`asadmin> *set resources.managed-executor-service.{resource-JNDI-name}.deployment-order=120*`
+
+[[delete-managed-executor-services]]
+== Delete a Managed Executor Service
+
+The `delete-managed-executor-service` asadmin command can be used to delete an existing managed executor service. Deleting a managed executor service is a dynamic event and does not require server restart.
+
+Before deleting a managed executor service resource, all associations to the resource must be removed.
+
+=== Deleting a Managed Executor Service
+This example deletes the managed executor service resource named `concurrent/Executor1`.
+
+[source, shell, subs="quotes"]
+----
+asadmin> *delete-managed-executor-service concurrent/Executor1*
+Managed executor service concurrent/Executor1 deleted successfully.
+Command delete-managed-executor-service executed successfully.
+----
