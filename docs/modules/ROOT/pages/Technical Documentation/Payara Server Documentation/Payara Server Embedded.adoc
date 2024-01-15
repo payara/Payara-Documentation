@@ -1,0 +1,109 @@
+[[payara-server-embedded]]
+= Payara Server Embedded
+
+Payara Embedded allows you to embed Payara Server into a Java application, therefore allowing you to start and control Payara programmatically.
+
+[[payara-embedded-distributions]]
+== Distributions
+
+Payara Embedded has two distribution variants, `payara-embedded-all` and `payara-embedded-web`, functionally these are the same as their standalone counterparts, Payara Server Full Profile and Payara Server Web Profile respectively.
+
+[[using-payara-embedded]]
+== Getting Started
+
+To use Payara Embedded within your project, you first need to add one of the distributions as a dependency:
+
+Payara Embedded All::
+[source, xml, subs=attributes+]
+----
+<dependency>
+    <groupId>fish.payara.extras</groupId>
+    <artifactId>payara-embedded-all</artifactId>
+    <version>{page-version}</version>
+    <type>jar</type>
+</dependency>
+----
+
+Payara Embedded Web::
+[source,xml, subs=attributes+]
+----
+<dependency>
+    <groupId>fish.payara.extras</groupId>
+    <artifactId>payara-embedded-web</artifactId>
+    <version>{page-version}</version>
+    <type>jar</type>
+</dependency>
+----
+
+[[payara-embedded-example]]
+=== Example
+
+After adding a Payara Embedded distribution as a dependency, you can begin using Payara Embedded in your application and project. For example, the following code will create and start an embedded Payara server, with the HTTP and HTTPS listener set to ports 9080 and 9845 respectively with the application `clusterjsp.war` deployed:
+
+[source,java]
+----
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.glassfish.embeddable.GlassFish;
+import org.glassfish.embeddable.GlassFishException;
+import org.glassfish.embeddable.GlassFishProperties;
+import org.glassfish.embeddable.GlassFishRuntime;
+
+/**
+ * Basic Example showing how to programmatically create, edit, start and deploy to
+ * an embedded Payara Server.
+ */
+public class Main {
+
+    public static void main(String[] args) {
+        try {
+            GlassFishRuntime runtime = GlassFishRuntime.bootstrap();
+            GlassFishProperties glassfishProperties = new GlassFishProperties();
+            glassfishProperties.setPort("http-listener", 9080);
+            glassfishProperties.setPort("https-listener", 9845);
+            GlassFish glassfish = runtime.newGlassFish(glassfishProperties);
+            glassfish.start();
+            glassfish.getDeployer().deploy(new File("opt/applications/clusterjsp.war"));
+        } catch (GlassFishException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}
+----
+
+[[payara-embedded-usecases]]
+== Payara Embedded Use Cases
+
+Overview of some expected use cases of Payara Embedded.
+
+[[bundle-application]]
+=== Bundle your Application
+
+Where the installation of Payara Server and the deployment of the applications can't be done on a central infrastructure, you may opt to use Payara Embedded. In this case, you can bundle Payara Server with the application within a single application, which makes it easier for installing it.
+
+Instead of having the three steps, installing Payara Server, configuring the environment, and deploying the application, you can do all those steps within the application containing Payara Embedded. You only need to start the application and the system is ready to respond to user requests.
+
+[[integration-testing]]
+=== Integration Testing
+
+While performing integration testing, you may need to deploy the application to Payara in order to verify the behaviour of the code you have written. While you could use a standalone installation of Payara Server, cleanup is not always done correctly and can cause other tests to behave incorrectly.
+
+Integration testing can be done easier and more consistently with Payara Embedded, you can start Payara up as the beginning of the test, verify the functionality and then use a clean instance for each test, therefore eliminating the possibility of an unexpected state in the environment.
+
+Starting Payara Embedded for testing can also be done using the Arquillian connector. In that case, the setup and teardown of Payara is managed for you.
+
+[[jdk-17-considerations]]
+== JDK 17 Considerations
+
+When running Payara Embedded on JDK 17, you must update your client side run configuration with all the necessary opens and exports for Payara to work as expected. The following JVM options should be added within your run configuration:
+
+[source, shell]
+----
+--add-opens=java.base/jdk.internal.loader=ALL-UNNAMED --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.management/sun.management=ALL-UNNAMED --add-opens=java.base/sun.net.www.protocol.jrt=ALL-UNNAMED -Xbootclasspath/a:${com.sun.aas.installRoot}/lib/grizzly-npn-api.jar --add-exports=java.base/sun.net.www=ALL-UNNAMED --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.desktop/java.beans=ALL-UNNAMED --add-exports=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED --add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED
+----
+
+[[see-also]]
+== See Also
+
+xref:Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Server Embedded.adoc[Payara Arquillian Connector]
