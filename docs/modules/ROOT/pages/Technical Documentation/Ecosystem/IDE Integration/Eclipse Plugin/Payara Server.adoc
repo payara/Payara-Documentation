@@ -38,7 +38,7 @@ image::eclipse-plugin/payara-server/new-server-resources.png[New Server Resource
 
 . First import or create some project, deployable to the *Payara Server*. Here we use one of the https://github.com/javaee-samples/javaee7-samples[Java EE 7 Samples] .
 
-. Right click the target server in the *Servers* view and click *Add and Remove...*
+. Right-click the target server in the *Servers* view and click *Add and Remove...*
 +
 image::eclipse-plugin/payara-server/add-resource-menu.png[Add and Remove menu]
 . Select resources you want to be managed by the *Payara Tools*, add them to the right panel and click *Finish*.
@@ -50,7 +50,7 @@ image::eclipse-plugin/payara-server/add-resource-console.png[Add and Remove wind
 . If the deployment was successful, you can use the application. Here we simply opened the internal Eclipse's browser and sent the HTTP GET request - and the application responded.
 +
 image::eclipse-plugin/payara-server/add-resource-browser.png[Request and Response in Browser]
-. You can also access the administration console directly from the Eclipse Browser. Just right click the target server in the *Servers* view and click *Payara -> View Admin Console*
+. You can also access the administration console directly from the Eclipse Browser. Just right-click the target server in the *Servers* view and click *Payara -> View Admin Console*
 +
 image::eclipse-plugin/payara-server/add-resource-admin-1.png[Admin Console]
 +
@@ -59,7 +59,7 @@ image::eclipse-plugin/payara-server/add-resource-admin-2.png[Admin Console]
 [[runtime-reconfiguration]]
 == Runtime Reconfiguration
 
-. In the *Servers* view double click the server you want to reconfigure. The *Server Overview* will open.
+. In the *Servers* view double-click the server you want to reconfigure. The *Server Overview* will open.
 +
 image::eclipse-plugin/payara-server/reconfig-overview.png[Server Overview]
 . Click on *Runtime Environment* and you will see well known window.
@@ -67,6 +67,93 @@ image::eclipse-plugin/payara-server/reconfig-overview.png[Server Overview]
 WARNING: Changing the runtime may result in unusable state of the server because of incompatible configuration.
 +
 image::eclipse-plugin/payara-server/reconfig-runtime.png[Runtime Configuration]
+
+[[deploy-to-docker-container]]
+== Deploy Applications in a Local Docker Container
+
+The Payara Server tools for Apache NetBeans include Docker integration, making it seamless to deploy exploded applications to a Payara Server instance running within a local Docker container.
+
+To take advantage of this feature, follow these steps below:
+
+. Register a new Payara Server instance by performing the following:
+.. Open the *Servers* view (if not visible, it should be under menu *Window -> Show View -> Servers*).
+.. Select *Payara -> Payara* and set the *Host name* and some comprehensible *Server name*.
+.. Then click *Next* to another window with server runtime configuration and browse and locate the Payara Server installation directory with the same version as the one running in the Docker container.
+.. Then click *Next* again to window with the configuration of the domain. Enter the domain name, host, and necessary credentials.
+.. For Docker integration, choose the "Docker Volume" option and provide the `HOST_PATH` (e.g., `D:/test`) and `CONTAINER_PATH` (e.g., `/mnt/test`) mapping details.
++
+This mapping should align with the exploded application path or parent path of exploded application.
+.. In the last step you can select resources which will be deployed on the server. You may add them later.
+. Run the Payara Server Docker container using the following command:
++
+[source, shell]
+----
+docker run -p 8080:8080 -p 4848:4848 -p 9009:9009 -v HOST_PATH:CONTAINER_PATH  payara/server-full:{page-version}
+----
++
+Replace `HOST_PATH` with the actual host path and `CONTAINER_PATH` with the desired container path.
++
+The `HOST_PATH` points to the location on your host machine, and `CONTAINER_PATH` is the corresponding location inside the container.
+
+. Create your web application and deploy it to the registered Payara Server instance.
+
+[[deploy-applications-in-wsl]]
+== Deploy Applications in a WSL Environment
+
+Another noteworthy feature is the integration of the Payara Server Tools with Windows Subsystem for Linux (WSL).
+
+This integration empowers developers to manage and deploy exploded applications to a Payara Server instance running within WSL.
+
+Here's how you can make use of this feature:
+
+. Start the Payara Server instance within WSL:
+.. Run the following command to start the server:
++
+[source, shell]
+----
+./asadmin start-domain
+----
+.. Set a password for the admin user:
++
+[source, shell]
+----
+./asadmin change-admin-password
+----
+.. Enable secure admin:
++
+[source, shell]
+----
+./asadmin enable-secure-admin
+----
+.. Restart the Payara Server domain:
++
+[source, shell]
+----
+./asadmin restart-domain
+----
+
+.. Fetch the IP address of WSL environment using the command `hostname -I` and enter it in the `host name` field in the Eclipse IDE settings.
+
+. Register the WSL-based Payara Server instance in VS Code:
+.. Open the *Servers* view (if not visible, it should be under menu *Window -> Show View -> Servers*).
+.. Select *Payara -> Payara* and set the *Host name* and some comprehensible *Server name*.
+.. Then click *Next* to another window with server runtime configuration and browse and locate the Payara Server installation directory with the same version as the one running in the Docker container.
+.. Then click *Next* again to window with the configuration of the domain. Enter the domain name, host name (fetched via the command `hostname -I` in WSL instance), and necessary credentials.
+.. For WSL integration, choose the "WSL" instance type.
+.. In the last step you can select resources which will be deployed on the server. You may add this setting later.
+
+. Create your web application and deploy it to the registered Payara Server instance.
+
+[[hot-deploy-and-auto-deploy-settings]]
+== Hot Deploy and Auto Deploy Settings
+
+To enable *Auto Deploy* from the Eclipse IDE, open The *Server* panel, double-click the server name and expand the *Publishing* section to reconfigure the setting.
+
+image::hot-auto-deploy/eclipse-payara-auto-deploy.png[Auto Publish applications]
+
+*Hot Deploy* mode can be enabled from the Payara Server properties page to boost the deployment performance which reuses the existing application instance relative to the modified source:
+
+image::hot-auto-deploy/eclipse-payara-hot-deploy.png[Payara Server Hot Deploy]
 
 [[see-also]]
 == See Also

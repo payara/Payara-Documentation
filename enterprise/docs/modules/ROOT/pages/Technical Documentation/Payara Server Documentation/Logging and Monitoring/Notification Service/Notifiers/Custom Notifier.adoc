@@ -1,9 +1,7 @@
 [[creating-custom-notifier]]
 = Creating Custom Notifier
 
-The notification service received a major overhaul in Payara Server Community 5.2020.5 (October 2020) which made it possible to implement new notifiers in a modular fashion. The overhaul also involved rewriting the existing notifiers as extensions and porting them over to a new community repository.
-
-The modular design allows developers to create their custom Notifier and plug it in into the Payara Platform. This guide describes how to create your Notifier.
+The notification service is fully modular, this design allows developers to create their custom Notifier and plug it in into the Payara Platform. This guide describes how to create your Notifier.
 
 [[requirements]]
 == Requirements
@@ -31,12 +29,14 @@ The other module is the optional plugin for the Admin Console.
 
 Since each module must be an OSGI module, define the maven packaging
 
+[source, xml, subs=attributes+]
 ----
 <packaging>glassfish-jar</packaging>
 ----
 
 Several plugins are used to generate the correct OSGI module for Payara.
 
+[source, xml, subs=attributes+]
 ----
 <plugins>
     <plugin>
@@ -51,7 +51,7 @@ Several plugins are used to generate the correct OSGI module for Payara.
     <plugin>
         <groupId>org.glassfish.hk2</groupId>
         <artifactId>hk2-inhabitant-generator</artifactId>
-        <version>2.6.1.payara-p1</version>
+        <version>3.0.2</version>
         <executions>
             <execution>
                 <goals>
@@ -102,7 +102,7 @@ Several plugins are used to generate the correct OSGI module for Payara.
     <plugin>
         <groupId>org.glassfish.build</groupId>
         <artifactId>command-security-maven-plugin</artifactId>
-        <version>1.0.10.payara-p1</version>
+        <version>1.0.13</version>
         <configuration>
             <isFailureFatal>false</isFailureFatal>
         </configuration>
@@ -145,6 +145,7 @@ Several plugins are used to generate the correct OSGI module for Payara.
 
 The Payara specific versions of these plugins can be found in our Patched repository on GitHub.
 
+[source, xml, subs=attributes+]
 ----
   <pluginRepositories>
         <pluginRepository>
@@ -162,15 +163,17 @@ The Payara specific versions of these plugins can be found in our Patched reposi
 
 The Notifier API itself is available in the `internal-api` artifact that is located in our Public Nexus repository.
 
+[source, xml, subs=attributes+]
 ----
    <dependency>
-       <groupId>fish.payara.server.internal.common</groupId>
+       <groupId>fish.payara.server.core.common</groupId>
        <artifactId>internal-api</artifactId>
-       <version>5.27.0</version>
+       <version>{page-version}</version>
        <optional>true</optional>
    </dependency>
 ----
 
+[source, xml, subs=attributes+]
 ----
   <repository>
       <id>payara-nexus-enterprise-artifacts</id>
@@ -214,6 +217,7 @@ Whether to apply the changes immediately (true) or after server restart.
 
 Additional configuration can be created by defining properties in a special annotated interface.
 
+[source, java, subs=attributes+]
 ----
 import org.jvnet.hk2.config.Attribute;
 import org.jvnet.hk2.config.Configured;
@@ -263,6 +267,7 @@ set-<notifierName>-notifier-configuration
 
 For each of the Asadmin commands, you need to create a Java Class.
 
+[source, java, subs=attributes+]
 ----
 import org.glassfish.api.admin.CommandLock;
 import org.glassfish.api.admin.ExecuteOn;
@@ -325,6 +330,7 @@ Method that needs to be implemented to retrieve the specific values of the notif
 
 The class for setting the notifier configuration can look like this
 
+[source, java, subs=attributes+]
 ----
 import java.beans.PropertyVetoException;
 
@@ -388,6 +394,7 @@ Parameters in the REST call holding the new configuration values. The name is th
 
 Now that we have the configuration data, and the possibility to configure the custom notifier, we can implement the Notifier itself.
 
+[source, java, subs=attributes+]
 ----
 import org.jvnet.hk2.annotations.Service;
 
@@ -489,6 +496,7 @@ The Notifier plugin is based on the Console Provider of Payara to extend the Adm
 
 Define the plugin by defining the file _META-INF/admingui/console-plugin.xml_ and specify the following content:
 
+[source, xml, subs=attributes+]
 ----
 <console-config id="customNotifier">
    <integration-point

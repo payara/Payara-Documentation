@@ -1,18 +1,16 @@
 = Eclipse MicroProfile JWT Authentication API
 
-Provided version of the API: {mpJwtSpecUrl}[MicroProfile Authentication API {mpJwtVersion}]
+Payara Server {page-version} provides MicroProfile JWT Authentication {mpJWTVersion}
 
 == Background
 
 The JWT Authentication API was designed to provide application callers with the ability to authenticate themselves using a JWT token. A JWT token is essentially a string of JSON with fields for specifying the caller/username and the groups the caller is in. To prevent tampering, the JSON token is cryptographically signed. Note that it's only signed, not fully encrypted. This means that the caller/username and the groups are in plain text, but because of the signature can't be changed.
 
-For a full overview of the API, review https://github.com/eclipse/microprofile-jwt-auth/releases[the documentation for the appropriate release.] 
+{mpJWTSpecUrl}[The complete specification] can be found on the Eclipse MicroProfile website.
 
-A key goal of the specification was to not just provide authentication, but to provide a means of getting access to the JSON token that was used for authentication using CDI based injection, with an abundantly large and rich amount of possible conversions. 
+Breaking changes introduced in MicroProfile JWT Authentication {mpJWTVersion} are listed in the official specification under {mpJWTSpecUrl}#_incompatible_changes[Incompatible Changes]
 
-https://github.com/eclipse/microprofile-jwt-auth/releases/tag/1.0[MicroProfile JWT Authentication 1.0] was released in MicroProfile 1.2
-
-IMPORTANT: Version 1.0 of the MicroProfile JWT Authentication specification does not define any means for preemptive authentication, that is, authenticating when the target resource (such as a JAX-RS end-point) is not protected / constrained by a security role. Practically this means that if a JWT token is sent alongside a request to a public / unchecked resource, MicroProfile JWT implementations will ignore it. This limitation will be addressed in a later version of the JWT specification.
+IMPORTANT: The MicroProfile JWT Authentication specification currently does not define any means for preemptive authentication, that is, authenticating when the target resource (such as a JAX-RS end-point) is not protected / constrained by a security role. Practically this means that if a JWT token is sent alongside a request to a public / unchecked resource, MicroProfile JWT implementations will ignore it. This limitation will be addressed in a later version of the JWT specification.
 
 == Java EE Security and JWT
 
@@ -205,7 +203,7 @@ IMPORTANT: The value of the `publicKey.cache.ttl` property is defined in millise
 An application activates the JWT authentication mechanism and identity store by annotating a class in the application, for instance, the JAX-RS `Application` class, with `@LoginConfig(authMethod = "MP-JWT")`. 
 
 == Protecting JAX-RS endpoints
-MicroProfile JWT Authentication specifies that JAX-RS endpoints are to be secured by using the `javax.annotation.security.RolesAllowed` annotation. Note that while this is a general annotation, in Java EE it's only EJB that interprets this. JAX-RS itself does not specify that this annotation should work on resource classes or methods and hence most implementations do not support it out of the box. Both Payara Server and Payara Micro do support it out of the box since *4.1.2.181* and *5.181*. This support holds for all types of authentication mechanisms, e.g. BASIC, and not just JWT.
+MicroProfile JWT Authentication specifies that JAX-RS endpoints are to be secured by using the `jakarta.annotation.security.RolesAllowed` annotation. Note that while this is a general annotation, in Java EE it's only EJB that interprets this. JAX-RS itself does not specify that this annotation should work on resource classes or methods and hence most implementations do not support it out of the box. Both Payara Server and Payara Micro do support it out of the box since *4.1.2.181* and *5.181*. This support holds for all types of authentication mechanisms, e.g. BASIC, and not just JWT.
 
 For example:
 

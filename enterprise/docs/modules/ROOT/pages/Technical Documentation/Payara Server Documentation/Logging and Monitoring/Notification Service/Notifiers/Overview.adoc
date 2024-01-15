@@ -1,0 +1,36 @@
+[[notifiers]]
+= Notifiers
+
+Payara Enterprise has additional notifiers built in and ready for use with your Payara Enterprise distribution with no further installation required. These notifiers allow notifications from the Notification Service to propagate to various channels.
+
+[[summary]]
+== Notifier Summary
+
+Each notifier extension is composed of 2 parts:
+
+[[core-module]]
+=== The Core Module
+
+The core module contains all the code necessary to receive notifications from the notification service and propagate them to their proposed channel. When installing this module, you'll get the admin commands to configure the notifier, as well as the ability to select that notifier in the notification sources such as Request Tracing commands and admin console pages.
+
+[[admin-console-plugin]]
+=== The Admin Console Plugin
+
+The admin console plugin contains all the code necessary to configure the notifier in the admin console. This is exclusively the tab in the notification service page. This module is not required for the notifier to function, but makes administrating the notifier easier.
+
+[[installation]]
+== Installing a Notifier
+
+To install a notifier extension: download the artifacts listed on the notifier documentation page and drop them into the `${PAYARA_HOME}/glassfish/modules` directory of your Payara Server installation.
+
+You can then restart the server to see your extension activated.
+
+TIP: Make sure that, if the notifier has dependencies in order to run, the dependency artifacts are also in the installation directory. For each notifier, the required JAR downloads are listed towards the top of the relevant documentation page.
+
+[[removing-notifiers]]
+== Removing Notifiers
+All Payara notifiers are included in Payara Enterprise by default, however they are fully pluggable and can be removed from your Payara installation. Each notifier consists of 2 parts, a notifier-core and a notifier-console-plugin. The notifier core is responsible for the notifier functionality and the asadmin commands, the notifier-console-plugin is not essential, but allows for the notifier to be configured through the admin console.
+
+To remove a notifier from Payara Enterprise edition, first find the relevant modules to the notifier you want to remove in `${PAYARA_HOME}/glassfish/modules`. To fully remove the notifier, you should delete both the notifier-core and the notifier-console-plugin files, then restart the domain.
+
+If you change your mind in the future, you can just drop both the notifier-core and optionally the notifier-console-plugin files back into the `${PAYARA_HOME}/glassfish/modules` directory and restart the domain.

@@ -1,0 +1,24 @@
+[[java-ee-to-jakarta-ee-transformation]]
+= Jakarta EE 8 Support
+:ordinal: 3
+
+Payara Platform {page-version} is certified as a valid Jakarta EE 10 runtime, so users will have to develop enterprise applications using Jakarta EE 10 APIs under the corresponding constraints of its corresponding specifications.
+
+In most cases this means that users that are migrating their applications from an older Jakarta EE 8 runtime (like Payara Server 5, for example) will have to convert their applications for them to correctly be deployed. This usually means undergoing the following changes:
+
+* Refactoring all uses of `javax.\*` classes for their `jakarta.*` counterparts.
+* Updating standard deployment descriptors (`web.xml`, `ejb-jar.xml`, etc.) to use the new XML schemas introduced in Jakarta EE 10.
+* Updating standard configuration properties, for example `javax.persistence.*` in the `persistence.xml` deployment descriptor to their Jakarta EE 10 equivalent property names.
+
+[[deployment-transformer]]
+== Deployment Transformer
+
+Fortunately, Payara Enterprise distributions (_Server_ and _Micro_, explicitly) include a *Deployment Transformer* tool that automatically executes the conversion of a Jakarta EE 8 application's components using at deployment time,  allowing users to have their Jakarta EE 8 applications transformed on the fly into the Jakarta EE 10 namespace.
+
+NOTE: The deployment transformer is enabled by default on both Payara Platform distributions.
+
+Users can disable the deployment transformer by setting the `fish.payara.deployment.transform.namespace` system property to `false` and restart the corresponding server instances. This might be desired if users have no intention on deploying Jakarta EE 8 applications and want to spare the extra overhead of the deployment transformer scanning their applications in vain.
+
+IMPORTANT: The deployment transformer will allow most Jakarta EE 8 applications to run on a Payara Platform 6 distribution with no changes, however, in some cases user intervention will be required to fix breaking changes introduced in Jakarta EE 10 (like pruned APIs, for example).
+
+It is recommended that Jakarta EE 8 applications are gradually migrated to Jakarta EE 10. The deployment transformer tool is not guaranteed to be included in future major releases of the Payara Platform.

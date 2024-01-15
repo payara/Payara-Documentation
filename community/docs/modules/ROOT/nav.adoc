@@ -20,6 +20,7 @@
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Application Deployment/Deployment Descriptors.adoc[Deployment Descriptors]
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Application Deployment/Descriptor Elements.adoc[Descriptor Elements]
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Application Deployment/Concurrent CDI Bean Loading.adoc[Concurrent CDI Bean Loading]
+**** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Application Deployment/Legacy mode of empty beans.xml.adoc[Legacy mode of empty beans.xml]
 *** Asadmin Commands
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Asadmin Commands/Server Management Asadmin Commands.adoc[Server Management Asadmin Commands]
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Asadmin Commands/Auto Naming.adoc[Auto Naming]
@@ -29,12 +30,6 @@
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Classloading/Overview.adoc[Overview]
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Classloading/Standard Classloading.adoc[Standard Classloading]
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Classloading/Enhanced Classloading.adoc[Enhanced Classloading]
-*** Concurrency Enhancements
-**** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Concurrency Enhancements/Overview.adoc[Overview]
-**** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Concurrency Enhancements/Configuring Context Services.adoc[Configuring Context Services]
-**** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Concurrency Enhancements/Configuring Managed Executor Services.adoc[Configuring Managed Executor Services]
-**** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Concurrency Enhancements/Configuring Managed Scheduled Executor Services.adoc[Configuring Managed Scheduled Executor Services]
-**** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Concurrency Enhancements/Configuring Managed Thread Factories.adoc[Configuring Managed Thread Factories]
 *** Configuration Options
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Configuration Options/JVM Options.adoc[JVM Options]
 **** xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Configuration Options/Password Aliases.adoc[Password Aliases]
@@ -96,6 +91,7 @@
 **** xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/Overview.adoc[Overview]
 **** xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/Asadmin Commands.adoc[Asadmin Commands]
 **** xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/Configuration.adoc[Configuration]
+**** xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/OpenTelemetry and OpenTracing.adoc[OpenTelemetry and OpenTracing]
 **** xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/Terminology.adoc[Terminology]
 **** xref:Technical Documentation/Payara Server Documentation/Logging and Monitoring/Request Tracing Service/Usage.adoc[Usage]
 ** Jakarta EE API
@@ -130,6 +126,8 @@
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/AutoScale Groups/Overview.adoc[Overview]
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/AutoScale Groups/Create AutoScale Group.adoc[Create AutoScale Group]
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/AutoScale Groups/Nodes Scaling Group.adoc[Nodes Scaling Group]
+*** Certificate Management
+**** xref:Technical Documentation/Payara Server Documentation/Extensions/Certificate Management/Overview.adoc[Overview]
 *** Notifiers
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/Notifiers/Overview.adoc[Overview]
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/Notifiers/Custom Notifiers.adoc[Custom Notifiers]
@@ -141,12 +139,13 @@
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/Notifiers/SNMP.adoc[SNMP]
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/Notifiers/Slack.adoc[Slack]
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/Notifiers/XMPP.adoc[XMPP]
+*** Transformer
+**** xref:Technical Documentation/Payara Server Documentation/Extensions/Transformer/Overview.adoc[Overview]
 *** gRPC Support
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/gRPC Support/Overview.adoc[Overview]
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/gRPC Support/Installation.adoc[Installation]
 **** xref:Technical Documentation/Payara Server Documentation/Extensions/gRPC Support/Usage.adoc[Usage]
 ** xref:Technical Documentation/Payara Server Documentation/Payara Server Docker Image.adoc[Payara Server Docker Image]
-** xref:Technical Documentation/Payara Server Documentation/Payara Server Embedded.adoc[Payara Server Embedded]
 ** Upgrade Payara
 *** xref:Technical Documentation/Payara Server Documentation/Upgrade Payara/Overview.adoc[Overview]
 *** xref:Technical Documentation/Payara Server Documentation/Upgrade Payara/Backup and Restore Method.adoc[Backup and Restore Method]
@@ -217,8 +216,9 @@
 *** xref:Technical Documentation/MicroProfile/Metrics/Metrics Rest Endpoint.adoc[Metrics Rest Endpoint]
 *** xref:Technical Documentation/MicroProfile/Metrics/Vendor Metrics.adoc[Vendor Metrics]
 ** xref:Technical Documentation/MicroProfile/OpenAPI.adoc[OpenAPI]
-** xref:Technical Documentation/MicroProfile/Opentracing.adoc[Opentracing]
+** xref:Technical Documentation/MicroProfile/OpenTracing.adoc[OpenTracing]
 ** xref:Technical Documentation/MicroProfile/Rest Client.adoc[Rest Client]
+** xref:Technical Documentation/MicroProfile/Telemetry.adoc[Telemetry]
 * Public API
 ** xref:Technical Documentation/Public API/Overview.adoc[Overview]
 ** xref:Technical Documentation/Public API/CDI Events.adoc[CDI Events]
@@ -230,37 +230,35 @@
 * Ecosystem
 ** xref:Technical Documentation/Ecosystem/Overview.adoc[Overview]
 ** Project Management Tools
-*** xref:Technical Documentation/Ecosystem/Project Management Tools/Payara Platform Maven Bom.adoc[Payara Platform Maven Bom]
-*** xref:Technical Documentation/Ecosystem/Project Management Tools/Payara Micro Maven Plugin.adoc[Payara Micro Maven Plugin]
-*** xref:Technical Documentation/Ecosystem/Project Management Tools/Payara Micro Maven Archetype.adoc[Payara Micro Maven Archetype]
-*** xref:Technical Documentation/Ecosystem/Project Management Tools/Payara Micro Gradle Plugin.adoc[Payara Micro Gradle Plugin]
-*** xref:Technical Documentation/Ecosystem/Project Management Tools/Maven Regex Profile Activation.adoc[Maven Regex Profile Activation]
-*** xref:Technical Documentation/Ecosystem/Project Management Tools/Gradle Plugin.adoc[Gradle Plugin]
-*** xref:Technical Documentation/Ecosystem/Project Management Tools/Maven Archetype.adoc[Maven Archetype]
 *** xref:Technical Documentation/Ecosystem/Project Management Tools/Maven Bom.adoc[Maven Bom]
 *** xref:Technical Documentation/Ecosystem/Project Management Tools/Maven Plugin.adoc[Maven Plugin]
+*** xref:Technical Documentation/Ecosystem/Project Management Tools/Maven Archetype.adoc[Maven Archetype]
+*** xref:Technical Documentation/Ecosystem/Project Management Tools/Gradle Plugin.adoc[Gradle Plugin]
 ** IDE Integration
 *** Eclipse Plugin
 **** xref:Technical Documentation/Ecosystem/IDE Integration/Eclipse Plugin/Overview.adoc[Overview]
 **** xref:Technical Documentation/Ecosystem/IDE Integration/Eclipse Plugin/Payara Server.adoc[Payara Server]
 **** xref:Technical Documentation/Ecosystem/IDE Integration/Eclipse Plugin/Payara Micro.adoc[Payara Micro]
 **** xref:Technical Documentation/Ecosystem/IDE Integration/Eclipse Plugin/Building Eclipse Plugin.adoc[Building Eclipse Plugin]
+**** xref:Technical Documentation/Ecosystem/IDE Integration/Eclipse Plugin/Transform to Jakarta-EE10.adoc[Transform to Jakarta-EE10]
 *** IntelliJ Plugin
 **** xref:Technical Documentation/Ecosystem/IDE Integration/IntelliJ Plugin/Overview.adoc[Overview]
-**** xref:Technical Documentation/Ecosystem/IDE Integration/IntelliJ Plugin/Building IntelliJ Plugin.adoc[Building IntelliJ Plugin]
-**** xref:Technical Documentation/Ecosystem/IDE Integration/IntelliJ Plugin/Payara Micro.adoc[Payara Micro]
 **** xref:Technical Documentation/Ecosystem/IDE Integration/IntelliJ Plugin/Payara Server.adoc[Payara Server]
-*** NetBeans Plugin
-**** xref:Technical Documentation/Ecosystem/IDE Integration/NetBeans Plugin/Overview.adoc[Overview]
-**** xref:Technical Documentation/Ecosystem/IDE Integration/NetBeans Plugin/Payara Server.adoc[Payara Server]
-**** xref:Technical Documentation/Ecosystem/IDE Integration/NetBeans Plugin/Payara Micro.adoc[Payara Micro]
-**** xref:Technical Documentation/Ecosystem/IDE Integration/NetBeans Plugin/Building NetBeans Plugin.adoc[Building NetBeans Plugin]
+**** xref:Technical Documentation/Ecosystem/IDE Integration/IntelliJ Plugin/Payara Micro.adoc[Payara Micro]
+**** xref:Technical Documentation/Ecosystem/IDE Integration/IntelliJ Plugin/Building IntelliJ Plugin.adoc[Building IntelliJ Plugin]
+**** xref:Technical Documentation/Ecosystem/IDE Integration/IntelliJ Plugin/Transform to Jakarta-EE10.adoc[Transform to Jakarta-EE10]
+*** Apache NetBeans IDE
+**** xref:Technical Documentation/Ecosystem/IDE Integration/Apache NetBeans IDE/Overview.adoc[Overview]
+**** xref:Technical Documentation/Ecosystem/IDE Integration/Apache NetBeans IDE/Payara Server.adoc[Payara Server]
+**** xref:Technical Documentation/Ecosystem/IDE Integration/Apache NetBeans IDE/Payara Micro.adoc[Payara Micro]
+**** xref:Technical Documentation/Ecosystem/IDE Integration/Apache NetBeans IDE/Building Apache NetBeans IDE.adoc[Building Apache NetBeans IDE]
+**** xref:Technical Documentation/Ecosystem/IDE Integration/Apache NetBeans IDE/Transform to Jakarta-EE10.adoc[Transform to Jakarta-EE10]
 *** VSCode Extension
 **** xref:Technical Documentation/Ecosystem/IDE Integration/VSCode Extension/Overview.adoc[Overview]
 **** xref:Technical Documentation/Ecosystem/IDE Integration/VSCode Extension/Payara Server.adoc[Payara Server]
 **** xref:Technical Documentation/Ecosystem/IDE Integration/VSCode Extension/Payara Micro.adoc[Payara Micro]
 **** xref:Technical Documentation/Ecosystem/IDE Integration/VSCode Extension/Building VSCode Extension.adoc[Building VSCode Extension]
-**** xref:Technical Documentation/Ecosystem/IDE Integration/VSCode Extension/Jakarta EE10 Transformation.adoc[Jakarta EE10 Transformation]
+**** xref:Technical Documentation/Ecosystem/IDE Integration/VSCode Extension/Transform to Jakarta-EE10.adoc[Transform to Jakarta-EE10]
 *** xref:Technical Documentation/Ecosystem/IDE Integration/Hot Deploy and Auto Deploy.adoc[Hot Deploy and Auto Deploy]
 ** Connector Suites
 *** Arquillian Containers
@@ -279,9 +277,9 @@
 **** xref:Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Azure SB.adoc[Azure SB]
 **** xref:Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/MQTT.adoc[MQTT]
 *** xref:Technical Documentation/Ecosystem/Connector Suites/Security Connectors.adoc[Security Connectors]
+** xref:Technical Documentation/Ecosystem/Jakarta EE Upgrade Advisor.adoc[Jakarta EE Upgrade Advisor]
 ** Miscellaneous
 *** xref:Technical Documentation/Ecosystem/Miscellaneous/JAX-RS Extension.adoc[JAX-RS Extension]
-*** xref:Technical Documentation/Ecosystem/Miscellaneous/Jaeger Tracing.adoc[Jaeger Tracing]
 
 include::partial$release-notes.adoc[Release Notes]
 

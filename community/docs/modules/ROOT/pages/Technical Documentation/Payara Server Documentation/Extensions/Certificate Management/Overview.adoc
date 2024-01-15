@@ -1,0 +1,829 @@
+[[certificate-management]]
+= Integrated SSL/TLS Certificate Management
+
+A set of commands to provide integrated management of SSL & TLS certificates in Payara Server.
+
+You can find the code here: https://github.com/payara/Certificate-Management.
+
+[[installation]]
+== Installing The Certificate Management Extension
+
+Build and install the following files into the directories listed below:
+
+* certificate-management-admin → payara6/glassfish/modules
+* certificate-management-common → payara6/glassfish/modules
+* certificate-management-console-plugin → payara6/glassfish/modules
+* certificate-management-cli → payara6/glassfish/lib/asadmin
+
+[[commands]]
+== Commands
+[[generate-self-signed-certificate]]
+=== `generate-self-signed-certificate`
+
+Usage::
+`asadmin> generate-self-signed-certificate --target=instancename --listener=listenername --dn="DN1" --alternativenames="ALT1;ALT2;ALT3" alias`
+
+Aim::
+This command can generate a self-signed certificate for an instance, placing the resultant key pair in the target  instance or listener's key and trust stores.
+
+If the instance or listener is configured to use the default key and trust store, the command will instead synchronize the instance with the DAS (under the assumption the certificate has been added to the default key and trust store of the DAS), since any certificates added to the instance stores would be lost upon next synchronisation.
+
+NOTE: This command will not overwrite an entry already present in the key store with the same alias. In this scenario no certificate is generated and the command exits. In the case however where there is not an entry with the same alias in the key store but there is in the trust store, a certificate will be generated and the entry in the trust store will be overwritten.
+
+[[command-options-self]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to add the certificate to.
+|server
+|no
+
+|`--reload`
+|Boolean
+|If the http listeners should be reloaded
+|false
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to add the certificate to.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|domain1 or the existing domain if only one exists
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|${installDir}/glassfish/nodes
+|no
+
+|`--distinguishedname`, `--dn`
+|String
+|The distinguished name to use when generating the certificate.
+|N/A
+|yes
+
+|`--alternativenames`, `--altnames`
+|String[]
+|The semicolon (;) separated list of additional Subject Alternative Names to add to the generated certificate.
+|N/A
+|no
+
+|`--alias` (primary)
+|String
+|The alias name to use when generating the certificate and storing it in the key and trust stores.
+|N/A
+|yes
+
+|===
+
+[[example-self]]
+==== Example
+
+[source, shell]
+----
+asadmin> generate-self-signed-certificate --dn "CN=test.payara.fish,IP=192.168.1.1"
+--listener http-listener-2
+--alternativenames "test2.payara.fish;DNS:test3.payara.fish,IP:127.0.0.1,EMAIL:anon@payara.fish"
+--target Instance1
+test_cert
+----
+
+[[renew-self-signed-certificates]]
+=== `renew-self-signed-certificates`
+
+Usage::
+`asadmin> renew-self-signed-certificates`
+
+Aim::
+The renew-self-signed-certificates subcommand renews all self-signed certificates in a keystore using the old distinguished name and alias. These certificates are then placed in the key and trust stores of the target instance or listener, replacing the old ones.
+
+[[command-options-renew]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to renew the certificates of.
+|server
+|no
+
+|`--reload`
+|Boolean
+|If the http listeners should be reloaded.
+|false
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to renew the certificates of.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|domain1
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|${installDir}/glassfish/domains
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|${installDir}/glassfish/nodes
+|no
+
+|===
+
+[[example-renew]]
+==== Example
+
+[source, shell]
+----
+asadmin> renew-self-signed-certificates
+----
+
+[[generate-csr]]
+=== `generate-csr`
+
+*Usage*::
+`asadmin> generate-csr --target=instancename --listener=listenername alias`
+
+*Aim*::
+This command can generate a certificate signing request (CSR) for an instance or listener's self-signed certificate, placing the resultant CSR file in `${installDir}/glassfish/tls`, using the alias name as the file name.
+
+*Note*::
+This will overwrite a CSR with the same name already present in the `${installDir}/glassfish/tls` directory.
+
+[[command-options-csr]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to get the certificate from.
+|server
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to get the certificate from.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|domain1
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|`${installDir}/glassfish/nodes`
+|no
+
+|`--alias` (primary)
+|String
+|The alias name of the certificate to generate a CSR for.
+|N/A
+|yes
+
+|===
+
+[[example-csr]]
+==== Example
+
+[source, shell]
+----
+asadmin> generate-csr --listener http-listener-2 --target Instance1 test_cert
+----
+
+[[add-to-keystore]]
+=== `add-to-keystore`
+
+*Usage*::
+`asadmin> add-to-keystore --target=instancename --listener=listenername --file /path/to/file alias`
+
+*Aim*::
+This command adds a certificate bundle (e.g. `.p12` or `.jks` file) to the target instance or listener's key store using the provided alias.
+
+If the instance or listener is configured to use the default key store, the command will instead synchronize the instance with the DAS (under the assumption the certificate has been added to the default key store of the DAS), since any certificates added to the instance stores would be lost upon next synchronisation.
+
+NOTE: This will overwrite an entry already present with the same alias. A certificate without a private key cannot be used by an HTTP listener and will return a warning.
+
+[[command-options-keystore]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to add the certificate to.
+|server
+|no
+
+|`--reload`
+|Boolean
+|If the http listeners should be reloaded
+|false
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to add the certificate to.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|domain1
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|`${installDir}/glassfish/nodes`
+|no
+
+|`--file`
+|File
+|The bundle file to add to the target key store
+|N/A
+|yes
+
+|`--alias` (primary)
+|String
+|The alias name to store the certificate bundle in the key store under.
+|N/A
+|yes
+
+|===
+
+[[example-keystore]]
+==== Example
+
+[source, shell]
+----
+asadmin> add-to-keystore --file /home/anon/Downloads/mycert.p12 mycert
+----
+
+[[add-to-truststore]]
+=== `add-to-truststore`
+
+*Usage*::
+`asadmin> add-to-truststore --target=instancename --listener=listenername --file /path/to/file alias`
+
+*Aim*::
+This command adds a certificate (e.g. `.cert` file) to the target instance or listener's trust store or listener's trust store using the provided alias.
+
+If the instance or listener is configured to use the default trust store, the command will instead synchronize the instance with the DAS (under the assumption the certificate has been added to the default trust store of the DAS), since any certificates added to the instance stores would be lost upon next synchronisation.
+
+*Note*::
+This will overwrite an entry already present with the same alias.
+
+[[command-options-truststore]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to add the certificate to.
+|server
+|no
+
+|`--reload`
+|Boolean
+|If the http listeners should be reloaded
+|false
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to add the certificate to.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|domain1
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|`${installDir}/glassfish/nodes`
+|no
+
+|`--file`
+|File
+|The certificate file to add to the target trust store
+|N/A
+|yes
+
+|`--alias` (primary)
+|String
+|The alias name to store the certificate in the trust store under.
+|N/A
+|yes
+
+|===
+
+[[example-truststore]]
+==== Example
+
+[source, shell]
+----
+asadmin> add-to-keystore --file /home/anon/Downloads/mycert.p12 mycert
+----
+
+[[remove-from-keystore]]
+=== `remove-from-keystore`
+
+*Usage*::
+`asadmin> remove-from-keystore --target=instancename --listener=listenername alias`
+
+*Aim*::
+This command removes a certificate from the target instance or listener's key store matching the provided alias.
+
+If the instance or listener is configured to use the default key store, the command will instead synchronize the instance with the DAS (under the assumption the certificate has been removed from the default key store of the DAS), since any certificates removed from the instance stores would be lost upon next synchronisation.
+
+[[command-options-remove]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to remove the certificate from.
+|server
+|no
+
+|`--reload`
+|Boolean
+|If the http listeners should be reloaded
+|false
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to remove the certificate from.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|`domain1`
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|`${installDir}/glassfish/nodes`
+|no
+
+|`--alias` (primary)
+|String
+|The alias name of the certificate to remove.
+|N/A
+|yes
+
+|===
+
+[[example-remove]]
+==== Example
+
+[source, shell]
+----
+asadmin> remove-from-keystore --domain_name production --target Instance1 --listener http-listener-2 mycert
+----
+
+[[remove-from-truststore]]
+=== `remove-from-truststore`
+
+*Usage*::
+`asadmin> remove-from-truststore --target=instancename --listener=listenername alias`
+
+*Aim*::
+This command removes a certificate from the target instance or listener's trust store matching the provided alias.
+
+If the instance or listener is configured to use the default trust store, the command will instead synchronize the instance with the DAS (under the assumption the certificate has been removed from the default trust store of the DAS), since any certificates removed from the instance stores would be lost upon next synchronisation.
+
+[[command-options-removetrust]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to remove the certificate from.
+|server
+|no
+
+|`--reload`
+|Boolean
+|If the http listeners should be reloaded
+|false
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to remove the certificate from.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|`domain1`
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|${installDir}/glassfish/nodes
+|no
+
+|`--alias` (primary)
+|String
+|The alias name of the certificate to remove.
+|N/A
+|yes
+
+|===
+
+[[example-removetrust]]
+==== Example
+
+[source, shell]
+----
+asadmin> remove-from-truststore --domain_name production --target Instance1 --listener http-listener-2 mycert
+----
+
+[[remove-expired-certificates]]
+=== `remove-expired-certificates`
+
+*Usage*::
+`asadmin> remove-expired-certificates --target=instancename --listener=listenername`
+
+*Aim*::
+This command removes all expired certificates from the target instance or listener's key and trust stores.
+
+If the instance or listener is configured to use the default trust store, the command will instead synchronize the instance with the DAS (under the assumption the certificate has been removed from the default trust store of the DAS), since any certificates removed from the instance stores would be lost upon next synchronisation.
+
+[[command-options-expired]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to remove expired certificates from.
+|server
+|no
+
+|`--reload`
+|Boolean
+|If the http listeners should be reloaded
+|false
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to remove expired certificates from.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|domain1
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|`${installDir}/glassfish/nodes`
+|no
+|===
+
+[[example-expired]]
+==== Example
+
+[source, shell]
+----
+asadmin> remove-expired-certificates --domain_name production --target Instance1 --listener http-listener-2
+----
+
+[[list-keystore-entries]]
+=== `list-keystore-entries`
+
+*Usage*::
+`asadmin> list-keystore-entries --target=instancename --listener=listenername`
+
+*Aim*::
+This command displays either all or a specific store entry from the target instance or listener's key store.
+
+[[command-options-list]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to list certificates from.
+|server
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to list certificates from.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|domain1
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|`${installDir}/glassfish/nodes`
+|no
+
+|`--verbose`
+|Boolean
+|Whether or not to print the full entry details.
+|false
+|no
+
+|`--alias` (primary)
+|String
+|The alias name of the entry to list. If not provided then all entries are listed.
+|N/A
+|false
+
+|===
+
+[[example-list]]
+==== Example
+
+[source, shell]
+----
+asadmin> list-keystore-entries --domain_name production --target Instance1 --listener http-listener-2 mycert
+----
+
+[[list-truststore-entries]]
+=== `list-truststore-entries`
+
+*Usage*::
+`asadmin> list-truststore-entries --target=instancename --listener=listenername`
+
+*Aim*::
+This command displays either all or a specific store entry from the target instance or listener's trust store.
+
+[[command-options]]
+==== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--target`
+|String
+|The name of the instance to list certificates from.
+|server
+|no
+
+|`--listener`
+|String
+|The name of the HTTP or IIOP listener to list certificates from.
+|N/A
+|no
+
+|`--domainname`
+|String
+|The name of the domain where the target instance exists.
+|domain1
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--node`
+|String
+|The name of the node where the target instance exists.
+|`localhost-$domainname`
+|no
+
+|`--nodedir`
+|String
+|The path to the directory containing the target node.
+|${installDir}/glassfish/nodes
+|no
+
+|`--verbose`
+|Boolean
+|Whether or not to print the full entry details.
+|false
+|no
+
+|`--alias` (primary)
+|String
+|The alias name of the entry to list. If not provided then all entries are listed.
+|N/A
+|false
+
+|===
+
+[[example]]
+==== Example
+
+[source, shell]
+----
+asadmin> list-truststore-entries --domain_name production --target Instance1 --listener http-listener-2 mycert
+----

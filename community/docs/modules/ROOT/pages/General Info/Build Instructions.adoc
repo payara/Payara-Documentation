@@ -1,5 +1,5 @@
-[[overview]]
-= Overview
+[[build-instructions]]
+= Build Instructions
 :ordinal: 3
 
 This page provides instructions on how to build the Payara Server's source code.
@@ -9,13 +9,14 @@ This page provides instructions on how to build the Payara Server's source code.
 
 To build and run Payara Server, your environment must be set up with the following:
 
-* Oracle _JDK 8 Update 162_ or later.
+* Oracle _JDK 11 Update 5_ or later.
 * Maven 3.3.9 or above
 * Git
-* A `JAVA_HOME` environment variable pointing to the JDK install location(e.g. `/home/user/jdk1.8.0_162/`)
-* A `PATH` environment variable that has a pointer to the Java binaries(`JAVA_HOME/bin`)
+* A `JAVA_HOME` environment variable pointing to the JDK install location (e.g. _/home/user/jdk11.0.16.1_)
+* A `PATH` environment variable that has a pointer to the Java binaries (`JAVA_HOME/bin`)
 
 You can also optionally add the Maven _bin_ folder to the `PATH` environment variable as well, and the documentation will assume that you have done so.
+
 
 [[getting-the-source-code]]
 == Getting the Source Code
@@ -27,14 +28,14 @@ This will download the Payara Server's source code, and initialize **git**, in a
 [[building-payara-server]]
 == Building Payara Server
 
-With your Git Bash or terminal window, navigate into the downloaded _Payara_ directory, and run:
+With your Git Bash or terminal window, navigate into the downloaded _Payara_  directory, and run:
 
 [source, shell]
 ----
 mvn clean install
 ----
 
-This will build Payara and run the integrated GlassFish unit tests. To save a bit of time, you can skip these tests by appending the _skipTests_ flag to the install command like so:
+This will build Payara and run the integrated unit tests. To save a bit of time, you can skip these tests by appending the _skipTests_ flag to the install command like so:
 
 [source, shell]
 ----
@@ -44,7 +45,7 @@ mvn clean install -DskipTests
 [[building-payara-micro]]
 == Building Payara Micro
 
-To build Payara Micro:
+Payara Micro is included as part of the default build. As it depends on modules of Payara Server, it can't be built on its own. To build Payara Micro:
 
 [source, shell]
 ----
@@ -64,7 +65,7 @@ The source code of the Official Docker Images is also integrated in the main Pay
 
 [source, shell]
 ----
-mvn clean install -PBuildExtras,BuildDockerImages -pl :docker-images -amd
+mvn clean install -PBuildDockerImages -pl :docker-images -amd
 ----
 
 The Maven build expects that a regular build of Payara is already executed as it searches for some artifacts in the Maven repository (like SNAPSHOT builds of the server)
@@ -77,27 +78,18 @@ There are a number of additional Maven build profiles:
 [source, shell]
 ----
 mvn clean install
-mvn clean install -PBuildExtras
+mvn clean install -PBuildEmbedded
 mvn clean install -PQuickBuild
 ----
 
 [cols=",,,",options="header",]
 |=======================================================================
-|Payara Version |clean install |-PBuildExtras |-PQuickBuild
-|Payara Server |✓ |✓ |✓
-|Payara Server (Web Profile) |✓ |✓ |
-|Payara Server Multi Language |✓ |✓ |
-|Payara Server Multi Language (Web Profile) |✓ |✓|
-|Payara Micro |✓ |✓ |
-|Payara Embedded | |✓|
-|Payara Embedded (Web Profile) | |✓|
+|Payara Version |clean install |-PBuildEmbedded |-PQuickBuild
+|Payara Server | ✓ | ✓ | ✓
+|Payara Server (Web Profile) | ✓ | ✓ |
+|Payara Server Multi Language | ✓ | ✓ |
+|Payara Server Multi Language (Web Profile) | ✓ | ✓ |
+|Payara Micro | ✓ | ✓ | ✓
+|Payara Embedded | | ✓ |
+|Payara Embedded (Web Profile) | | ✓ |
 |=======================================================================
-
-To save time on builds, you can also add the flag _skipTests_:
-
-[source, shell]
-----
-mvn clean install -DskipTests
-----
-
-This will cut out all build tests so will save quite a bit of time.

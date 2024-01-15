@@ -20,19 +20,19 @@ IMPORTANT: If the purpose of a clustered singleton bean is to only define a pers
 [[initialization]]
 == `@Clustered` and `@Startup` / `@Initialized` `@ApplicationScoped`
 
-Care must be taken in this scenario. By default, the `@PostConstruct` lifecycle method is called for every instance in the cluster for these beans. This behavior needs to be disabled by using `@Clustered(callPostConstructOnAttach = false)` and possibly `callPreDestoyOnDetach = false` as well, so only the `@PostConstcut` method will be called only once per cluster.
-`@Observed` `@Initialzed` methods are called for every instance in the cluster. The only valid method for cluster-wide initialization is to use the `@PostConstruct` lifecycle method configured as described above.
+Care must be taken in this scenario. By default, the `@PostConstruct` lifecycle method is called for every instance in the cluster for these beans. This behavior needs to be disabled by using `@Clustered(callPostConstructOnAttach = false)` and possibly `callPreDestroyOnDetach = false` as well, so only the `@PostConstruct` method will be called only once per cluster.
+`@Observed` `@Initialized` methods are called for every instance in the cluster. The only valid method for cluster-wide initialization is to use the `@PostConstruct` lifecycle method configured as described above.
 
 [[cdinotes]]
 == CDI Considerations and Notes
 
 Since there are no default locks for CDI, `@Clustered` CDI `@ApplicationScoped` beans do not have distributed locks on by default.
-It is highly recommended to enable distributed locks for CDI Clustered beans: `@Clustered(lock = DistributedLockType.LOCK)` so there is no chance of race condition / data corruption for CDI Clustered beans
+It is highly recommended to enable distributed locks for CDI Clustered beans: `@Clustered(lock = DistributedLockType.LOCK)` so there is no chance of race condition / data corruption for CDI Clustered beans.
 
 [[requirementss]]
 == Requirements and assumption
 
-. Hazelcast is required to be enabled (default on Payara 5)
+. Hazelcast is required to be enabled (default on Payara 6)
 . `@Clustered` only works with `@ApplicationScoped` or `@Singleton` annotation, and in no other circumstance
 . All fields in the `@Clustered @Singleton` class need to be correctly Serializable
 . Works correctly only if accessed via @Injected proxy, not through direct access
@@ -40,6 +40,16 @@ It is highly recommended to enable distributed locks for CDI Clustered beans: `@
 . All method calls to `@Clustered` beans operate on a local instance
 . Data corruption is possible if distributed lock is turned off and there is a race condition between method calls to the same bean on multiple cluster nodes simultaneously. In such a case, last method call wins the singleton state
 . Clustered singletons are stored in Hazelcast map under "Payara/(EJB/CDI)/singleton/<singletonComponentName>/[lock]"
+
+IMPORTANT: It is also highly recommended to add a `serialVersionUID` variable to the `@Clustered @Singleton` class, in order to verify that a loaded class and the serialized object are compatible. A previously serialized entry in the Data Grid is compatible with an updated version of the same class.
+
+[source, java]
+----
+private static final long serialVersionUID = 1234L;
+----
+
+Adding a `serialVersionUID` is expected to prevent serialization issues encountered by the Data Grid if your singleton's source code is updated regularly.
+
 
 [[usage]]
 == Usage
@@ -56,7 +66,7 @@ An example for a CDI bean:
 [source, java]
 ----
 @Clustered
-@javax.enterprise.context.ApplicationScoped
+@jakarta.enterprise.context.ApplicationScoped
 public class ClusterSingletonBean implements Serializable {
 
 }
@@ -67,7 +77,7 @@ An example for a Singleton EJB:
 [source, java]
 ----
 @Clustered
-@javax.ejb.Singleton
+@jakarta.ejb.Singleton
 public class ClusterSingletonBean implements Serializable {
 
 }

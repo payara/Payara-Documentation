@@ -2,9 +2,62 @@
 = Payara Server Upgrade Tool
 :ordinal: 1
 
-This tool can be used to upgrade an existing Payara Server installation to a newer version. The Upgrade Tool is bundled in Payara Server versions starting from release `5.24.0` and is maintained as a separate JAR artifact under the `fish.payara.extras: payara-upgrade-tool` GAV coordinates.
+This tool can be used to upgrade an existing Payara Server installation to a newer version. The Upgrade Tool is bundled in Payara Server by default and is maintained as a separate JAR artifact under the `fish.payara.extras:payara-upgrade-tool` GAV coordinates.
 
-TIP: The upgrade tool can be manually installed to Payara Platform `5.20.0` and newer if needed. To do so, download the latest JAR release from Payara Nexus using https://nexus.payara.fish/#browse/browse:payara-enterprise-downloadable-artifacts:fish%2Fpayara%2Fextras%2Fpayara-upgrade-tool[this link] and then drop it into your Payara Server installation under the `payara5/glassfish/lib/asadmin` folder, replacing an older version of the artifact in case it exists.
+TIP: The upgrade tool can be manually upgraded to a newer version in case it is needed. To do so, download the latest 2.x JAR release from Nexus using https://nexus.payara.fish/#browse/browse:payara-enterprise-downloadable-artifacts:fish%2Fpayara%2Fextras%2Fpayara-upgrade-tool[this link] and then replace the older version into your Payara Server installation under the `${PAYARA_SERVER_INSTALL}/glassfish/lib/asadmin` folder.
+
+[[payara-server-6-upgrade]]
+== Upgrading to Payara Server 6
+
+It is possible to upgrade a Payara Server `5.x` domain to version `6.x`. The process should not be any different as to upgrading between different Payara 5 minor versions, though with the following caveats:
+
+. The upgrade tool only supports upgrading to Payara Server 6 versions `6.x.y` or higher.
+. When performing an upgrade from Payara 5 to Payara 6, make sure that you're using JDK 11 as this is the minimum JDK version required to run Payara Server 6.
+. The upgrade tool will not adjust the `default-web.xml` configuration file (located in `${as-install}/config`) for each domain, so the following changes have are required:
+.. A `<servlet-class>` entry of `org.apache.jasper.servlet.JspServlet` must be converted to `org.glassfish.wasp.servlet.JspServlet`
+.. The `<system-jar-includes>` initialization parameter of the `jsp` servlet has had a change in value between Payara Server 5 and Payara Server 6, reflecting the change in modules from Jakarta EE 8 to Jakarta EE 10.
++
+This is how the parameter looks on a standard Payara Server `6.4.0` domain configuration:
++
+[source, xml]
+----
+<init-param>
+  <param-name>system-jar-includes</param-name>
+  <param-value>
+    /lib/
+    \lib\
+    expressly.jar
+    jakarta.servlet-api.jar
+    jakarta.servlet.jsp-api.jar
+    jakarta.servlet.jsp.jstl-api.jar
+    jakarta.servlet.jsp.jstl.jar
+    jakarta.jms-api.jar
+    jakarta.faces.jar
+    wasp.jar
+    jspcaching-connector.jar
+    web-glue.jar
+    hibernate-validator.jar
+    jakarta.ejb-api.jar
+    jakarta.enterprise.deploy-api.jar
+    jakarta.activation-api.jar
+    angus-activation.jar
+    jakarta.mail-api.jar
+    angus-mail.jar
+    jakarta.persistence.jar
+    jakarta.resource-api.jar
+    jakarta.security.auth.message-api.jar
+    jakarta.security.jacc-api.jar
+    jakarta.transaction-api.jar
+    webservices-osgi.jar
+    weld-osgi-bundle.jar
+    jersey-mvc-jsp.jar
+  </param-value>
+</init-param>
+----
++
+You'll have to adjust the value of this parameter by copying the current values of a clean Payara Server 6.4.0 or newer domain after the upgrade tool completes the process.
+
+IMPORTANT: It is recommended that users should run the latest version of Payara Server 5.x before attempting to upgrade to version 6.x.
 
 [[commands]]
 == Asadmin CLI Commands
@@ -19,12 +72,12 @@ The following are the Asadmin CLI commands available to the upgrade tool.
 *Aim*::
 This command can be used to upgrade Payara Server to the specified distribution along with all SSH nodes in the `domain.xml` configuration file.
 
-The command will also back up the old version and domains in the default location (`payara5/glassfish/domains`) or the location specified using the `--domaindir` option to allow for rolling back.
+The command will also back up the old version and domains in the default location (`payara6/glassfish/domains`) or the location specified using the `--domaindir` option to allow for rolling back.
 
 [[command-options-1]]
 ==== Command Options
 
-[cols="20,10,35,15,20",options="header",]
+[cols=",,,,",options="header",]
 |=======================================================================
 |Option |Type |Description |Default |Mandatory
 |`--username` |String | The username for the Payara Nexus server.||Yes, unless `--usedownloaded` is specified
@@ -42,7 +95,7 @@ This example upgrades a Payara Web distribution to version 5.24.1
 
 [source, shell]
 ----
-asadmin> upgrade-server --username example-user --distribution payara-web --version 5.24.1
+asadmin> upgrade-server --username example-user --distribution web --version 5.24.1
 ----
 
 [[rollback-server-command]]
@@ -66,13 +119,13 @@ WARNING: This command is not supported on Windows OS, please use the `rollbackUp
 [[staged-upgrades]]
 == Staged Upgrades
 
-When the `upgrade-server` command is either used on Windows or with the `--stage` option enabled, the new server files are installed next to the current installation in various _.new_ directories (e.g. `payara5/glassfish/bin.new`). The following helper scripts are available to interact with staged upgrades.
+When the `upgrade-server` command is either used on Windows or with the `--stage` option enabled, the new server files are installed next to the current installation in various _.new_ directories (e.g. `payara6/glassfish/bin.new`). The following helper scripts are available to interact with staged upgrades.
 
 [[apply-staged-upgrades]]
 === Apply Staged Upgrade Script
 
 *Usage*::
-`> ./payara5/glassfish/bin/applyStagedUpgrade`
+`> ./payara6/glassfish/bin/applyStagedUpgrade`
 
 *Aim*::
 This script is used to apply an upgrade staged using the `upgrade-server` command.
@@ -92,7 +145,7 @@ It will then upgrade the nodes of the domains in the default domain dir, or the 
 === Rollback Upgrade Script
 
 *Usage*::
-`> ./payara5/glassfish/bin/rollbackUpgrade`
+`> ./payara6/glassfish/bin/rollbackUpgrade`
 
 *Aim*::
 This script is used to rollback a server upgrade applied using the `applyStagedUpgrade` script.
@@ -112,14 +165,12 @@ It will then rollback the nodes of the domains in the default domain dir, or the
 === Cleanup Upgrade Script
 
 *Usage*::
-`> ./payara5/glassfish/bin/cleanupUpgrade`
+`> ./payara6/glassfish/bin/cleanupUpgrade`
 
 *Aim*::
 This script is used to clean up any leftovers from a staged upgrade: any _.old_ folders and any _.new_ folders will be deleted.
 
 WARNING: Use of this script will prevent you from rolling back or applying a staged upgrade.
-
-IMPORTANT: This script cannot be used to clean up upgrades from releases prior to `5.26.0`, as it uses a config file to determine the directories to delete which is only generated by the `upgrade-server` command from release `5.26.0` onwards.
 
 [[configure-logging-levels]]
 == Configure Logging Levels
@@ -131,7 +182,7 @@ The upgrade tool commands and helper scripts will print a set of minimum details
 
 These variables can also be configured as system properties in the Asadmin CLI script file located in the `{as-install}/bin` folder like this:
 
-[source, bash]
+[source, shell]
 ----
 AS_INSTALL=`dirname "$0"`/../glassfish
 AS_INSTALL_LIB="$AS_INSTALL/lib"

@@ -143,7 +143,10 @@ class Xfile(_Xobject):
             self._opened = True
             with open(self.path, 'r', encoding="utf-8") as file:
                 for _ in range(3):
-                    ordinal_string = next(file, '').strip().replace("-", "\\-")
+                    try:
+                        ordinal_string = next(file, '').strip().replace("-", "\\-")
+                    except UnicodeDecodeError:
+                        print("stop")
                     ordinal_match = re.search(self._ordinal_regex, ordinal_string)
                     if ordinal_match:
                         self._ordinal = int(ordinal_match.group().strip())

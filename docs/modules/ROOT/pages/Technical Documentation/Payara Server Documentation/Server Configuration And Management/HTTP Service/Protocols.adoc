@@ -228,7 +228,7 @@ The level of compression to be used:
 `set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.compression-level=[-1-9]`
 
 [[configuration-http-compression-strategy]]
-===== Compression Strategy
+==== Compression Strategy
 
 Sets the strategy to be used during HTTP compression.
 
@@ -442,6 +442,46 @@ HTTP header name used for identifying the originating user of an HTTP request.
 set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.remote-user-mapping=value
 ----
 
+[[configuration-http-cookie-same-site-enabled]]
+==== Enable Cookie SameSite
+
+Enabling to set all cookies to use the SameSite value.
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.cookie-same-site-enabled=[true|false]
+----
+
+[[configuration-http-cookie-same-site-value]]
+==== Cookie SameSite Value
+
+The values to be used:
+
+* `Lax`: Cookies are not sent on normal cross-site subrequests
+* `Strict`: Cookies will only be sent in a first-party context
+* `None`: Cookies will be sent in all contexts
+
+*Asadmin Command:*
+
+[source, shell]
+----
+set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.http.cookie-same-site-value=[Lax|Strict|None]
+----
+
+Users can set up the SameSite Cookie attribute at the *application level* by using the `payara-web.xml` deployment descriptor.
+
+Set this attribute by using the `cookie-properties` tag with a child property named `cookieSameSite`:
+[source,xml,indent=0]
+----
+<payara-web-app >
+    <cookie-properties>
+        <property name="cookieSameSite" value="Strict" />
+    </cookie-properties>
+</payara-web-app>
+----
+
 [[http2-settings]]
 === HTTP/2 Settings
 
@@ -575,39 +615,6 @@ set configs.config.server-config.network-config.protocols.protocol.${protocol-na
 === SSL/TLS Settings
 
 The following SSL/TLS settings can be configured:
-
-[[configuration-ssl-ssl3]]
-==== SSLv3 Enabled
-
-Whether to enable SSLv3 or not.
-
-*Asadmin Command:*
-
-[source, shell]
-----
-set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.ssl3-enabled=[true | false]
-----
-
-[[configuration-ssl-tls]]
-==== TLS Enabled
-
-Whether to enable TLS or not.
-
-*Asadmin Command:*
-
-`set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.tls-enabled=[true|false]`
-
-[[configuration-ssl-tls11]]
-==== TLS V1.1 Enabled
-
-Whether to enable TLS V1.1 or not. Will be ignored if TLS is disabled.
-
-*Asadmin Command:*
-
-[source, shell]
-----
-set configs.config.server-config.network-config.protocols.protocol.${protocol-name}.ssl.tls11-enabled=[true|false]
-----
 
 [[configuration-ssl-tls12]]
 ==== TLS V1.2 Enabled
@@ -834,9 +841,7 @@ The `create-ssl` command creates a set of SSL parameters for a created protocol.
 asadmin create-ssl [--help]
         --certname certname
         --type protocol
-        [--ssl3enabled={false|true}]
         [--ssl3tlsciphers ssl3tlsciphers]
-        [--tlsenabled={false|true}]
         [--tlsrollbackenabled={false|true}]
         [--clientauthenabled={false|true}]
         [--target target]

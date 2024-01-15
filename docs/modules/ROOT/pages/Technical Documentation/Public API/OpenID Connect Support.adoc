@@ -87,7 +87,7 @@ itself but by the Server (like `payara.security.openid.redirectURI=${baseURL}/Ca
 
 The annotation and MicroProfile properties has several configuration options. They are detailed below.
 
-.Configuration Options for `@OpenIdAuthenticationDefinition
+.Configuration Options for `@OpenIdAuthenticationDefinition`
 |===
 | Option | MP Config property | Required/Type | Description | Default value | Requirements
 
@@ -477,16 +477,14 @@ When these values, which correspond to lists (e.g. `scopesSupported`, `responseT
 [[secret-alias]]
 == Client Secret Aliasing
 
-The client secret can be input directly, or for added security it can be aliased using any of the following features:
+The client secret can be input directly, or for added security it can be aliased using xref:Technical Documentation/MicroProfile/Config/Overview.adoc[Microprofile Config]
 
-- xref://Technical Documentation/Payara Server Documentation/Server Configuration And Management/Configuration Options/Password Aliases.adoc[Password Aliases]
-- xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Configuration Options/Variable Substitution/Types of Variables.adoc[Environment Variables / System Properties]
-- xref:/Technical Documentation/MicroProfile/Config/Overview.adoc[Config API]
+NOTE: Environment Variables and System Properties can be used indirectly through MicroProfile Config.
 
 [[fetch-caller-data]]
 == Fetch Caller Data
 
-As the OpenId Connect Client is built on top of Jakarta EE Security API, therefore `javax.security.enterprise.SecurityContext` interface can provide caller info which is available as a CDI bean and can be injected into any context-aware instance.
+As the OpenId Connect Client is built on top of Jakarta EE Security API, therefore `jakarta.security.enterprise.SecurityContext` interface can provide caller info which is available as a CDI bean and can be injected into any context-aware instance.
 
 The Payara Public API also provides a `fish.payara.security.openid.api.OpenIdContext` interface which is also available as a CDI bean and consist of the following methods:
 
@@ -585,7 +583,7 @@ When the `Bearer` authorization header is present in the request, the provided t
 
 NOTE: Compared to the normal browser flow, no groups are automatically assigned to the identity. The reason for this is that machine-to-machine communication tends to be much more fine-grained and services might want to check more claims, such as `audience`.
 
-The resource service is required to map the information in the JWT token to groups utilizing the `https://jakarta.ee/specifications/platform/8/apidocs/javax/security/enterprise/identitystore/identitystore[IdentityStore]` interface. The OpenID connector provides the following classes to make this process possible:
+The resource service is required to map the information in the JWT token to groups utilizing the `https://jakarta.ee/specifications/platform/10/apidocs/jakarta/security/enterprise/identitystore/identitystore[IdentityStore]` interface. The OpenID connector provides the following classes to make this process possible:
 
 `AccessTokenCallerPrincipal`:: Caller principal subclass that contains access to all claims of passed JWT token
 `BearerGroupIdentityStore`:: A convenience base implementation of the necessary Jakarta EE security identity store.
@@ -714,7 +712,7 @@ To disable the scope validation for Azure AD integration it is needed to use the
 
 Keycloak is an Open Source Identity and Access Management Server, which is a OAuth2 and OpenID Connect(OIDC) protocol complaint. In this section,the basic steps are described to setup Keycloak OpenId provider.
 
-- Refer to Keycloak https://www.keycloak.org/guides#getting-started[getting started documentation] to run and setup keycloak.
+- Refer to Keycloak https://www.keycloak.org/docs/latest/getting_started/index.html[getting started documentation] to run and setup keycloak.
 
 - After Keycloak setup done, login to Keycloak admin console and add the new realm by pressing the **Add Realm** button: image:security-connector/oidc/keycloak/add-realm.png[Add Realm]
 
@@ -784,102 +782,6 @@ image:security-connector/oidc/keycloak/groups-claim.png[Groups Claim]
     )
 )
 public class SecurityBean {
-}
-----
-
-[[standalone-openid-connect-connector]]
-== Standalone OpenID Connect connector
-
-When using this standalone connector, import classes with the with the `fish.payara.security.connectors` package instead of the `fish.payara.security`.
-
-[[download-the-standalone-openid-connect-connector]]
-=== Download the standalone OpenID Connect connector
-
-You can access the latest version in the https://nexus.payara.fish/service/rest/repository/browse/payara-artifacts/fish/payara/security/connectors/openid-standalone/[Payara Artifacts Maven Repository].
-
-You can also add the Payara Artifacts repository into your pom.xml and define the dependency as follows:
-
-[source, xml]
-----
-    <repositories>
-            <repository>
-                <id>payara-nexus-artifacts</id>
-                <url>https://nexus.payara.fish/repository/payara-artifacts</url>
-                <releases>
-                    <enabled>true</enabled>
-                </releases>
-                <snapshots>
-                    <enabled>false</enabled>
-                </snapshots>
-            </repository>
-        </repositories>
-        <dependencies>
-            <dependency>
-                <groupId>fish.payara.security.connectors</groupId>
-                <artifactId>openid-standalone</artifactId>
-                <version>VERSION</version>
-            </dependency>
-        </dependencies>
-----
-
-[[support-for-multitenancy]]
-=== Support for Multitenancy
-
-By default, the same configuration of the OpenID connector is applied for the whole application, for all authentication attempts. In a multitenant scenario, each tenant should be able to supply a different configuration. This is implemented by an optional session scope for the configuration, which means that the configuration is evaluated for each user session. Therefore it's possible to dynamically adjust the configuration before each authantication attempt, e.g. based on the URL, domain in the URL or any other information in the incoming HTTP request.
-
-However, it's not possible to use a different configuration for different secured resources. Once a user is authenticated, the authentication information is saved in the HTTP session until the user logs out. All secure resources will be accessed using the same user.
-
-Multitenancy is disabled by default for performance reasons. To enable it, set the MicroProfile Configuration property `payara.security.openid.sessionScopedConfiguration` to `true`. To specify it directly in the application, you can place it in the https://download.eclipse.org/microprofile/microprofile-config-1.4/microprofile-config-spec.html#default_configsources[microprofile-config.properties] file.
-
-NOTE: If you use the security connector in EAR and you want to specify configuration properties in `microprofile-config.properties`, note that you need to place the `microprofile-config.properties` file in a JAR file in the `lib` directory in the `EAR`. This will make the properties visible for all modules in the EAR. If you place the `microprofile-config.properties` file only in the WAR inside the EAR, it will be ignored even if you use the connector only in the WAR application.
-
-Dynamic configuration is possible using Expression Language to specify the properties in the configuration annotations as described in xref:/Technical Documentation/Public API/OpenID Connect Support.adoc#el-support[Payara Documentation].
-
-[[example-for-multitenancy]]
-==== *Example for multitenancy*
-
-Create microprofile-config.properties in your application, in the META-INF directory, with the following contents:
-
-[source, shell]
-----
-payara.security.openid.employee.providerURI=<EMPLOYEE_OPENID_PROVIDER_URI>
-payara.security.openid.dealer.providerURI=<DEALER_OPENID_PROVIDER_URI>
-payara.security.openid.sessionScopedConfiguration=true
-----
-
-Apply the following configuration using the `OpenIdAuthenticationDefinition` annotation:
-
-[source, java]
-----
-@OpenIdAuthenticationDefinition(
-        providerURI = "#{openidConfigBean.tokenEndpointURL}",
-        clientId = CLIENT_ID_VALUE,
-        clientSecret = CLIENT_SECRET_VALUE,
-        redirectURI = "${baseURL}/Callback"
-)
-----
-
-Create `OpenidConfigBean` class with the `tokenEndpointURL` method. This class can be a CDI bean that injects `HttpServletRequest` to get information about which tenant to use. it will also inject `Config` to retrieve the configuration about each tenant from the `microprofile-config.properties` file:
-
-[source, java]
-----
-@Named
-public class OpenidConfigBeanEL {
-    @Inject
-    HttpServletRequest request;
-    @Inject
-    Config config;
-    private static final String BASE_OPENID_KEY = "payara.security.openid";
-    public String getTokenEndpointURL() {
-        String tenant = getTenant(request);  // a custom method to decide which tenant to use
-        return config
-                .getOptionalValue(BASE_OPENID_KEY + "." + tenant + ".providerURI", String.class)
-                // e.g. payara.security.openid.employee.providerURI
-                .orElseGet(() -> {
-                    // read config for the employee tenant by default
-                   return config.getValue(BASE_OPENID_KEY + ".employee.providerURI", String.class);
-                });
-    }
 }
 ----
 

@@ -23,6 +23,8 @@ This command starts the specified domain
 | `--drop-interrupted-commands` | `Boolean`| | `false`| No
 | `--prebootcommandfile`| `String` | Path to file containing commands to run before booting the server. Only a limited amount of commands will work at this point|| No
 | `--postbootcommandfile` | `String` | Path to file containing commands to run after the server is booted. | | No
+|`--timeout` |`Integer` |Specifies how long to take for the domain to start in seconds. If starting the domain takes longer than this amount then this command will fail |`600` |No
+|`--warmup` | `Boolean` |Specifies if the server will stop after setting configurations. | `false` | No
 |===
 
 [[start-domains]]
@@ -38,8 +40,13 @@ NOTE: The domains will be started assuming default values for all options you wo
 
 [[command-options]]
 === Command Options
+[cols="2,1,4,1,1",options="header"]
+|===
+|Options | Type | Description | Default | Mandatory
+|`--timeout` |`Integer` |Specifies how long to take for the domains to start in seconds. If starting the domains takes longer than this amount then this command will fail |`600` |No
+|`--domainTimeout` |`Integer` |Specifies how long to take for each domain to start in seconds. If starting the domains takes longer than this amount then this command will fail |`600` |No
 
-No command options available.
+|===
 
 [[example]]
 === Example
@@ -64,8 +71,13 @@ NOTE: The domains will be stopped assuming default values for all options you wo
 
 [[command-options-1]]
 === Command Options
+[cols="2,1,4,1,1",options="header"]
+|===
+|Options | Type | Description | Default | Mandatory
+|`--timeout` |`Integer` |Specifies how long to take for the domains to stop in seconds. If stopping the domains takes longer than this amount then this command will fail |`600` |No
+|`--domainTimeout` |`Integer` |Specifies how long to take each domain to stop in seconds. If stopping the domain takes longer than this amount then this command will fail |`60` |No
 
-No command options available.
+|===
 
 [[example-1]]
 === Example
@@ -88,8 +100,13 @@ This command can be used to restart the specified list of domains in the operand
 
 [[command-options-2]]
 === Command Options
+[cols="2,1,4,1,1",options="header"]
+|===
+|Options | Type | Description | Default | Mandatory
+|`--timeout` |`Integer` |Specifies how long to take for the domains to restart in seconds. If restarting the domains takes longer than this amount then this command will fail |`600` |No
+|`--domainTimeout` |`Integer` |Specifies how long to take for each domain to restart in seconds. If restarting the domain takes longer than this amount then this command will fail |`600` |No
 
-No command options available.
+|===
 
 [[example-2]]
 === Example
@@ -118,6 +135,9 @@ This command can be used to stop ALL current running domains on the server's ins
 |Option |Type |Description |Default |Mandatory
 |`--force` | `Boolean` | Specifies whether each domain is forcibly stopped immediately.| `true`|No
 |`--kill` | `Boolean` |Specifies whether the domain is killed by using functionality of the operating system to terminate the domain process | `false`|No
+|`--timeout` |`Integer` |Specifies how long to take for the domains to stop in seconds. If stopping the domains takes longer than this amount then this command will fail |`600` |No
+|`--domainTimeout` |`Integer` |Specifies how long to take for each domain to stop in seconds. If stopping the domain takes longer than this amount then this command will fail |`60` |No
+
 |====
 
 [[example-5]]
@@ -144,8 +164,8 @@ This command performs a backup on the domain. The `backup-domain` command requir
 |Options | Type | Description | Default | Mandatory
 | `--long`| `Boolean` | Displays detailed information about the backup operation| `false`| No
 | `--description` | `String` | A description to store in the backup zip || No
-| `--domaindir` | `String`| Specifies the domain root directory | `~/payara5/glassfish/domains`| No
-| `--backupdir` | `String` | Specifies the directory where the backup is to be stored | `~/payara5/glassfish/domains/{domain_name}/backups`| No
+| `--domaindir` | `String`| Specifies the domain root directory | `~/payara6/glassfish/domains`| No
+| `--backupdir` | `String` | Specifies the directory where the backup is to be stored | `~/payara6/glassfish/domains/{domain_name}/backups`| No
 |===
 
 [[restore-domain]]
@@ -164,8 +184,8 @@ WARNING: If a domain is restored on an already existing domain folder, all the f
 |Options | Type | Description | Default | Mandatory
 | `--long`| `Boolean` | Displays detailed information about the backup operation| `false`| No
 | `--filename` | `String` | The name of the backup file to use as the source || No
-| `--domaindir` | `String`| Specifies the domain root directory | `~/payara5/glassfish/domains`| No
-| `--backupdir` | `String` | Specifies the directory where the backup file is stored | `~/payara5/glassfish/domains/{domain_name}/backups`| No
+| `--domaindir` | `String`| Specifies the domain root directory | `~/payara6/glassfish/domains`| No
+| `--backupdir` | `String` | Specifies the directory where the backup file is stored | `~/payara6/glassfish/domains/{domain_name}/backups`| No
 | `--force` | `Boolean` | Forces the restore-domain command to continue when the name of the domain to restore does not match the name of the domain in the backup file | `false` | No
 |===
 
@@ -302,17 +322,6 @@ This means that you can run asadmin commands by typing `asadmin` in a terminal a
 | `--file`| `String` | The path for the resulting file| `${payara.home}/glassfish/bin/bash_autocomplete`| No
 | `--localCommands`| `Boolean` | This option will include local asadmin commands | `false` | No
 |===
-
-[[get-domain-xml-command]]
-== `get-domain-xml`
-
-*Usage*::
-`asadmin > get-domain-xml`
-
-*Aim*::
-Gets the text of the `domain.xml` configuration file. 
-
-IMPORTANT: This command will only run against a local instance.
 
 [[list-rest-endpoints-command]]
 == `list-rest-endpoints`

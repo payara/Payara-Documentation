@@ -3,10 +3,12 @@
 
 Payara Server uses a dedicated key and certificate store when using SSL/TLS connections. The files are located in the configuration directory of the domain `<payara-home>/glassfish/domains/<domain-name>/config` and referenced through JVM options so that they are used for the entire JVM.
 
-`keystore.jks`:: Java Keystore formatted file containing the Cryptographic keys, like the private keys associated with the certificates.
-`cacerts.jks`:: Java Keystore formatted file used as Trust Store file holding the X.509 certificates.
+`keystore.p12`:: Java Keystore formatted file containing the Cryptographic keys, like the private keys associated with the certificates.
+`cacerts.p12`:: Java Keystore formatted file used as Trust Store file holding the X.509 certificates.
 
 These keystores are protected with the Master Password of your domain.
+
+IMPORTANT: From Payara version 6.2023.2 and later the keystores were migrated from JKS to PKCS12 format.
 
 [[add-certificate]]
 == Adding SSL Certificate
@@ -41,9 +43,9 @@ openssl pkcs12 -export -in mycert.crt -inkey mycert.key -out mycert.p12 -name my
 
 The resulting p12 bundle can then be added to the keystore and truststore in Payara Server as described in the following sections.
 
-=== Import into `keystore.jks`
+=== Import into `keystore.p12`
 
-The information needs to be imported into the `keystore.jks`` file of your Payara Server domain which will use it.
+The information needs to be imported into the `keystore.p12` file of your Payara Server domain which will use it.
 
 [[via-asadmin-cli-1]]
 ==== Using Asadmin CLI
@@ -73,12 +75,12 @@ You can also use the `keytool` command of the JDK:
 
 [source, shell]
 ----
-keytool -importkeystore -destkeystore keystore.jks -srckeystore mycert.p12 -srcstoretype PKCS12 -alias mydomain_certificate
+keytool -importkeystore -destkeystore keystore.p12 -srckeystore mycert.p12 -srcstoretype PKCS12 -alias mydomain_certificate
 ----
 
 The parameters of the above command are self-explanatory. Important here is the correct alias value.
 
-=== Import into `cacerts.jks`
+=== Import into `cacerts.p12`
 
 A similar command is used to import the information into the Trust Store file so that our certificate is trusted by the JVM.
 
@@ -110,7 +112,7 @@ You can also use the `keytool` command of the JDK:
 
 [source,shell]
 ----
-keytool -importcert -trustcacerts -destkeystore cacerts.jks -file mycert.crt -alias mydomain_certificate
+keytool -importcert -trustcacerts -destkeystore cacerts.p12 -file mycert.crt -alias mydomain_certificate
 ----
 
 === Update HTTP Listener
@@ -166,13 +168,13 @@ JVM options can be configured using the 'create-jvm-options' asadmin command, yo
 *Additional Keystores*
 [source, shell]
 ----
-asadmin create-jvm-options "-Dfish.payara.ssl.additionalKeyStores=/path/to/keystore.jks\:/path2/to/keystore2.jks"
+asadmin create-jvm-options "-Dfish.payara.ssl.additionalKeyStores=/path/to/keystore.p12\:/path2/to/keystore2.p12"
 ----
 
 *Additional Truststores*
 [source, shell]
 ----
-asadmin create-jvm-options "-Dfish.payara.ssl.additionalTrustStores=/path/to/truststore.jks\:/path2/to/truststore2.jks"
+asadmin create-jvm-options "-Dfish.payara.ssl.additionalTrustStores=/path/to/truststore.p12\:/path2/to/truststore2.p12"
 ----
 
 NOTE: If you load multiple keystores with the same alias, the server will use the first keystore with that alias, starting with the default and then the additional keystores in the order they are listed in the JVM option.
