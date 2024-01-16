@@ -1,0 +1,92 @@
+[[delete-local-instance]]
+= delete-local-instance
+
+Deletes a Payara Server instance on the machine where the subcommand is run/
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] delete-local-instance [--help]
+[--nodedir node-dir] [--node node-name]
+[instance-name]
+----
+
+[[description]]
+== Description
+
+The `delete-local-instance` subcommand deletes a Payara Server instance on the machine where the subcommand is run. This subcommand does not require the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to be configured. You must run this command from the machine where the instance resides.
+
+The subcommand can delete any Payara Server instance, regardless of how the instance was created. For example, this subcommand can delete an instance that was created by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-instance.adoc#create-instance[`create-instance`] subcommand.
+
+The instance that is being deleted must not be running. Otherwise, an error occurs.
+
+The subcommand deletes an instance by performing the following actions:
+
+* Removing the instance from the configuration of the domain administration server (DAS)
+* Deleting the instance's files from file system
+
+If the instance that is being deleted is the only instance that is using the node directory, that directory is also removed.
+
+If a standalone instance is deleted, the instance's standalone configuration is also deleted. A standalone instance refers to a configuration that is named instance-name`-config` to which no other clusters or unclustered instances refer.
+
+The `delete-local-instance` subcommand does not contact the DAS to determine the node on which the instance resides. To determine the node on which the instance resides, the subcommand searches the directory that contains the node directories. If multiple node directories exist, the node must be specified as an option of the subcommand.
+
+If no operand is specified and only one instance resides on the specified node, the subcommand deletes the instance. If no operand is specified and multiple instances reside on the node, an error occurs.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--nodedir`::
+  Specifies the directory that contains the instance's node directory. The instance's files are stored in the instance's node directory. The default is as-install`/nodes`.
+`--node`::
+  Specifies the node on which the instance resides. This option may be omitted only if the directory that the `--nodedir` option specifies contains only one node directory. Otherwise, this option is required.
+
+[[operands]]
+== Operands
+
+instance-name::
+  The name of the instance to delete. This operand may be omitted if only one instance resides on the specified node. Otherwise, this operand is required.
+
+[[examples]]
+== Examples
+
+*Example 1 Deleting an Instance*
+
+This example deletes the instance `pmdsainst`.
+
+[source,shell]
+----
+asadmin> delete-local-instance pmdsainst
+
+Command delete-local-instance executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-instance.adoc#create-instance[`create-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-local-instance.adoc#create-local-instance[`create-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-instance.adoc#delete-instance[`delete-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-instance.adoc#start-instance[`start-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-local-instance.adoc#start-local-instance[`start-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-instance.adoc#stop-instance[`stop-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-local-instance.adoc#stop-local-instance[`stop-local-instance`]
+
+

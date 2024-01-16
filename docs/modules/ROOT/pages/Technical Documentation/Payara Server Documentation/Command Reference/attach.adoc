@@ -1,0 +1,65 @@
+[[attach]]
+= attach
+
+Attaches to subcommands that were started using `asadmin --detach` or that contain progress information.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] attach [--help] 
+job_id
+----
+
+[[description]]
+== Description
+
+The `attach` subcommand attaches to subcommands that were started using the `asadmin` utility option `--detach` or that contain progress information. The `--detach` option detaches long-running subcommands and executes them in the background in detach mode.
+
+Job IDs are assigned to the subcommands (jobs), and can be used to view the status of a job and its output. Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-jobs.adoc#list-jobs[`list-jobs`] subcommand to view the jobs and their job IDs, and the xref:Technical Documentation/Payara Server Documentation/Command Reference/configure-managed-jobs.adoc#configure-managed-jobs[`configure-managed-jobs`] subcommand to configure how long information about the jobs is kept.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the link:Technical Documentation/Payara Server Documentation/Command Reference/asadmin#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+
+[[operands]]
+== Operands
+
+job_id::
+  The ID of the job for which you want to view status and output.
+
+[[examples]]
+== Examples
+
+*Example 1: Attaching to a Subcommand and Checking Its Status*
+
+This example attaches to the `deploy` subcommand with a job ID of `20` and shows that the job is finished. If a subcommand is still in progress, the output displays the current status, for example, `64%: Uploading bits`.
+
+[source,shell]
+----
+asadmin> attach 20
+Finished execution of deploy
+Command attach executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/configure-managed-jobs.adoc#configure-managed-jobs[`configure-managed-jobs`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-jobs.adoc#list-jobs[`list-jobs`]

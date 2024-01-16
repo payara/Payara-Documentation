@@ -1,0 +1,124 @@
+[[list-nodes-dcom]]
+= list-nodes-dcom
+
+Lists all Payara Server nodes that support communication over DCOM in a domain.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] list-nodes-dcom [--help] 
+[--long={false|true}]
+----
+
+[[description]]
+== Description
+
+The `list-nodes-dcom` subcommand lists all Payara Server nodes that support communication over the Distributed Component Object Model (DCOM)
+remote protocol. The DCOM protocol is available only on Windows systems.
+
+NOTE: To list all nodes in a domain regardless of the type of the node, run the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc#list-nodes[`list-nodes`] subcommand.
+
+By default, the subcommand displays the following information for each
+node that is listed:
+
+* The name of the node
+* The type of the node, which is `DCOM`
+* The name of the host that the node represents
+
+The `--long` option of the subcommand specifies whether the nodes are listed in long format. In long format, the following additional information about each node is displayed:
+
+* The path to the parent of the base installation directory of Payara Server on the host that the node represents
+* A comma-separated list of the names of the Payara Server instances that reside on the node
+
+If the `--terse` option of the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] utility is `true` and the
+`--long` option of the subcommand is `false`, the subcommand lists only the name of each node.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--long`::
+`-l`::
+  Specifies whether the nodes are listed in long format. +
+  Possible values are as follows: +
+  `true`;;
+    The nodes are listed in long format.
+  `false`;;
+    The nodes are listed in short format (default).
+
+[[examples]]
+== Examples
+
+*Example 1 Listing Payara Server Nodes*
+
+This example displays the name, type, and host for all Payara Server
+nodes that support communication over DCOM in a domain.
+
+[source,shell]
+----
+asadmin> list-nodes-dcom
+xkyd  DCOM  xkyd.example.com
+wpmdl2  DCOM  wpmdl2.example.com
+wpmdl1  DCOM  wpmdl1.example.com
+Command list-nodes-dcom executed successfully.
+----
+
+*Example 2 Listing Only the Names of Payara Server Nodes*
+
+This example uses the `--terse` option of the `asadmin` utility to list
+only the names of the Payara Server nodes that support communication
+over DCOM in a domain.
+
+[source,shell]
+----
+asadmin> list-nodes-dcom --terse=true
+xkyd
+wpmdl2
+wpmdl1
+----
+
+*Example 3 Listing Payara Server Nodes in Long Format*
+
+This example lists the Payara Server nodes that support
+communication over DCOM in a domain in long format.
+
+[source,shell]
+----
+asadmin> list-nodes-dcom --long=true
+NODE NAME    TYPE   NODE HOST            INSTALL DIRECTORY   REFERENCED BY
+xkyd         DCOM   xkyd.example.com     C:\glassfish3
+wpmdl2       DCOM   wpmdl2.example.com   C:\glassfish3       wdi2
+wpmdl1       DCOM   wpmdl1.example.com   C:\glassfish3       wdi1
+Command list-nodes-dcom executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-node-config.adoc#create-node-config[`create-node-config`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-node-dcom.adoc#create-node-dcom[`create-node-dcom`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-node-ssh.adoc#create-node-ssh[`create-node-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-config.adoc#delete-node-config[`delete-node-config`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-dcom.adoc#delete-node-dcom[`delete-node-dcom`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-ssh.adoc#delete-node-ssh[`delete-node-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc#list-nodes[`list-nodes`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-config.adoc#list-nodes-config[`list-nodes-config`],
+* xref:#list-nodes-dcom[`list-nodes-dcom`]
+
+

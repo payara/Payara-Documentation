@@ -1,0 +1,70 @@
+[[stop-database]]
+= stop-database
+
+Stops a running H2 database server.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] stop-database [--help] 
+[--dbuser db-user]
+[--dbhost host] [--dbport port-no]
+----
+
+[[description]]
+== Description
+
+The `stop-database` subcommand stops a running H2 database server process. The database is typically started with the xref:Technical Documentation/Payara Server Documentation/Command Reference/start-database.adoc#start-database[`start-database`] subcommand.
+A single host can have multiple database server processes running on different ports. The `stop-database` subcommand stops the database server process for the specified port only.
+
+This subcommand is supported in local mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--dbuser`::
+  The username of the Java DB user that is to stop the server process.
+  If this option is omitted, no user is specified.
+`--dbhost`::
+  The host name or IP address of the Java DB server process. The default is the IP address 0.0.0.0, which denotes all network interfaces on the host where you run the `stop-database` subcommand.
+`--dbport`::
+  The port number where the H2 database server listens for client connections.
+
+[[examples]]
+== Examples
+
+*Example 1 Stopping Java DB*
+
+This example stops Java DB on host host1 and port 5001.
+
+[source,shell]
+----
+asadmin> stop-database --dbhost host1 --dbport 5001
+
+Command stop-database executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+The exit status applies to errors in executing the `asadmin` utility. For information on database errors, see the `h2.log` file. This file is located in the directory you specify by using the `--dbhome` option when you run the `start-database` subcommand.
+
+If you did not specify `--dbhome`, the value of `H2_INSTALL` defaults to `as-install/h2`.
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-database.adoc#start-database[`start-database`]
+"xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#administering-database-connectivity[Administering Database Connectivity]" in the Payara Server General Administration section

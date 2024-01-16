@@ -1,0 +1,90 @@
+[[create-profiler]]
+= create-profiler
+
+Creates the profiler element.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] create-profiler [--help] 
+[--target target_name] 
+[--classpath classpath] [--nativelibpath native_library_path] [--enabled=true] 
+[--property(name=value)[:name=value]*] profiler_name
+----
+
+[[description]]
+== Description
+
+The `create-profiler` subcommand creates the profiler element. A server instance is tied to the profiler by the profiler element in the Java configuration. Only one profiler exists at a time.
+If you attempt to create a profiler while one already exists, an error message is displayed.
+
+For changes to take effect, the server must restarted.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--target`::
+  This option specifies the target on which you are creating a profiler. Valid values are +
+  `server`;;
+    Creates the profiler for the default server instance. This is the default value.
+  configuration_name;;
+    Creates the profiler for the named configuration
+  cluster_name;;
+    Creates the profiler for every server instance in the cluster
+  instance_name;;
+    Creates the profiler for a particular server instance
+`--classpath`::
+  Java classpath string that specifies the classes needed by the profiler.
+`--nativelibpath`::
+  This path is automatically constructed to be a concatenation of the
+  Payara Server installation relative path for its native shared libraries, standard JRE native library path, the shell environment
+  setting (`LD_LIBRARY_PATH` on UNIX) and any path that may be specified in the profile element.
+`--enabled`::
+  Profiler is enabled by default.
+`--property`::
+  Name/value pairs of provider-specific attributes.
+
+[[operands]]
+== Operands
+
+profiler_name::
+  Name of the profiler.
+
+[[examples]]
+== Examples
+
+*Example 1 Creating a Profiler*
+
+This example creates a profiler named `sample_profiler`.
+
+[source,shell]
+----
+asadmin> create-profiler --classpath /home/appserver/
+--nativelibpath /u/home/lib --enabled=false
+--property defaultuser=admin:password=adminadmin sample_profiler
+Created Profiler with id = sample_profiler
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-profiler.adoc#delete-profiler[`delete-profiler`]
+
+

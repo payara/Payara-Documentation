@@ -1,0 +1,91 @@
+[[list-jms-resources]]
+= list-jms-resources
+
+Lists the JMS resources.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] list-jms-resources [--help]
+[--restype type]
+[target]
+----
+
+[[description]]
+== Description
+
+The `list-jms-resources` subcommand lists the existing Java Message Service (JMS) resources (destination and connection factory resources).
+
+This subcommand is supported in remote mode only. Remote `asadmin` subcommands require a running domain administration server (DAS).
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--restype`::
+  The JMS resource type can be `jakarta.jms.Topic`, `jakarta.jms.Queue`, `jakarta.jms.ConnectionFactory`, `jakarta.jms.TopicConnectionFactory`, or `jakarta.jms.QueueConnectionFactory`.
+
+[[operands]]
+== Operands
+
+target::
+  Restricts the listing to resources for a specified target. Valid values are as follows: +
+  `server`;;
+    Lists the resources for the default server instance. This is the default value.
+  `domain`;;
+    Lists the resources for the domain.
+  cluster-name;;
+    Lists the resources for every server instance in the specified cluster.
+  instance-name;;
+    Lists the resources for the specified server instance.
+
+[[examples]]
+== Examples
+
+*Example 1 Listing all JMS resources*
+
+The following subcommand lists all JMS resources.
+
+[source,shell]
+----
+asadmin> list-jms-resources
+jms/Queue
+jms/ConnectionFactory
+jms/DurableConnectionFactory
+jms/Topic
+Command list-jms-resources executed successfully.
+----
+
+*Example 2 Listing JMS resources of a specified type*
+
+The following subcommand lists all `jakarta.jms.ConnectionFactory` resources.
+
+[source,shell]
+----
+asadmin> list-jms-resources --restype jakarta.jms.ConnectionFactory
+jms/ConnectionFactory
+jms/DurableConnectionFactory
+Command list-jms-resources executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-jms-resource.adoc#create-jms-resource[`create-jms-resource`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-jms-resource.adoc#delete-jms-resource[`delete-jms-resource`]
+
+

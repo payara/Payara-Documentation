@@ -1,0 +1,98 @@
+[[list-jvm-options]]
+= list-jvm-options
+
+Lists options for the Java application launcher.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] list-jvm-options [--help] 
+[--target target] 
+[--profiler={false|true}] 
+----
+
+[[description]]
+== Description
+
+The `list-jvm-options` subcommand displays a list of command-line options that are passed to the Java application launcher when Payara Server is started.
+
+The options are managed by using the JVM Options page of the Administration Console or by using the `create-jvm-options` and `delete-jvm-options` subcommands.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--target`::
+  Specifies the target for which you are listing Java application launcher options. +
+  Valid values are as follows: +
+  `server`;;
+    Specifies the DAS (default).
+  instance-name;;
+    Specifies a Payara Server instance.
+  cluster-name;;
+    Specifies a cluster.
+  configuration-name;;
+    Specifies a named configuration.
+`--profiler`::
+  Specifies whether the Java application launcher options to list are for the profiler. Set this option to true only if a profiler has been
+  configured. If this option is set to true and no profiler is configured, an error occurs. The default is false.
+
+[[examples]]
+== Examples
+
+*Example 1 Listing the Java Application Launcher Options*
+
+This example lists the options that are used by the Java application launcher.
+
+[source,shell]
+----
+asadmin> list-jvm-options
+-Djava.security.auth.login.config=${com.sun.aas.instanceRoot}/config/login.conf
+-XX: LogVMOutput
+-XX: UnlockDiagnosticVMOptions
+-Dcom.sun.enterprise.config.config_environment_factory_class=
+com.sun.enterprise.config.serverbeans.AppserverConfigEnvironmentFactory
+-Djavax.net.ssl.keyStore=${com.sun.aas.instanceRoot}/config/keystore.jks
+-XX:NewRatio=2
+-DANTLR_USE_DIRECT_CLASS_LOADING=true
+-Djava.security.policy=${com.sun.aas.instanceRoot}/config/server.policy
+-Djdbc.drivers=org.apache.derby.jdbc.ClientDriver
+-Djavax.net.ssl.trustStore=${com.sun.aas.instanceRoot}/config/cacerts.jks
+-client
+-Djava.ext.dirs=${com.sun.aas.javaRoot}/lib/ext${path.separator}${
+com.sun.aas.javaRoot}/jre/lib/ext${path.separator}${com.sun.aas.instanceRoot}
+/lib/ext${path.separator}${com.sun.aas.derbyRoot}/lib
+-Xmx512m
+-XX:MaxPermSize=192m
+-XX:LogFile=${com.sun.aas.instanceRoot}/logs/jvm.log
+Command list-jvm-options executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-jvm-options.adoc#create-jvm-options[`create-jvm-options`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-jvm-options.adoc#delete-jvm-options[`delete-jvm-options`]
+
+For more information about the Java application launcher, see the reference page for the operating system that you are using:
+
+* http://docs.oracle.com/javase/6/docs/technotes/tools/solaris/java.html[Oracle Solaris and Linux: java - the Java application launcher] (http://docs.oracle.com/javase/6/docs/technotes/tools/solaris/java.html)
+* http://docs.oracle.com/javase/6/docs/technotes/tools/windows/java.html[Windows: java - the Java application launcher] (http://docs.oracle.com/javase/6/docs/technotes/tools/windows/java.html)
+
+

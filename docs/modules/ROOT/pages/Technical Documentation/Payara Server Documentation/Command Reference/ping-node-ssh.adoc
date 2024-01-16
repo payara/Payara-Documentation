@@ -1,0 +1,110 @@
+[[ping-node-ssh]]
+= ping-node-ssh
+
+Tests if a node that is enabled for communication over SSH is usable.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] ping-node-ssh [--help]
+[--validate={false|true}] node-name
+----
+
+[[description]]
+== Description
+
+The `ping-node-ssh` subcommand tests if a node that is enabled for communication over secure shell (SSH) is usable. This subcommand
+requires secure shell (SSH) to be configured on the machine where the domain administration server (DAS) is running and on the machine where
+the node resides. You may run this command from any machine that can contact the DAS.
+
+If the node is usable, the subcommand displays a confirmation that the subcommand could connect to the node through SSH. This confirmation
+includes the name of the host that the node represents.
+
+Optionally, the subcommand can also validate the node to determine if the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] utility can run on the
+host that the node represents. To validate a node, the subcommand runs the xref:Technical Documentation/Payara Server Documentation/Command Reference/version.adoc#version[`version`] subcommand. If the node is
+valid, the subcommand displays the version that the `version` subcommand returns.
+
+The node that is specified as the operand of this subcommand must be enabled for communication over SSH. If the node is not enabled for
+communication over SSH, an error occurs. To determine whether a node is enabled for communication over SSH, use the
+xref:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc#list-nodes[`list-nodes`] subcommand.
+
+NOTE: To test whether a node that is enabled for communication over the Distributed Component Object Model (DCOM) remote protocol is usable, use
+the xref:Technical Documentation/Payara Server Documentation/Command Reference/ping-node-dcom.adoc#ping-node-dcom[`ping-node-dcom`] subcommand.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--validate`::
+  Specifies whether the subcommand validates the node. +
+  Possible values are as follows: +
+  `true`;;
+    The node is validated.
+  `false`;;
+    The node is not validated (default).
+
+[[operands]]
+== Operands
+
+node-name::
+  The name of the node to test. The node must be enabled for communication over SSH. Otherwise, an error occurs.
+
+[[examples]]
+== Examples
+
+*Example 1 Testing if an SSH-Enabled Node Is Usable*
+
+This example tests if the SSH-enabled node `sj03-node` is usable.
+
+[source,shell]
+----
+asadmin> ping-node-ssh sj03-node
+Successfully made SSH connection to node sj03-node (sj03.example.com)
+Command ping-node-ssh executed successfully.
+----
+
+*Example 2 Validating an SSH-Enabled Node*
+
+This example validates the SSH-enabled node `adc-node`.
+
+//TODO - Review if the command output prints "GlassFish"
+
+[source,shell, subs=attributes+]
+----
+asadmin> ping-node-ssh --validate=true adc-node
+Successfully made SSH connection to node adcnode (adc.example.com)
+GlassFish version found at /export/payara:
+Using locally retrieved version string from version class.
+Version = Payara Server {page-version} #badassfish (build 00)
+Command version executed successfully.
+Command ping-node-ssh executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-node-ssh.adoc#create-node-ssh[`create-node-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-ssh.adoc#delete-node-ssh[`delete-node-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc#list-nodes[`list-nodes`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/ping-node-dcom.adoc#ping-node-dcom[`ping-node-dcom`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/setup-ssh.adoc#setup-ssh[`setup-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/update-node-ssh.adoc#update-node-ssh[`update-node-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/version.adoc#version[`version`]
+
+

@@ -1,0 +1,117 @@
+[[create-node-config]]
+= create-node-config
+
+Creates a node that is not enabled for remote communication.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] create-node-config [--help]
+[--nodehost node-host]
+[--installdir as-install-parent] [--nodedir node-dir] node-name
+----
+
+[[description]]
+== Description
+
+The `create-node-config` subcommand creates a node that is not enabled for remote communication. The `create-node-config` subcommand does not
+require the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to be configured to create the node.
+
+A node represents a host on which the Payara Server software is installed. A node must exist for every host on which Payara Server instances reside.
+
+NOTE: To represent the host where the DAS is running, Payara Server provides the predefined node `localhost-domain`. The predefined node `localhost-domain` is not enabled for remote communication.
+
+All administration of instances on a node that is not enabled for remote communication must be performed on the host that the node represents.
+The domain administration server (DAS) on a remote host cannot contact the node. To administer instances on a node that represents a host that is remote from the DAS, you must use the following subcommands:
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-local-instance.adoc#create-local-instance[`create-local-instance`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-local-instance.adoc#delete-local-instance[`delete-local-instance`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-local-instance.adoc#start-local-instance[`start-local-instance`]
+
+However, you may use xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-local-instance.adoc#stop-local-instance[`stop-local-instance`]
+or xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-instance.adoc#stop-instance[`stop-instance`] to stop the instances.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--nodehost`::
+  The name of the host that the node represents. If this option is omitted, no host is specified for the node.
+`--installdir`::
+  The full path to the parent of the base installation directory of the Payara Server software on the host, for example,
+  `/export/payara5/`. If this option is omitted, no parent of the base installation directory of the Payara Server software is specified for the node.
+`--nodedir`::
+  The path to the directory that is to contain Payara Server instances that are created on the node. If a relative path is specified, the path is relative to the as-install directory.
+  If this option is omitted, no directory for instances is specified for the node.
+
+[[operands]]
+== Operands
+
+node-name::
+  The name of the node. +
+  The name must meet the following requirements: +
+  * The name may contain only ASCII characters.
+  * The name must start with a letter, a number, or an underscore.
+  * The name may contain only the following characters:
+  ** Lowercase letters
+  ** Uppercase letters
+  ** Numbers
+  ** Hyphen
+  ** Period
+  ** Underscore
+  * The name must be unique in the domain and must not be the name of another node, a cluster, a named configuration, or a Payara Server instance.
+  * The name must not be `domain`, `server`, or any other keyword that is reserved by Payara Server.
+
+[[examples]]
+== Examples
+
+*Example 1 Creating a Node That Is Not Enabled for Remote Communication*
+
+This example creates the node `sj03` for host `sj03.example.com`. The node is not enabled for remote communication.
+
+[source,shell]
+----
+asadmin> create-node-config --nodehost sj03.example.com sj03
+
+Command create-node-config executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-local-instance.adoc#create-local-instance[`create-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-node-dcom.adoc#create-node-dcom[`create-node-dcom`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-node-ssh.adoc#create-node-ssh[`create-node-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-local-instance.adoc#delete-local-instance[`delete-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-config.adoc#delete-node-config[`delete-node-config`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/install-node.adoc#install-node[`install-node`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/install-node-dcom.adoc#install-node-dcom[`install-node-dcom`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/install-node-ssh.adoc#install-node-ssh[`install-node-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc#list-nodes[`list-nodes`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-local-instance.adoc#start-local-instance[`start-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-instance.adoc#stop-instance[`stop-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-local-instance.adoc#stop-local-instance[`stop-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/uninstall-node.adoc#uninstall-node[`uninstall-node`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/uninstall-node-dcom.adoc#uninstall-node-dcom[`uninstall-node-dcom`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/uninstall-node-ssh.adoc#uninstall-node-ssh[`uninstall-node-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/update-node-config.adoc#update-node-config[`update-node-config`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/update-node-dcom.adoc#update-node-dcom[`update-node-dcom`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/update-node-ssh.adoc#update-node-ssh[`update-node-ssh`]
+
+

@@ -1,0 +1,84 @@
+[[rollback-transaction]]
+= rollback-transaction
+
+Rolls back the named transaction.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] rollback-transaction [--help] 
+[--target target]
+transaction_id
+----
+
+[[description]]
+== Description
+
+The `rollback-transaction` subcommand rolls back the named transaction.
+
+Before you can roll back a transaction, you must do the following:
+
+. Enable monitoring using the `set` subcommand. For example:
++
+[source,shell]
+----
+asadmin> set clstr1-config.monitoring-service.module-monitoring-levels.transaction-service=HIGH
+----
+. Use the `freeze-transaction-service` subcommand to halt in-process transactions.
+. Look up the active transactions using the `get` subcommand with the `--monitor` option. For example:
++
+[source,shell]
+----
+asadmin> get --monitor inst1.server.transaction-service.activeids-current
+----
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--target`::
+  This option specifies the target on which you are rolling back the transactions. Valid values are `server` or any other clustered or stand-alone instance.
+
+[[operands]]
+== Operands
+
+transaction_id::
+  Identifier for the transaction to be rolled back.
+
+[[examples]]
+== Examples
+
+*Example 1 Using rollback-transaction command*
+
+[source,shell]
+----
+% asadmin rollback-transaction 0000000000000001_00
+Command rollback-transaction executed succeessfully
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/freeze-transaction-service.adoc#freeze-transaction-service[`freeze-transaction-service`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/recover-transactions.adoc#recover-transactions[`recover-transactions`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/unfreeze-transaction-service.adoc#unfreeze-transaction-service[`unfreeze-transaction-service`],
+* "xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#administering-transactions[Administering Transactions]" in the Payara Server General Administration section
+* "https://jakarta.ee/specifications/transactions/[Transactions]" in The Jakarta EE Specifications
+
+

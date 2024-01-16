@@ -1,0 +1,87 @@
+[[delete-message-security-provider]]
+= delete-message-security-provider
+
+Enables administrators to delete a message security provider.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] delete-message-security-provider [--help] 
+[--target target]
+--layer message_layer
+provider_name
+----
+
+[[description]]
+== Description
+
+The `delete-message-security-provider` subcommand enables administrators
+to delete a message security provider.
+
+In terms of what happens when this subcommand is run, the `provider-config` sub-element for the given message layer (`message-security-config` element of `domain.xml` is deleted.
+The `domain.xml` file specifies parameters and properties to the Payara Server). The options specified in the list below apply to
+attributes within the `message-security-config` and `provider-config` sub-elements of the `domain.xml` file.
+
+If the message-layer (`message-security-config` attribute) does not exist, it is created, and then the `provider-config` is created under it.
+
+This command is supported in remote mode only.
+
+[[options]]
+== Options
+
+If an option has a short option name, then the short option precedes the long option name. Short options have one dash whereas long options have two dashes.
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--target`::
+  Specifies the target from which you are deleting the message security provider. Valid values are +
+  `server`;;
+    Deletes the message security provider from the default server instance `server` and is the default value
+  `domain`;;
+    Deletes the message security provider from the domain.
+  cluster_name;;
+    Deletes the message security provider from every server instance in the cluster.
+  instance_name;;
+    Deletes the message security provider from a particular sever instance.
+`--layer`::
+  The message-layer from which the provider has to be deleted. The default value is `HttpServlet`.
+
+[[operands]]
+== Operands
+
+provider_name::
+  The name of the provider used to reference the `provider-config` element.
+
+[[examples]]
+== Examples
+
+*Example 1 Deleting a message security provider*
+
+The following example shows how to delete a message security provider for a client.
+
+[source,shell]
+----
+asadmin> delete-message-security-provider 
+--layer SOAP mySecurityProvider
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-message-security-provider.adoc#create-message-security-provider[`create-message-security-provider`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-message-security-providers.adoc#list-message-security-providers[`list-message-security-providers`]
+
+

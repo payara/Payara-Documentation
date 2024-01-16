@@ -1,0 +1,96 @@
+[[configure-jms-cluster]]
+= configure-jms-cluster
+
+Configures the Message Queue cluster providing JMS services to a Payara Server cluster.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] configure-jms-cluster [--help]
+[--clustertype={conventional|enhanced}]
+[--configstoretype={masterbroker|shareddb}]
+[--messagestoretype={file|jdbc}]
+[--dbvendor database-vendor]
+[--dbuser database-user]
+[--dburl database-url]
+[--property (name=value)[:name=value]*]
+cluster-name
+----
+
+[[description]]
+== Description
+
+The `configure-jms-cluster` configures the Message Queue cluster providing JMS services to a Payara Server cluster.
+
+This subcommand should be used before the Payara Server cluster is started for the first time. Otherwise, follow the instructions in
+xref:Technical Documentation/Payara Server Documentation/General Administration/jms.adoc#administering-the-java-message-service-jms[Administering the Java Message Service (JMS)] in Payara Server General Administration section.
+
+This subcommand is supported in remote mode only. Remote `asadmin` subcommands require a running domain administration server (DAS).
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--clustertype`::
+  The type of Message Queue cluster to configure. The value `conventional` specifies a conventional cluster, and the value `enhanced` specifies an enhanced, high-availability cluster. +
+  The default value is `conventional`. +
+  If `enhanced` is specified, the `configstoretype` and `messagestoretype` options are ignored.
+`--configstoretype`::
+  The type of data store for configuration data in a conventional cluster. The value `masterbroker` specifies the use of a master broker
+  to store and manage the configuration data. The value `shareddb` specifies the use of a shared database to store the configuration data. +
+  The default value is `masterbroker`. +
+  This option is ignored if `clustertype` is set to `enhanced`.
+`--messagestoretype`::
+  The type of data store for message data in brokers in a conventional cluster. The value `file` specifies a file store. The value `jdbc` specifies a JDBC store. +
+  The default value is `file`. +
+  This option is ignored if `clustertype` is set to `enhanced`.
+`--dbvendor` ::
+`--dbuser`::
+`--dburl`::
+  The database vendor, user, and access url of the JDBC database to use in any of these situations: +
+  * When `clustertype` is set to `enhanced`
+  * When `configstoretype` is set to `shareddb`
+  * When `messagestoretype` is set to `jdbc` +
+
+NOTE: To specify the password of the JDBC database user, use the
+`--passwordfile` utility option of the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] command after adding the
+entry `AS_ADMIN_JMSDBPASSWORD` to the password file.
+
+`--property`::
+  A list of additional database-vendor-specific properties to configure the JDBC database for use by the Message Queue cluster.
+  Specify properties as a colon (`:`) separated list of property names and values in the form:
++
+[source,shell]
+----
+prop1name=prop1value:prop2name=prop2value
+----
+
+[[operands]]
+== Operands
+
+cluster-name::
+  The name of the Payara Server cluster for which the Message Queue cluster is to provide JMS services. +
+  Because Payara Server uses the cluster name to uniquely identify database tables the Message Queue cluster might require, the length of
+  the name is restricted in the following situations: +
+  * If `clustertype` is set to `enhanced`, the name can be no longer than n–21 characters, where n is the maximum table name length allowed by the database.
+  * If `configstoretype` is set to `shareddb`, the name can be no longer than n–19 characters, where n is the maximum table name length allowed by the database.
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+
+

@@ -1,0 +1,95 @@
+[[recover-transactions]]
+= recover-transactions
+
+Manually recovers pending transactions.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] recover-transactions [--help] 
+[--transactionlogdir transaction_log_dir]
+[--target target_server_name] server_name
+----
+
+[[description]]
+== Description
+
+The `recover-transactions` subcommand manually recovers pending transactions.
+
+For an installation of multiple server instances, you can run the `recover-transactions` subcommand from a surviving server instance to
+recover transactions after a server failure. To use this subcommand in this way, the following conditions must be met:
+
+* Delegated transaction recovery is disabled.
+* Transaction logs are stored on a shared file system or in a database that is accessible to all server instances.
+
+For a stand-alone server, do not use this subcommand to recover transactions after a server failure. For a stand-alone server, the
+`recover-transactions` subcommand can recover transactions only when a resource fails, but the server is still running. If a stand-alone server
+fails, only the full startup recovery process can recover transactions that were pending when the server failed.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--transactionlogdir`::
+  The location of the transaction logs for a server for which transaction recovery is requested. This option applies only if
+  transaction logs are stored on a shared file system.
+`--target`::
+  The target server that performs the recovery for the server that is specified by the server_name operand. The target server should be running.
+`--destination`::
+  This option is deprecated. It works exactly as the `--target` option does.
+
+[[operands]]
+== Operands
+
+server_name::
+  For a stand-alone server, the value of this operand is typically `server`. Transactions are recovered only if a resource fails, but the server is still running. +
+  For an installation of multiple server instances, the value of this operand is the name of the server for which the recovery is required.
+  The in-flight transactions on this server will be recovered. If this server is running, recovery is performed by the same server. In this
+  situation, the `--transactionlogdir` and `--target` options should be omitted. If the server is not running, the `--target` option is
+  required, and the `--transactionlogdir` option is also required if transaction logs are stored on a shared file system.
+
+[[examples]]
+== Examples
+
+*Example 1 Recovering transactions on a running server*
+
+[source,shell]
+----
+% asadmin recover-transactions server1
+Transaction recovered.
+----
+
+*Example 2 Recovering transactions for a server that is not running*
+
+[source,shell]
+----
+% asadmin recover-transactions --transactionlogdir /logs/tx --target server1 server2
+Transaction recovered.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/freeze-transaction-service.adoc#freeze-transaction-service[`freeze-transaction-service`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/rollback-transaction.adoc#rollback-transaction[`rollback-transaction`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/unfreeze-transaction-service.adoc#unfreeze-transaction-service[`unfreeze-transaction-service`]
+* xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#administering-transactions[Administering Transactions]" in Payara Server General Administration section,
+* https://jakarta.ee/specifications/transactions/2.0/jakarta-transactions-spec-2.0.html[Transactions]
+
+

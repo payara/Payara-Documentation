@@ -1,0 +1,99 @@
+[[list-backups]]
+= list-backups
+
+Lists all backups.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] list-backups [--help]
+[--long[={false|true}]]
+[--domaindir domain-root-dir]
+[--backupdir backup-directory]
+[--backupconfig backup-config-name]
+[domain-name]
+----
+
+[[description]]
+== Description
+
+The `list-backups` subcommand displays information about domain backups.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--long`::
+`-l`::
+  Displays detailed information about each backup. +
+  The default value is `false`.
+`--domaindir`::
+  Specifies the domain root directory, the parent directory of the domain upon which the command will operate. +
+  The default value is `as-install/domains`.
+`--backupdir`::
+  Specifies the directory under which backup files are stored. +
+  The default value is `as-install/domains/domain-dir/backups`. If the domain is not in the default location, the location is `domain-dir/backups`.
+`--backupconfig`::
+  Restricts the listing of backup files in the backup directory to those for the specified domain backup configuration.
+
+[[operands]]
+== Operands
+
+domain-name::
+  Specifies the domain for which backups are listed. +
+  This operand is optional if only one domain exists in the Payara Server installation.
+
+[[examples]]
+== Examples
+
+*Example 1 Listing Domain Backups*
+
+This example provides detailed information about backups in the default domain.
+
+[source,shell, subs=attributes+]
+----
+asadmin> list-backups --long
+Description               : domain1 backup created on 2023_12_01 by user adminuser
+GlassFish Version         : Payara Server {page-version} #badassfish
+Backup User               : adminuser
+Backup Date               : Wed Dec 01 09:22:45 PST 2023
+Domain Name               : domain1
+Backup Type               : full
+Backup Config Name        :
+Backup Filename (origin)  : /payara/glassfish/domains/domain1/backups/domain1_2023_12_01_v00001.zip
+Domain Directory          : /payara/glassfish/domains/domain1
+
+Description               : domain1 backup created on 2023_12_16 by user adminuser
+GlassFish Version         : Payara Server {page-version} #badassfish
+Backup User               : adminuser
+Backup Date               : Thu Dec 16 09:23:48 PST 2023
+Domain Name               : domain1
+Backup Type               : full
+Backup Config Name        : 
+Backup Filename (origin)  : /payara/glassfish/domains/domain1/backups/domain1_2023_12_16_v00001.zip
+Domain Directory          : /payara/glassfish/domains/domain1
+
+Command list-backups executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/backup-domain.adoc#backup-domain[`backup-domain`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/restore-domain.adoc#restore-domain[`restore-domain`]
+
+

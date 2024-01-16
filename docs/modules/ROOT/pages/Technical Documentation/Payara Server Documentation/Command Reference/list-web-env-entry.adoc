@@ -1,0 +1,104 @@
+[[list-web-env-entry]]
+= list-web-env-entry
+
+Lists environment entries for a deployed web application or module.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] list-web-env-entry [--help] 
+[--name=env-entry-name] application-name[/module]
+----
+
+[[description]]
+== Description
+
+The `list-web-env-entry` subcommand lists the environment entries for one of the following items:
+
+* A deployed web application
+* A web module in a deployed Jakarta EE application
+
+The application must already be deployed. Otherwise, an error occurs.
+
+The `list-web-env-entry` subcommand lists only entries that have previously been set by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-web-env-entry.adoc#set-web-env-entry[`set-web-env-entry`] subcommand. The subcommand does not list environment entries that are
+set only in the application's deployment descriptor.
+
+For each entry, the following information is displayed:
+
+* The name of the entry
+* The Java type of the entry
+* The value to which the entry is set
+* The value of the `--ignoreDescriptorItem` option of the `set-web-env-entry` subcommand that was specified when the entry was set
+* The description of the entry or `null` if no description was specified when the entry was set
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--name`::
+  The name of the environment entry that is to be listed. The name is a JNDI name relative to the `java:comp/env` context. The name must be
+  unique within a deployment component. If this option is omitted, all environment entries that have previously been set for the application are listed.
+
+[[operands]]
+== Operands
+
+application-name::
+  The name of the application. This name can be obtained from the Administration Console or by using the
+  xref:Technical Documentation/Payara Server Documentation/Command Reference/list-applications.adoc#list-applications[`list-applications`] subcommand. +
+  The application must already be deployed. Otherwise, an error occurs.
+module::
+  The relative path to the module within the application's enterprise archive (EAR) file. The path to the module is specified in the
+  `module` element of the application's `application.xml` file. +
+  module is required only if the environment entry applies to a web module of a Jakarta EE application. If specified, module must follow
+  application-name, separated by a slash (/). +
+  For example, the `application.xml` file for the `myApp` application might specify the following web module: +
+[source,xml]
+----
+<module>
+    <web>
+        <web-uri>myWebModule.war</web-uri>
+    </web>
+</module> 
+----
+  The module would be specified as the operand of this command as `myApp/myWebModule.war`.
+
+[[examples]]
+== Examples
+
+*Example 1 Listing Environment Entries for a Web Application*
+
+This example lists all environment entries that have been set for the web application `hello` by using the `set-web-env-entry` subcommand.
+Because no description was specified when the `Hello Port` environment entry was set, `null` is displayed instead of a description for this entry.
+
+[source,shell]
+----
+asadmin> list-web-env-entry hello
+Hello User (java.lang.String) = techscribe ignoreDescriptorItem=false
+ //User authentication for Hello appplication
+Hello Port (java.lang.Integer) = null ignoreDescriptorItem=true //null
+
+Command list-web-env-entry executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-applications.adoc#list-applications[`list-applications`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-web-env-entry.adoc#set-web-env-entry[`set-web-env-entry`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/unset-web-env-entry.adoc#unset-web-env-entry[`unset-web-env-entry`]
+
+

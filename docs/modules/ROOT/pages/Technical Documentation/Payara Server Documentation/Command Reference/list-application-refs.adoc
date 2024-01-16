@@ -1,0 +1,77 @@
+[[list-application-refs]]
+= list-application-refs
+
+Lists the existing application references.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] list-application-refs [--help] 
+[--long={false|true}] [target]
+----
+
+[[description]]
+== Description
+
+The `list-application-refs` subcommand lists all application references in a cluster or an unclustered server instance. This effectively lists
+all the modules deployed on the specified target (for example, J2EE applications, Web modules, and enterprise bean modules).
+
+If multiple versions of a module or application are deployed, this subcommand lists all versions. To list which version is enabled, set the
+`--long` option to `true`. For more information about module and application versions, see xref:Technical Documentation/Payara Server Documentation/Application Deployment/overview.adoc#module-and-application-versions[Module and Application Versions] in Payara Server Application
+Deployment Guide.
+
+The target instance or instances making up the cluster need not be running or available for this subcommand to succeed.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--long`::
+  If `true`, displays whether each module or application listed is enabled. The default is `false`.
+
+[[operands]]
+== Operands
+
+target::
+  The target for which you are listing the application references. Valid values are +
+  * `server`- Specifies the default server instance as the target. `server` is the name of the default server instance and is the default value.
+  * cluster_name- Specifies a certain cluster as the target.
+  * instance_name- Specifies a certain server instance as the target.
+
+[[examples]]
+== Examples
+
+*Example 1 Listing Application References*
+
+The following example lists the application references for the unclustered server instance `NewServer`.
+
+[source,shell]
+----
+asadmin> list-application-refs NewServer
+ClientSessionMDBApp
+MEjbApp
+__ejb_container_timer_app
+Command list-application-refs executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-application-ref.adoc#create-application-ref[`create-application-ref`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-application-ref.adoc#delete-application-ref[`delete-application-ref`]

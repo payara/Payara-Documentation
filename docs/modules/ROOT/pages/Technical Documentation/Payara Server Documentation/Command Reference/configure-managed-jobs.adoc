@@ -1,0 +1,68 @@
+[[configure-managed-jobs]]
+= configure-managed-jobs
+
+Configures how long information about subcommands that were started using `asadmin --detach` or that contain progress information is kept.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] configure-managed-jobs [--help]
+[--in-memory-retention-period in-memory-retention-period]
+[--job-retention-period job-retention-period]
+[--cleanup-initial-delay cleanup-initial-delay]
+[--cleanup-poll-interval cleanup-poll-interval]
+----
+
+[[description]]
+== Description
+
+The `configure-managed-jobs` subcommand configures how long information about subcommands (jobs) that were started using the `asadmin` utility option `--detach` or that contain progress information is kept. The `--detach` option detaches long-running subcommands and executes them in the background in detach mode. Job information includes subcommand progress and status.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--in-memory-retention-period`::
+  Specifies how long a completed job is kept in memory after the job is finished. The default value is 1 hour.
+`--job-retention-period`::
+  Specifies how long a job is stored. The default value is 24 hours.
+`--cleanup-initial-delay`::
+  After server startup, specifies the initial delay after which the cleanup service starts purging jobs. The default value is 5 minutes.
+`--cleanup-poll-interval`::
+  Specifies the time interval after which the cleanup service polls for expired jobs. The default value is 20 minutes.
+
+[[examples]]
+== Examples
+
+*Example 1 Configuring the Job Retention Period*
+
+This example sets the job retention period to 36 hours. Time periods can be specified in Hh|Mm|Ss for hours, minutes, or seconds.
+
+[source,shell]
+----
+asadmin> configure-managed-jobs --job-retention-period=36h
+Command configure-managed-jobs executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-jobs.adoc#list-jobs[`list-jobs`]
+
+

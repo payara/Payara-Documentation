@@ -1,0 +1,98 @@
+[[create-custom-resource]]
+= create-custom-resource
+
+Creates a custom resource.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] create-custom-resource [--help] 
+--restype type --factoryclass classname 
+[--enabled={true|false}] [--description text] 
+[--property (name=value)[:name=value]*] jndi-name 
+[--target target]
+----
+
+[[description]]
+== Description
+
+The `create-custom-resource` subcommand creates a custom resource.
+A custom resource specifies a custom server-wide resource object factory that implements the `javax.naming.spi.ObjectFactory` interface.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--target`::
+  The target on which the custom resource you are creating will be available. Valid values are: +
+  `server`;;
+    The resource will be available on the default server instance and all domains hosted on the instance. This is the default value.
+  `domain`;;
+    The resource will be available on the specified domain only.
+  cluster_name;;
+    The resource will be available on every server instance in the
+    cluster.
+  instance_name;;
+    The resource will be available on the specified server instance only. +
+
+NOTE: The resource is always created for the domain as a whole, but the `resource-ref` for the resource is only created for the specified
+`--target`. This means that although the resource is defined at the domain level, it is only available at the specified target level.
+Use the `create-resource-ref` subcommand to refer to the resource in multiple targets if needed.
+
+`--restype`::
+  The type of custom resource to be created. Specify a fully qualified type definition, for example `javax.naming.spi.ObjectFactory`.
+  The resource type definition follows the format, xxx`.`xxx.
+`--factoryclass`::
+  Factory class name for the custom resource. This class implements the `javax.naming.spi.ObjectFactory` interface.
+`--enabled`::
+  Determines whether the custom resource is enable at runtime. Default is true.
+`--description`::
+  Text providing details about the custom resource. This description is a string value and can include a maximum of 250 characters.
+`--property`::
+  Optional attribute name/value pairs for configuring the resource.
+
+[[operands]]
+== Operands
+
+jndi-name::
+  The JNDI name of this resource.
+
+[[examples]]
+== Examples
+
+*Example 1 Creating a Custom Resource*
+
+This example creates a custom resource.
+
+[source,shell]
+----
+asadmin> create-custom-resource --restype topic 
+--factoryclass com.imq.topic
+Custom Resource mycustomresource created.
+Command create-custom-resource executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-custom-resource.adoc#delete-custom-resource[`delete-custom-resource`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-custom-resources.adoc#list-custom-resources[`list-custom-resources`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-resource-ref.adoc#create-resource-ref[`create-resource-ref`]
+
+

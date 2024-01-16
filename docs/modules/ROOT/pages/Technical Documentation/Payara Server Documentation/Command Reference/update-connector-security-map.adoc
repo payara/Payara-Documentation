@@ -1,0 +1,86 @@
+[[update-connector-security-map]]
+= update-connector-security-map
+
+Modifies a security map for the specified connector connection pool.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] update-connector-security-map [--help]
+--poolname connector_connection_pool_name
+[--addprincipals principal_name1[,principal_name2]*] 
+[--addusergroups user_group1[,user_group2]*]
+[--removeprincipals principal_name1[,principal_name2]*]
+[--removeusergroups user_group1[,user_group2]*]
+[--mappedusername username]
+mapname
+----
+
+[[description]]
+== Description
+
+The `update-connector-security-map` subcommand modifies a security map for the specified connector connection pool.
+
+For this subcommand to succeed, you must have first created a connector connection pool using the `create-connector-connection-pool` subcommand.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--poolname`::
+  Specifies the name of the connector connection pool to which the security map that is to be updated belongs.
+`--addprincipals`::
+  Specifies a comma-separated list of EIS-specific principals to be added. Use either the `--addprincipals` or `--addusergroups` options, but not both in the same command.
+`--addusergroups`::
+  Specifies a comma-separated list of EIS user groups to be added. Use either the `--addprincipals` or `--addusergroups` options, but not both in the same command.
+`--removeprincipals`::
+  Specifies a comma-separated list of EIS-specific principals to be removed.
+`--removeusergroups`::
+  Specifies a comma-separated list of EIS user groups to be removed.
+`--mappedusername`::
+  Specifies the EIS username.
+
+[[operands]]
+== Operands
+
+mapname::
+  The name of the security map to be updated.
+
+[[examples]]
+== Examples
+
+*Example 1 Updating a Connector Security Map*
+
+This example adds principals to the existing security map named `securityMap1`.
+
+[source,shell]
+----
+asadmin> update-connector-security-map --poolname connector-pool1 
+--addprincipals principal1,principal2 securityMap1
+Command update-connector-security-map executed successfully
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-security-map.adoc#create-connector-security-map[`create-connector-security-map`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-connector-security-map.adoc#delete-connector-security-map[`delete-connector-security-map`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-security-maps.adoc#list-connector-security-maps[`list-connector-security-maps`]
+
+

@@ -1,0 +1,86 @@
+[[create-http-health-checker]]
+= create-http-health-checker
+
+IMPORTANT: This subcommand has been retained from Oracle GlassFish's original integration with external load balancers, but it has no proper integration functionality in Payara Server. Hence, it is not intended to be used in any way. +
+The documentation in this page may not be accurate.
+
+Creates a health-checker for a specified load balancer configuration.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] create-http-health-checker [--help] 
+[--url "/"]
+[--interval 30] [--timeout 10]
+[--config config_name] target
+----
+
+[[description]]
+== Description
+
+The `create-http-health-checker` subcommand creates a health checker for a specified load balancer configuration. A health checker is unique for the combination of target and load balancer configuration.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--url`::
+  The URL to ping to determine whether the instance is healthy.
+`--interval`::
+  The interval in seconds the health checker waits between checks of an
+  unhealthy instance to see whether it has become healthy. The default
+  value is 30 seconds. A value of 0 disables the health checker.
+`--timeout`::
+  The interval in seconds the health checker waits to receive a response
+  from an instance. If the health checker has not received a response in
+  this interval, the instance is considered unhealthy.
+`--config`::
+  The load balancer configuration for which you create the
+  health-checker. If you do not specify a configuration, the subcommand
+  creates a health checker for every load balancer configuration
+  associated with the target. If no configuration references the target,
+  the subcommand fails.
+
+[[operands]]
+== Operands
+
+target::
+  Specifies the target to which the health checker applies. +
+  Valid values are: +
+  * cluster_name - The name of a target cluster.
+  * instance_name - The name of a target server instance.
+
+[[examples]]
+== Examples
+
+*Example 1 Creating a Health Checker for a Load Balancer Configuration*
+
+This example creates a health checker for a load balancer configuration named `mycluster-http-lb-config` on a cluster named `mycluster`.
+
+[source,shell]
+----
+asadmin> create-http-health-checker --config mycluster-http-lb-config mycluster
+
+Command create-http-health-checker executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-http-health-checker.adoc#delete-http-health-checker[`delete-http-health-checker`]
+
+

@@ -1,0 +1,74 @@
+[[configure-lb-weight]]
+= configure-lb-weight
+
+IMPORTANT: This subcommand has been retained from Oracle GlassFish's original integration with external load balancers, but it has no proper integration functionality in Payara Server. Hence, it is not intended to be used in any way. +
+ +
+The documentation in this page may not be accurate.
+
+Sets load balancing weights for clustered instances.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] configure-lb-weight [--help] 
+--cluster cluster_name
+instance-name=weight[:instance-name=weight]
+----
+
+[[description]]
+== Description
+
+The `configure-lb-weight` subcommand assigns weight to the server instances in a cluster. Weights can be used for HTTP, RMI/IIOP and JMS load balancing. For the HTTP load balancer, the weights are used only if the load balancer's policy is set to `weighted-round-robin`.
+The load balancer policy is set in the `create-http-lb-ref` subcommand or `set` subcommand.
+
+Use the weight to vary the load going to different instances in the cluster. For example, if an instance is on a machine with more capacity, give it a higher weight so that more requests are sent to that instance by the load balancer. The default weight is 100. If all instances have the default weight, the load balancer performs simple round-robin load balancing.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--cluster`::
+  The name of the cluster.
+
+[[operands]]
+== Operands
+
+instance-name=weight::
+  The name of the instance and the weight you are assigning it. The weight must be an integer. The pairs of instances and weights are
+  separated by colons. For example `instance1=1:instance2=4` means that for every five requests, one goes to instance1 and four go to instance2. A weight of 1 is the default.
+
+[[examples]]
+== Examples
+
+*Example 1 Assigning Load Balancer Weights to Cluster Instances*
+
+The following subcommand assigns weights of `1`, `1`, and `2` to
+instances `i1`, `i2`, and `i3` in the `cluster1` cluster.
+
+[source,shell]
+----
+asadmin> configure-lb-weight --cluster cluster1 i1=1:i2=1:i3=2
+Command configure-lb-weight executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-http-lb-ref.adoc#create-http-lb-ref[`create-http-lb-ref`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-cluster.adoc#create-cluster[`create-cluster`]
+
+

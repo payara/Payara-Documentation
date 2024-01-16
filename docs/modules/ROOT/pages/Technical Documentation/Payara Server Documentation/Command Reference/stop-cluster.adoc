@@ -1,0 +1,91 @@
+[[stop-cluster]]
+= stop-cluster
+
+Stops a Payara Server cluster.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] stop-cluster [--help]
+[--verbose={false|true}] 
+[--kill={false|true}] 
+[--autohadboverride={true|false}] 
+cluster-name
+----
+
+[[description]]
+== Description
+
+The `stop-cluster` subcommand stops a Payara Server cluster by stopping all running Payara Server instances in the cluster.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--verbose`::
+  Specifies whether additional progress messages about the status of instances in the cluster are displayed while the cluster is being stopped. +
+  Possible values are as follows: +
+  `true`;;
+    Additional progress messages about the status of instances in the cluster are displayed.
+  `false`;;
+    No messages about the status of instances in the cluster are displayed.
+`--kill`::
+  Specifies whether each instance in the cluster is killed by using functionality of the operating system to terminate the instance process. +
+  Possible values are as follows: +
+  `false`;;
+    No instances are killed. The subcommand uses functionality of the Java platform to terminate each instance process (default).
+  `true`;;
+    Each instance is killed. The subcommand uses functionality of the operating system to terminate each instance process.
+`--autohadboverride`::
+  Do not specify this option. This option is retained for compatibility with earlier releases. If you specify this option, a syntax error does
+  not occur. Instead, the subcommand runs successfully and displays a warning message that the option is ignored.
+
+[[operands]]
+== Operands
+
+cluster-name::
+  The name of the cluster to stop.
+
+[[examples]]
+== Examples
+
+*Example 1 Stopping a Cluster*
+
+This example stops the cluster `pmdcluster`. Additional progress messages about the status of instances in the cluster are displayed while the cluster is being stopped.
+
+[source,shell]
+----
+asadmin> stop-cluster --verbose pmdcluster
+stop-instance pmd-i-sj01
+stop-instance pmd-i-sj02
+
+The command stop-instance executed successfully for: pmd-i-sj01 pmd-i-sj02
+
+Command stop-cluster executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-cluster.adoc#create-cluster[`create-cluster`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-cluster.adoc#delete-cluster[`delete-cluster`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-clusters.adoc#list-clusters[`list-clusters`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-cluster.adoc#start-cluster[`start-cluster`]
+
+

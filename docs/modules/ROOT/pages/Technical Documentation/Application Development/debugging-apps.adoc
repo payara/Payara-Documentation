@@ -1,0 +1,181 @@
+[[debugging-applications]]
+= Debugging Applications
+
+This chapter gives guidelines for debugging applications deployed in Payara Server or Payara Micro.
+
+[[debugging-in-payara-server]]
+== Debugging in Payara Server
+
+[[enabling-debugging]]
+=== Enabling Debugging
+
+When you enable debugging, you enable both local and remote debugging. To start the server in debug mode, use the `--debug` option as follows:
+
+[source,shell]
+----
+asadmin start-domain --debug [domain-name]
+----
+
+You can then attach to the server from the Java Debugger (`jdb`) at its default Java Platform Debugger Architecture (JPDA) port, which is `9009`.
+
+For example, in UNIX systems:
+
+[source,shell]
+----
+jdb -attach 9009
+----
+
+And for Windows OS:
+
+[source,shell]
+----
+jdb -connect com.sun.jdi.SocketAttach:port=9009
+----
+
+For more information about the `jdb` debugger, see the following official Java SE 11 documentation links:
+
+* Java Platform Debugger Architecture: `https://docs.oracle.com/en/java/javase/11/docs/specs/jpda/jpda.html`
+* Java SE `jdb` command: `https://docs.oracle.com/en/java/javase/11/tools/jdb.html`
+
+Payara Server debugging is based on JPDA. For more information, see xref:Technical Documentation/application-development-guide:debugging-apps.adoc#jpda-options[JPDA Options].
+
+You can attach any JPDA compliant debugger to Payara Server, including that of all major Java IDE environments like IntelliJ, Apache Netbeans, Eclipse and Visual Studio Code.
+
+You can enable debugging even when Payara Server is started without the `--debug` option. This is useful in development environments where you want to make sure that debugging is always turned on.
+
+[[to-set-the-server-to-automatically-start-up-in-debug-mode]]
+===== To Set the Server to Automatically Start Up in Debug Mode
+
+. Use the Administration Console. Select the _JVM Settings_ component under the relevant configuration.
+. Check the _Debug Enabled_ box.
+. To specify a different port (from `9009`, the default) to use when attaching the JVM software to a debugger, specify `address=` port-number in the _Debug Options_ field.
+. To add JPDA options, add any desired JPDA debugging options in Debug Options. See xref:Technical Documentation/application-development-guide:debugging-apps.adoc#jpda-options[JPDA Options].
+
+[[jpda-options]]
+=== JPDA Options
+
+The default JPDA options in Payara Server are as follows:
+
+[source, text]
+----
+-Xdebug -agentlib:transport=dt_socket,server=y,suspend=n,address=9009
+----
+
+TIP: In Windows OS, you can change `dt_socket` to `dt_shmem` to connect via a shared memory transport protocol.
+
+If you specify `suspend=y`, the JVM software starts in suspended mode and stays suspended until a debugger attaches to it. This is helpful if you want to start debugging as soon as the JVM process starts.
+
+To specify a different port (from `9009`, the default) to use when attaching the JVM software to a debugger, specify `address=<port-number>`.
+
+You can include any additional options if needed.
+
+[[generating-a-stack-trace-for-debugging]]
+=== Generating a Stack Trace for Debugging
+
+To generate a Java stack trace for debugging purposes, use the `asadmin generate-jvm-report --type=thread` command. The generated stack trace goes to the `${domain-dir}/logs/server.log` file and also appears on the command prompt screen.
+
+For more information about the `asadmin generate-jvm-report` command, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/generate-jvm-report.adoc[generate-jvm-report].
+
+[[application-client-debugging]]
+=== Application Client Debugging
+
+When the `appclient` script executes the `java` command to run the Application Client Container (ACC), which in turn runs the client itself, it includes on the command line the value of the `VMARGS` environment variable. You can set this variable to any suitable value. For example:
+
+[source,shell]
+----
+VMARGS=-agentlib:transport=dt_socket,server=y,suspend=y,address=8118
+----
+
+IMPORTANT: For debugging an application client, you must set the suspend option to `y` so you can connect the debugger to the client before any code has actually executed. Otherwise, the client may start running and execute past the point you want to examine.
+
+You should use different ports for the server and client if you are debugging both concurrently. For details about setting the port, see
+xref:Technical Documentation/application-development-guide:debugging-apps.adoc#jpda-options[JPDA Options].
+
+You can also include JVM options in the `appclient` script directly. For information about the `appclient` script, see the
+xref:Technical Documentation/Payara Server Documentation/Command Reference/appclient.adoc[appclient].
+
+NOTE: The Application Client Container is supported only in the Full Profile, not in the Web Profile. See xref:Technical Documentation/application-development-guide:java-clients.adoc#developing-java-clients[Developing Java Clients].
+
+[[open-message-queue-debugging]]
+=== Open Message Queue Debugging
+
+Open Message Queue has a broker logger, which can be useful for debugging Java Message Service (JMS) applications, including message-driven bean applications.
+
+You can adjust the logger's verbosity, and you can send the logger output to the broker's console using the broker's `-tty` option.
+
+NOTE: JMS resources are supported only in the Full Profile, not in the Web Profile. See xref:Technical Documentation/application-development-guide:jms.adoc#using-jakarta-messaging[Using Jakarta Messaging].
+
+[[enabling-verbose-mode]]
+=== Enabling Verbose Mode
+
+To have the server logs and messages printed to `System.out` on your command prompt screen, you can start the server in *verbose mode*.
+This makes it easy to do simple debugging using print statements, without having to check the `server.log` file every time.
+
+To start the domain in verbose mode, use the `--verbose` option as follows:
+
+[source,shell]
+----
+asadmin start-domain --verbose [domain-name]
+----
+
+When the server is in verbose mode, messages are logged to the console or terminal window in addition to the log file. In addition, pressing `Ctrl-C` stops the server and pressing `Ctrl-\` (on UNIX platforms) or `Ctrl-Break` (on Windows OS) prints a thread dump.
+
+On UNIX platforms, you can also print a thread dump using the `jstack` command or the command `kill -QUIT <process_id>`.
+
+[[class-loader-debugging]]
+=== Class Loader Debugging
+
+To generate class loading messages, use the following `asadmin create-jvm-options` command:
+
+[source,shell]
+----
+asadmin create-jvm-options -verbose\:class
+----
+
+To send the JVM messages to a special JVM log file instead of `stdout`, use the following `asadmin create-jvm-options` commands:
+
+[source,shell]
+----
+asadmin create-jvm-options -XX\:+LogVMOutput
+asadmin create-jvm-options -XX\:LogFile=${com.sun.aas.instanceRoot}/logs/jvm.log
+----
+
+To send Payara Server messages to the standard console instead of `stderr`, start the domain in verbose mode as described in xref:Technical Documentation/application-development-guide:debugging-apps.adoc#enabling-verbose-mode[Enabling Verbose Mode].
+
+[[debugging-in-payara-micro]]
+== Debugging in Payara Micro
+
+As Payara Micro' server instance is a standalone Java process that runs without an administration interface, debugging applications that run in it is as simple as configuring the debugging options when launching a new server instance from the command line:
+
+[source, shell]
+----
+java -agentlib:jdwp=transport=dt_socket,server=y,address=9011,suspend=y -jar payara-micro.jar --deploy myapp.war
+----
+
+Then you can attach a new debugger session from within your preferred IDE.
+
+[[profiling-tools]]
+== Profiling Tools
+
+You can use a profiler to perform remote profiling on Payara Server to discover bottlenecks in server-side performance. Profilers are extremely useful (either *Instrumental* or *Sampling* profiles) in analysing the CPU cycles of an application's specific components, finding bottlenecks on long-spanning operations, track the runtime of specific methods, etc.
+
+Most profiling tools in the market can be integrated with Payara Server running on Java 11. The following "free-to_use" tools are recommended to be used due to their simplicity and ease to integrate with Payara Server:
+
+Apache NetBeans Profiler:: Comes bundled with Apache Netbeans, which has native support for running, debugging and profiling applications in Payara Server. For more information read https://netbeans.apache.org/kb/docs/java/profiler-intro.html[Introduction to Profiling Java Applications in NetBeans IDE]
+
+Async Profiler:: A powerful lightweight profiler that can run locally or remotely and trace CPU cycles, hardware and software performance and do Java Heap allocation analysis. This profiler is currently maintained as an https://github.com/async-profiler/async-profiler[open source project].
++
+NOTE: If using IntelliJ IDEA Ultimate, Async profiler is bundled by default and requires no extra installation.
+
+If you wish to configure to Payara Server to automatically run the  profiler's agent when the server's JVM starts, you can do so by configuring the profiler as a Java agent by navigating to the Administration Console, heading to the server's instance configuration settings, selecting _JVM Settings_ option and navigate to the _Profiler_ tab. The following configuration attributes are available:
+
+* _Profiler Name_: A name for the profiler's "profile" you wish to configure. Any name will suffice.
+* _Status_: Whether the profiler's configuration is enabled or not.
+* _Classpath_: Allows the user to customize the classpath of the profiler's agent.
+* _Native Library Path_: Path to the native library binaries of the profiler's agent.
+* _Options_: Additional options you can use to configure the profiler.
++
+For example, the following options can be used to configure Async Profiler:
++
+** `event=cpu`
+** `file=profile.html`

@@ -1,0 +1,104 @@
+[[unset-web-context-param]]
+= unset-web-context-param
+
+Unsets a servlet context-initialization parameter of a deployed web application or module.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] unset-web-context-param [--help] 
+--name=context-param-name application-name[/module]
+----
+
+[[description]]
+== Description
+
+The `unset-web-context-param` subcommand unsets a servlet context-initialization parameter of one of the following items:
+
+* A deployed web application
+* A web module in a deployed Jakarta EE application
+
+When a parameter is unset, its value reverts to the value, if any, that is set in the application's deployment descriptor.
+
+The application must already be deployed. Otherwise, an error occurs.
+
+The parameter must have previously been set by using the `set-web-context-param` subcommand. Otherwise, an error occurs.
+
+NOTE: Do not use the `unset-web-context-param` subcommand to change the value of a servlet context-initialization parameter that is set in an
+application's deployment descriptor. Instead, use the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-web-context-param.adoc#set-web-context-param[`set-web-context-param`] subcommand for this purpose.
+
+This subcommand enables you to change the configuration of a deployed application without the need to modify the application's deployment
+descriptors and repackage and redeploy the application.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--name`::
+  The name of the servlet context-initialization parameter that is to be unset. This parameter must have previously been set by using the
+  `set-web-context-param` subcommand. Otherwise, an error occurs.
+
+[[operands]]
+== Operands
+
+application-name::
+  The name of the application. This name can be obtained from the Administration Console or by using the
+  xref:Technical Documentation/Payara Server Documentation/Command Reference/list-applications.adoc#list-applications[`list-applications`] subcommand. +
+  The application must already be deployed. Otherwise, an error occurs.
+module::
+  The relative path to the module within the application's enterprise archive (EAR) file. The path to the module is specified in the
+  `module` element of the application's `application.xml` file. +
+  module is required only if the servlet context-initialization parameter applies to a web module of a Jakarta EE application. If
+  specified, module must follow application-name, separated by a slash (/). +
+  For example, the `application.xml` file for the `myApp` application might specify the following web module:
++
+[source,xml]
+----
+<module>
+    <web>
+        <web-uri>myWebModule.war</web-uri>
+    </web>
+</module> 
+----
+  The module would be specified as the operand of this command as `myApp/myWebModule.war`.
+
+[[examples]]
+== Examples
+
+*Example 1 Unsetting a Servlet Context-Initialization Parameter for a Web Application*
+
+This example unsets the servlet context-initialization parameter `javax.faces.STATE_SAVING_METHOD` of the web application `basic-ezcomp`.
+The parameter reverts to the value, if any, that is defined in the application's deployment descriptor.
+
+[source,shell]
+----
+asadmin> unset-web-context-param 
+--name=javax.faces.STATE_SAVING_METHOD basic-ezcomp
+
+Command unset-web-context-param executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-applications.adoc#list-applications[`list-applications`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-web-context-param.adoc#list-web-context-param[`list-web-context-param`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-web-context-param.adoc#set-web-context-param[`set-web-context-param`]
+
+

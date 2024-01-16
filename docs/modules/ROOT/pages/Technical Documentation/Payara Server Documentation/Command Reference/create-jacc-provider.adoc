@@ -1,0 +1,96 @@
+[[create-jacc-provider]]
+= create-jacc-provider
+
+Enables administrators to create a JACC provider that can be used by third-party authorization modules for applications running in Payara Server.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] create-jacc-provider [--help]
+[--policyproviderclass pol-provider-class] 
+[--policyconfigfactoryclass pc-factory-class] 
+[--property name=value)[:name=value]*] 
+[--target target] jacc-provider-name
+----
+
+[[description]]
+== Description
+
+The `create-jacc-provider` subcommand creates a JSR-115—compliant Java Authorization Contract for Containers (JACC) provider that can be used for authorization of applications running in Payara. The JACC provider is created as a `jacc-provider` element within the `security-service` element in the domain's `domain.xml` file.
+
+The default Payara installation includes two JACC providers, named `default` and `simple`.
+Any JACC providers created with the `create-jacc-provider` subcommand are in addition to these two default providers. The default Payara JACC providers implement a simple, file-based authorization engine that complies with the JACC specification. The `create-jacc-provider` subcommand makes it possible to specify additional third-party JACC providers.
+
+You can create any number of JACC providers within the `security-service` element, but the Payara runtime uses only one of them at any given time. The `jacc-provider` element in the `security-service` element points to the name of the provider that is currently in use by Payara. If you change this element to point to a different JACC provider, restart Payara.
+
+This command is supported in remote mode only.
+
+[[options]]
+== Options
+
+If an option has a short option name, then the short option precedes the long option name. Short options have one dash whereas long options have two dashes.
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--policyproviderclass`::
+  Specifies the fully qualified class name for the `javax.security.jacc.policy.provider` that implements the `java.security.Policy`.
+`--policyconfigfactoryclass`::
+  Specifies the fully qualified class name for the `javax.security.jacc.PolicyConfigurationFactory.provider` that implements the provider-specific `javax.security.jacc.PolicyConfigurationFactory`.
+`--property`::
+  Optional attribute name/value pairs for configuring the JACC provider. The following properties are available: +
+  `repository`;;
+    The directory containing the JACC policy file. For the `default` Payara JACC provider, the default directory is `${com.sun.aas.instanceRoot}/generated/policy`. This property is not defined by default for the `simple` Payara JACC provider.
+`--target`::
+  Specifies the target for which you are creating the JACC provider. The following values are valid: +
+  `server`;;
+    Creates the JACC provider on the default server instance. This is the default value.
+  configuration_name;;
+    Creates the JACC provider in the specified configuration.
+  cluster_name;;
+    Creates the JACC provider on all server instances in the specified cluster.
+  instance_name;;
+    Creates the JACC provider on a specified server instance.
+
+[[operands]]
+== Operands
+
+jacc-provider-name::
+  The name of the provider used to reference the `jacc-provider` element in `domain.xml`.
+
+[[examples]]
+== Examples
+
+*Example 1 Creating a JACC Provider*
+
+The following example shows how to create a JACC provider named `testJACC` on the default `server` target.
+
+[source,shell]
+----
+asadmin> create-jacc-provider
+--policyproviderclass org.glassfish.exousia.modules.locked.SimplePolicyProvider
+--policyconfigfactoryclass org.glassfish.exousia.modules.locked.SimplePolicyConfigurationFactory
+testJACC
+
+Command create-jacc-provider executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-jacc-provider.adoc#delete-jacc-provider[`delete-jacc-provider`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-jacc-providers.adoc#list-jacc-providers[`list-jacc-providers`]
+
+

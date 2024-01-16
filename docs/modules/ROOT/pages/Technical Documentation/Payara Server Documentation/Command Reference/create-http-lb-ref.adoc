@@ -1,0 +1,142 @@
+[[create-http-lb-ref]]
+= create-http-lb-ref
+
+IMPORTANT: This subcommand has been retained from Oracle GlassFish's original integration with external load balancers, but it has no proper integration functionality in Payara Server. Hence, it is not intended to be used in any way. +
+The documentation in this page may not be accurate.
+
+Adds an existing cluster or server instance to an existing load balancer configuration or load balancer.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] create-http-lb-ref [--help] 
+--config config_name | --lbname load_balancer_name 
+[--lbpolicy round-robin] [--lbpolicymodule lb_policy_module] 
+[--healthcheckerurl url] [--healthcheckerinterval 10] 
+[--healthcheckertimeout 10] [--lbenableallinstances=true] 
+[--lbenableallapplications=true] [--lbweight instance=weight[:instance=weight]*] 
+target
+----
+
+[[description]]
+== Description
+
+Use the `create-http-lb-ref` subcommand to:
+
+* Add an existing cluster or server instance to an existing load balancer configuration or load balancer. The load balancer forwards the requests to the clustered and standalone instances it references.
+* Set the load balancing policy to round-robin, weighted round-robin, or to a user-defined policy.
+* Configure a health checker for the load balancer. Any health checker settings defined here apply only to the target. If you do not create a health checker with this subcommand, use `create-http-health-checker`.
+* Enable all instances in the target cluster for load balancing, or use `enable-http-lb-server` to enable them individually.
+* Enable all applications deployed to the target for load balancing, or use `enable-http-lb-application` to enable them individually.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--config`::
+  Specifies which load balancer configuration to which to add clusters and server instances. Specify either a load balancer configuration or a load balancer. Specifying both results in an error.
+`--lbname`::
+  Specifies the load balancer to which to add clusters and server instances. Specify either a load balancer configuration or a load balancer. Specifying both results in an error.
+`--lbpolicy`::
+  The policy the load balancer follows. Valid values are `round-robin`, `weighted-round-robin`, and `user-defined`. If you choose user-defined, specify a load balancer policy module with the
+  `lbpolicymodule` option. If you choose `weighted-round-robin` assign weights to the server instances using the `configure-lb-weight` subcommand. The default is `round-robin`.
+`--lbpolicymodule`::
+  If your load balancer policy is `user-defined`, use this option to specify the full path and name of the shared library of your load balancing policy module. The shared library needs to be in a location accessible by the web server.
+`--healthcheckerurl`::
+  The URL to ping to determine whether the instance is healthy.
+`--healthcheckerinterval`::
+  The interval in seconds the health checker waits between checks of an unhealthy instance to see whether it has become healthy. The default value is 30 seconds. A value of 0 disables the health checker.
+`--healthcheckertimeout`::
+  The interval in seconds the health checker waits to receive a response from an instance. If the health checker has not received a response in this interval, the instance is considered unhealthy. The default is 10.
+`--lbenableallinstances`::
+  Enables all instances in the target cluster for load balancing. If the target is a server instance, enables that instance for load balancing. The default value is true.
+`--lbenableallapplications`::
+  Enables all applications deployed to the target cluster or instance for load balancing. The default value is true.
+`--lbweight`::
+  The name of the instance and the weight you are assigning it.
+  The weight must be an integer. The pairs of instances and weights are separated by colons. For example `instance1=1:instance2=4` means that for every five requests, one goes to instance1 and four go to instance2. A weight of 1 is the default.
+
+[[operands]]
+== Operands
+
+target::
+  Specifies which cluster or instance to add to the load balancer. Valid values are: +
+  * cluster_name - Specifies that requests for this cluster will be handled by the load balancer.
+  * stand-alone_instance_name - Specifies that requests for this standalone instance will be handled by the load balancer.
+
+[[examples]]
+== Examples
+
+*Example 1 Adding a Cluster Reference to a Load Balancer Configuration*
+
+This example adds a reference to a cluster named `cluster2` to a load balancer configuration named `mylbconfig`.
+
+[source,shell]
+----
+asadmin> create-http-lb-ref --config mylbconfig cluster2 
+
+Command create-http-lb-ref executed successfully.
+----
+
+*Example 2 Adding a Cluster Reference to a Load Balancer*
+
+This example adds a reference to a cluster named `cluster2` to a load balancer named `mylb`.
+
+[source,shell]
+----
+asadmin> create-http-lb-ref --lbname mylb cluster2 
+
+Command create-http-lb-ref executed successfully.
+----
+
+*Example 3 Configuring a Health Checker and Load Balancer Policy*
+
+This example configures a health checker and load balancing policy, and enables the load balancer for instances and applications.
+
+[source,shell]
+----
+asadmin> create-http-lb-ref --config mylbconfig --lbpolicy weighted-round-robin 
+--healthcheckerinterval 40 --healthcheckertimeout 20 
+--lbenableallinstances=true --lbenableallapplications=true cluster2 
+
+Command create-http-lb-ref executed successfully.
+----
+
+*Example 4 Setting a User-Defined Load Balancing Policy*
+
+This example sets a user-defined load balancing policy.
+
+[source,shell]
+----
+asadmin> create-http-lb-ref --lbpolicy user-defined --lbpolicymodule /user/modules/module.so
+--config mylbconfig cluster2
+
+Command create-http-lb-ref executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/configure-lb-weight.adoc#configure-lb-weight[`configure-lb-weight`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-http-health-checker.adoc#create-http-health-checker[`create-http-health-checker`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-http-lb-ref.adoc#delete-http-lb-ref[`delete-http-lb-ref`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-http-lb-application.adoc#enable-http-lb-application[`enable-http-lb-application`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-http-lb-server.adoc#enable-http-lb-server[`enable-http-lb-server`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-http-lb-configs.adoc#list-http-lb-configs[`list-http-lb-configs`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-http-lbs.adoc#list-http-lbs[`list-http-lbs`]
+
+

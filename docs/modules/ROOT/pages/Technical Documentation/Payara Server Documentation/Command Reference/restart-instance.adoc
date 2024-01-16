@@ -1,0 +1,101 @@
+[[restart-instance]]
+= restart-instance
+
+Restarts a running Payara Server instance.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] restart-instance [--help] 
+[--debug={false|true}] instance-name
+----
+
+[[description]]
+== Description
+
+The `restart-instance` subcommand restarts a running Payara Server instance. This subcommand requires secure shell (SSH) to be configured on the machine where the domain administration server (DAS) is running and on the machine where the instance resides.
+
+NOTE: SSH is not required if the instance resides on a node of type `CONFIG` that represents the local host. A node of type `CONFIG` is not enabled for communication over SSH.
+
+You may run this subcommand from any machine that can contact the DAS.
+
+The subcommand can restart any Payara Server instance, regardless of how the instance was created. For example, this subcommand can restart an instance that was created by using the
+xref:Technical Documentation/Payara Server Documentation/Command Reference/create-local-instance.adoc#create-local-instance[`create-local-instance`] subcommand.
+
+When this subcommand restarts an instance, the DAS synchronizes the instance with changes since the last synchronization as follows:
+
+* For the `config` directory, the DAS synchronizes the instance with all changes.
+* For the `applications` directory and `docroot` directory, only a change to a top-level subdirectory causes the DAS to synchronize all files under that subdirectory. +
+If a file below a top level subdirectory is changed without a change to a file in the top level subdirectory, full synchronization is required. In normal operation, files below the top level subdirectories of these directories are not changed. If an application is deployed and undeployed, full synchronization is not necessary to update the instance with the change.
+
+If different synchronization behavior is required, the instance must be stopped and restarted by using following sequence of subcommands:
+
+. xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-instance.adoc#stop-instance[`stop-instance`]
+. xref:Technical Documentation/Payara Server Documentation/Command Reference/start-instance.adoc#start-instance[`start-instance`]
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--debug`::
+  Specifies whether the instance is restarted with https://docs.oracle.com/javase/8/docs/technotes/guides/jpda/index.html/[Java Platform Debugger Architecture (JPDA)](https://docs.oracle.com/javase/8/docs/technotes/guides/jpda/index.html/) debugging enabled. +
+  Possible values are as follows: +
+  `true`;;
+    The instance is restarted with JPDA debugging enabled and the port number for JPDA debugging is displayed.
+  `false`;;
+    The instance is restarted with JPDA debugging disabled. +
+  The default is the current setting of this option for the instance that is being restarted.
+
+[[operands]]
+== Operands
+
+instance-name::
+  The name of the Payara Server instance to restart. If the instance is not running, the subcommand displays a warning message and attempts to start the instance.
+
+[[examples]]
+== Examples
+
+*Example 1 Restarting a Payara Server Instance*
+
+This example restarts the Payara Server instance `pmdsa1`.
+
+[source,shell]
+----
+asadmin> restart-instance pmdsa1
+Instance pmdsa1 was restarted. 
+
+Command restart-instance executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-instance#create-instance[`create-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-local-instance#create-local-instance[`create-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-instance#delete-instance[`delete-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-local-instance#delete-local-instance[`delete-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-local-instance#restart-local-instance[`restart-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/setup-ssh#setup-ssh[`setup-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-instance#start-instance[`start-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-local-instance#start-local-instance[`start-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-instance#stop-instance[`stop-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-local-instance#stop-local-instance[`stop-local-instance`]
+* http://www.oracle.com/technetwork/java/javase/tech/jpda-141715.html[Java Platform Debugger Architecture (JPDA)] (http://www.oracle.com/technetwork/java/javase/tech/jpda-141715.html)
+
+

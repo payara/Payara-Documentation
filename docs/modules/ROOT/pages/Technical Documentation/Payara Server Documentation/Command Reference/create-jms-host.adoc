@@ -1,0 +1,92 @@
+[[create-jms-host]]
+= create-jms-host
+
+Creates a JMS host.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] create-jms-host [--help]
+--mqhost mq-host --mqport mq-port
+--mquser mq-user --mqpassword mq-password
+[--target target]
+[--force={false|true}]
+jms_host_name
+----
+
+[[description]]
+== Description
+
+Creates a Java Message Service (JMS) host within the JMS service.
+
+This subcommand is supported in remote mode only. Remote `asadmin` subcommands require a running domain administration server (DAS).
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--mqhost`::
+  The host name for the JMS service.
+`--mqport`::
+  The port number used by the JMS service.
+`--mquser`::
+  The user name for the JMS service.
+`--mqpassword`::
+  The password for the JMS service.
+`--target`::
+  Creates the JMS host only for the specified target. Valid values are as follows: +
+  `server`;;
+    Creates the JMS host for the default server instance. This is the default value.
+  configuration-name;;
+    Creates the JMS host in the specified configuration.
+  cluster-name;;
+    Creates the JMS host for every server instance in the specified
+    cluster.
+  instance-name;;
+    Creates the JMS host for the specified server instance.
+`--force`::
+  Specifies whether the subcommand overwrites the existing JMS host of the same name. The default value is `false`.
+
+[[operands]]
+== Operands
+
+jms_host_name::
+  A unique identifier for the JMS host to be created.
+
+[[examples]]
+== Examples
+
+*Example 1 Creating a JMS host using a non-default port*
+
+The following command creates a JMS host named `MyNewHost` on the system `pigeon`.
+
+[source,shell]
+----
+asadmin> create-jms-host --mqhost pigeon.example.com --mqport 7677 
+--mquser admin --mqpassword admin MyNewHost
+Jms Host MyNewHost created.
+Command create-jms-host executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-jms-host.adoc#delete-jms-host[`delete-jms-host`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/jms-ping.adoc#jms-ping[`jms-ping`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-jms-hosts.adoc#list-jms-hosts[`list-jms-hosts`]
+
+

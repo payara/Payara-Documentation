@@ -1,0 +1,87 @@
+[[ping-connection-pool]]
+= ping-connection-pool
+
+Tests if a connection pool is usable.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] ping-connection-pool [--help] 
+pool_name 
+[--appname application [--modulename module]
+----
+
+[[description]]
+== Description
+
+The `ping-connection-pool` subcommand tests if an existing JDBC or connector connection pool is usable . For example, if you create a new
+JDBC connection pool for an application that is expected to be deployed later, the JDBC pool is tested with this subcommand before deploying the application.
+
+Before testing availability of a connection pool, you must create the connection pool with authentication and ensure that the server or database is started.
+
+This subcommand is supported in remote mode only.
+
+Application Scoped Resources
+
+The `ping-connection-pool` subcommand can target resources that are scoped to a specific application or module, as defined in the
+`glassfish-resources.xml` or `payara-resources.xml` for the Payara Server domain.
+
+* To reference the `jndi-name` for an application scoped resource, perform the lookup using the `java:app` prefix.
+* To reference the `jndi-name` for a module scoped resource, perform the lookup using the `java:module` prefix.
+
+The `jndi-name` for application-scoped-resources or module-scoped-resources are specified using the format
+`java:app/`jdbc/myDataSource or `java:module/`jdbc/myModuleLevelDataSource`.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--appname`::
+  Name of the application in which the application scoped resource is defined.
+`--modulename`::
+  Name of the module in which the module scoped resource is defined.
+
+[[operands]]
+== Operands
+
+pool_name::
+  Name of the connection pool to be reinitialized.
+
+[[examples]]
+== Examples
+
+*Example 1 Contacting a Connection Pool*
+
+This example tests to see if the connection pool named `DerbyPool` is usable.
+
+[source,shell]
+----
+asadmin> ping-connection-pool DerbyPool
+Command ping-connection-pool executed successfully
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-connection-pool.adoc#create-connector-connection-pool[`create-connector-connection-pool`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-jdbc-connection-pool.adoc#create-jdbc-connection-pool[`create-jdbc-connection-pool`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-connector-connection-pool.adoc#delete-connector-connection-pool[`delete-connector-connection-pool`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-jdbc-connection-pool.adoc#delete-jdbc-connection-pool[`delete-jdbc-connection-pool`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-connection-pools.adoc#list-connector-connection-pools[`list-connector-connection-pools`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-jdbc-connection-pools.adoc#list-jdbc-connection-pools[`list-jdbc-connection-pools`]
+
+

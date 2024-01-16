@@ -1,0 +1,75 @@
+[[set-log-file-format]]
+= set-log-file-format
+
+Sets the formatter to be used for the server log file.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-log-file-format [--help]
+[--target target]
+[formatter]
+----
+
+[[description]]
+== Description
+
+The `set-log-file-format` subcommand sets the formatter to be used for the server log file for the specified target.
+
+Payara Server provides the ULF (UniformLogFormatter) and ODL (Oracle Diagnostics Logging) formatters. A custom formatter can also be used by
+specifying the fully qualified name of a class that extends the`java.util.logging.Formatter` class.
+
+The custom formatter class can be packaged in a JAR file and placed in domain `/lib/ext`, or implemented as an HK2 service and the JAR
+containing the formatter implementation installed in `glassfish/modules`.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--target`::
+  Specifies the target for which the formatter is being set. Specify the name of the server domain, instance, or cluster. If this option is
+  omitted, logger attributes are set for the default server.
+
+[[operands]]
+== Operands
+
+formatter::
+  Specifies the fomatter to be used for the server log file. Valid values are ULF, ODL, or the fully qualified name of the custom
+  formatter class to be used to render the log files. The default value is ODL.
+
+[[examples]]
+== Examples
+
+*Example 1 Setting the Log File Format*
+
+This example sets the server log file format to `ULF` for `server1`.
+
+[source,shell]
+----
+asadmin> set-log-file-format --target server1 ULF
+Command set-log-file-format executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-loggers.adoc#list-loggers[`list-loggers`],
+* xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#administering-the-logging-service[Administering the Logging Service] in the Payara Server General Administration section
+
+

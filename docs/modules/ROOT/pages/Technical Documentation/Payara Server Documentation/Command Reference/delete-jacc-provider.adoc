@@ -1,0 +1,83 @@
+[[delete-jacc-provider]]
+= delete-jacc-provider
+
+Enables administrators to delete JACC providers defined for a domain.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] delete-jacc-provider [--help]
+[--target target] jacc-provider-name
+----
+
+[[description]]
+== Description
+
+The `delete-jacc-provider` subcommand enables administrators to delete JACC providers defined for a domain. JACC providers are defined as `jacc-provider` elements in the `security-service` element in the domain's `domain.xml` file. JACC providers can be created using the Payara Server Admin Console or the `create-jacc-provider` subcommand.
+
+The default Payara Server installation includes two JACC providers, named `default` and `simple`. These default providers should not be deleted.
+
+The JACC provider used byPayara Server for authorization is identified by the `jacc-provider` element of `security-service` in `domain.xml`. Therefore, if you delete the `jacc-provider` provider, make sure you change `jacc-provider` to the name of some other JACC provider that exists under `security-service`.
+
+If you change the `jacc-provider` element to point to a different JACC provider, you must restart Payara Server.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+If an option has a short option name, then the short option precedes the long option name. Short options have one dash whereas long options have two dashes.
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--target`::
+  Specifies the target from which you are deleting the JACC provider. The following values are valid: +
+  `server`;;
+    Deletes the JACC provider on the default server instance. This is the default value.
+  configuration_name;;
+    Deletes the JACC provider in the specified configuration.
+  cluster_name;;
+    Deletes the JACC provider on all server instances in the specified cluster.
+  instance_name;;
+    Deletes the JACC provider on a specified server instance.
+
+[[operands]]
+== Operands
+
+jacc-provider-name::
+  The name of the JACC provider to be deleted.
+
+[[examples]]
+== Examples
+
+*Example 1 Deleting a JACC provider*
+
+The following example shows how to delete a JACC provider named `testJACC` from the default domain.
+
+[source,shell]
+----
+asadmin> delete-jacc-provider testJACC
+
+Command delete-jacc-provider executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-jacc-provider#create-jacc-provider[`create-jacc-provider`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-jacc-providers#list-jacc-providers[`list-jacc-providers`]
+
+
