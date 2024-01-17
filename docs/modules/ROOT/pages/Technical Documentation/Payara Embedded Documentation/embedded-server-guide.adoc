@@ -1,7 +1,9 @@
 [[payara-server-embedded-server-guide]]
 = Payara Server Embedded Server Guide
 
-This document explains how to run applications in embedded Payara Server and to develop applications in which Payara Server is embedded. This document is for software developers who are developing applications to run in embedded Payara Server. The ability to program in the Java language is assumed.
+This document explains how to run applications in embedded Payara Server and to develop applications in which Payara Server is embedded.
+
+This document is for software developers who are developing applications to run in an embedded instance of Payara Server.
 
 [[introduction-to-embedded-payara-server]]
 == Introduction to Embedded Payara Server
@@ -54,24 +56,45 @@ To specify an existing `domain.xml` file, invoke the `setConfigFileURI` method o
 
 Payara Server provides an application programming interface (API) for developing applications in which Payara Server is embedded.
 
-//TODO - Page will have to be updated properly with paths to corresponding Maven artefacts depending of the edition in use
-
 [[setting-the-class-path]]
 === Setting the Class Path
+
+Payara Embedded has two distribution variants, `payara-embedded-all` and `payara-embedded-web`, functionally these are the same as their standalone counterparts, Payara Server Full Profile and Payara Server Web Profile respectively.
 
 To enable your applications to locate the class libraries for embedded
 Payara Server, add one of the following JAR files to your class path:
 
-`payara-embedded-web.jar`::
-Contains classes needed for deploying strictly Jakarta EE web applications.
-Download this file from https://central.sonatype.com/artifact/fish.payara.extras/payara-embedded-web[Maven Central].
-
 `payara-embedded-all.jar`::
 Contains classes needed for deploying all Jakarta EE application types.
-Download this file from
-https://central.sonatype.com/artifact/fish.payara.extras/payara-embedded-all/[Maven Central].
+Can be setup as a Maven dependency with the following GAV coordinates:
++
+[source, xml, subs=attributes+]
+----
+<dependency>
+    <groupId>fish.payara.extras</groupId>
+    <artifactId>payara-embedded-all</artifactId>
+    <version>{page-version}</version>
+    <type>jar</type>
+</dependency>
+----
 
-In addition, add to the class path any other JAR files or classes upon which your applications depend. For example, if an application uses a database other than H2, include the JDBC driver JAR files in the class path accordingly.
+`payara-embedded-web.jar`::
+Contains classes needed for deploying strictly Jakarta EE web applications.
+Can be setup as a Maven dependency with the following GAV coordinates:
++
+[source, xml, subs=attributes+]
+----
+<dependency>
+    <groupId>fish.payara.extras</groupId>
+    <artifactId>payara-embedded-web</artifactId>
+    <version>{page-version}</version>
+    <type>jar</type>
+</dependency>
+----
+
+In addition, add to the class path any other JAR files or classes upon which your applications depend.
+
+For example, if an application uses a database other than H2, include the JDBC driver JAR files in the class path accordingly.
 
 [[creating-starting-and-stopping-embedded-payara-server]]
 === Creating, Starting, and Stopping Embedded Payara Server
@@ -752,14 +775,14 @@ a|In order of precedence:
 |If `true`, omits modules from the classpath if they are not specified using `EJBContainer.MODULES` and have a manifest file with a `Main-Class` attribute.
 |===
 
-[[changing-log-levels-in-embedded-payara-server]]
-== Changing Log Levels in Embedded Payara Server
+[[changing-log-levels-in-payara-embedded]]
+== Changing Log Levels in Payara Server Embedded
 
-To change the JUL (Java Util Logging) log levels in Embedded Payara Server, you can follow the steps in this section, or you can use the Embedded Server API as shown in the previous examples.
+To change the JUL (Java Util Logging) log levels in Payara Server Embedded, you can follow the steps in this section, or you can use the Embedded Server API as shown in the previous examples.
 
 For more information about Payara Server logging, see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#administering-the-logging-service[Administering the Logging Service] in the Payara Server General Administration section.
 
-You can change log levels in Embedded Payara Server in either of the following ways:
+You can change log levels in Payara Embedded Server in either of the following ways:
 
 * Using the Payara Server Embedded Server API
 * Creating a custom logging configuration file
@@ -773,7 +796,8 @@ This example shows how to set log levels using the `getLogger` method in the API
 import org.glassfish.embeddable.*;
 
 public class EmbeddedRunner{
-    private static void main(String... args){
+
+    public static void main(String[] args){
         // Create Embedded server
         var server = GlassFishRuntime.bootstrap().newGlassFish();
 
@@ -815,8 +839,8 @@ The `jdbc/__default` H2 database is preconfigured in any Embedded Payara Server.
 
 Embedded Payara Server uses an embedded H2 database created in a temporary domain that is destroyed when an embedded Payara Server is stopped. You can use an H2 database configured with non-embedded Payara Server if you explicitly specify the instance root directory or through its configuration file.
 
-[[restrictions-for-embedded-payara-server]]
-== Restrictions for Embedded Payara Server
+[[restrictions-for-payara-server-embedded-web-profile]]
+== Restrictions for Payara Server Embedded Web Profile
 
 The web profile variant of the Embedded API (`payara-embedded-web.jar`) only supports the following Payara Server features:
 
@@ -847,3 +871,39 @@ When embedded Payara Server is started, the base installation directory that Pay
 * `lib`
 
 NOTE: If necessary, Payara Server also creates an instance root directory.
+
+[[payara-server-embedded-usecases]]
+== Payara Server Embedded Use Cases
+
+Overview of some expected use cases of Payara Server Embedded.
+
+[[bundle-application]]
+=== Bundle your Application
+
+Where the installation of Payara Server and the deployment of the applications can't be done on a central infrastructure, you may opt to use Payara Embedded. In this case, you can bundle Payara Server with the application within a single application, which makes it easier for installing it.
+
+Instead of having the three steps, installing Payara Server, configuring the environment, and deploying the application, you can do all those steps within the application containing Payara Embedded. You only need to start the application and the system is ready to respond to user requests.
+
+[[integration-testing]]
+=== Integration Testing
+
+While performing integration testing, you may need to deploy the application to Payara in order to verify the behaviour of the code you have written. While you could use a standalone installation of Payara Server, cleanup is not always done correctly and can cause other tests to behave incorrectly.
+
+Integration testing can be done easier and more consistently with Payara Embedded, you can start Payara up as the beginning of the test, verify the functionality and then use a clean instance for each test, therefore eliminating the possibility of an unexpected state in the environment.
+
+Starting Payara Embedded for testing can also be done using the Arquillian connector. In that case, the setup and teardown of Payara is managed for you.
+
+[[jdk-17-considerations]]
+== JDK 17 Considerations
+
+When running Payara Embedded on JDK 17, you must update your client side run configuration with all the necessary opens and exports for Payara to work as expected. The following JVM options should be added within your run configuration:
+
+[source, shell]
+----
+--add-opens=java.base/jdk.internal.loader=ALL-UNNAMED --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.management/sun.management=ALL-UNNAMED --add-opens=java.base/sun.net.www.protocol.jrt=ALL-UNNAMED -Xbootclasspath/a:${com.sun.aas.installRoot}/lib/grizzly-npn-api.jar --add-exports=java.base/sun.net.www=ALL-UNNAMED --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.desktop/java.beans=ALL-UNNAMED --add-exports=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED --add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED
+----
+
+[[see-also]]
+== See Also
+
+* xref:Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Server Embedded.adoc[Payara Arquillian Connector]
