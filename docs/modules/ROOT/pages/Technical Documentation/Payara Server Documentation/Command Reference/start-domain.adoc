@@ -1,17 +1,18 @@
 [[start-domain]]
 = start-domain
 
-Starts the DAS of the specified domain.
+Starts the Domain Administration Server(DAS) of the specified domain.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin [asadmin-options] start-domain [--help] 
-[--debug={true|false}] [--suspend={true|false}] [--domaindir domain-dir] 
-[--dry-run={true|false}] [--upgrade={true|false}] 
-[--verbose={true|false}] [--watchdog={true|false}] 
+asadmin [asadmin-options] start-domain [--help]
+[--debug={true|false}] [--domaindir domain-dir]
+[--dry-run={true|false}] [--upgrade={true|false}]
+[--verbose={true|false}] [--watchdog={true|false}]
+[--timeout timeout] [--warmup={true|false}]
 [domain-name]
 ----
 
@@ -35,77 +36,102 @@ after adding the entry `AS_ADMIN_NEWPASSWORD` to the password file.
 
 asadmin-options::
   Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
+
 `--debug`::
 `-d`::
   Specifies whether the domain is started with https://docs.oracle.com/en/java/javase/11/docs/specs/jpda/conninv.html[Java Platform Debugger Architecture (JPDA)]
-  debugging enabled. With debugging enabled extra exceptions can be printed. +
-  Possible values are as follows: +
+  debugging enabled. With debugging enabled extra exceptions can be printed.
++
+Possible values are as follows:
+
   `true`;;
     The instance is started with JPDA debugging enabled and the port number for JPDA debugging is displayed.
   `false`;;
     The instance is started with JPDA debugging disabled (default).
-`--suspend`::
-`-s`::
-  Specifies whether the domain is started with https://docs.oracle.com/en/java/javase/11/docs/specs/jpda/conninv.html[Java
-  Platform Debugger Architecture (JPDA)]
-  debugging enabled and suspend the newly started VM before the main class loads. When a debugger connects, it can send a JDWP command to resume the suspended VM.
-  With debugging enabled extra exceptions can be printed. Possible values are as follows: +
-  `true`;;
-    The instance is started with JPDA debugging enabled and a suspendPolicy of `SUSPEND_ALL`.
-    The port number for JPDA debugging is displayed.
-  `false`;;
-    The instance is started with JPDA debugging disabled (default).
+
 `--dry-run`::
 `-n`::
   Suppresses actual starting of the domain. Instead, `start-domain` displays the full java command that would be used to start the domain,
-  including all options. Reviewing this command can be useful to confirm JVM options and when troubleshooting startup issues. +
-  The default value is `false`.
+  including all options. Reviewing this command can be useful to confirm JVM options and when troubleshooting startup issues.
++
+The default value is `false`.
+
 `--domaindir`::
   The domain root directory, which contains the directory of the domain that is to be restarted. If specified, the path must be accessible in
   the file system. The default location of the domain root directory is `as-install/domains`.
+
 `--upgrade`::
   Specifies whether the configuration of the domain administration server (DAS) is upgraded to the current release. Normally, if the
   subcommand detects that the configuration is from an older release of Payara Server, the configuration is upgraded automatically before
-  being started. You should not need to use this option explicitly. +
-  Possible values are as follows: +
-  `true`;;
+  being started. You should not need to use this option explicitly.
++
+Possible values are as follows:
+
+`true`;;
     When the domain is started, the configuration is modified to be compatible with this release of Payara Server, and the Payara Server process stops.
-  `false`;;
+`false`;;
     The configuration of the DAS is not updated (default).
+
 `--verbose`::
 `-v`::
-  Specifies whether detailed information about the domain is displayed in the console window where the subcommand is run. +
-  Possible values are as follows: +
+  Specifies whether detailed information about the domain is displayed in the console window where the subcommand is run.
++
+Possible values are as follows:
+
   `true`;;
-    Detailed startup messages and log messages about the domain are displayed in the console window where the subcommand is run. If the
+Detailed startup messages and log messages about the domain are displayed in the console window where the subcommand is run. If the
     domain is later restarted by running the xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-domain.adoc#restart-domain[`restart-domain`]
-    subcommand from a different console window, messages continue to be displayed in the original console window. +
-    You can kill the Payara Server process by typing `CTRL-C` in the console window. +
-    You can kill the Payara Server process and obtain a thread dump for the server by typing one of the following key combinations in the console window: +
+    subcommand from a different console window, messages continue to be displayed in the original console window.
++
+You can kill the Payara Server process by typing `CTRL-C` in the console window.
++
+You can kill the Payara Server process and obtain a thread dump for the server by typing one of the following key combinations in the console window:
+
     * `CTRL-\` on UNIX systems
     * `CTRL-Break` on Windows systems
   `false`;;
     Detailed information is not displayed (default).
+
 `--watchdog`::
 `-w`::
   Specifies whether limited information about the domain is displayed in the console window where the subcommand is run. The `--watchdog`
   option is similar to `--verbose` but does not display the detailed startup messages and log messages. This option is useful when running
-  the `asadmin` utility in the background or with no attached console. +
-  Possible values are as follows: +
+  the `asadmin` utility in the background or with no attached console.
++
+Possible values are as follows:
+
   `true`;;
     Limited information is displayed in the console window.
   `false`;;
     Limited information is not displayed in the console window (default).
 
+`--prebootcommandfile`::
+ Path to file containing commands to run before booting the server. Only a limited amount of commands will work at this point.
+
+`--postbootcommandfile`::
+Path to file containing commands to run after the server is booted.
+
+`--timeout`::
+Specifies how long to take for the domain to start in seconds. If starting the domain takes longer than this amount then this command will fail.
++
+The default value is `600`.
+
+`--warmup`::
+Specifies if the server will stop after setting configurations.
++
+The default value is `false`.
+
 [[operands]]
 == Operands
 
 domain-name::
-  The unique name of the domain you want to start. +
-  This operand is optional if only one domain exists in the Payara Server installation.
+The unique name of the domain you want to start.
++
+This operand is optional if only one domain exists in the Payara Server installation.
 
 [[examples]]
 == Examples
@@ -118,10 +144,10 @@ This example starts `mydomain4` in the default domains directory.
 ----
 asadmin> start-domain mydomain4
 Waiting for DAS to start. ...........
-Started domain: mydomain4 
+Started domain: mydomain4
 Domain location: /myhome/payara6/glassfish/domains/mydomain4
 Log file: /myhome/payara6/glassfish/domains/mydomain4/logs/server.log
-Admin port for the domain: 4848 
+Admin port for the domain: 4848
 Command start-domain executed successfully.
 ----
 
@@ -140,6 +166,10 @@ Command start-domain executed successfully.
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-domain.adoc#delete-domain[`delete-domain`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/list-domains.adoc#list-domains[`list-domains`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-domain.adoc#restart-domain[`restart-domain`],
-* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-domain.adoc#stop-domain[`stop-domain`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-domains.adoc#restart-domains[`restart-domains`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-domains.adoc#start-domains[`start-domains`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-domain.adoc#stop-domain[`stop-domain`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-domains.adoc#stop-domains[`stop-domains`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-all-domains.adoc#stop-all-domains[`stop-all-domains`]
 
 

@@ -1,27 +1,28 @@
-[[start-cluster]]
-= start-cluster
+[[restart-cluster]]
+= restart-cluster
 
-Starts a cluster.
+Restarts all instances in a cluster.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin [asadmin-options] start-cluster [--help] 
-[--autohadboverride={true|false}]
-[--verbose={false|true}] cluster-name
+asadmin [asadmin-options] restart-cluster
+[--verbose=false] [--rolling=true]
+[--delay=0] [--instancetimeout=instancetimeout]
+[--timeout=timeout] clustername
 ----
 
 [[description]]
 == Description
 
-The `start-cluster` subcommand starts a cluster by starting all Payara Server instances in the cluster that are not already running.
+The `restart-cluster` subcommand stops and starts a cluster by stoping and starting all Payara Server instances in the cluster that are  already running.
 This subcommand requires the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to be configured on the host where
 the domain administration server (DAS) is running and on all hosts where instances in the cluster reside.
 
-NOTE: If all instances reside on the same host as the DAS, DCOM or SSH is not required. You might require to start a cluster in which instances reside
-on hosts where DCOM or SSH is not configured that are remote from the DAS. In this situation, run the xref:Technical Documentation/Payara Server Documentation/Command Reference/start-local-instance.adoc#start-local-instance[`start-local-instance`] subcommand for each instance from the host where the instance resides.
+NOTE: If all instances reside on the same host as the DAS, DCOM or SSH is not required. You might require to restart a cluster in which instances reside
+on hosts where DCOM or SSH is not configured that are remote from the DAS. In this situation, run the xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-local-instance.adoc#restart-local-instance[`restart-local-instance`] subcommand for each instance from the host where the instance resides.
 
 You may run this subcommand from any host that can contact the DAS.
 
@@ -37,43 +38,43 @@ asadmin-options::
 `-?`::
   Displays the help text for the subcommand.
 
-`--autohadboverride`::
-  Do not specify this option. This option is retained for compatibility with earlier releases. If you specify this option, a syntax error does
-  not occur. Instead, the subcommand runs successfully and displays a warning message that the option is ignored.
-
 `--verbose`::
-  Specifies whether additional status information is displayed when the cluster is started.
-+
-Valid values are as follows:
-+
+  Specifies whether additional status information is displayed when the cluster is started. +
+  Valid values are as follows: +
   `true`;;
     Displays the command to start each instance in the cluster and whether the attempt to start each instance succeeded.
   `false`;;
     Displays no additional status information (default).
 
+`--rolling`::
+Performs a rolling restart which each instance restarted in turn. The default value is `true`.
+
+`--delay`::
+Delay in (ms) between each instance restart in a rolling restart. The default value is `0`.
+
+`--instanceTimeout`::
+Specify a timeout value of instances. The default value is `600`.
+
+`--timeout`::
+Specify a timeout value of the command. The default value is `600`.
+
 [[operands]]
 == Operands
 
 cluster-name::
-  The name of the cluster to start.
+  The name of the cluster to restart.
 
 [[examples]]
 == Examples
 
-*Example 1 Staring a Cluster*
+*Example 1 Restarting a Cluster*
 
-This example starts the cluster `ymlcluster`. Additional status information is displayed when the cluster is started.
+This example restarts the cluster `c1`.
 
 [source,shell]
 ----
-asadmin> start-cluster --verbose ymlcluster
-start-instance yml-i-sr1-usca-02
-start-instance yml-i-sr1-usca-01
-
-The command start-instance executed successfully for: 
-yml-i-sr1-usca-02 yml-i-sr1-usca-01 
-
-Command start-cluster executed successfully.
+asadmin> restart-cluster c1
+Command restart-cluster executed successfully.
 ----
 
 [[exit-status]]
@@ -92,8 +93,8 @@ Command start-cluster executed successfully.
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/list-clusters#list-clusters[`list-clusters`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/setup-ssh#setup-ssh[`setup-ssh`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/start-local-instance#start-local-instance[`start-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-cluster#start-cluster[`start-cluster`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-cluster#stop-cluster[`stop-cluster`],
-* xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-cluster#restart-cluster[`restart-cluster`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/validate-dcom#validate-dcom[`validate-dcom`]
 
 

@@ -1,59 +1,65 @@
-[[create-network-listener]]
-= create-network-listener
+[[set-network-listener-configuration]]
+= set-network-listener-configuration
 
-Adds a new network listener socket.
+Helps to modify an existing network listener.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin [asadmin-options] create-network-listener [--help]
-[--address address] 
---listenerport listener-port 
-[--threadpool thread-pool] 
---protocol protocol 
-[--transport transport] 
-[--enabled={true|false}] 
-[--jkenabled={false|true}]
-[--target target]
+asadmin set-network-listener-configuration
+[--enabled=true|false] [--dynamic=true|false]
+[--address=address] --listenerport=listenerport
+[--listenerportrange=listenerportrange]
+[--threadpool=threadpool] [--protocol=protocol]
+[--transport=transport] [--jkenabled=true|false]
+[--target=server] name
 listener-name
 ----
 
 [[description]]
 == Description
 
-The `create-network-listener` subcommand creates a network listener. This subcommand is supported in remote mode only.
+The `set-network-listener-configuration` subcommand modifies an existing network listener.
 
 NOTE: If you edit the special network listener named `admin-listener`, you
 must restart the server for the changes to take effect. The Administration Console does not tell you that a restart is required in this case.
-
-NOTE: You can use the `create-http-listener` subcommand to create a network listener that uses the HTTP protocol without having to first create a protocol, transport, or HTTP configuration. This subcommand is a
-convenient shortcut, but it gives access to only a limited number of options.
 
 [[options]]
 == Options
 
 asadmin-options::
   Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
+
 `--address`::
   The IP address or the hostname (resolvable by DNS).
+
 `--listenerport`::
-  The port number to create the listen socket on. Legal values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024
-  requires superuser privileges. Configuring an SSL listen socket to listen on port 443 is standard.
+The port on which the network listener is going to be listening.
+
+`--listenerPortRange`::
+Port range which the network listener can bind to.
+
 `--threadpool`::
   The name of the thread pool for this listener. Specifying a thread pool is optional. The default is `http-thread-pool`.
+
 `--protocol`::
   The name of the protocol for this listener.
+
 `--transport`::
   The name of the transport for this listener. Specifying a transport is optional. The default is `tcp`.
+
 `--enabled`::
   If set to `true`, the default, the listener is enabled at runtime.
+
 `--jkenabled`::
-  If set to `true`, `mod_jk` is enabled for this listener. The default is false.
+If enabled, the network listener will become an Apache mod-jk listener. The default is false.
+
 `--target`::
   Creates the network listener only on the specified target. Valid values are as follows: +
   `server`;;
@@ -68,21 +74,20 @@ asadmin-options::
 [[operands]]
 == Operands
 
-listener-name::
+name::
   The name of the network listener.
 
 [[examples]]
 == Examples
 
-*Example 1 Creating a Network Listener*
+*Example 1 Modifying a Network Listener*
 
-The following command creates a network listener named `sampleListener` that is not enabled at runtime:
+The following command modifies a network listener named `sampleListener`:
 
 [source,shell]
 ----
-asadmin> create-network-listener --listenerport 7272 --protocol http-1
---enabled=false sampleListener
-Command create-network-listener executed successfully.
+asadmin> set-network-listener-configuration --dynamic true --enabled=false --listenerport 8080 sampleListener
+Command set-network-listener-configuration executed successfully.
 ----
 
 [[exit-status]]
@@ -97,10 +102,11 @@ Command create-network-listener executed successfully.
 
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/create-http-listener.adoc#create-http-listener[`create-http-listener`],
-* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-network-listener-configuration.adoc#set-network-listener-configuration[`set-network-listener-configuration`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-http-listeners.adoc#restart-http-listeners[`restart-http-listeners`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/create-protocol.adoc#create-protocol[`create-protocol`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/create-threadpool.adoc#create-threadpool[`create-threadpool`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/create-transport.adoc#create-transport[`create-transport`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-network-listener.adoc#create-network-listener[`create-network-listener`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-network-listener.adoc#delete-network-listener[`delete-network-listener`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/list-network-listeners.adoc#list-network-listeners[`list-network-listeners`]
 
