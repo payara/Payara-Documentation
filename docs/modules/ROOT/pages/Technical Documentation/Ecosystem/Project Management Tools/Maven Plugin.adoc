@@ -223,6 +223,26 @@ NOTE: If you want to execute the payara-micro plugin along with maven-toolchains
 |false
 |Enables the Hot Deploy mode.
 
+|`autoDeploy`
+|false
+|Enables automatic compilation and deployment upon saving files.
+
+|`liveReload`
+|false
+|Triggers a browser refresh for an up-to-date view after each redeployment.
+
+|`browser`
+|none
+|Specifies the browser for live reload. Adapted based on the system if not specified.
+
+|`keepState`
+|false
+|Persists session state across multiple redeployments.
+
+|`trimLog`
+|false
+|Refactors log format for improved readability.
+
 |===
 
 === `stop`
@@ -310,7 +330,49 @@ NOTE: This goal is specifically designed for integration with the IDEs and Edito
 |`metadataChanged`
 |false
 |If set to true, reloads deployment descriptors metadata in Hot Deploy mode
+
+|`keepState`
+|false
+|Persists session state across multiple redeployments.
 |===
+
+=== `dev`
+
+*Aim*: The dev goal is designed to streamline development by enabling `deployWar`, `exploded`, `autoDeploy`, `liveReload`, `keepState`, and `trimLog` to true, which facilitating auto compilation and deployment on saving files resulting in rapid compilation, and deployment for an efficient development workflow.
+
+
+*Usage*: 
+```
+mvn payara-micro:dev
+```
+
+The `dev` mojo is an extended mojo of `start` and is pre-configured for developing web applications in development mode which is equivalent to starting the Payara Micro instance using the following command:
+
+```
+mvn payara-micro:start -DautoDeploy=true -DliveReload=true -DdeployWar=true -Dexploded=true -DkeepState -DtrimLog=true
+```
+
+==== *Features in Dev Mode*:
+1. AutoDeploy Feature:
+The AutoDeploy feature enables automatic compilation and deployment of the application upon saving files within the project structure. Enabled by setting `autoDeploy=true`.
+The AutoDeploy feature relies on Java's WatchService to monitor changes in source directories, enabling continuous build and reload using Maven's Invoker. It dynamically modifies Maven goals based on file modifications, supports asynchronous execution for concurrent build tasks, and includes specifics for tracking changes in source, resources, and test directories. However, it has a limitation and is not supported for `pom.xml`, `--prebootcommandfile`, `--postbootcommandfile`, or `--postdeploycommandfile`.
+2. Restart on Modifying Command File:
+The restart functionality in Dev mode enables a seamless instance restart upon modifications to the boot command file `--prebootcommandfile`, `--postbootcommandfile`, or `--postdeploycommandfile`, offering a quick server restart option for improved development efficiency. However, modifying the `pom.xml` is not supported, as limitations may arise when restarting with a modified `pom.xml`, potentially conflicting with previously passed properties via the command line.
+3. LiveReload Feature:
+The LiveReload feature automatically refreshes the browser upon redeployment. The liveReload property is set to true by default in the dev mojo and false in the start mojo.
+
+- `liveReload` Property:
+  Enables or disables automatic browser refresh on redeployment.
+- `browser` Property:
+  The browser property offers seamless configuration. If not specified, the system prioritizes Chrome and Firefox, gracefully falling back to Edge for Windows, Safari for macOS, or Firefox for other platforms. This improvement simplifies setup - no need to worry about specifying a browser; it adapts based on your system, making configuring a breeze!
+- Persisting Last Accessed URL: 
+The last accessed Payara Micro URL is stored in the `payara-maven-config.properties` file within the system's temporary directory. This ensures accessibility across application restarts, eliminating the need for users to manually navigate to the last accessed URL. This streamlined approach enhances the overall user experience by maintaining continuity and reducing manual intervention after each restart.
+4. Persistent Session State:
+The `keepState` property allows for the persistence of session state across multiple redeployments during the development process. Enabled by default in the `dev` mojo and disabled in the `start` mojo.
+5. Readable Logging:
+The `trimLog` property refactors the log format for improved readability. Enabled by default in the `dev` mojo and disabled in the `start` mojo.
+
+Note: All listed features are enabled by default in Dev Mode.
 
 [[using-toolchains]]
 === Using Toolchains
