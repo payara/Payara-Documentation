@@ -58,7 +58,7 @@ If you are using the Jakarta Persistence API by calling `Persistence.createEMF()
 
 . Run the application.
 
-. Monitor the application. See "xref:Technical Documentation/Payara Server Documentation/General Administration/monitoring.adoc#administering-the-monitoring-service[Administering the Monitoring Service]" in Payara Server General Administration section.
+. Monitor the application. See "xref:Technical Documentation/Payara Server Documentation/General Administration/monitoring.adoc#administering-the-monitoring-service[Administering the Monitoring Service]" in the Payara Server General Administration section.
 
 [[specifying-the-database-for-an-application]]
 == Specifying the Database for an Application
@@ -128,22 +128,22 @@ If you are using the Java Persistence API by calling `Persistence.createEMF()`, 
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
-    <persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
-        <persistence-unit name ="em2">
-            <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-            <class>fish.payara.jpa.JpaBean</class>
-            <properties>
-                <property name="eclipselink.target-database" value="H2"/>
-                <!-- JDBC connection properties -->
-                <property name="eclipselink.jdbc.driver" value="org.h2.Driver"/>
-                <property name="eclipselink.jdbc.url" value="jdbc:h2://localhost:1527/~/testdb"/>
-                <property name="eclipselink.jdbc.user" value="APP"/>
-                <property name="eclipselink.jdbc.password" value="APP"/>
-            </properties>
-        </persistence-unit>
-    </persistence>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    <persistence-unit name ="em2">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>fish.payara.jpa.JpaBean</class>
+        <properties>
+            <property name="eclipselink.target-database" value="H2"/>
+            <!-- JDBC connection properties -->
+            <property name="eclipselink.jdbc.driver" value="org.h2.Driver"/>
+            <property name="eclipselink.jdbc.url" value="jdbc:h2://localhost:1527/~/testdb"/>
+            <property name="eclipselink.jdbc.user" value="APP"/>
+            <property name="eclipselink.jdbc.password" value="APP"/>
+        </properties>
+    </persistence-unit>
+</persistence>
 ----
 
 For configurations of supported and other drivers, see "xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in the Payara Server General Administration section.
@@ -503,3 +503,31 @@ delete from Employee where empId = 1;
 ----
 +
 This can be done only if the foreign key field is allowed to be `null`.
+
+[[jpa-cache-coordination]]
+== Using the Hazelcast EclipseLink Cache Coordination Protocol
+
+If necessary, your can configure the Data Grid (implemented via Hazelcast) as the coordination mechanism for the application's L2 cache (if enabled). To do so, configure the `persistence.xml` deployment descriptor as follows:
+
+. Set the `eclipselink.cache.coordination.protocol` property to `fish.payara.persistence.eclipselink.cache.coordination.HazelcastPublishingTransportManager`
+. Set the `eclipselink.cache.coordination.channel` property to a unique value for the coordination channel's name.
+
+The channel property is optional, but is highly recommended if the application has more than one Persistence Unit. A good practice is to name the channel after the persistence unit.
+
+Here is a complete example:
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8" ?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    <persistence-unit name="MyPU" transaction-type="JTA">
+        <jta-data-source>jdbc/myDataSource</jta-data-source>
+        <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
+        <properties>
+            <property name="eclipselink.cache.coordination.protocol" value="fish.payara.persistence.eclipselink.cache.coordination.HazelcastPublishingTransportManager"/>
+            <property name="eclipselink.cache.coordination.channel" value="MyPUChannel"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+----
