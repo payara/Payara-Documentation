@@ -4674,7 +4674,25 @@ none - contains data
 [[max-wait-time-in-millis]]
 == `max-wait-time-in-millis`
 
-This element is deprecated. Do not use.
+This element controls what to do when the number of requests exceeds the amount of beans available in the pool.
+
+Applies to all beans.
+
+Possible values of this element include:
+
+* `-1` (_default_)
++
+When the pooled number is exceeded, a new EJB instance is created, there is no upper bound in place.
+
+* `0`
++
+When the pooled number is exceeded, the request will wait for a bean to free up in the pool. This effectively caps the number of threads that are concurrently created for the bean's client request.
+
+* Between `1` - `MAX_INTEGER`
++
+When the pool number is exceeded, the request will wait for a bean to free up in the pool, up to the number of milliseconds specified here.
++
+After this time has expired, a new EJB instance is created and dispatched, thus the configured pool size acts as a soft upper bound, one that can be exceeded once the timer has expired.
 
 [[superelements-112]]
 === Superelements
