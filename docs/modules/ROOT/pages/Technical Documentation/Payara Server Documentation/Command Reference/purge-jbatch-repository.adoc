@@ -1,0 +1,100 @@
+[[purge-jbatch-repository]]
+= purge-jbatch-repository
+
+Purges the current Jakarta Batch repository.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] purge-jbatch-repository [--help]
+[app-tag]
+----
+
+[[description]]
+== Description
+
+The `purge-jbatch-repository` subcommand will purge the current Jakarta Batch repository of all jobs scheduled for the referenced application's tag.
+
+NOTE: The command will remove all current jobs created by the referenced application whether these jobs are running or not.
+
+TIP: If you are having trouble finding the application's tag for your application, you can get it programmatically on a Java EE application by using the following code:
+
+[source, java]
+----
+import com.ibm.jbatch.container.servicesmanager.ServicesManager;
+import com.ibm.jbatch.container.servicesmanager.ServicesManagerImpl;
+import com.ibm.jbatch.container.services.IPersistenceManagerService;
+...
+
+JobOperator jobOperator = getJobOperator();
+Long executionId = jobOperator.start("job-name", new Properties());
+
+ServicesManager manager = ServicesManagerImpl.getInstance();
+IPersistenceManagerService ps = manager.getPersistenceManagerService();
+String applicationTag = ps.getJobCurrentTag(jobid);
+----
+
+If using Maven, you'll have to add a dependency to IBM's *JBatch Container Runtime* to your project to access the classes referenced above:
+
+[source, xml]
+----
+<dependency>
+    <groupId>com.ibm.jbatch</groupId>
+    <artifactId>com.ibm.jbatch.container</artifactId>
+    <version>2.1.1</version>
+    <scope>provided</scope>
+</dependency>
+----
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+
+[[operands]]
+== Operands
+
+app-tag::
+The application tag whose Jakarta Batch jobs will be purged from the repository.
++
+The application's tag is structured like this:
++
+----
+<Configuration Identifier>:<Application Name>__/<Application Name>
+----
++
+Where *Configuration Identifier* is the identifier of the configuration associated to the instance or cluster where the application is deployed and *Application Name* is the name of the deployed application.
++
+See the description of the command on how to acquire the application's tag in a programmatic manner.
+
+[[examples]]
+== Examples
+
+To remove all current jobs for an application named _jbatch-test_ deployed on the DAS (`server-config`) then run the following command:
+
+[source, shell]
+----
+asadmin> purge-jbatch-repository "server-config:jbatch-test__/jbatch-test"
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-batch-jobs.adoc#list-batch-jobs[`list-batch-jobs`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-batch-job-executions.adoc#list-batch-job-executions[`list-batch-job-executions`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-batch-job-steps.adoc#list-batch-job-steps[`list-batch-job-steps`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-batch-runtime-configuration.adoc#list-batch-runtime-configuration[`list-batch-runtime-configuration`]
