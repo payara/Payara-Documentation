@@ -12,6 +12,7 @@ asadmin [asadmin-options] set-batch-runtime-configuration [--help]
 [--target target]
 [--datasourcelookupname datasource-lookup-name]
 [--executorservicelookupname executor-service-lookup-name]
+[--schemaName schema-name --tablePrefix table-prefix --tableSuffix table-suffix]
 ----
 
 [[description]]
@@ -37,12 +38,24 @@ asadmin-options::
     Configures the batch runtime for a particular server instance.
 `--datasourcelookupname`::
 `-d`::
-  The JNDI lookup name of the data source to be used to store job information. The default data source is `jdbc/__TimerPool`. +
-  Do not change the data source after the first batch job has been submitted to the batch runtime for execution. If the data source must be changed, stop and restart the domain and then make the change before any jobs are started or restarted. However, once the data source has been changed, information stored in the previous data source becomes inaccessible.
+  The JNDI lookup name of the data source to be used to store job information.
++
+The default data source is `jdbc/__TimerPool`.
++
+NOTE: Do not change the data source after the first batch job has been submitted to the batch runtime for execution. If the data source must be changed, stop and restart the domain and then make the change before any jobs are started or restarted. However, once the data source has been changed, information stored in the previous data source becomes inaccessible.
 `--executorservicelookupname`::
 `-x`::
   The JNDI lookup name of the managed executor service to be used to provide threads to jobs. The default managed executor service is `concurrent/__defaultManagedExecutorService`. +
   The managed executor service can be changed after a batch job has been submitted to the batch runtime without impacting execution of the job.
+`--schemaName`::
+`-n`::
+The database schema that holds the batch tables.
++
+Defaults to `APP`
+`--tablePrefix`::
+The prefix to apply to the batch table name.
+`--tableSuffix`::
+Sets the suffix to apply to the batch table name.
 
 [[examples]]
 == Examples
@@ -55,6 +68,15 @@ The following example configures the batch runtime for the default server instan
 ----
 asadmin> set-batch-runtime-configuration --executorservicelookupname concurrent/myExecutor
 Command set-batch-runtime-configuration executed successfully.
+----
+
+*Example 2 Configuring datasource and table data*
+
+The following command will set the data source and the prefix and suffix for the DAS:
+
+[source, shell]
+----
+asadmin> set-batch-runtime-configuration --target="server" --datasourcelookupname="jdbc/BatchJobsDS" --tablePrefix="BATCHJ_" --tableSuffix="_JB"
 ----
 
 [[exit-status]]
