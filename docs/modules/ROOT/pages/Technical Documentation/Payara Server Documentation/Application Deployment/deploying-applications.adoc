@@ -23,6 +23,10 @@ The following topics are addressed here:
 * xref:to-deploy-an-application-or-module-automatically[To Deploy an Application or Module Automatically]
 * xref:to-deploy-an-application-or-module-by-using-a-deployment-plan[To Deploy an Application or Module by Using a Deployment Plan]
 * xref:to-deploy-an-application-or-module-in-a-directory-format[To Deploy an Application or Module in a Directory Format]
+* xref:to-deploy-an-application-on-server-start[To Deploy an Application on Server start]
+* xref:to-deploy-from-a-url[To Deploy from a URL]
+* xref:to-deploy-from-a-maven-repository[To Deploy from a Maven Repository]
+
 
 Instructions for accomplishing these tasks by using the Administration Console are contained in the Administration Console online help.
 
@@ -532,6 +536,72 @@ Command deploy executed successfully.
 ----
 
 TIP: You can also view the full syntax and options of the subcommand by typing `asadmin help deploy` at the command line.
+
+[[to-deploy-an-application-on-server-start]]
+=== To Deploy an Application on Server start
+
+
+GlassFish has had the ability to deploy applications on server start for a long time now, using the _autodeploy_ directory. While acceptable in development environments, the scanner used to deploy files in this directory is a security risk for production and is therefore disabled in the `production` domain bundled with Payara Server.
+
+To reintroduce the capability of deploying an application on server startup without the risk of enabling the deployment scanner, a feature from Payara Micro was introduced: the ability to run asadmin commands at startup, either pre or post boot.
+
+To enable this feature, we have extended the `start-domain` feature to accept two extra options: `--prebootcommandfile` and `--postbootcommandfile` which can be used as follows:
+
+*Pre-boot Commands*::
+*Usage*: `asadmin> start-domain --prebootcommandfile=/path/to/file`
++
+*Aim*: passing a list of commands as a file to the server to run pre-boot.
+
+IMPORTANT: Due to the time during boot when the commands in this file are executed, this only supports `set` commands.
+
+*Post-boot Commands*::
+*Usage*: `asadmin> start-domain --postbootcommandfile=/path/to/file`
++
+*Aim*: passing a list of commands as a file to the server to run post-boot. This is where commands such as service configuration commands should be run.
+
+[NOTE]
+====
+There are some important caveats to note:
+
+* Both files should be saved in a text format, with each command on its own line.
+* Lines where the first non-whitespace character is # are treated as comments
+* Any blank lines will be ignored
+* Any invalid or failing commands will be logged to the server.log and the file will continue to be processed
+* The files *_must_* exist, and be accessible from Payara Server.
+* Both pre-boot and post-boot files can be passed at the same time.
+====
+
+[[to-deploy-from-a-url]]
+=== To Deploy from a URL
+
+Payara Embedded has the ability to deploy applications from a URL for a while, and this feature has now been brought into Payara Server. To facilitate this new feature, a new asadmin command was created: `deploy-remote-archive`. This command takes all of the same parameters as the standard deploy command, and is used in exactly the same way - the only difference is in the command name, and the fact you specify a URL instead of a file.
+
+*Usage*: `asadmin> deploy-remote-archive _url_`
+
+*Example*: `asadmin> deploy-remote-archive https://nexus.payara.fish/repository/payara-artifacts/fish/payara/testing/clusterjsp/1.1/clusterjsp-1.1.war`
+
+WARNING: The command will only accept HTTP and HTTPS URLs.
+
+[[to-deploy-from-a-maven-repository]]
+=== To Deploy from a Maven Repository
+
+The feature of Payara Micro to deploy applications from a Maven Repository using their Group, Artefact, Version (GAV) coordinates has also been brought into Payara Server. This functionality uses the same command as when deploying from a URL: `deploy-remote-archive`. This command takes all of the same parameters as the standard deploy command, but has an extra parameter:
+
+* `additionalRepositories` - This parameter accepts a comma separated list of repository URLs, that will be probed when searching for an artefact. By default, the command will only look in Maven Central.
+
+*Usage*: `asadmin> deploy-remote-archive --additionalRepositories repo1,repo2,...,repoN groupId,artefactId,versionNumber`
+
+*Examples*:
+
+* `asadmin> deploy-remote-archive --additionalRepositories https://google.co.uk,https://nexus.payara.fish/repository/payara-artifacts fish.payara.testing,clusterjsp,1.1`
+* `asadmin> deploy-remote-archive --additiolsnalRepositories https://nexus.payara.fish/repository/payara-artifacts fish.payara.testing,clusterjsp,1.1`
+* `asadmin> deploy-remote-archive --target instance1 fish.payara.testing,clusterjsp,1.1`
+
+If you don't specify a name or context root for the artefact when deploying using GAV coordinates, it will just be the artefact name (in the example above, it would be `clusterjsp`).
+
+NOTE:  If an application matching the GAV coordinates exists on multiple repositories, the first found will be deployed. The order that the repositories are searched is the order that you specify them in. For example, given an _additionalRepositories_ of _repo1,repo2_, the order that the repositories would be searched is: Maven Central > repo1 > repo2.
+
+Although the command accepts Maven GAV coordinates, it does not actually make use of Maven, and so artefacts will not be saved into your local maven repository.
 
 [[modifying-the-configuration-of-a-web-application-or-module]]
 == Modifying the Configuration of a Web Application or Module
