@@ -1,0 +1,102 @@
+[[set-ejb-invoker-configuration]]
+= set-ejb-invoker-configuration
+
+Enables or disables the endpoint that allows HTTP(S) transport based communication for remote EJBs.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-ejb-invoker-configuration [--help]
+[--target] target
+[--enabled={true|false}]
+[--securityenabled={true|false}]
+[--roles] roles-list
+[--authmoduleclass] sam-class
+[--authmodule] security-provider-id
+[--realmname] realm-name
+[--authtype] auth-type
+[--endpoint ] context-root
+[--virtualservers] virtualserver-list
+----
+
+[[description]]
+== Description
+
+The `set-ejb-invoker-configuration` can be used to configure the Remote EJB Lite HTTP endpoint settings.
+
+IMPORTANT: The `set-ejb-invoker-configuration --enabled=true/false` commands actually deploy/undeploy an internal small WAR application that exposes the endpoint. +
+This application is shown in all overviews that show deployed applications that are currently enabled.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+Specifies the target for which to configure the `ejb-invoker` endpoint. Valid values are as follows: +
+`server`;;
+Configures the EJB invoker endpoint for the default server instance `server` and is the default value.
+cluster-name;;
+Configures the EJB invoker endpoint for every server instance in the cluster.
+deployment-group-name;;
+Configures the EJB invoker endpoint for every server instance in the deployment group.
+instance-name;;
+Configures the EJB invoker endpoint for a particular server instance.
+`--enabled`::
+Enables or disables the `ejb-invoker` application.
++
+Defaults to `true`
+`--securityenabled`::
+Whether secure access to the `ejb-invoker` endpoint is enabled or not.
++
+Defaults to `false`
+`--roles`::
+If defined, the endpoint will be configured to be authorised for users that belong to the list of the roles specified (in comma-separated format).
+`--endpoint`::
+The context root used to expose the `ejb-invoker` application endpoint.
++
+Defaults to `ejb-invoker`
+`--authmoduleclass`::
+Defines the full qualified class name implementing a `jakarta.security.auth.message.module.ServerAuthModule` subclass.
++
+If defined and `securityenabled` is set to `true`, the HttpServlet Message security provider is created and `ejb-invoker` application secured with the configured authentication module.
+`--authmodule`::
+Defines the existing message security provider ID.
++
+If defined and `securityenabled` is set to `true`, the `ejb-invoker application` will be secured with it.
+--realmname`::
+Defines the registered realm name.
++
+If defined and `securityenabled` it set to `true`, the `ejb-invoker` application will be secured with the corresponding realm that will be used for authentication.
+--`authtype`::
+If defined, the endpoint will be assigned to a list of *virtual servers* specified as a comma-separated list of names.
++
+Otherwise, the endpoint will be assigned to all virtual servers available.
+
+[[examples]]
+== Examples
+
+The following command will enable the endpoint on the DAS:
+
+[source, shell]
+----
+asadmin> set-ejb-invoker-configuration --enabled=true
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-ejb-invoker-configuration.adoc#get-ejb-invoker-configuration[`get-ejb-invoker-configuration`]

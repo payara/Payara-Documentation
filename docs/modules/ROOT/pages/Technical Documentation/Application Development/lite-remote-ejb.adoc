@@ -1,12 +1,5 @@
-[[ejb-container-enhancements]]
-= EJB Container Enhancements
-
-This section details several improvements and enhancements done to features provided by the EJB container.
-
-//TODO - Continue here? Possible new section, plus new commands to be added as well
-
 [[lite-remote-ejb]]
-== Lite Remote EJB Communication
+= Lite Remote EJB Communication
 
 For scenarios when communication with remote EJBs is needed across a complex network topology or when a server architecture is deployed on a cloud provider, there's a new feature for the EJB server and client applications: A lite and thin client that can be used to communicate via HTTP(S) instead of IIOP-RMI.
 
@@ -25,160 +18,16 @@ IMPORTANT: TX Propagation and Security Propagation is *not supported* by EJB Rem
 WARNING: In the current version of this feature, not all remote EJB features are implemented yet.
 
 [[configuring-http-for-remote-ejb]]
-=== Configuring HTTP(S) for Remote EJBs
+== Configuring HTTP(S) for Remote EJBs
 
 HTTP(S) for EJB remoting in Payara Server makes use of a special web endpoint on which is located by default on the path `/ejb-invoker`.
 
-IMPORTANT: This endpoint is disabled out of the box and it can be enabled using the `set-ejb-invoker-configuration` asadmin command.
+//TODO - A new section in General Administration should be introduced in order to teach the user how to configure the EJB invoker HTTP endpoint.
 
-[[set-ejb-invoker-configuration]]
-==== `set-ejb-invoker-configuration`
-
-*Usage*::
-----
-asadmin set-ejb-invoker-configuration
-        [--enabled=true|false]
-        [--securityenabled=true|false]
-        [--roles=<role-list>]
-        [--authmoduleclass=<SAM-class>]
-        [--authmodule=<security-provider-id>]
-        [--realmname=<realm-name>]
-        [--authtype=<auth-type>]
-        [--endpoint=<context-root[default:ejb-invoker]>]
-        [--virtualservers=<virtualserver-list>]
-        [--target=<target[default:server]>]
-----
-
-*Aim*::
-Enables or disables the endpoint that allows HTTP(S) transport based communication for remote EJBs.
-
-[[command-options]]
-===== Command Options
-
-[cols="3,1,10,1,1", options="header"]
-|====
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`enabled`
-|Boolean
-|Enables or disables the `ejb-invoker` application.
-|true
-|No
-
-|`securityenabled`
-|Boolean
-|Whether or not secure access to the `ejb-invoker` endpoint is enabled.
-|false
-|No
-
-|`roles`
-|String
-|If defined, the endpoint will be assigned to a list of the role specified as a comma-separated..
-|invoker
-|No
-
-|`endpoint`
-|String
-|The context root used to expose the `ejb-invoker` application endpoint.
-|`ejb-invoker`
-|No
-
-|`authmoduleclass`
-|String
-|Defines the full qualified class name implementing `jakarta.security.auth.message.module.ServerAuthModule`. If defined and `securityenabled` is set to true, the HttpServlet Message security provider is created and `ejb-invoker` application secured with the configured SAM.
-|
-|No
-
-|`authmodule`
-|String
-|Defines the existing message security provider id. If defined and `securityenabled` is set to true, the `ejb-invoker application` will be secured with it.
-|
-|No
-
-|`realmname`
-|String
-|Defines the registered realm name. If defined and `securityenabled` it set to true, the `ejb-invoker` application will be secured with the corresponding realm that will be used for authentication.
-|
-|No
-
-|`authtype`
-|String
-|The instance or cluster to enable the endpoint.
-|
-|No
-
-|`virtualservers`
-|String
-|If defined, the endpoint will be assigned to a list of *virtual servers* specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available.
-|
-|No
-
-|`target`
-|String
-|The target configuration where the command should be run.
-|server
-|No
-|====
-
-[[example]]
-===== Example
-
-The following command will enable the endpoint on the DAS:
-
-[source, shell]
-----
-asadmin > set-ejb-invoker-configuration --enabled=true
-----
-
-NOTE: The `set-ejb-invoker-configuration --enabled=true/false` commands actually deploy/undeploy an internal small WAR application that exposes the endpoint. In this version this application is shown in all overviews that show deployed applications once enabled.
-
-
-[[get-ejb-invoker-configuration]]
-==== `get-ejb-invoker-configuration`
-
-*Usage*::
-----
-asadmin get-ejb-invoker-configuration [--target=<target[default:server]>]
-----
-
-*Aim*::
-Returns the current configuration options for the `ejb-invoker` application on the targeted configuration.
-
-[[command-options-2]]
-===== Command Options
-
-[cols="2,1,10,1,1", options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`target`
-|String
-|The target configuration where the command should be run.
-|server
-|No
-|===
-
-
-[[example-1]]
-===== Example
-
-The following command returns the current configuration options from the DAS:
-
-[source, shell]
-----
-asadmin > get-ejb-invoker-configuration --target cluster1
-----
+IMPORTANT: This endpoint is disabled out of the box, and it can be enabled using the `set-ejb-invoker-configuration` asadmin command.
 
 [[configuring-thin-client]]
-=== Configuring the Thin Client Dependency
+== Configuring the Thin Client Dependency
 
 Client applications that wish to use HTTP(S) as the transport protocol when calling remote EJBs will have to use a *special thin-client* dependency. To do this, you can add the following Maven dependency to your client project:
 
@@ -232,6 +81,7 @@ import static javax.naming.Context.PROVIDER_URL;
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+
 public class RemoteEJBLiteClient{
     public static void main(String... args) throws NamingException{
         Properties environment = new Properties();
@@ -239,13 +89,13 @@ public class RemoteEJBLiteClient{
         environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
         InitialContext ejbRemoteContext = new InitialContext(environment);
         BeanRemote beanRemote = (BeanRemote) ejbRemoteContext.lookup("java:global/test/Bean");
-        beanRemote.method() // returns "method"
+        beanRemote.method(); // returns "method"
     }
 }
 ----
 
 [[calling-secured-bean]]
-==== Calling a Secured Remote EJB
+=== Calling a Secured Remote EJB
 
 When calling a secured EJB using the `ejb-invoker` endpoint, there are some considerations in place for the client code:
 
@@ -299,6 +149,7 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 public class RemoteEJBLiteClient{
+
     public static void main(String... args) throws NamingException{
         Properties environment = new Properties();
         environment.put(INITIAL_CONTEXT_FACTORY,"fish.payara.ejb.rest.client.RemoteEJBContextFactory");
@@ -307,7 +158,7 @@ public class RemoteEJBLiteClient{
         environment.put(SECURITY_CREDENTIALS, "p1");
         InitialContext ejbRemoteContext = new InitialContext(environment);
         BeanRemote beanRemote = (BeanRemote) ejbRemoteContext.lookup("java:global/test/Bean");
-        beanRemote.method() // returns "method"
+        beanRemote.method(); // returns "method"
     }
 }
 ----
@@ -315,7 +166,7 @@ public class RemoteEJBLiteClient{
 IMPORTANT: When accessing secured EJBs you *should* use only HTTPS (that means, enabling confidential transport requirements to the remote EJB), as the submitted credentials will be transferred in clear text (not encrypted, only base64 encoded), which is a security risk you should avoid in any production environment.
 
 [[jndi-customization-options]]
-==== JNDI Customization Options
+=== JNDI Customization Options
 
 Under the covers the remote EJB proxy uses a JAX-RS (Jersey) REST client builder in order to establish communication with the remote server. If you want to customize and modify the parameters for this communication (timeouts, keystores, etc.) the following JNDI context properties can be used to this end:
 
@@ -373,16 +224,18 @@ Under the covers the remote EJB proxy uses a JAX-RS (Jersey) REST client builder
 The constants are also exposed as static attributes of the `fish.payara.ejb.rest.client.RemoteEJBContextFactory` class.
 
 [[system-properties-fallbacks]]
-==== System Properties Fallbacks
+=== System Properties Fallbacks
 
 The JNDI customization options listed above as well the environment variables defined in `javax.naming.Context` (except `APPLET`) can be set by setting a system property of the same name that will act as a fallback.
+
 That means it will not override an environment variable that is already present but would be used in the case that it is not defined when `InitialContextFactory.getInitialContext` is invoked.
 
 [[client-side-adapter]]
-=== Client side adapter
+== Client-side adapter
 
 EJB Lite connector is, in its current form, suited for invoking stateless remote EJBs.
 However, if you're using the connector with existing clients, those may depend on stateful interactions, like invoking stateful EJBs or accessing application server data sources and connection factories.
+
 Client side adapters serve the purpose of emulating stateful behavior at the client and delegate the requests to stateful backend, when all information from the client is collected.
 
 The API of client side adapters is prescribed by interface `fish.payara.ejb.http.client.adapter.ClientAdapter`:
@@ -404,18 +257,19 @@ public interface ClientAdapter {
 To make use of the adapter, put an instance of `ClientAdapter` into JNDI context property `fish.payara.clientAdapter`. Every JNDI lookup will be  first passed to the adapter instance in such case. If adapter returns a non-empty `Optional` value, tit will be passed back to the client.
 
 [[composing-multiple-adapters]]
-==== Composing multiple adapters
+=== Composing multiple adapters
 
-Client side emulation might require stubbing diverse JNDI names and return types, and handling all of that in a single ClientAdapter implementation would result in not very maintainable code. Therefore the client library offers two classes that help with composition of multiple Client adapters into the parent instance to be passed to `RemoteEJBContextFactory`:
+Client side emulation might require stubbing diverse JNDI names and return types, and handling all of that in a single ClientAdapter implementation would result in not very maintainable code. Therefore, the client library offers two classes that help with composition of multiple Client adapters into the parent instance to be passed to `RemoteEJBContextFactory`:
 
 * `CompositeClientAdapter` concatenates multiple client adapter instances, calling adapters in a defined order and returning first non-empty proxy provided by the adapters.
 * `ClientAdapterCustomizer` is a decorator, that helps separate JNDI name matching from instantiation of client adapter.
+
 Most used method of customizer is `matchPrefix`, which will only call downstream adapter when requested JNDI name matches prefix.
 
 NOTE: This prefix is stripped before invoking the downstream adapter.
 
 [[composite-client-adapter-example]]
-===== Composite Client Adapter example
+==== Composite Client Adapter example
 
 [source,java]
 ----
@@ -434,10 +288,10 @@ Context context = new InitialContext(props);
 See https://javadoc.io/doc/fish.payara.extras/ejb-http-client[API documentation] of the client library for detailed description of `ClientAdapterCustomizer` methods and contracts of `CompositeClientAdapter`.
 
 [[known-limitations]]
-=== Known Limitations
+== Known Limitations
 
 [[serialization-limitations]]
-==== Serialization Limitations
+=== Serialization Limitations
 
 The HTTP adapter utilizes http://json-b.net/[JSON-B] for serialization. This places limits on types of objects that can be transmitted as method arguments or return types. The serialization can be customized by means of JSON-B annotations.
 
@@ -446,6 +300,12 @@ The HTTP adapter utilizes http://json-b.net/[JSON-B] for serialization. This pla
 . Polymorphism is not supported by default
 
 [[programming-model-limitations]]
-==== Programming Model Limitations
+=== Programming Model Limitations
 
 The HTTP adapter uses stateless HTTP requests. In its current form, it is unfit for invoking stateful objects like `@Stateful` Enterprise Java Beans, or using server resources like `DataSource` or `ConnectionFactory`.
+
+[[see-also]]
+== See Also
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-ejb-invoker-configuration.adoc#get-ejb-invoker-configuration[`get-ejb-invoker-configuration`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-ejb-invoker-configuration.adoc#set-ejb-invoker-configuration[`set-ejb-invoker-configuration`]
