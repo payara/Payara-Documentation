@@ -33,7 +33,8 @@ asadmin [asadmin-options] deploy [--help]
 [--libraries jar_file[,jar_file]*]
 [--target target] 
 [--type pkg-type]
-[--properties(name=value)[:name=value]*] 
+[--properties(name=value)[:name=value]*]
+[--skipdsfailure]
 [file_archive|filepath]
 ----
 
@@ -168,6 +169,11 @@ asadmin-options::
     If set to `true`, preserves any application-scoped resources and restores them during redeployment. Default is `false`. +
   Other available properties are determined by the implementation of the component that is being redeployed. +
   For components packaged as OSGi bundles (`--type=osgi`), the `deploy` subcommand accepts properties arguments to wrap a WAR file as a WAB (Web Application Bundle) at the time of deployment. The subcommand looks for a key named `UriScheme` and, if present, uses the key as a URL stream handler to decorate the input stream. Other properties are used in the decoration process. For example, the Payara Server OSGi web container registers a URL stream handler named `webbundle`, which is used to wrap a plain WAR file as a WAB. For more information about usage, see the example in this help page.
+
+`--skipdsfailure`::
+This option will skip over a data source failure. This means an application can be deployed with a data source set up, but the database need not be running at the time. Without this option the deployment would fail if a data source is defined and the database is not available.
+
+ asadmin> deploy --skipdsfailure /home/mark/clusterjsp-1.1.war
 
 [[operands]]
 == Operands
