@@ -10,6 +10,52 @@ The Full Profile supports the entire EJB 4.0+ specification. For details, see ht
 
 Payara Server is backward compatible with 1.1, 2.0, 2.1, 3.0, 3.1 and 4.0 enterprise beans. However, to take advantage of version 3.1+ features, you should develop new beans as 3.1+ enterprise beans.
 
+[[custom-ejb-jar-names]]
+== Customized EJB-JAR Archive Names
+
+It is possible to instruct the server runtime to override the name of an EJB-JAR module when it is deployed either as a standalone module or as part of an EAR application. It is also possible to instruct Payara Server to override the module and/or application's name.
+
+[[overwriting-module-name]]
+=== Overwriting the Module Name
+
+When deploying an EJB-JAR module on Payara Server/Micro, the portable JNDI names for all scanned EJBs will be generated using the name of the module as specified on the _ejb-jar.xml_ deployment descriptor:
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar xmlns = "https://jakarta.ee/xml/ns/jakartaee"
+         version = "4.0"
+         xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation = "https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/ejb-jar_4_0.xsd">
+    <module-name>MODULE_NAME</module-name>
+</ejb-jar>
+----
+
+NOTE: If the name's not specified in the deployment descriptor, the specification states that the module name will be the same as the JAR artifact used to deploy it.
+
+However, when deploying a JAR from an IDE (like **NetBeans** or **IntelliJ**), the IDE deploys to Payara Server using the asadmin `deploy` command, with the `--name` option specified. This will force the module to have the specified name over the name defined in _ejb-jar.xml_. This is undesired because the IDE usually infers the module name from the name of the project or the JAR file and doesn't take the correct name of the module into account.
+
+The module name defined in the deployment descriptor will be used even if it tries to be overridden using the `--name` option. This behaviour will *always* take precedence.
+
+IMPORTANT: In the case you need to overwrite the name of the module when deploying the module, use the `--forceName` command option.
+
+[[overwriting--the-application-name]]
+=== Overwriting the Application Name
+
+In the case of EAR artifacts, the portable JNDI names for all scanned EJBs will use the application name defined in the _application.xml_ deployment descriptor:
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="https://jakarta.ee/xml/ns/jakartaee"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/application_10.xsd" version="10">
+    <display-name>My Application</display-name>
+    <application-name>APPLICATION_NAME</application-name>
+</application>
+----
+
+NOTE: You can use the `--name` and `--forcename` deployment options to override the application name in a similar manner with what happens with EJB-JAR modules.
+
 [[value-added-features]]
 == Value Added Features
 
@@ -120,7 +166,7 @@ http://localhost:8080/ejb-timer-service-app/timer
 ----
 
 To change the database used by the EJB Timer Service, set the EJB Timer Service's Timer DataSource setting to a valid JDBC resource.
-If the EJB Timer Service has already been started in a server instance, you must also create the timer database table. DDL files to create these tables are located in `${as-install}/lib/install/databases`.
+If the EJB Timer Service has already been started in a server instance, you must also create the timer database table. DDL files to create these tables are located in `as-install/lib/install/databases`.
 
 Using the EJB Timer Service is equivalent to interacting with a single JDBC resource manager.
 If an EJB component or application accesses a database either directly through JDBC or indirectly (for example, through an entity bean's persistence mechanism), and also interacts with the EJB Timer Service, its data source must be configured with an XA-compatible JDBC driver.
@@ -149,15 +195,83 @@ The default value for `--keepstate` is `false`. This option is supported only on
 When the `--keepstate` is set to `true`, each application that uses an EJB timer is assigned an *ID* in the timer database.
 The EJB object that is associated with a given application is assigned an ID that is constructed from the application ID and a numerical suffix. To preserve active timer data, Payara Server stores the application ID and the EJB ID in the timer database. To restore the data, the class loader of the newly redeployed application retrieves the EJB timers that correspond to these IDs from the timer database.
 
+[[advanced-persistent-timers]]
+=== Advanced Persistent Timer Configuration
+
+If using an external RDBMS engine for storing persistent timer data is not an option, it is also possible to use the *Domain Data Grid* to function as a replacement in production environments.
+
+Persisting an EJB Timer to the Domain Data Grid means that the Data Grid itself will store the timer details, preserving it even if the original instance leaves the grid.
+
+IMPORTANT: All stored timers are lost if the whole domain is stopped. +
+In the case of Payara Micro, this will occur if all instances in the Data Grid are stopped as well.
+
+The Persistence service for EJB Timers can be set in the Admin console by navigating to the *EJB Timer Service* tab in the EJB Container node of a configuration.
+
+To use the Data Grid to store EJB Timers set the *Persistence Service* to _DataGrid_
+
+image:ejb/set-ejb-timer-persistence.png[Set EJB Persistence to Data Grid]
+
+EJB Timers will be coordinated across a single deployment group and if an instance of the deployment group is stopped another instance in the same deployment group will take ownership of the timer and ensure it is fired.
+
+CAUTION: Clustered Timer Firing Mode is NOT used in this version of Payara Server and is always "One Per Deployment Group"
+
+It is also possible to set the `ejb-timer-service` from the command line. To get the current state, run the following command:
+
+[source, shell]
+----
+asadmin> get configs.config.<your-config>.ejb-container.ejb-timer-service
+----
+
+This will return the current state taken from the _domain.xml_ configuration file, which by default should be something similar to the following:
+
+[source, shell]
+----
+asadmin> get configs.config.server-config.ejb-container.ejb-timer-service
+configs.config.server-config.ejb-container.ejb-timer-service.ejb-timer-service=Database
+configs.config.server-config.ejb-container.ejb-timer-service.max-redeliveries=1
+configs.config.server-config.ejb-container.ejb-timer-service.minimum-delivery-interval-in-millis=1000
+configs.config.server-config.ejb-container.ejb-timer-service.redelivery-interval-internal-in-millis=5000
+Command get executed successfully.
+----
+
+To persist to the Data Grid you need only change the value for `configs.config.server-config.ejb-container.ejb-timer-service.ejb-timer-service` to `DataGrid`.
+
+To do this, run the following `set` command:
+
+[source, bash]
+----
+asadmin> set configs.config.server-config.ejb-container.ejb-timer-service.ejb-timer-service=DataGrid
+----
+
+WARNING: You will need to restart your domain to apply the changes.
+
+[[timer-migration]]
+==== Timer Migration
+
+EJB Timers stored in the Domain Data Grid support timer migration between instances in the same Deployment Group. You can migrate timers using the Admin console from the *Deployment Group* page.
+
+Timers can also be migrated between instances using asadmin commands like this:
+
+[source, shell]
+----
+asadmin> migrate-timers --target server1 server2
+----
+
+Where `server1` is the active instance to migrate timers to and `server2` is the failed instance.
+
+[[migration-live-instance]]
+===== Migration from Live Instances
+
+The `migrate-timers` command can also be used to migrate timers that are scheduled to expire on a live instance. This allows a user to pre-emptively move their timers around without having to resort to failover mechanics.
+
 [[to-deploy-an-ejb-timer-to-a-cluster]]
-=== To Deploy an EJB Timer to a Cluster
+==== To Deploy an EJB Timer to a Cluster
 
 This procedure explains how to deploy an EJB timer to a cluster or deployment group.
 
 By default, Payara Server's Timer Service points to the preconfigured `jdbc/__TimerPool` resource, which uses an embedded H2 database configuration that will not work in clustered environments.
 
-The problem is that the embedded H2 database runs in the server's JVM, so when you use the `jdbc/__TimerPool` resource, each DAS and each server
-instance will have their own, separate, databases.
+The problem is that the embedded H2 database runs in the server's JVM, so when you use the `jdbc/__TimerPool` resource, each DAS and each server instance will have their own, separate, databases.
 
 Because of this, clustered server instances will not be able to find the database table on the DAS, and the DAS will not be able to find the tables on the clustered server instances.
 
@@ -172,8 +286,7 @@ Here are the steps on configuring the Timer Service:
 +
 [source,shell]
 ----
-asadmin set configs.config.cluster_name-config.ejb-container.ejb-timer-service.timer-
-datasource=jdbc/my-timer-resource
+asadmin set configs.config.cluster_name-config.ejb-container.ejb-timer-service.timer-datasource=jdbc/my-timer-resource
 ----
 . Restart the DAS and the target cluster(s) or deployment groups. +
 [source,shell]
@@ -185,16 +298,17 @@ asadmin start-cluster cluster-name | deployment-group-name
 ----
 
 [[troubleshooting]]
-==== Troubleshooting
+===== Troubleshooting
 
 If you inadvertently used the `jdbc/__TimerPool` resource for your EJB timer in a clustered Payara Server environment, the DAS and the server instances will be using separate H2 database instances that are running in individual JVMs.
 
 For timers to work in a clustered environment, the DAS and the clustered server instances must share a common database.
 
-If you attempt to deploy an application with EJB timers without setting the timer resource correctly, the startup will fail, and you will be
-left with a marker file, named `ejb-timer-service-app`, on the DAS that will prevent the Timer Service from correctly creating the database table.
+If you attempt to deploy an application with EJB timers without setting the timer resource correctly, the startup will fail, and you will be left with a marker file, named `ejb-timer-service-app`, on the DAS that will prevent the Timer Service from correctly creating the database table.
 
-The solution is to remove the marker file on the DAS, restart the DAS and the clusters or deployment groups, and then redeploy any applications that rely on the offending EJB timer. The marker file is located on the DAS in `${domain-dir}/generated/ejb/ejb-timer-service-app`.
+The solution is to remove the marker file on the DAS, restart the DAS and the clusters or deployment groups, and then redeploy any applications that rely on the offending EJB timer.
+
+The marker file is located on the DAS in `domain-dir/generated/ejb/ejb-timer-service-app`.
 
 [[using-session-beans]]
 == Using Session Beans
@@ -220,11 +334,50 @@ A stateless session bean container uses a bean pool to service requests. The Pay
 * `steady-pool-size`
 * `resize-quantity`
 * `max-pool-size`
+* `max-wait-time-in-millis`
 * `pool-idle-timeout-in-seconds`
 
 For more information about `glassfish-ejb-jar.xml`, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in the Payara Server Application Deployment section.
 
 Payara Server provides the `wscompile` and `wsdeploy` tools to help you implement a web service endpoint as a stateless session bean.
+
+It is possible to limit the number of concurrent Stateless EJB instances that are dispatched, allowing fine-grained control of resources, limiting surface area for DDOS attacks and making applications run more smoothly and efficiently.
+
+This is done regardless of the maximum number of instances available in a bean's pool. Using these boundaries, it is possible to instruct the EJB container so that the maximum number of threads is not exceeded at runtime.
+
+NOTE: The system property `fish.payara.ejb-container.max-wait-time-in-millis` can be set to change the default global value of `<max-wait-time-in-millis>` for *_ALL_* Stateless EJB bean pools.
+
+IMPORTANT: Unless overridden in the deployment descriptor file, this will become the new default value and can be used to cap the upper bound of all concurrent invocations of any Stateless EJB pools.
+
+[[example]]
+===== Example
+
+The following is a sample `glassfish-ejb-jar.xml` deployment descriptor that configures 2 EJBs with the settings mentioned beforehand.
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glassfish-ejb-jar PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 EJB 3.1//EN" "http://glassfish.org/dtds/glassfish-ejb-jar_3_1-1.dtd">
+<glassfish-ejb-jar>
+  <enterprise-beans>
+    <ejb>
+      <ejb-name>PooledStatelessBean</ejb-name>
+      <bean-pool>
+          <max-pool-size>1</max-pool-size>
+          <max-wait-time-in-millis>0</max-wait-time-in-millis>
+          <steady-pool-size>1</steady-pool-size>
+      </bean-pool>
+    </ejb>
+    <ejb>
+      <ejb-name>PooledMDB</ejb-name>
+      <bean-pool>
+          <max-pool-size>1</max-pool-size>
+          <resize-quantity>1</resize-quantity>
+      </bean-pool>
+    </ejb>
+  </enterprise-beans>
+</glassfish-ejb-jar>
+----
 
 [[stateful-container]]
 ==== Stateful Container
@@ -603,8 +756,7 @@ The `jndi-name` element of the `ejb` element in the `glassfish-ejb-jar.xml` file
 [[message-driven-bean-pool]]
 ==== *Message-Driven Bean Pool*
 
-The container manages a pool of message-driven beans for the concurrent processing of a stream of messages.
-The `glassfish-ejb-jar.xml` file contains the elements that define the pool (that is, the `bean-pool` element):
+The container manages a pool of message-driven beans for the concurrent processing of a stream of messages. The `glassfish-ejb-jar.xml` file contains the elements that define the pool (that is, the `bean-pool` element):
 
 * `steady-pool-size`
 * `resize-quantity`
@@ -643,6 +795,7 @@ This section discusses the following restrictions and performance optimizations 
 ==== *Pool Tuning and Monitoring*
 
 The message-driven bean pool is also a pool of threads, with each message-driven bean instance in the pool associating with a server session, and each server session associating with a thread.
+
 Therefore, a large pool size also means a high number of threads, which impacts performance and server resources.
 
 When configuring message-driven bean pool properties, make sure to consider factors such as message arrival rate and pattern, `onMessage` method processing time, overall server resources (threads, memory, and so on), and any concurrency requirements and limitations from other resources that the message-driven bean accesses.
@@ -650,6 +803,18 @@ When configuring message-driven bean pool properties, make sure to consider fact
 When tuning performance and resource usage, make sure to consider potential JMS provider properties for the connection factory used by the container (the `mdb-connection-factory` element in the `glassfish-ejb-jar.xml` file). For example, you can tune the Open Message Queue flow control related properties for connection factory in situations where the message incoming rate is much higher than `max-pool-size` can handle.
 
 Refer to "xref:Technical Documentation/Payara Server Documentation/General Administration/monitoring.adoc#administering-the-monitoring-service[Administering the Monitoring Service]" in the Payara Server General Administration section for information on how to get message-driven bean pool statistics.
+
+[[fine-tuning-with-the-activationconfigproperty-annotation]]
+==== Fine-tuning with the ActivationConfigProperty annotation
+
+It is also possible to configure the MDB bean pool size with the `ActivationConfigProperty` annotation. Any bean annotated with `@MessageDriven` can use `@ActivationConfigProperty` to set property names and property values. For example:
+
+[source, java]
+----
+@ActivationConfigProperty(propertyName = "MaxPoolSize", propertyValue = "100")
+----
+
+The `MaxPoolSize`, `MaxWaitTimeInMillis`, `PoolResizeQuantity`, `SteadyPoolSize` and `PoolIdleTimeoutInSeconds` are all MDB pool properties that can configured using the `@ActivationConfigProperty` annotation.
 
 [[the-onmessage-runtime-exception]]
 ==== The `onMessage` Runtime Exception
@@ -681,3 +846,149 @@ method before the container starts to close the container's connection to the me
 A message-driven bean's `onMessage` method can use the `jakarta.jms.Message.getJMSRedelivered` method to check whether a received message is a redelivered message.
 
 CAUTION: The `cmt-max-runtime-exceptions` property is deprecated and support for this feature may be removed in the future.
+
+[[tracing-remote-ejbs]]
+== Tracing Remote EJBs
+
+Remote calls to an EJB from a Java SE client will have their active OpenTelemetry span context automatically propagated to the server, with the server-side span being created as a child of this client call. This will allow users to trace EJB calls that are originated externally from the server, and the span context will be propagated internally to any traceable components.
+
+[[java-se-client-tracing]]
+=== Java SE Client Tracing
+
+No additional setup is required on the client side over what is to be expected for making regular un-traced remote EJB calls - the requirements are the same: usage of `payara-embedded-all` or the application client facilities of a Payara Server instance.
+
+No additional properties need to be specified when performing the initial context lookup either:
+
+[source, java]
+----
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.util.Properties;
+
+...
+
+Properties contextProperties = new Properties();
+contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
+
+try {
+    Context context = new InitialContext(contextProperties);
+    EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
+} catch (NamingException ne) {
+    logger.warning("Failed performing lookup:\n" + ne.getMessage());
+}
+----
+
+//TODO - Following sections needs updating with regards to using OpenTelemetry on client-side.
+
+[[getting-a-tracer]]
+==== Getting a Tracer Instance
+
+Injection of an OpenTracing tracer is not supported on Java SE clients, so you must create an instance yourself and register it to a `GlobalTracer` instance.
+
+WARNING: Manual registration of a tracer instance is only required if using a third-party tracer such as ZipKin or Jaeger - if using the built-in Payara Platform Request Tracing service the registration will automatically happen during creation of the initial context.
+
+NOTE: The built-in Payara Request Tracing service does not support tracing of Java SE clients (though will still propagate the active span context to the server)
+
+[source, java]
+----
+import io.opentracing.Tracer;
+import io.opentracing.util.GlobalTracer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.util.Properties;
+
+...
+
+Properties contextProperties = new Properties();
+contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
+
+try {
+    Context context = new InitialContext(contextProperties);
+    EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
+
+    Tracer tracer = GlobalTracer.get();
+} catch (NamingException ne) {
+    logger.warning("Failed performing lookup:\n" + ne.getMessage());
+}
+----
+
+Extra information on creating a Tracer instance and registering it to the `GlobalTracer` can be found link:https://opentracing.io/guides/java/tracers/[here], but in short it can be done like so (replacing `CustomTracer` with your desired implementation):
+
+[source, java]
+----
+Tracer tracerImpl = new CustomTracer(...);
+GlobalTracer.register(tracerImpl);
+----
+
+[[starting-a-span]]
+==== Starting a Span
+
+The `@Traced` annotation is not supported on Java SE client methods, so spans must be started and finished manually. Note that the Span Context of the *active* span will be propagated to the server, so it is recommended that you use a try-with-resources clause to help ensure your span scope is the one you expect.
+
+[source, java]
+----
+import io.opentracing.Scope;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+import io.opentracing.util.GlobalTracer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.util.Properties;
+
+...
+
+Properties contextProperties = new Properties();
+contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
+
+try {
+    Context context = new InitialContext(contextProperties);
+    EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
+
+    Tracer tracer = GlobalTracer.get();
+
+    try (Scope scope = tracer.buildSpan("ExecuteEjb").startActive(true)) {
+        ejb.doTheThing();
+    }
+} catch (NamingException ne) {
+    logger.warning("Failed performing lookup:\n" + ne.getMessage());
+}
+----
+
+Once your span has been started, you can attach any desired baggage items (link:https://opentracing.io/docs/overview/tags-logs-baggage/[String key:value pairs]), and these will be propagated to the server along with the span context. These can then be retrieved within the EJB implementation hosted on Payara Server like so:
+
+[source, java]
+----
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
+
+@Stateless
+public class Ejb implements EjbRemote {
+
+    @Inject
+    Tracer tracer;
+
+    public void businessMethod(){
+        Span activeSpan = tracer.activeSpan();
+        if (activeSpan != null) {
+            String myBaggageItem = activeSpan.getBaggageItem("myBaggageItem");
+        }
+    }
+}
+----
+
+NOTE: Baggage items are attached to the Span you invoke `setBaggageItem` on, as well as any child spans, so you are not prevented from starting additional child spans on your EJB methods manually or via the `@Traced` annotation.
+
+[[jdk17-support]]
+== JDK 17+ Support Considerations
+
+The following considerations must be taken into account when using EJB Features on JDK 17+:
+
+* If using a Java SE client for remote EJB lookups, add the `--add-opens=java.base/java.lang=ALL-UNNAMED` JVM argument to the list of startup arguments of the client.
