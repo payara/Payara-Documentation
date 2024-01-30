@@ -1,0 +1,118 @@
+[[standard-classloading]]
+= Standard Classloading
+:ordinal: 1
+
+In a JVM implementation, the class loaders dynamically load a specific Java class file needed for resolving a dependency. For example, when an instance of
+`java.util.Enumeration` needs to be created, one of the class loaders loads the relevant class into the environment.
+
+For information about class loader debugging, see xref:Technical Documentation/Application Development/debugging-apps.adoc#class-loader-debugging[Class Loader Debugging].
+
+Class loaders in Payara Server follow a delegation hierarchy by default. This page documents how classes are usually loaded and from which locations.
+
+[[classloader-hierarchy]]
+== The Class Loader Hierarchy
+
+With the default classloader configuration, Payara Server will attempt to search for classes in the following locations in this order:
+
+1. Classes provided by the JDK
+2. Extension libraries in a Payara Server domain (installed as a library of the `ext` type )
+3. Classes provided by Payara Server
+4. Common libraries in a Payara Server domain (installed as a library of the `common` type)
+5. Application-specific libraries in Payara Server (installed as a library of the `app` type)
+6. Classes and libraries provided by the deployed application archive (e.g. `WAR` or `EAR`)
+
+Classloaders that are lower in the hierarchy will first delegate searching for a class to a classloader higher in the hierarchy. 
+
+NOTE: If none of the classloaders higher in the hierarchy finds the class, the classloader will attempt to find the class itself. 
+
+Here, you can see that:
+
+* Classes provided by Payara Server have higher priority than classes provided by an application
+* Classes provided by Payara Server have higher priority than installed libraries of type `common` and `app`
+* Classes in installed libraries have higher priority than classes provided by an application
+* To install a library with a higher priority than classes provided by Payara Server, it should be installed with type `ext`
+
+The delegation hierarchy can be tweaked using the xref:Technical Documentation/Application Development/Classloading/Enhanced Classloading.adoc[Enhanced Classloading] features. For example, it's possible to give the classes provided by an application the highest priority (by disabling classloading delegation), or completely hide (isolate) classes provided by Payara Server from a deployed application.
+
+The Jakarta Servlet specification recommends that a web module's class loader look in the local class loader before delegating to its parent.
+
+
+You can make this class loader follow the delegation inversion model in the Servlet specification by setting `delegate="false"` in the `class-loader`
+element of the `payara-web.xml` file. It is safe to do this only for a web module that does not interact with any other modules. For more details,
+see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#class-loader[class-loader]" in the Payara Server Application Deployment section.
+
+The default value is `delegate="true"`, which causes a web module's class loader to delegate in the same manner as the other class loaders.
+You must use `delegate="true"` for a web application that accesses EJB components or that acts as a web service client or endpoint.
+
+For a number of packages, including `java.\*` and `jakarta.\*`, symbol resolution is always delegated to the parent class loader regardless of the `delegate` setting. This prevents applications from overriding core Java runtime classes or changing the API versions of specifications that are part of the Jakarta EE platform.
+
+
+[[install-libraries]]
+== Install Libraries in a Payara Server Domain
+
+If a deployed application requires additional classes not provided by the application, you can install a library with those classes into the Payara Server domain. This is useful if you'd like to build an application for flexible deployments and configure it with classes dropped on the classpath, or if you'd like multiple deployed applications to share the same library.
+
+If an internal Payara Server resource, such as a JDBC connection pool, requires an additional library, you can install it into the Payara Server domain too.
+
+To install a library into a Payara Server domain, use the asadmin xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Asadmin Commands/Server Management Asadmin Commands.adoc#add-library-command[add-library] command. This command accepts the `--type` argument, which accepts the following options:
+
+`common`:: The library is installed as a common library into the `lib` directory in the Payara Server domain
+`ext`:: The library is installed as an extension library into the `lib/ext` directory in the Payara Server domain
+`app`:: the library is installed as an application library into the `lib/applibs` directory in the Payara Server domain
+
+[[common-libraries]]
+== Common Libraries
+
+Common libraries are available to all applications or modules deployed on servers with the same configuration. There are several levels of common libraries:
+
+* Shared by all applications deployed on the same Payara Server installation - located in the `glassfish/lib` directory in the Payara Server installation
+* Shared by all applications deployed in the same Payara Server domain - located in the `lib` directory in that Payara Server domain directory
+* Shared by all applications deployed on instances that share the same configuration - located in the `config/<config-name>/lib` directory in the particular Payara Server domain directory
+
+NOTE: Only libraries shared by applications in the same domain can be installed by the `add-library` asadmin command. All other types have to be installed manually by copying the libraries into the particular locations.
+
+[[extension-libraries]]
+== Extension Libraries
+
+Application developers can use libraries installed as extension libraries to extend the functionality of the core Payara Server platform. For example, an Oracle Database JDBC driver should be installed as an extension library if it's going to be used via JPA to use Oracle-specific JPA features. Or a Java agent library should be installed as an extension library if the Java agent instruments classes in Payara Server to use classes from the agent library itself.
+
+CAUTION: Classes in extension libraries will be available to all deployed applications. If you need that classes from an extension library are available also to Payara Server's internal classes (and OSGi bundles in general) as is often the case with Java agents, you also need to add the packages exported by the library into OSGi boot delegation. This is done by modifying the `glassfish/config/osgi.properties` configuration file in the Payara Server installation and adding the packages to the list in the `org.osgi.framework.bootdelegation` property. Packages exported by Oracle JDBC drivers are already added by default.
+
+[[extension-library-support-jdk-8]]
+=== Extension Libraries Support On JDK 8
+
+When Payara Server runs on JDK 8, extension libraries are added to the JVM using the standard https://docs.oracle.com/javase/tutorial/ext/index.html[Java extension mechanism], by adding the `lib/ext` directory in the current domain as an extension directory using the `java.ext.dirs` JVM option.
+
+[[extension-library-support-jdk-11]]
+=== Extension Libraries Support On JDK 11+
+
+When Payara Server runs on JDK 11 and newer releases, extension libraries are added to the system classpath at the beginning of the classpath, so that they have higher priority than all other classes and libraries on the classpath. This is because the Java extension mechanism isn't supported in Java 11 and newer and the official recommend way to replace it is to add the libraries to the classpath directly.
+
+This behavior is triggered automatically if the `java.ext.dirs` property isn't defined as a JVM option, regardless of the JDK version used. Since defining the `java.ext.dirs` on Java 11+ leads to an error, this JVM option cannot be used with Java 11+ and extension libraries are automatically added as classpath elements. 
+
+TIP: It's also possible to trigger this behavior when using Java 8 by removing the `java.ext.dirs` JVM option from the Payara Server default configuration settings.
+
+[[Application-Specific-libraries]]
+== Application Specific Libraries
+
+You can specify module or application-specific library classes in one of the following ways:
+
+* Use the Administration Console. Open the _Applications_ component, then go to the page for the type of application or module. Select the _Deploy_ button. Type the comma-separated paths in the _Libraries_ field.
+
+* Use the `asadmin deploy` command with the `--libraries` option and specify comma-separated paths. For more details, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/deploy.adoc[Payara Server Reference Manual].
+
+* Use the `asadmin add-library` command with the `--type app` option. For details, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/add-library.adoc[add-library].
+
+NOTE: None of these alternatives apply to application clients. For more information, see xref:Technical Documentation/Application Development/java-clients.adoc#using-libraries-with-application-clients[Using Libraries with Application Clients].
+
+You can update a library JAR file using dynamic reloading or by restarting (disabling and re-enabling) a module or application. To add or remove library JAR files, you can redeploy the module or application. Application libraries are included in the _Applib_ class loader. Paths to libraries can be relative or absolute.
+
+A relative path is relative to `${domain-dir}/lib/applibs`. If the path is absolute, the path must be accessible to the domain administration server (DAS). Payara Server automatically synchronizes these libraries to all remote instances when a cluster or deployment group is restarted. However,
+libraries specified by absolute paths are not guaranteed to be synchronized.
+
+TIP: You can also use application-specific class loading to access different versions of a library from different applications.
+
+If multiple applications or modules refer to the same libraries, classes in those libraries are automatically shared. This can reduce the memory footprint and allow sharing of static information. However, applications or modules using application-specific libraries are not portable.
+
+NOTE: If you see an access control error message when you try to use a library, you may need to grant permission to the library in the
+`server.policy` file. For more information, see xref::Technical Documentation/Application Development/securing-apps.adoc#changing-permissions-for-an-application[Changing Permissions for an Application].
