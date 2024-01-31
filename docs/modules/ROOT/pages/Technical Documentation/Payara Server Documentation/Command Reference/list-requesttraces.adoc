@@ -1,0 +1,176 @@
+[[list-requesttraces]]
+= list-requesttraces
+
+Retrieves a list of request tracing service traces.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] list-requesttraces [--help]
+[--first] value
+[--historicTraces={true|false}]
+----
+
+[[description]]
+== Description
+
+This command can be used to list a number of previous request trace messages from either the current or historic trace stores of the Request Tracing Service.
+
+The request tracing messages are in JSON format, so can be parsed by log parsing tools as if it were in the following format:
+
+[source, json]
+----
+{
+   "traceSpans":[
+      {
+         "operationName":"processContainerRequest",
+         "spanContext":{
+            "spanId":"61fa3c1c-9f62-43fe-8e55-faba2ce77f92",
+            "traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"
+         },
+         "startTime":"2018-03-15T12:36:07.391Z[Europe/London]",
+         "endTime":"2018-03-15T12:36:07.560Z[Europe/London]",
+         "traceDuration":"169000000",
+         "spanTags":[
+            {
+               "Server":"server"
+            },
+            {
+               "Domain":"domain1"
+            }
+         ]
+      },
+      {
+         "operationName":"authenticateJaspic",
+         "spanContext":{
+            "spanId":"fb929e4d-1477-4841-a088-0d07888608a6",
+            "traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"
+         },
+         "startTime":"2018-03-15T12:36:07.391Z[Europe/London]",
+         "endTime":"2018-03-15T12:36:07.392Z[Europe/London]",
+         "traceDuration":"1000000",
+         "spanTags":[
+            {
+               "Context":""
+            },
+            {
+               "AppContext":"__asadmin "
+            },
+            {
+               "AuthResult":"true"
+            },
+            {
+               "Principal":"admin"
+            }
+         ]
+      },
+      {
+         "operationName":"processServletRequest",
+         "spanContext":{
+            "spanId":"94cc4722-0990-4230-aa34-f0e0f629b1d8",
+            "traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"
+         },
+         "startTime":"2018-03-15T12:36:07.392Z[Europe/London]",
+         "endTime":"2018-03-15T12:36:07.559Z[Europe/London]",
+         "traceDuration":"167000000",
+         "spanTags":[
+            {
+               "referer":"[http://localhost:4848/common/index.jsf]"
+            },
+            {
+               "accept-language":"[en-GB,en;q=0.8,de;q=0.5,zh-CN;q=0.3]"
+            },
+            {
+               "cookie":"[JSESSIONID=99ce446fd68ec4adb3a3aa61b087; treeForm_tree-hi=treeForm:tree:nodes:hazelcast]"
+            },
+            {
+               "QueryString":"bare=true"
+            },
+            {
+               "Method":"GET"
+            },
+            {
+               "URL":"http://localhost:4848/cluster/cluster/clusters.jsf"
+            },
+            {
+               "accept":"[*/*]"
+            },
+            {
+               "host":"[localhost:4848]"
+            },
+            {
+               "connection":"[keep-alive]"
+            },
+            {
+               "Class":"jakarta.faces.webapp.FacesServlet"
+            },
+            {
+               "accept-encoding":"[gzip, deflate]"
+            },
+            {
+               "user-agent":"[Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0]"
+            }
+         ],
+         "references":[
+            {
+               "spanContext":{
+                  "spanId":"61fa3c1c-9f62-43fe-8e55-faba2ce77f92",
+                  "traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"
+               },
+               "relationshipType":"ChildOf"
+            }
+         ]
+      }
+   ]
+}
+----
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--first`::
+Defaults to `false`. A limit for the number of Request Tracing messages to return in the output.
+`--historicTraces`::
+Defaults to `true`. Whether to get the traces from the historic trace store or not.
+
+[[examples]]
+== Examples
+
+*Example 1 Retrieve Non-historic traces*
+
+[source, shell]
+----
+asadmin> list-requesttraces --historictraces false
+----
+
+Will give an output similar to the following:
+
+----
+Occurring Time            Elapsed Time  Traced Message
+2018-03-15T12:36:07.391Z  169           {"traceSpans":[
+{"operationName":"processContainerRequest","spanContext":{"spanId":"61fa3c1c-9f62-43fe-8e55-faba2ce77f92","traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"},"startTime":"2018-03-15T12:36:07.391Z[Europe/London]","endTime":"2018-03-15T12:36:07.560Z[Europe/London]","traceDuration":"169000000","spanTags":[{"Server": "server"},{"Domain": "domain1"}]},
+{"operationName":"authenticateJaspic","spanContext":{"spanId":"fb929e4d-1477-4841-a088-0d07888608a6","traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"},"startTime":"2018-03-15T12:36:07.391Z[Europe/London]","endTime":"2018-03-15T12:36:07.392Z[Europe/London]","traceDuration":"1000000","spanTags":[{"Context": ""},{"AppContext": "__asadmin "},{"AuthResult": "true"},{"Principal": "admin"}]},
+{"operationName":"processServletRequest","spanContext":{"spanId":"94cc4722-0990-4230-aa34-f0e0f629b1d8","traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"},"startTime":"2018-03-15T12:36:07.392Z[Europe/London]","endTime":"2018-03-15T12:36:07.559Z[Europe/London]","traceDuration":"167000000","spanTags":[{"referer": "[http://localhost:4848/common/index.jsf]"},{"accept-language": "[en-GB,en;q=0.8,de;q=0.5,zh-CN;q=0.3]"},{"cookie": "[JSESSIONID=99ce446fd68ec4adb3a3aa61b087; treeForm_tree-hi=treeForm:tree:nodes:hazelcast]"},{"QueryString": "bare=true"},{"Method": "GET"},{"URL": "http://localhost:4848/cluster/cluster/clusters.jsf"},{"accept": "[*/*]"},{"host": "[localhost:4848]"},{"connection": "[keep-alive]"},{"Class": "jakarta.faces.webapp.FacesServlet"},{"accept-encoding": "[gzip, deflate]"},{"user-agent": "[Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0]"}],"references":[{"spanContext":{"spanId":"61fa3c1c-9f62-43fe-8e55-faba2ce77f92","traceId":"13bdc5c0-7827-4106-ad32-0242fb75a732"},"relationshipType":"ChildOf"}]}
+]}
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-requesttracing-configuration.adoc#set-requesttracing-configuration[`set-requesttracing-configuration`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-requesttracing-configuration.adoc#get-requesttracing-configuration[`get-requesttracing-configuration`]
