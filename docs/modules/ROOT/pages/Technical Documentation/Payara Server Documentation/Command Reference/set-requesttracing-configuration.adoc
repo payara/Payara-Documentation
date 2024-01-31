@@ -1,0 +1,137 @@
+[[set-requesttracing-configuration]]
+= set-requesttracing-configuration
+
+Configures the Request Tracing service.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-requesttracing-configuration [--help]
+[--enabled={false|true}]
+[--dynamic={false|true}]
+[--sampleRate] rate
+[--adaptiveSamplingEnabled={false|true}]
+[--adaptiveSamplingTargetCount] targetCount
+[--adaptiveSamplingTimeValue] value
+[--adaptiveSamplingTimeUnit] timeUnit
+[--applicationsOnlyEnabled={false|true}]
+[--thresholdValue] value
+[--thresholdUnit] timeUnit
+[--sampleRateFirstEnabled={false|true}]
+[--traceStoreSize] size
+[--traceStoreTimeout] timeout
+[--reservoirSamplingEnabled={false|true}]
+[--historicTraceStoreEnabled={false|true}]
+[--historicTraceStoreSize] size
+[--historicTraceStoreTimeout] timeout
+----
+
+[[description]]
+== Description
+
+This command can be used to configure several aspects of the Request Tracing service.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--enabled`::
+Defaults to `false`. Enables or disables the Request Tracing service
+`--dynamic`::
+Defaults to `false`. When set to `true`, applies the changes without a server restart.
++
+Otherwise, a restart is required.
+`--sampleRate`::
+The probability of a trace being sampled.
++
+The rate must be a positive number between `0` and `1.0`
+`--adaptiveSamplingEnabled`::
+Defaults to `false`. Whether to use an adaptive sampling rate.
+`--adaptiveSamplingTargetCount`::
+The target number of traces to sample per the configured time window.
++
+Defaults to `6`.
+`--adaptiveSamplingTimeValue`::
+The period of time to attempt to hit the adaptive sample target count in.
++
+Defaults to `1`.
+`--adaptiveSamplingTimeUnit`::
+The time unit for the `adaptiveSampleTimeValue` option.
++
+Defaults to `MINUTES`.
+`--applicationsOnlyEnabled`::
+Defaults to `true`. Whether to exclusively sample traces related to applications.
+`--thresholdValue`::
+Sets the number of time units which trigger the tracing of a request.
++
+NOTE: Only used if `adaptiveSamplingEnabled` is set to `false`.
+`--thresholdUnit`::
+Sets the time unit to use for the threshold.
++
+NOTE: Only used if `adaptiveSamplingEnabled` is set to `false`.
+`--sampleRateFirstEnabled`::
+Defaults to `true`. Whether to perform the sampling check before or after the threshold calculation.
+`--traceStoreSize`::
+Sets how many request traces will be stored.
++
+Defaults to `20` trace records.
+`--traceStoreTimeout`::
+Sets how long before Request Tracing messages are removed.
++
+This field is specified in the format `%d %h %m %s` where `%` is an integer. Any of the units can also be omitted.
++
+NOTE: This option is ignored when reservoir sampling is enabled.
+`--reservoirSamplingEnabled`::
+Defaults to `false`. Whether to use reservoir sampling, or time based sampling.
+`--historicTracestoreEnabled`::
+Defaults to `false`. When present, enables storage of the slowest sampled historical request traces in a separate trace store.
+`--historicTracestoreSize`::
+Sets how many request traces will be stored for historical purposes.
++
+Defaults to `20` trace records.
+`--historicTracestoreTimeout`::
+Sets how long before Request Tracing messages are removed from the historical trace store.
++
+This field is specified in the format `%d %h %m %s` where `%` is an integer. Any of the units can also be omitted.
++
+NOTE: This option is ignored when reservoir sampling is enabled.
+
+[[examples]]
+== Examples
+
+*Example 1 Configure the Request Tracing Service Threshold and Historic Trace Storage*
+
+Enables the Request Tracing service with a 10 seconds threshold and to store the last 20 traces from 1 day, 2 hours and 3 minutes ago:
+
+[source, shell]
+----
+asadmin> set-requesttracing-configuration
+    --enabled=true
+    --thresholdValue=10
+    --thresholdUnit="SECONDS"
+    --dynamic=true
+    --historicTraceStoreEnabled=true
+    --historicTraceStoreSize=20
+    --historicTraceStoreTimeout='1d 2h 3m 30s'
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-requesttracing-configuration.adoc#get-requesttracing-configuration[`get-requesttracing-configuration`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-requesttraces.adoc#list-requesttraces[`list-requesttraces`]
+
