@@ -20,8 +20,8 @@ For more information about clusters, see the xref:ROOT:Technical Documentation/P
 An HTTP listener, also known as a network listener, is a listen socket that has an Internet Protocol (IP) address, a port number, a server
 name, and a default virtual server. Each virtual server provides connections between the server and clients through one or more
 listeners. Each listener must have a unique combination of port number and IP address. For example, an HTTP listener can listen for a host on
-all configured IP addresses on a given port by specifying the IP address 0.0.0.0. A listener can listen on a specific port on all network interfaces
-by using the IP 0.0.0.0, and a configured port. Alternatively, the listener can specify a unique IP address for each listener while using the same port.
+all configured IP addresses on a given port by specifying the IP address `0.0.0.0`. A listener can listen on a specific port on all network interfaces
+by using the IP `0.0.0.0`, and a configured port. Alternatively, the listener can specify a unique IP address for each listener while using the same port.
 
 A virtual server will then be used to select a combination of network listeners to use for an application.
 For example, Payara Server has two default network listeners for user deployed applications: an insecure listener on port 8080 (http-listener-1),
@@ -29,10 +29,10 @@ and a secure listener on port 8181 (http-listener-2).
 
 Because an HTTP listener is a combination of IP address and port number, you can have multiple HTTP listeners with the same IP address and
 different port numbers, or with different IP addresses and the same port number (if your host was configured to respond to these addresses).
-However, if an HTTP listener uses the 0.0.0.0 IP address, which listens on all IP addresses on a port, you cannot create HTTP listeners for
+However, if an HTTP listener uses the `0.0.0.0` IP address, which listens on all IP addresses on a port, you cannot create HTTP listeners for
 additional IP addresses that listen on the same port for a specific IP address. For example, if an HTTP listener uses 0.0.0.0:8080 (all IP
 addresses on port 8080), another HTTP listener cannot use 1.2.3.4:8080. The host running the Payara Server typically has access to only one
-IP address. HTTP listeners typically use the 0.0.0.0 IP address and different port numbers, with each port number serving a different
+IP address. HTTP listeners typically use the `0.0.0.0` IP address and different port numbers, with each port number serving a different
 purpose. However, if the host does have access to more than one IP address, each address can serve a different purpose.
 
 To access a web application deployed on Payara Server, use the URL `http://localhost:8080/` (or `https://localhost:8081/` for a secure
@@ -364,7 +364,7 @@ This example creates an HTTP listener named `sampleListener` that uses a non-def
 
 [source,shell]
 ----
-asadmin> create-http-listener --listeneraddress 0.0.0.0 
+asadmin> create-http-listener --listeneraddress `0.0.0.0`
 --listenerport 7272 --defaultvs server --servername host1.sun.com 
 --acceptorthreads 100 --securityenabled=false 
 --enabled=false sampleListener
