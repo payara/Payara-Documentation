@@ -397,26 +397,7 @@ failure.
 
 image:connection-pools/connection_pools_4.png[Connection validation configuration in Admin console]
 
-[[set-up-the-validation-using-asadmin]]
-=== Set up the validation using administration commands
-
-To turn on connection validation using `asadmin` commands:
-
-[source, shell]
-----
-asadmin> set resources.jdbc-connection-pool.test-pool.connection-validation-method=custom-validation
-asadmin> set resources.jdbc-connection-pool.test-pool.validation-classname= org.glassfish.api.jdbc.validation.DerbyConnectionValidation
-asadmin> set resources.jdbc-connection-pool.test-pool.is-connection-validation-required=true
-----
-
-You can also set whether to close all connections on failure with the
-following command:
-
-[source, shell]
-----
-asadmin> set resources.jdbc-connection-pool.test-pool.fail-all-connections=true
-----
-
+Additional information regarding enabling connection validation through 'asadmin' commands, along with various options, is elaborated in the the xref:ROOT:Technical Documentation/Application Development/jdbc.adoc[`Handling Invalid Connections`] section of our Payara Server Application Development JDBC documentation.
 
 [[to-delete-a-jdbc-connection-pool]]
 == To Delete a JDBC Connection Pool
@@ -557,29 +538,10 @@ WARNING: A potential connection leak detected for connection pool test-pool. The
  ...
 ----
 
-
-[[statement-caching]]
-== Statement Caching
-
-Statement caching stores statements, prepared statements, and callable statements that are executed repeatedly by applications in a cache, thereby improving performance. Instead of the statement being prepared each time, the cache is searched for a match. The overhead of parsing and creating new statements each time is eliminated.
-
-Statement caching is usually a feature of the JDBC driver. The Payara Server provides caching for drivers that do not support caching. To enable this feature, set the Statement Cache Size for the JDBC connection pool in one of the following ways:
-
-* Enter a Statement Cache Size value in the Edit Connection Pool Advanced Attributes page in the Administration Console. For more information, click the Help button in the Administration Console.
-* Specify the `--statementcachesize` option in the `asadmin create-jdbc-connection-pool` command. For more information, seexref:docs:reference-manual:create-jdbc-connection-pool.adoc[`create-jdbc-connection-pool`].
-* Specify the `statement-cache-size` option in the `asadmin set` command. For example:
-+
-[source,shell]
-----
-asadmin set domain1.resources.jdbc-connection-pool.H2Pool.statement-cache-size=10
-----
-
-By default, this attribute is set to zero and the statement caching is turned off. To enable statement caching, you can set any positive nonzero value. The built-in cache eviction strategy is LRU-based (Least Recently Used). When a connection pool is flushed, the connections in the statement cache are recreated.
-
 [[enabling-jdbc-call-logging]]
 == Enabling JDBC Call Logging
 
-With *Log JDBC Calls* configured on the connection call each call into the connection pool is timed and logged to the server log at the `FINE` level. A typical log message with Log JDBC Enabled is shown below;
+With *Log JDBC Calls* configured on the connection call each call into the connection pool is timed and logged to the server log at the `FINE` level. A typical log message with Log JDBC Enabled is shown below:
 
 [source, log]
 ----
@@ -606,121 +568,15 @@ The *Log JDBC Calls* setting for a JDBC connection pool can also be configured v
 asadmin set domain.resources.jdbc-connection-pool.__TimerPool.log-jdbc-calls=true
 ----
 
-
-[[statement-tracing]]
-==== *Statement Tracing*
-
-You can trace the SQL statements executed by applications that use a JDBC connection pool. Set the SQL Trace Listeners attribute to a comma-separated list of trace listener implementation classes in one of the following ways:
-
-* Enter an SQL Trace Listeners value in the Edit Connection Pool Advanced Attributes page in the Administration Console. For more information, click the Help button in the Administration Console.
-* Specify the `--sqltracelisteners` option in the `asadmin create-jdbc-connection-pool` command. For more information, see xref:Technical Documentation/Payara Server Documentation/Command Reference/create-jdbc-connection-pool.adoc[`create-jdbc-connection-pool`].
-* Specify the `sql-trace-listeners` option in the `asadmin set` command. For example:
-+
-[source,shell]
-----
-asadmin set domain1.resources.jdbc-connection-pool.H2Pool.sql-trace-listeners=listeners
-----
-
-The Payara Server provides a public interface, org.glassfish.api.jdbc.SQLTraceListener , that implements a means of recording `SQLTraceRecord` objects. To make custom implementations of this interface available to Payara Server, place the implementation classes in `as-install/lib`.
-
-The Payara Server provides an SQL tracing logger to log the SQL operations in the form of `SQLTraceRecord` objects in the `server.log` file. The module name under which the SQL operation is logged is `javax.enterprise.resource.sqltrace`. SQL traces are logged as `FINE` messages along with the module name to enable easy filtering of the SQL logs. A sample SQL trace record looks like this:
-
-[source,shell]
-----
-|2009-11-27T15:46:52.202+0530|FINE|javax.enterprise.resource.sqltrace.com.sun.gjc.util
-|_ThreadID=29;_ThreadName=Thread-1;ClassName=com.sun.gjc.util.SQLTraceLogger;MethodName=sqlTrace;
-|ThreadID=77 | ThreadName=p: thread-pool-1; w: 6 | TimeStamp=1259317012202
-| ClassName=com.sun.gjc.spi.jdbc40.PreparedStatementWrapper40 | MethodName=executeUpdate
-| arg[0]=insert into table1(colName) values(100) | arg[1]=columnNames |
-----
-
-This trace shows that an `executeUpdate(String sql, String columnNames)` operation is being done.
-
-When SQL statement tracing is enabled and JDBC connection pool monitoring is enabled, Payara Server maintains a tracing cache of recent queries and their frequency of use. The following JDBC connection pool properties can be configured to control this cache and the monitoring statistics available from it:
-
-`time-to-keep-queries-in-minutes`::
-Specifies how long in minutes to keep a query in the tracing cache, tracking its frequency of use. The default value is 5 minutes.
-`number-of-top-queries-to-report`::
-Specifies how many of the most used queries, in frequency order, are listed the monitoring report. The default value is 10 queries.
-
-Set these parameters in one of the following ways:
-
-* Add them as properties in the Edit JDBC Connection Pool Properties page in the Administration Console.
-* Specify them using the `--property` option in the `create-jdbc-connection-pool` subcommand. For more information, see
-xref:Technical Documentation/Payara Server Documentation/Command Reference/create-jdbc-connection-pool.adoc[`create-jdbc-connection-pool`].
-* Set them using the `set` subcommand. For example:
-+
-[source,shell]
-----
-asadmin set resources.jdbc-connection-pool.pool-name.property.time-to-keep-queries-in-minutes=10
-----
-
-
-[[jdbc-call-logging-deployment]]
-== Application Deployment
-
-In Java EE 7+ applications and above, a JDBC data source can be deployed by adding the `@DataSourceDefinition` annotation to  a managed component (like and `@Stateless` EJB bean for example). The *Log JDBC Calls* setting can be configured using this annotation as well:
-
-[source, java]
-----
-@DataSourceDefinition(
-    name = "java:app/MyApp/MyDS",
-    className = "org.h2.jdbcx.JdbcDataSource",
-    url = "jdbc:h2:mem:test",
-    properties = {"fish.payara.log-jdbc-calls=true"})
-----
-
-The Data source definition can also be added to a deployment descriptor of an application, for example in the _web.xml_ standard deployment descriptor:
-
-[source, xml]
-----
-<data-source>
-   <name>java:global/ExampleDataSource</name>
-   <class-name>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</class-name>
-   <server-name>localhost</server-name>
-   <port-number>3306</port-number>
-   <database-name>mysql</database-name>
-   <user>test</user>
-   <password>test</password>
-   <!-- Example of how to use a Payara specific custom connection pool setting -->
-   <property>
-       <name>fish.payara.log-jdbc-calls</name>
-       <value>true</value>
-   </property>
-</data-source>
-----
-
-or in the definition of a `jdbc-connection-pool` in a __payara-resources.xml__ file:
-[source, xml]
-----
-<jdbc-connection-pool name="examplePool"
-        res-type="javax.sql.DataSource"
-        datasource-classname="org.h2.jdbcx.JdbcDataSource" log-jdbc-calls="true">
-    <property name="user" value="test"/>
-    <property name="password" value="test"/>
-    <property name="url" value="java:global/ExampleDataSource"/>
-</jdbc-connection-pool>
-
-----
-
-This can also be done in the creation of a JDBC Connection Pool with the `--logjdbccalls` option.
-
-[source, shell]
-----
-asadmin create jdbc-connection-pool --datasourceclassname org.h2.jdbcx.JdbcDataSource --restype javax.sql.XADataSource --logjdbccalls=true examplePool
-----
-
-
 [[advance-connection-pool-properties-in-deployment-descriptors]]
-== Advanced Connection Pool Properties in Deployment Descriptors
-:page-aliases:Technical Documentation/Payara Server Documentation/advanced-jdbc/advanced-connection-pool-properties.adoc
+=== Advanced Connection Pool Properties in Deployment Descriptors
 
 Payara Server supports setting advanced JDBC connection pool properties directly on data source definitions made with the `@DataSourceDefinition` annotation or directly on deployment descriptors.
 
 [[setting-properties-in-the-deployment-descriptor]]
 === Setting Properties in the Deployment Descriptor
 
-In a Java EE 7+ application, a data source definition can be added to a deployment descriptor of an application. For a web application, you would this in the standard _web.xml_ deployment descriptor. To set advanced properties just add a `property` element as shown in the following example:
+In a Jakarta EE application, a data source definition can be added to a deployment descriptor of an application. For a web application, you would this in the standard _web.xml_ deployment descriptor. To set advanced properties just add a `property` element as shown in the following example:
 
 [source, xml]
 ----
@@ -743,7 +599,7 @@ In a Java EE 7+ application, a data source definition can be added to a deployme
 [[setting-properties-via-annotations.]]
 === Setting Properties on the `@DataSourceDefinition` Annotation.
 
-In Java EE 7+ applications, a JDBC data source can be deployed by adding the `@DataSourceDefinition` annotation to  a managed component (like and `@Stateless` EJB bean for example). To configure advanced JDBC properties, use the `properties` attribute of the annotation to define an array of the properties to configure:
+In Jakarta EE applications, a JDBC data source can be deployed by adding the `@DataSourceDefinition` annotation to  a managed component (like and `@Stateless` EJB bean for example). To configure advanced JDBC properties, use the `properties` attribute of the annotation to define an array of the properties to configure:
 
 [source, java]
 ----
@@ -1521,7 +1377,7 @@ Many performance problems in Enterprise Applications can be traced to slow datab
 The warning message (see below) logs the SQL query and the stack trace to the code executing the query. This enables rapid diagnosis by pinpointing the exact lines of code to investigate.
 
 [[configuring-the-slow-sql-logger]]
-== Configuring the Slow SQL Logger
+=== Configuring the Slow SQL Logger
 
 Ensure Wrap JDBC Objects is enabled in your JDBC Connection Pool (enabled by default) for the Slow SQL Logger to function correctly.
 
@@ -1556,7 +1412,7 @@ asadmin set domain.resources.jdbc-connection-pool.__TimerPool.slow-query-thresho
 [[slow-sqldeployment]]
 === Application Deployment
 
-In Java EE 7+ applications, a JDBC data source can be deployed by adding the `@DataSourceDefinition` annotation to  a managed component (like and `@Stateless` EJB bean for example). The *Slow Query Log Threshold* time can be configured using this annotation, like in the following example:
+In Jakarta EE applications, a JDBC data source can be deployed by adding the `@DataSourceDefinition` annotation to  a managed component (like and `@Stateless` EJB bean for example). The *Slow Query Log Threshold* time can be configured using this annotation, like in the following example:
 
 [source, java]
 ----
@@ -1631,7 +1487,6 @@ java.lang.Exception: Stack Trace shows code path to SQL
 
 [[sql-trace-listeners]]
 == Custom SQL Trace Listeners
-:page-aliases:Technical Documentation/Payara Server Documentation/advanced-jdbc/sql-trace-listeners.adoc
 
 Payara Server provides support for custom SQL Trace Listeners. A *SQL Trace Listener* is registered against a data source and is called after each method call made on the JDBC connection pool.
 
@@ -1748,7 +1603,7 @@ asadmin set domain.resources.jdbc-connection-pool.__TimerPool.sql-trace-listener
 [[sql-trace-deployment]]
 === Application Deployment
 
-In Java EE 7+ applications, a JDBC data source can be deployed by adding the `@DataSourceDefinition` annotation to  a managed component (like and `@Stateless` EJB bean for example). SQL Trace Listener classes can be configured using this annotation, like in the following example:
+In Jakarta EE applications, a JDBC data source can be deployed by adding the `@DataSourceDefinition` annotation to  a managed component (like and `@Stateless` EJB bean for example). SQL Trace Listener classes can be configured using this annotation, like in the following example:
 
 [source, java]
 ----

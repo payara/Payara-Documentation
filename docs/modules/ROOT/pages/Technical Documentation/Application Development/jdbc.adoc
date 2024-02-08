@@ -126,8 +126,8 @@ SQL traces are logged as `FINE` messages along with the module name to enable ea
 ----
 [#|2009-11-27T15:46:52.202+0530|FINE|Payara Server {page-version}|jakarta.enterprise.resource.sqltrace.com.sun.gjc.util
 |_ThreadID=29;_ThreadName=Thread-1;ClassName=com.sun.gjc.util.SQLTraceLogger;MethodName=sqlTrace;
-|ThreadID=77 | ThreadName=p: thread-pool-1; w: 6 | TimeStamp=1259317012202 
-| ClassName=com.sun.gjc.spi.jdbc40.PreparedStatementWrapper40 | MethodName=executeUpdate 
+|ThreadID=77 | ThreadName=p: thread-pool-1; w: 6 | TimeStamp=1259317012202
+| ClassName=com.sun.gjc.spi.jdbc40.PreparedStatementWrapper40 | MethodName=executeUpdate
 | arg[0]=insert into table1(colName) values(100) | arg[1]=columnNames | |#]
 ----
 
@@ -136,9 +136,9 @@ This trace shows that an `executeUpdate(String sql, String columnNames)` operati
 When SQL statement tracing is enabled and JDBC connection pool monitoring is enabled, Payara Server maintains a tracing cache of recent queries and their frequency of use. The following JDBC connection pool properties can be configured to control this cache and the monitoring statistics available from it:
 
 `time-to-keep-queries-in-minutes`::
-  Specifies how long in minutes to keep a query in the tracing cache,   tracking its frequency of use. The default value is `5` minutes.
+Specifies how long in minutes to keep a query in the tracing cache,   tracking its frequency of use. The default value is `5` minutes.
 `number-of-top-queries-to-report`::
-  Specifies how many of the most used queries, in frequency order, are   listed the monitoring statistic. The default value is `10` queries.
+Specifies how many of the most used queries, in frequency order, are   listed the monitoring statistic. The default value is `10` queries.
 
 Set these parameters in one of the following ways:
 
@@ -394,3 +394,58 @@ Accessing a `DataSource` using the `Synchronization.beforeCompletion()` method r
 You can define an application-scoped database or other resources for an enterprise application, web module, EJB module, connector module, or application client module by supplying a `payara-resources.xml` deployment descriptor file.
 
 For more details, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources]" in the Payara Server Application Deployment section.
+
+
+[[jdbc-call-logging-deployment]]
+== JDBC Development Guidelines
+
+In Jakarta EE applications and above, a JDBC data source can be deployed by adding the `@DataSourceDefinition` annotation to  a managed component (like and `@Stateless` EJB bean for example). The *Log JDBC Calls* setting can be configured using this annotation as well:
+
+[source, java]
+----
+@DataSourceDefinition(
+    name = "java:app/MyApp/MyDS",
+    className = "org.h2.jdbcx.JdbcDataSource",
+    url = "jdbc:h2:mem:test",
+    properties = {"fish.payara.log-jdbc-calls=true"})
+----
+
+The Data source definition can also be added to a deployment descriptor of an application, for example in the _web.xml_ standard deployment descriptor:
+
+[source, xml]
+----
+<data-source>
+   <name>java:global/ExampleDataSource</name>
+   <class-name>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</class-name>
+   <server-name>localhost</server-name>
+   <port-number>3306</port-number>
+   <database-name>mysql</database-name>
+   <user>test</user>
+   <password>test</password>
+   <!-- Example of how to use a Payara specific custom connection pool setting -->
+   <property>
+       <name>fish.payara.log-jdbc-calls</name>
+       <value>true</value>
+   </property>
+</data-source>
+----
+
+or in the definition of a `jdbc-connection-pool` in a __payara-resources.xml__ file:
+[source, xml]
+----
+<jdbc-connection-pool name="examplePool"
+        res-type="javax.sql.DataSource"
+        datasource-classname="org.h2.jdbcx.JdbcDataSource" log-jdbc-calls="true">
+    <property name="user" value="test"/>
+    <property name="password" value="test"/>
+    <property name="url" value="java:global/ExampleDataSource"/>
+</jdbc-connection-pool>
+
+----
+
+This can also be done in the creation of a JDBC Connection Pool with the `--logjdbccalls` option.
+
+[source, shell]
+----
+asadmin create jdbc-connection-pool --datasourceclassname org.h2.jdbcx.JdbcDataSource --restype javax.sql.XADataSource --logjdbccalls=true examplePool
+----
