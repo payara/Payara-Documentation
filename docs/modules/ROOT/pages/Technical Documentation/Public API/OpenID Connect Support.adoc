@@ -217,6 +217,20 @@ The annotation and MicroProfile properties has several configuration options. Th
 | groups
 | N/A.
 
+| `proxyDefinition.hostName`
+| `payara.security.openid.proxyHostname`
+| `false`
+| Defines the hostname of the proxied server.
+| 
+| N/A.
+
+| `proxyDefinition.port`
+| `payara.security.openid.proxyPort`
+| `false`
+| Defines the port of the proxied server.
+| 
+| N/A.
+
 | `extraParameters`
 |
 | `false`
@@ -396,6 +410,42 @@ With the `logout` parameter of the `OpenIdAuthenticationDefinition` you can defi
 |===
 
 A programmatic logout is performed by calling `OpenIdContext#logout()` which invalidates the RP's active OpenId Connect session. If `fish.payara.security.annotations.LogoutDefinition#notifyProvider` is set to true then it redirects the End-User's User Agent to the `end_session_endpoint` to notify the OP that the user has logged out of the RP's application. It will also ask the user whether they want to logout from the OP as well. After successful logout, the End-User's User Agent redirects back to the RP's `_post_redirect_uri_` configured via the `fish.payara.security.annotations.LogoutDefinition#redirectURI` property.
+
+[[proxy-support]]
+=== Proxy Definition 
+
+With the `proxyDefinition` parameter of the `OpenIdAuthenticationDefinition`, you can specify details regarding proxy mapping within the OpenID Connect client configuration. It contains attributes to specify the `hostName` and `port` of the proxied server. This addition facilitates the configuration of proxy mapping for requests traversing through reverse web proxies.
+Moreover, the proxy configuration details (`hostName` and `port`) can be dynamically utilized to define the `redirectURI` within the `OpenIdAuthenticationDefinition`, replacing the `baseURL` placeholder if present. This allows for a more flexible setup, especially in scenarios involving reverse web proxies.
+
+**Scenarios without Proxy:**
+
+- **Case 1:**
+  ** `redirectURI` employs the `${baseURL}` placeholder, which defaults to `${baseURL}/Callback` when `redirectURI` is not explicitly defined.
+  ** Proxy definition is also absent.
+  ** **Outcome:** The generated `redirectURI` should include the request's host and port. The registered Authorized Redirect URI in Google Cloud must contain a URL with the Payara Instance's host and port.
+
+- **Case 2:**
+  ** `redirectURI` is explicitly defined with the Payara Instance's host and port.
+  ** Proxy definition is not present.
+  ** **Outcome:** The registered Authorized Redirect URI in Google Cloud must contain a URL with the Payara Instance's host and port.
+
+**Scenarios with Proxy:**
+
+- **Case 3:**
+  ** `redirectURI` employs the `${baseURL}` placeholder, defaulting to `${baseURL}/Callback` when `redirectURI` is not explicitly defined.
+  ** Proxy definition is included.
+  ** **Outcome:** The generated `redirectURI` should include the proxy's host and port. The registered Authorized Redirect URI in Google Cloud must contain a URL with the proxy's host and port.
+
+- **Case 4:**
+  ** `redirectURI` is explicitly defined with the Payara Instance's host and port.
+  ** Proxy definition is also present.
+  ** **Outcome:** The registered Authorized Redirect URI in Google Cloud must contain a URL with the Payara Instance's host and port.
+
+- **Case 5:**
+  ** `redirectURI` is explicitly defined with the Proxy's host and port.
+  ** Proxy definition is included.
+  ** **Outcome:** The registered Authorized Redirect URI in Google Cloud must contain a URL with the proxy's host and port.
+
 
 [[provider-metadata]]
 === Provider Metadata
