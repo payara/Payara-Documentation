@@ -73,3 +73,26 @@ The `fish.payara.faces.enableParallelInit` context parameter can also be combine
 This is an existing Mojarra-specific parameter to also enable parallel initialisation, but in a slightly earlier stage of the initialisation process.
 
 IMPORTANT: As a Payara Platform specific implementation this will use the default Platform Concurrency executor if there is one, if not it will create a single use executor with 5 threads.
+
+[[use-bundled-jsf]]
+== Using an Alternative Jakarta Faces Implementation
+
+As a special case of how the classloader hierarchy can be modified (see xref:Technical Documentation/Application Development/class-loaders.adoc#configuring-delegation[configuring classloading delegation]), the Payara Platform allows the use of a Jakarta Faces implementation that is bundled on a web application.
+
+This feature may be useful to switch to a different implementation than the default one included with the server.
+
+To configure this feature, you need to indicate within the `payara-web.xml` / `glassfish-web.xml` deployment descriptor that the server should use a bundled Jakarta Faces implementation as follows:
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}">
+<payara-web-app error-url="">
+    <class-loader delegate="false"/>
+    <property name="useBundledJsf" value="true" />
+</payara-web-app>
+----
+
+By specifying these options, the bundled Jakarta Faces implementation within your web application will be used instead of the default implementation included within the server.
+
+IMPORTANT: If deploying a EAR application you must bundle the Jakarta Faces implementation library within the embedded WAR component. You cannot add an alternative Jakarta Faces implementation as an EAR library.
