@@ -357,35 +357,25 @@ following administration commands:
 asadmin> set resources.jdbc-connection-pool.test-pool.max-pool-size=200
 ----
 
-
 [[connection-validation]]
 == Connection validation
 
-Connection validation ensures that connections aren't assigned to your application
-after the connection has already gone stale.
+Connection validation ensures that connections aren't assigned to your application after the connection has already gone stale.
 
 Connection validation is always a trade-off between how sure you want to be that
-a connection is valid and the performance impact that the validation mechanism can
-exert into application that use the pool. There will be a negative performance
-impact by having to return an invalid connection by your application and borrow
-a new one, so finding the right balance is key.
+a connection is valid and the performance impact that the validation mechanism can exert into application that use the pool. There will be a negative performance impact by having to return an invalid connection by your application and borrow a new one, so finding the right balance is key.
 
 Before using a connection from the pool a simple query is sent to test the
-connection. If there is an issue with the connection, it is removed from the pool
-and another one is used. If you have an issue such as the database being down
-and you have a large number of connections then each of those connections will
-be tested and removed.
+connection. If there is an issue with the connection, it is removed from the pool and another one is used. If you have an issue such as the database being down, and you have a large number of connections then each of those connections will be tested and removed.
 
-In order to avoid this, you can set a connection validation so that if a connection
-fails, all remaining open connections are closed.
+In order to avoid this, you can set a connection validation so that if a connection fails, all remaining open connections are closed.
 
 [[set-up-the-validation-via-the-admin-console]]
 === Set up the validation using the admin console
 
 . Click on the name of the connection pool
 . Select the _Advanced_ tab
-. Scroll down to the _Connection Validation_ section and select the following
-settings:
+. Scroll down to the _Connection Validation_ section and select the following settings:
 .. _Connection Validation required_
 .. _Validation method_ - custom-validation
 .. _Validation class name_ – a proper class name for the chosen JDBC driver,
@@ -402,8 +392,7 @@ Additional information regarding enabling connection validation through 'asadmin
 [[to-delete-a-jdbc-connection-pool]]
 == To Delete a JDBC Connection Pool
 
-Use the `delete-jdbc-connection-pool` subcommand in remote mode to delete an existing JDBC connection pool. Deleting a JDBC connection pool
-is a dynamic event and does not require server restart.
+Use the `delete-jdbc-connection-pool` subcommand in remote mode to delete an existing JDBC connection pool. Deleting a JDBC connection pool is a dynamic event and does not require server restart.
 
 *Before You Begin*
 
@@ -417,7 +406,7 @@ xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/
 xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-jdbc-connection-pool.adoc[`delete-jdbc-connection-pool`] subcommand.
 
 [[example-to-delete-a-jdbc-connection-pool]]
-==== *Example 11-7 To Delete a JDBC Connection Pool*
+=== *Example 11-7 To Delete a JDBC Connection Pool*
 
 This example deletes the JDBC connection pool named `H2Pool`.
 
@@ -435,7 +424,7 @@ You can also view the full syntax and options of the subcommand by typing `asadm
 In Payara Server, JDBC Connection Pools support a variety of features to simplify administration, monitoring and performance tuning.
 
 [[transparent-pool-reconfiguration]]
-==== *Transparent Pool Reconfiguration*
+=== *Transparent Pool Reconfiguration*
 
 When the properties or attributes of a JDBC connection pool are changed, the connection pool is destroyed and re-created. Normally, applications using the connection pool must be redeployed as a consequence. This restriction can be avoided by enabling transparent JDBC connection pool reconfiguration. When this feature is enabled, applications do not need to be redeployed. Instead, requests for new connections are blocked until the reconfiguration operation completes. Connection requests from any in-flight transactions are served using the old pool configuration to complete the transaction. Then, connections are created using the pool's new configuration, and any blocked connection requests are served with connections from the re-created pool.
 
@@ -608,6 +597,8 @@ In Jakarta EE applications, a JDBC data source can be deployed by adding the `@D
     className = "org.h2.jdbcx.JdbcDataSource",
     url = "jdbc:h2:mem:test",
     properties = {"fish.payara.is-connection-validation-required=true"})
+public class ApplicationComponent{
+}
 ----
 
 [[full-list-of-properties]]
@@ -755,7 +746,7 @@ A JDBC resource is created by specifying the connection pool with which the reso
 The Jakarta EE standard specifies that certain default resources be made available to applications, and defines specific JNDI names for these default resources. Payara Server makes these names available through the use of logical JNDI names, which map Jakarta EE standard JNDI names to specific Payara Server resources. For JDBC resources, the Jakarta EE standard name `java:comp/DefaultDataSource` is mapped to the `jdbc/__default` resource.
 
 [[to-create-a-jdbc-resource]]
-==== *To Create a JDBC Resource*
+=== *To Create a JDBC Resource*
 
 Use the `create-jdbc-resource` subcommand in remote mode to create a JDBC resource. Creating a JDBC resource is a dynamic event and does not require server restart.
 
@@ -786,7 +777,7 @@ Command create-jdbc-resource executed successfully.
 You can also view the full syntax and options of the subcommand by typing `asadmin help create-jdbc-resource` at the command line.
 
 [[to-list-jdbc-resources]]
-==== *To List JDBC Resources*
+=== *To List JDBC Resources*
 
 Use the `list-jdbc-resources` subcommand in remote mode to list the existing JDBC resources.
 
@@ -811,7 +802,7 @@ Command list-jdbc-resources executed successfully.
 You can also view the full syntax and options of the subcommand by typing `asadmin help list-jdbc-resources` at the command line.
 
 [[to-update-a-jdbc-resource]]
-==== *To Update a JDBC Resource*
+=== *To Update a JDBC Resource*
 
 You can enable or disable a JDBC resource by using the `set` subcommand. The JDBC resource is identified by its dotted name.
 
@@ -831,7 +822,7 @@ asadmin>set resources.jdbc-resource.res1.enabled=false
 ----
 
 [[to-delete-a-jdbc-resource]]
-==== *To Delete a JDBC Resource*
+=== *To Delete a JDBC Resource*
 
 Use the `delete-jdbc-resource` subcommand in remote mode to delete an existing JDBC resource. Deleting a JDBC resource is a dynamic event and does not require server restart.
 
@@ -1409,103 +1400,15 @@ You can also set the threshold time to milliseconds simply by passing a decimal 
 asadmin set domain.resources.jdbc-connection-pool.__TimerPool.slow-query-threshold-in-seconds=0.2
 ----
 
-[[sql-trace-listeners]]
-== Custom SQL Trace Listeners
+[[configuring-sql-trace-listeners]]
+== Configuring SQL Trace Listeners
 
 Payara Server provides support for custom SQL Trace Listeners. A *SQL Trace Listener* is registered against a data source and is called after each method call made on the JDBC connection pool.
 
-SQL Trace Listeners allows developers to track all calls to the database and can be used to develop custom auditing, error handling or monitoring components. SQL Trace Listeners can be enabled globally on a data source if the class that implements it is on the server's _classpath_, or can be enabled on application specific data sources by including them in the application's WAR or EAR.
-
-[[sql-trace-listener-interface]]
-=== SQL Trace listener Interface
-
-The SQL Trace Listener interface is shown below:
-
-[source, java]
-----
-public interface SQLTraceListener {
-    /**
-     * Notify listeners with SQL trace information.
-     * @param record SQLTraceRecord that has information related
-     * to the SQL operation
-     */
-    public void sqlTrace(SQLTraceRecord record);
-
-}
-----
-
-To write a custom trace listener you need to implement the interface and override the `sqlTrace` method. The `SQLTraceRecord` object contains information about the executed call to the JDBC connection pool. The following is the list of properties that can be queried using their respective *getter* methods:
-
-[source ,java]
-----
-    /**
-     * Thread ID from which SQL statement originated.
-     */
-    private long threadID;
-
-    /**
-     * Thread Name from which SQL statement originated.
-     */
-    private String threadName;
-
-    /**
-     * Pool Name in which the SQL statement is executed.
-     */
-    private String poolName;
-
-    /**
-     * Type of SQL query. Could be PreparedStatement, CallableStatement or
-     * other object types.
-     */
-    private String className;
-
-    /**
-     * Method that executed the query.
-     */
-    private String methodName;
-
-    /**
-     * Time of execution of query.
-     */
-    private long timeStamp;
-
-    /**
-     * Parameters of the method that executed the SQL query. Includes information
-     * like SQL query, arguments and so on.
-     */
-    private Object[] params;
-----
-
-[[example-sql-trace-listener]]
-=== SQL Trace Listener Example
-
-The following code fragment illustrates an example SQL trace listener that just logs the executed call to the server's log file:
-
-[source, java]
-----
-public class SQLTraceLogger implements SQLTraceListener {
-
-    private static Logger _logger = initLogger();
-
-    private static Logger initLogger() {
-        _logger = LogDomains.getLogger(SQLTraceLogger.class, LogDomains.SQL_TRACE_LOGGER);
-        return _logger;
-    }
-
-    public SQLTraceLogger() {
-    }
-
-    public void sqlTrace(SQLTraceRecord record) {
-        _logger.log(Level.FINE, record.toString());
-    }
-}
-----
-
-[[configuring-sql-trace-listeners]]
-=== Configuring SQL Trace Listeners
+More information on how to implement a SQL Trace listener can be found in the xref:Technical Documentation/Application Development/jdbc.adoc#sql-trace-listeners[Application Development section].
 
 [[sql-trace-administration-console]]
-==== Using the Administration Console
+=== Using the Administration Console
 
 SQL Trace Listeners can be enabled on a JDBC connection pool through the administration web console. Navigate to the *Advanced Tab* of your connection pool by selecting the JDBC -> JDBC Connection Pools -> *<Your Connection pool>*.
 
@@ -1513,9 +1416,10 @@ Proceed to add the fully qualified class name of your SQL Trace Listener impleme
 
 image:advanced-jdbc/sqltracelistener.png[Enabling SQL Tracing in the administration console]
 
-IMPORTANT: The implementation class must be on the server's _classpath_ for it to work correctly
+IMPORTANT: The implementation class must be on the server's _classpath_ for it to work correctly.
 
-==== Using asadmin commands
+[[sql-trace-asadmin-commands]]
+=== Using asadmin commands
 
 SQL Trace Listeners can be enabled on a JDBC connection pool using with an `asadmin` commands by using the `set` command to set the `fish.payara.lsql-trace-listeners` to the fully qualified class name of your listener implementation, like on the following example:
 

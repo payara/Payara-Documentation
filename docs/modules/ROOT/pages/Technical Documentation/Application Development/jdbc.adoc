@@ -5,7 +5,7 @@ This chapter describes how to use the Java Database Connectivity (JDBC) API for 
 
 This chapter also provides high level JDBC implementation instructions for servlets and EJB components deployed in Payara Server.
 
-IMPORTANT: Payara Server does not support connection pooling or transactions for an applica`tion's database access if it does not use standard Jakarta EE `DataSource` objects.
+IMPORTANT: Payara Server does not support connection pooling or transactions for an application's database access if it does not use standard Jakarta EE `DataSource` objects.
 
 [[statements]]
 == Statements
@@ -92,31 +92,100 @@ To enable statement caching, you can set any positive nonzero value. The built-i
 
 When a connection pool is flushed, the connections in the statement cache are recreated.
 
-[[statement-tracing]]
-=== Statement Tracing
+[[sql-trace-listeners]]
+== SQL Trace Listeners
 
-You can trace the SQL statements executed by applications that use a JDBC connection pool. Set the _SQL Trace Listeners_ attribute to a comma-separated list of trace listener implementation classes in one of the following ways:
+Payara Server provides support for custom SQL Trace Listeners. A *SQL Trace Listener* is registered against a data source and is called after each method call made on the JDBC connection pool.
 
-* Enter an _SQL Trace Listeners_ value in the _Edit Connection Pool Advanced Attributes_ page in the Administration Console.
-* Specify the `--sqltracelisteners` option in the `asadmin create-jdbc-connection-pool` command.
-* Specify the `sql-trace-listeners` option in the `asadmin set` command. For example:
-+
-[source,shell]
-----
-asadmin set domain1.resources.jdbc-connection-pool.DerbyPool.sql-trace-listeners=listeners
-----
+SQL Trace Listeners allows developers to track all calls to the database and can be used to develop custom auditing, error handling or monitoring components. SQL Trace Listeners can be enabled globally on a data source if the class that implements it is on the server's _classpath_, or can be enabled on application specific data sources by including them in the application's WAR or EAR.
 
-Payara Server provides a public interface, `org.glassfish.api.jdbc.SQLTraceListener`, that implements a means of recording `SQLTraceRecord` objects. Custom implementations must override the method like this:
+[[sql-trace-listener-interface]]
+=== SQL Trace listener Interface
+
+The SQL Trace Listener interface is shown below:
 
 [source, java]
 ----
-@Override
-public void sqlTrace(SQLTraceRecord record) {
-    //Do something with the record.
+public interface SQLTraceListener {
+    /**
+     * Notify listeners with SQL trace information.
+     * @param record SQLTraceRecord that has information related
+     * to the SQL operation
+     */
+    public void sqlTrace(SQLTraceRecord record);
+
 }
 ----
 
-To make custom implementations of this interface available to Payara Server, place the implementation classes in `${as-install}/lib`.
+To write a custom trace listener you need to implement the interface and override the `sqlTrace` method. The `SQLTraceRecord` object contains information about the executed call to the JDBC connection pool. The following is the list of properties that can be queried using their respective *getter* methods:
+
+[source ,java]
+----
+/**
+ * Thread ID from which SQL statement originated.
+ */
+private long threadID;
+
+/**
+ * Thread Name from which SQL statement originated.
+ */
+private String threadName;
+
+/**
+ * Pool Name in which the SQL statement is executed.
+ */
+private String poolName;
+
+/**
+ * Type of SQL query. Could be PreparedStatement, CallableStatement or
+ * other object types.
+ */
+private String className;
+
+/**
+ * Method that executed the query.
+ */
+private String methodName;
+
+/**
+ * Time of execution of query.
+ */
+private long timeStamp;
+
+/**
+ * Parameters of the method that executed the SQL query. Includes information
+ * like SQL query, arguments and so on.
+ */
+private Object[] params;
+----
+
+[[example-sql-trace-listener]]
+=== SQL Trace Listener Example
+
+The following code fragment illustrates an example SQL trace listener that just logs the executed call to the server's log file:
+
+[source, java]
+----
+public class SQLTraceLogger implements SQLTraceListener {
+
+    private static Logger _logger = initLogger();
+
+    private static Logger initLogger() {
+        _logger = LogDomains.getLogger(SQLTraceLogger.class, LogDomains.SQL_TRACE_LOGGER);
+        return _logger;
+    }
+
+    public SQLTraceLogger() {
+    }
+
+    public void sqlTrace(SQLTraceRecord record) {
+        _logger.log(Level.FINE, record.toString());
+    }
+}
+----
+
+[[sql-trace-listener-logger]]
+=== SQL Trace Listener Logger
 
 Payara Server provides an SQL tracing logger to log the SQL operations in the form of `SQLTraceRecord` objects in the `server.log` file. The module name under which the SQL operation is logged is `javax.enterprise.resource.sqltrace`.
 
@@ -150,6 +219,24 @@ Set these parameters in one of the following ways:
 ----
 asadmin set resources.jdbc-connection-pool.pool-name.property.time-to-keep-queries-in-minutes=10
 ----
+
+[[configuring-sql-trace-listeners]]
+==== Configuring SQL Trace Listeners
+
+To configure the listeners used by a connection pool set the _SQL Trace Listeners_ attribute to a comma-separated list of trace listener implementation classes in one of the following ways:
+
+* Enter an _SQL Trace Listeners_ value in the _Edit Connection Pool Advanced Attributes_ page in the Administration Console.
+* Specify the `--sqltracelisteners` option in the `asadmin create-jdbc-connection-pool` command.
+* Specify the `sql-trace-listeners` option in the `asadmin set` command. For example:
++
+[source,shell]
+----
+asadmin set domain1.resources.jdbc-connection-pool.DerbyPool.sql-trace-listeners=listeners
+----
+
+To make custom implementations of this interface available to Payara Server, place the implementation classes in `${as-install}/lib`.
+
+More information on how to configure SQL Trace listeners can be read in the xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc[JDBC Connection Pool] configuration of Payara Server's administration section.
 
 [[connections]]
 == Connections
@@ -273,20 +360,29 @@ The default `DataSource` implementation in Payara Server provides a `markConnect
 
 [source,java]
 ----
-public void markConnectionAsBad(java.sql.Connection connection)
+public class Datasource{
+
+    public void markConnectionAsBad(java.sql.Connection connection){
+    }
+}
 ----
 
 For example:
 
 [source,java]
 ----
-var ds = (com.sun.appserv.jdbc.DataSource)context.lookup("jdbc/myDataSource");
-try(var con = ds.getConnection(); //Connection will be destroyed during close.
-    var stmt = con.createStatement()){
-   stmt.executeUpdate("Update");
-}
-catch (BadConnectionException e){
-   ds.markConnectionAsBad(con)
+public class ApplicationComponent{
+
+    public void operation(){
+        var ds = (com.sun.appserv.jdbc.DataSource)context.lookup("jdbc/myDataSource");
+        try(var con = ds.getConnection(); //Connection will be destroyed during close.
+            var stmt = con.createStatement()){
+           stmt.executeUpdate("Update");
+        }
+        catch (BadConnectionException e){
+           ds.markConnectionAsBad(con);
+        }
+    }
 }
 ----
 
@@ -341,19 +437,30 @@ The method signature is as follows:
 
 [source,java]
 ----
-public java.sql.Connection getConnection(java.sql.Connection con) throws java.sql.SQLException
+import java.sql.Connection;
+
+public class Connection{
+    public Connection getConnection(Connection con) throws java.sql.SQLException;
+}
 ----
 
 For example:
 
 [source,java]
 ----
-var ctx = new InitialContext();
-var ds = (com.sun.appserv.jdbc.DataSource)ctx.lookup("jdbc/MyBase");
+import java.sql.Connection;
 
-try(var con = ds.getConnection(); //return wrapped connection to pool on close.
-    var drivercon = ds.getConnection(con)){
-    // Do db operations.
+public class MyComponent{
+
+    public void operation(){
+        var ctx = new InitialContext();
+        var ds = (com.sun.appserv.jdbc.DataSource)ctx.lookup("jdbc/MyBase");
+
+        try(var con = ds.getConnection(); //return wrapped connection to pool on close.
+            var drivercon = ds.getConnection(con)){
+            // Do db operations.
+        }
+    }
 }
 ----
 
@@ -395,7 +502,6 @@ You can define an application-scoped database or other resources for an enterpri
 
 For more details, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/deploying-applications.adoc#application-scoped-resources[Application-Scoped Resources]" in the Payara Server Application Deployment section.
 
-
 [[jdbc-call-logging-deployment]]
 == JDBC Development Guidelines
 
@@ -408,9 +514,12 @@ In Jakarta EE applications and above, a JDBC data source can be deployed by addi
     className = "org.h2.jdbcx.JdbcDataSource",
     url = "jdbc:h2:mem:test",
     properties = {"fish.payara.log-jdbc-calls=true"})
+public class JDBCComponent{
+
+}
 ----
 
-The Data source definition can also be added to a deployment descriptor of an application, for example in the _web.xml_ standard deployment descriptor:
+The Data source definition can also be added to a deployment descriptor of an application, for example in the `web.xml` standard deployment descriptor:
 
 [source, xml]
 ----
@@ -422,7 +531,7 @@ The Data source definition can also be added to a deployment descriptor of an ap
    <database-name>mysql</database-name>
    <user>test</user>
    <password>test</password>
-   <!-- Example of how to use a Payara specific custom connection pool setting -->
+   <!-- Example of how to use a Payara Server specific custom connection pool setting -->
    <property>
        <name>fish.payara.log-jdbc-calls</name>
        <value>true</value>
@@ -430,7 +539,8 @@ The Data source definition can also be added to a deployment descriptor of an ap
 </data-source>
 ----
 
-or in the definition of a `jdbc-connection-pool` in a __payara-resources.xml__ file:
+Or in the definition of a `jdbc-connection-pool` in a `payara-resources.xml` file:
+
 [source, xml]
 ----
 <jdbc-connection-pool name="examplePool"
@@ -480,9 +590,8 @@ The below example shows the Slow Query Log Threshold and SQL Trace Listener set 
 </data-source>
 ----
 
-
 [[example-trace]]
-=== Example Trace
+=== Slow Query Trace Example
 
 Below is an example `WARNING` trace for a slow query recollected from the server's log:
 
@@ -522,6 +631,3 @@ java.lang.Exception: Stack Trace shows code path to SQL
     at org.eclipse.persistence.internal.jpa.QueryImpl.getResultList(QueryImpl.java:473)
     at fish.payara.team.info.controllers.MemberSessionBean.getTeamMemberByName(MemberSessionBean.java:35)
 ----
-
-
-
