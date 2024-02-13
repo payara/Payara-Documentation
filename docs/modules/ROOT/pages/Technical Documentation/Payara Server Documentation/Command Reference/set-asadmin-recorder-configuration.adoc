@@ -1,0 +1,78 @@
+[[set-asadmin-recorder-configuration]]
+= set-asadmin-recorder-configuration
+
+Configures the Asadmin Recorder service.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-asadmin-recorder-configuration [--help]
+[--enabled={true|false}]
+[--outputlocation=outputlocation]
+[--filtercommands={true|false}]
+[--filteredcommands=filteredcommands]
+[--prependenabled={true|false}]
+[--prependedoptions=prependedoptions]
+----
+
+[[description]]
+== Description
+
+The `set-asadmin-recorder-configuration` subcommand adjusts the settings of the Asadmin Recorder. When enabled with --enabled true, it starts recording all asadmin commands issued through the Admin Console.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+--enabled::
+Activates or deactivates the Asadmin Recorder feature.
+--outputLocation::
+-o::
+The absolute file path for the asadmin commands to be written to. This defaults to a file called asadmin-commands.txt in the domain directory.
+--filterCommands::
+-f::
+Specifies whether or not the commands specified with the --filteredcommands option should be excluded from being recorded or not.
+--filteredCommands::
+A comma separated list of asadmin commands and regular expressions to exclude from being recorded.
+
+
+[[examples]]
+== Examples
+
+*Example 1*
+
+The following will enable the asadmin recorder, set the output location to /home/user/asadmin-commands.txt,
+and prevent the start-instance command from being recorded (in addition to the default configuration):
+
+[source, shell]
+----
+asadmin> set-asadmin-recorder-configuration --enabled true --outputLocation /home/user/asadmin-commands.txt --filterCommands true
+--filteredCommands "version,_(.*),list(.*),get(.*),uptime,enable-asadmin-recorder,disable-asadmin-recorder,set-asadmin-recorder-configuration,asadmin-recorder-enabled,start-instance"
+
+Command set-asadmin-recorder-configuration executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-asadmin-recorder-configuration.adoc#get-asadmin-recorder-configuration[`get-asadmin-recorder-configuration`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-asadmin-recorder.adoc#enable-asadmin-recorder[`enable-asadmin-recorder`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/disable-asadmin-recorder.adoc#disable-asadmin-recorder[`disable-asadmin-recorder`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin-recorder-enabled.adoc#asadmin-recorder-enabled[`asadmin-recorder-enabled`]
+
+
+
