@@ -17,16 +17,17 @@ image:recorder/enable-recorder.png[Enable recorder in Web Console]
 
 image:recorder/disable-recorder.png[Disable recorder in Web Console]
 
-Once enabled, actions in the admin console that have a corresponding `asadmin` command will be recorded to a file. By default, this file is located in the domain directory, and is called _asadmin-commands.txt_.
+Once enabled, actions in the admin console that have a corresponding `asadmin` command will be recorded to a file. By default, this file
+is located in the domain directory, and is called _asadmin-commands.txt_.
 
-Once enabled or disabled, the asadmin recorder will remain enabled/disabled until specifically enabled or disabled again through the web console or using the appropriate asadmin command. This means that the asadmin recorder will remain enabled or disabled across server restarts.
+Once enabled or disabled, the asadmin recorder will remain enabled/disabled until specifically enabled or disabled again through the web console or using the appropriate asadmin command.
+This means that the asadmin recorder will remain enabled or disabled across server restarts.
 
 You can also enable or disable the asadmin recorder on its configuration page (detailed in the following section), or by using the following asadmin commands:
 
-`enable-asadmin-recorder`:: Enables the asadmin recorder.
-`disable-asadmin-recorder`:: Disables the asadmin recorder.
-`set-asadmin-recorder-configuration --enabled true`:: Alternative way of enabling the asadmin recorder.
-`set-asadmin-recorder-configuration --enabled false`:: Alternative way of disabling the asadmin recorder.
+xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-asadmin-recorder.adoc#enable-asadmin-recorder[`enable-asadmin-recorder`] +
+xref:Technical Documentation/Payara Server Documentation/Command Reference/disable-asadmin-recorder.adoc#disable-asadmin-recorder[`disable-asadmin-recorder`] +
+xref:Technical Documentation/Payara Server Documentation/Command Reference/set-asadmin-recorder-configuration.adoc#set-asadmin-recorder-configuration[`set-asadmin-recorder-configuration`]
 
 [[configuring-the-asadmin-recorder]]
 === Configuring the Asadmin Recorder
@@ -46,19 +47,7 @@ The default regular expressions and asadmin commands set in the _Filtered Comman
 
 Be sure to click on the _Save_ button to have any changes you make take effect.
 
-In addition to using the admin console, you can configure the asadmin recorder service using the `set-asadmin-recorder-configuration` command. The command takes the following parameters:
-
-`--enabled`:: Enables or Disables the Asadmin Recorder service.
-`--outputLocation`:: Specifies the absolute file path of where the recorded asadmin commands will be written to.
-`--filterCommands`:: Specifies whether or not the commands specified with the `--filteredcommands` option should be excluded from being recorded or not.
-`--filteredCommands`:: A comma separated list of asadmin commands and regular expressions to exclude from being recorded.
-
-As an example, the following will enable the asadmin recorder, set the output location to _/home/user/asadmin-commands.txt_, and prevent the `start-instance` command from being recorded (in addition to the default configuration):
-
-[source, shell]
-----
-asadmin set-asadmin-recorder-configuration --enabled true --outputLocation /home/user/asadmin-commands.txt --filterCommands true --filteredCommands "version,_(.*),list(.*),get(.*),uptime,enable-asadmin-recorder,disable-asadmin-recorder,set-asadmin-recorder-configuration,asadmin-recorder-enabled,start-instance"
-----
+In addition to using the admin console, you can configure the asadmin recorder service using the `set-asadmin-recorder-configuration` command. See xref:Technical Documentation/Payara Server Documentation/Command Reference/set-asadmin-recorder-configuration.adoc#set-asadmin-recorder-configuration[`set-asadmin-recorder-configuration`] +
 
 [[running-the-generated-scripts]]
 === Running the Generated Scripts
@@ -67,25 +56,14 @@ Documentation on running asadmin scripts can be found in the _GlassFish Server A
 
 [[asadmin-commands]]
 === Asadmin Commands
-The following is the list of available asadmin commands with their available options to configure the asadmin recorder:
 
-[cols=",,a",options="header",]
-|=======================================================================
-|Command |Description |Options
-|`get-asadmin-recorder-configuration` |Returns the current configuration of the Asadmin Recorder service.
-|None
-|`set-asadmin-recorder-configuration` |Configures the Asadmin Recorder service. |
-* `--enabled` - Enables or Disables the Asadmin Recorder service.
-* `--outputLocation` - Specifies the absolute file path of where the recorded asadmin commands will be written to.
-* `--filterCommands` - Specifies whether or not the commands specified with the `--filteredcommands` option should be excluded from being recorded or not.
-* `--filteredCommands` - A comma separated list of asadmin commands and regular expressions to exclude from being recorded.
-|`enable-asadmin-recorder` |Enables the Asadmin Recorder service with its current configuration settings.
-|None
-|`disable-asadmin-recorder` |Disables the Asadmin Recorder service.
-|None
-|`asadmin-recorder-enabled` |Returns whether or not the Asadmin Recorder service is enabled.
-|None
-|=======================================================================
+The following is the list of available asadmin commands to configure the asadmin recorder:
+
+xref:Technical Documentation/Payara Server Documentation/Command Reference/get-asadmin-recorder-configuration.adoc#get-asadmin-recorder-configuration[`get-asadmin-recorder-configuration`] +
+xref:Technical Documentation/Payara Server Documentation/Command Reference/set-asadmin-recorder-configuration.adoc#set-asadmin-recorder-configuration[`set-asadmin-recorder-configuration`] +
+xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-asadmin-recorder.adoc#enable-asadmin-recorder[`enable-asadmin-recorder`] +
+xref:Technical Documentation/Payara Server Documentation/Command Reference/disable-asadmin-recorder.adoc#disable-asadmin-recorder[`disable-asadmin-recorder`] +
+xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin-recorder-enabled.adoc#asadmin-recorder-enabled[`asadmin-recorder-enabled`]
 
 [[admin-console-auditing-service]]
 == Admin Console Auditing Service
@@ -139,163 +117,10 @@ a notifier on its configuration screen, the server will **automatically** add it
 [[from-the-commandline]]
 === From the Command Line
 
-The following is the list of available asadmin commands with their available
-options to configure the auditing service:
+The following is the list of available asadmin commands to configure the auditing service:
 
-[[set-admin-audit-configuration]]
-==== `set-admin-audit-configuration`
-
-*Usage*::
-`asadmin> set-admin-audit-configuration`
-
-*Aim*::
-This command can be used to set the configuration settings of the service.
-
-[[command-options]]
-===== Command Options
-
-[cols=",,a,,",options="header",]
-|=======================================================================
-|Option      |Type    |Description                     |Default |Mandatory
-|`--enabled` |Boolean |Enables or disables the service |false   |No
-|`--dynamic` |Boolean |Whether to apply changes immediately of after a domain restart. |false |No
-|`--auditLevel` |String | Sets the auditing level. One of:
-
-* MODIFIERS
-* ACCESSORS
-* INTERNAL
-| MODIFIERS | No
-|=======================================================================
-
-[[example]]
-===== Example
-
-[source, shell]
-----
-asadmin> set-admin-audit-configuration --enabled=true --dynamic=true --auditLevel=ACCESSORS
-
-Command set-admin-audit-configuration executed successfully.
-----
-
-
-[[set-admin-audit-service-notifier-configuration]]
-==== `set-admin-audit-service-notifier-configuration`
-
-*Usage*::
-
-----
-asadmin> set-admin-audit-service-notifier-configuration
- --notifier=<string>
- --enabled=true|false
- --dynamic=true|false
- --noisy=true|false
-----
-
-*Aim*::
-This command can be used to enable or disable a specific notifier and the verbosity of the events being relayed.
-
-[[command-options-1]]
-=== Command Options
-
-[cols=",,a,,",options="header",]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-| `--notifier`
-| String
-| The notifier to configure. One of (case-insensitive):
-
-* `LOG`
-* `HIPCHAT`
-* `SLACK`
-* `JMS`
-* `EMAIL`
-* `XMPP`
-* `SNMP`
-* `EVENTBUS`
-* `NEWRELIC`
-* `DATADOG`
-* `CDIEVENTBUS`
-
-| -
-| yes
-
-|`--enable`
-|Boolean
-|Enables or disables the notifier
-|false
-|Yes
-
-|`--noisy`
-|Boolean
-|Enables or disables *noisy mode*. A noisy notifier includes verbose information in the notifiers output.
-|-
-|No
-
-|`--dynamic`
-|Boolean
-|Whether to apply the changes immediately or after server restart
-|false
-|No
-
-| `--target`
-|String
-|The instance or cluster that will be configured
-|server
-|no
-
-|===
-
-[[example-1]]
-=== Examples
-
-To configure the auditing service to relay events to the log notifier without having to restart the domain run the following command:
-
-[source, shell]
-----
-asadmin> set-admin-audit-service-notifier-configuration --notifier=log --enabled=true --dynamic=true --noisy=false
-log.enabled was false set to true
-log.noisy was true set to false
-
-Command set-admin-audit-service-notifier-configuration executed successfully.
-----
-
-[[get-admin-audit-configuration]]
-==== `get-admin-audit-configuration`
-
-*Usage*::
-`asadmin> get-admin-audit-configuration`
-
-*Aim*::
-This command can be used to list the configuration settings of the auditing service.
-
-[[command-options-2]]
-==== Command Options
-
-There are no available options for this command.
-
-[[example-2]]
-==== Example
-
-Running the following command will yield the current configuration of the auditing service:
-
-[source, shell]
-----
-asadmin> get-admin-audit-configuration
-
-Enabled  Audit Level
-false    MODIFIERS
-Name     Notifier Enabled
-LOG      false
-
-Command get-admin-audit-configuration executed successfully.
-----
-
-NOTE: The first row corresponds to the service configuration, second row onwards will detail any notifiers being configured..
+xref:Technical Documentation/Payara Server Documentation/Command Reference/set-admin-audit-configuration.adoc#set-admin-audit-configuration[`set-admin-audit-configuration`] +
+xref:Technical Documentation/Payara Server Documentation/Command Reference/get-admin-audit-configuration.adoc#get-admin-audit-configuration[`get-admin-audit-configuration`] +
 
 [[admin-console-environment-warning]]
 == Admin Console Environment Warning
@@ -313,63 +138,7 @@ The warning can be configured in the admin console as seen in the screenshot abo
 [[configuring-the-environment-warning-via-asadmin]]
 === Configuring the Environment Warning via Asadmin
 
-There are corresponding asadmin commands to get and set the configuration
+The following is the list of available asadmin commands to get and set the configuration the Environment Warning.
 
-[[set-environment-warning-configuration]]
-=== `set-environment-warning-configuration`
-
-*Usage:* `asadmin> set-environment-warning-configuration --enabled=true --message="Caution, this is on production" --textcolour="#00ff00" --backgroundcolour="#ff00ff"`
-
-*Aim:* Sets the environment warning properties and can enable/disable the warning
-
-[[get-environment-warning-configuration]]
-=== `get-environment-warning-configuration`
-
-*Usage:* `asadmin> get-environment-warning-configuration`
-
-*Aim:* Gets the current environment warning configuration
-
-*Example:*::
-[source]
-----
-Enabled  Message                         Background Colour  Text Colour
-true     Caution, this is on production  #ff00ff            #00ff00
-Command get-environment-warning-configuration executed successfully.
-----
-
-[[command-options]]
-=== Command Options
-
-[cols="4,2,5,1,1",options="header"]
-|====
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`enabled`
-|boolean
-|If it is set to true, the top warning banner is shown, otherwise it is not.
-|-
-|Yes
-
-|`message`
-|String
-|Text message for the top warning banner.
-|-
-|Yes
-
-|`backgroundcolour`
-|Hex colour code
-|Background colour for the top warning banner. It must be a hex value, like `#ffffff`.
-|-
-|Yes
-
-|`textcolour`
-|Hex colour code
-|Text colour for the top warning banner. It must be a hex value, like `#ffffff`.
-|-
-|Yes
-
-|====
+xref:Technical Documentation/Payara Server Documentation/Command Reference/set-environment-warning-configuration.adoc#set-environment-warning-configuration[`set-environment-warning-configuration`] +
+xref:Technical Documentation/Payara Server Documentation/Command Reference/get-environment-warning-configuration.adoc#get-environment-warning-configuration[`get-environment-warning-configuration`]

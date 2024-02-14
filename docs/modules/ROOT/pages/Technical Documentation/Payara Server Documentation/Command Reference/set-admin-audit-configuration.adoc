@@ -21,7 +21,7 @@ asadmin [asadmin-options] set-admin-audit-configuration [--help]
 [[description]]
 == Description
 
-The `set-asadmin-recorder-configuration` subcommand can be used to set the configuration settings of the Admin Audit Configuration.
+The `set-admin-audit-configuration` subcommand can be used to set the configuration settings of the Admin Audit Configuration.
 
 
 [[options]]
@@ -37,10 +37,15 @@ Applies changes dynamically to the running system without the need for a restart
 --enabled::
 Turns the audit service on or off, controlling whether administrative actions are tracked and logged for security and compliance purposes.
 --auditlevel::
-Sets the auditing level. One of: +
-    * MODIFIERS (default)  +
-    * ACCESSORS +
-    * INTERNAL +
+Sets the auditing level. One of:
++
+    * MODIFIERS (default)
+    * ACCESSORS
+    * INTERNAL
+--target:: Specifies the target for which to configure the audit settings, in this case, a server.
+--enablenotifiers:: Enables selected notification services for audit events.
+--disablenotifiers:: Disables selected notification services without affecting others.
+--setnotifiers:: Configures notification services, specifying event types and settings.
 
 
 [[examples]]
@@ -50,7 +55,7 @@ Sets the auditing level. One of: +
 
 [source, shell]
 ----
-asadmin>  set-admin-audit-configuration --enabled=true --dynamic=true --auditLevel=ACCESSORS
+asadmin> set-admin-audit-configuration --dynamic --enabled --auditlevel=MODIFIERS --target=server --enablenotifiers=email,alert --disablenotifiers=log --setnotifiers="email:critical,alert:all"
 
 Command set-admin-audit-configuration executed successfully.
 ----
