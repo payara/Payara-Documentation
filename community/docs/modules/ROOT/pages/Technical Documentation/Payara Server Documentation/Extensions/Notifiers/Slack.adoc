@@ -8,8 +8,8 @@ Payara Server includes a special notifier to send notifications from the Notific
 [[downloads]]
 == Downloads
 
-- link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/slack-notifier-core/2.0/slack-notifier-core-2.0.jar[Slack Notifier Core 2.0]
-- link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/slack-notifier-console-plugin/2.0/slack-notifier-console-plugin-2.0.jar[Slack Notifier Console Plugin 2.0]
+* link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/slack-notifier-core/2.0/slack-notifier-core-2.0.jar[Slack Notifier Core 2.0]
+* link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/slack-notifier-console-plugin/2.0/slack-notifier-console-plugin-2.0.jar[Slack Notifier Console Plugin 2.0]
 
 [[slack-integration-configuration]]
 == Slack Integration Configuration
@@ -20,7 +20,9 @@ In order to allow the notification service to log events on a Slack channel of y
 . Have a Slack account with granted permissions to create channels and configure API integrations.
 . Have created a Slack channel which will be used by the Notification Service to report notification events.
 
-Once you have completed these requirements, you can configure an https://api.slack.com/incoming-webhooks[Incoming Webhook integration] for the channel. An _Incoming Webhook_ is the simplest integration mechanism that Slack provides, in that they make use of normal HTTP requests with a _JSON_ payload that includes the message text and additional options to format incoming messages to the channel.
+Once you have completed these requirements, you can configure an link:https://api.slack.com/incoming-webhooks[Incoming Webhook integration] for the channel.
+
+An _Incoming Webhook_ is the simplest integration mechanism that Slack provides, in that they make use of normal HTTP requests with a _JSON_ payload that includes the message text and additional options to format incoming messages to the channel.
 
 [[configure-incoming-webhook]]
 === Configure Incoming WebHook
@@ -37,7 +39,9 @@ NOTE: It's recommended to choose a _private_ channel, since it will keep these n
 
 . With this, the WebHook configuration is finished. Now, take special attention to the WebHook URL, which is usually follows this structure:
 +
-`https://hooks.slack.com/services/{TOKEN1}/{TOKEN2}/{TOKEN3}`
+----
+https://hooks.slack.com/services/{TOKEN1}/{TOKEN2}/{TOKEN3}
+----
 +
 Like in the following sample:
 +
@@ -47,16 +51,16 @@ We will use these 3 tokens when configuring the server's integration later.
 +
 We recommend that you configure the following settings in the channel integration to give better visualization for your notifications:
 +
-* *Descriptive Label*: Use a name that's easy to understand to identify this WebHook integration
-* *Customize Name*: Insert a name for the "agent" that will report the notification messages
-* *Customize Icon*: Insert a custom icon to identify the agent that will be visualized in the messages. We recommend using one of the Payara logos like in this sample:
+*Descriptive Label*:: Use a name that's easy to understand to identify this WebHook integration
+*Customize Name*:: Insert a name for the "agent" that will report the notification messages
+*Customize Icon*:: Insert a custom icon to identify the agent that will be visualized in the messages. We recommend using one of the Payara logos like in this sample:
 +
 image:notification-service/slack/webhook-additional-settings.png[WebHook Additional Settings]
 
 [[payara-server-configuration]]
 == Payara Server Configuration
 
-With the Incoming WebHook properly configured, now it's time to setup the Notification Service in the domain configuration.
+With the Incoming WebHook properly configured, now it's time to set up the Notification Service in the domain configuration.
 
 [[using-the-admin-console]]
 === Using the Admin Console
@@ -76,7 +80,7 @@ like this:
 
 [source, shell]
 ----
-asadmin> set-slack-notifier-configuration --enabled=true --dynamic=true --token1=T43CHENUC --token2=B441EFQB1 --token3=Jas8P3jCZ4wK8Y2m88dCxGkn
+asadmin set-slack-notifier-configuration --enabled=true --dynamic=true --token1=T43CHENUC --token2=B441EFQB1 --token3=Jas8P3jCZ4wK8Y2m88dCxGkn
 ----
 
 You can use the `--enabled` and `--dynamic` options to enable or disable the Slack notifier on demand.
@@ -85,7 +89,7 @@ Also, you can retrieve the current configuration for the Slack notifier using th
 
 [source, shell]
 ----
-asadmin > get-slack-notifier-configuration
+asadmin get-slack-notifier-configuration
 
 Enabled  Noisy  Token 1    Token 2    Token 3
 true     false  T43CHENUC  B441EFQB1  Jas8P3jCZ4wK8Y2m88dCxGkn

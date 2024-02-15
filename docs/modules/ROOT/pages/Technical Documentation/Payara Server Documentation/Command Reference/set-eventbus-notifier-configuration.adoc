@@ -1,0 +1,74 @@
+[[set-eventbus-notifier-configuration]]
+= set-eventbus-notifier-configuration
+
+Configures the settings of the Event Bus notifier
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-eventbus-notifier-configuration [--help]
+[--target target]
+[--enabled={false|true}]
+[--dynamic={false|true}]
+[--noisy={false|true}]
+[--topicName topicName]
+----
+
+[[description]]
+== Description
+
+This command can be used to configure the behaviour of the EventBus notifier in Payara Server.
+
+NOTE: The Data Grid must be enabled for the Event Bus to be available.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are configuring the Event Bus notifier. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified server instance.
+`--enabled`::
+Defaults to `false`. Enables or disables the notifier.
+`--dynamic`::
+Defaults to `false`. When set to `true`, applies the changes without a server restart.
++
+Otherwise, a restart is required.
+`--noisy`::
+Defaults to `false`. Whether the notifier is active even if the notification event threshold is set to `FINE`.
+`--topicName`::
+Defines the name of the internal Hazelcast distributed topic which will be used by the event bus to subscribe to notification events.
+
+[[examples]]
+== Examples
+
+*Example 1 Enable the Event Bus notifier and set its topic*
+
+[source, shell]
+----
+asadmin set-eventbus-notifier-configuration --topicName=testTopic --dynamic=true --enabled=true
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-eventbus-notifier-configuration.adoc#get-eventbus-notifier-configuration[`get-eventbus-notifier-configuration`]
