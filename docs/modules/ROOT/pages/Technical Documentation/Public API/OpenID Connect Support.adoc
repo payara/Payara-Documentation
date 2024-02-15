@@ -67,6 +67,8 @@ NOTE: Only some basic redirect is supported namely a GET. Only the URL and query
 
 [source, java]
 ----
+@WebServlet("/callback")
+public class CallbackServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -74,6 +76,7 @@ NOTE: Only some basic redirect is supported namely a GET. Only the URL and query
         // Now return to original requested page
         response.sendRedirect(request.getSession().getAttribute(OpenIdConstant.ORIGINAL_REQUEST).toString());
     }
+}
 ----
 
 [[configuration]]
@@ -83,7 +86,8 @@ OpenID Client can be configured with both `@OpenIdAuthenticationDefinition` anno
 The annotation and MicroProfile properties has several configuration options.
 
 CAUTION: If you are using MicroProfile Config properties and the value contains a placeholder that should not be resolved by MicroProfile Config
-itself but by the Server (like `payara.security.openid.redirectURI=${baseURL}/Callback`) make sure the value is properly escaped. It will otherwise result in `NoSuchElementException`. Here's an example how such a value should be escaped: `payara.security.openid.redirectURI=\\${baseURL}/Callback`
+itself but by the Server (like `payara.security.openid.redirectURI=${baseURL}/Callback`) make sure the value is properly escaped. It will otherwise result in `NoSuchElementException`. +
+Here's an example how such a value should be escaped: `payara.security.openid.redirectURI=\\${baseURL}/Callback`
 
 The annotation and MicroProfile properties has several configuration options. They are detailed below.
 
@@ -93,7 +97,7 @@ The annotation and MicroProfile properties has several configuration options. Th
 
 | `providerURI`
 | `payara.security.openid.providerURI`
-| false
+| `false`
 | The provider URI to discover the metadata of the OpenID Connect provider. If not specified, metadata are read from `providerMetadata`.
 |
 | The endpoint must be HTTPS.
@@ -107,14 +111,14 @@ The annotation and MicroProfile properties has several configuration options. Th
 
 | `clientId`
 | `payara.security.openid.clientId`
-| true
+| `true`
 | The client identifier issued when the application was registered.
 |
 | N/A.
 
 | `clientSecret`
 | `payara.security.openid.clientSecret`
-| true
+| `true`
 | The client secret for the registered application.
 |
 | N/A.
@@ -122,48 +126,48 @@ The annotation and MicroProfile properties has several configuration options. Th
 | `redirectURI`
 | `payara.security.openid.redirectURI`
 | `true`
-| The URL to redirect the user to upon successful authentication. Can include the variable ${baseURL}, which is replaced by the URL of the application's context path (e.g. `https://myhost:8080/myapp`)
-| ${baseURL}/Callback
+| The URL to redirect the user to upon successful authentication. Can include the variable `${baseURL}`, which is replaced by the URL of the application's context path (e.g. `https://myhost:8080/myapp`)
+| `${baseURL}/Callback`
 | Must be equal to one set in the OpenID Connect provider.
 
 | `scope`
 | `payara.security.openid.scope`
-| false
+| `false`
 | The scopes requested from the OpenID Connect provider.
 | {"openid", "email", "profile"}
 | N/A.
 
 | `responseType`
 | `payara.security.openid.responseType`
-| false
+| `false`
 | Response Type value defines the processing flow to be used.
 | code
 | N/A.
 
 | `responseMode`
 | `payara.security.openid.responseMode`
-| false
+| `false`
 | Informs the Authorization Server of the mechanism to be used for returning parameters from the Authorization Endpoint.
 |
 | N/A.
 
 | `prompt`
 | `payara.security.openid.prompt`
-| false
+| `false`
 | The prompt value specifies whether the authorization server prompts the user for re-authentication and consent.
 |
 | N/A.
 
 | `display`
 | `payara.security.openid.display`
-| false
+| `false`
 | The display value specifying how the authorization server displays the authentication and consent user interface pages.
 | page
 | N/A.
 
 | `useNonce`
 | `payara.security.openid.useNonce`
-| false
+| `false`
 | Enables string value used to mitigate replay attacks.
 | `true`
 | N/A.
@@ -177,21 +181,21 @@ The annotation and MicroProfile properties has several configuration options. Th
 
 | `jwksConnectTimeout`
 | `payara.security.openid.jwks.connect.timeout`
-| false
-| Sets the connect timeout(in milliseconds) for Remote JWKS retrieval.
+| `false`
+| Sets the connect timeout(in milliseconds) for remote JWKS retrieval.
 | `500`
 | Value must not be negative and if value is zero then infinite timeout.
 
 | `jwksReadTimeout`
 | `payara.security.openid.jwks.read.timeout`
-| false
-| Sets the read timeout(in milliseconds) for Remote JWKS retrieval.
+| `false`
+| Sets the read timeout(in milliseconds) for remote JWKS retrieval.
 | 500
 | Value must not be negative and if value is zero then infinite timeout.
 
 | `tokenAutoRefresh`
 | `payara.security.openid.token.autoRefresh`
-| false
+| `false`
 | Enables or disables the automatically performed refresh of Access and Refresh Token.
 | false
 | N/A.
@@ -200,7 +204,7 @@ The annotation and MicroProfile properties has several configuration options. Th
 | `payara.security.openid.token.minValidity`
 | `false`
 | Sets the minimum validity time(in milliseconds) the Access Token must be valid before it is considered expired.
-| 10000
+| `10000`
 | Value must not be negative.
 
 | `claimsDefinition.callerNameClaim`
@@ -215,6 +219,20 @@ The annotation and MicroProfile properties has several configuration options. Th
 | `false`
 | Defines the name of callerGroups claim and maps the claim's value to caller groups value in IdentityStore#validate.
 | groups
+| N/A.
+
+| `proxyDefinition.hostName`
+| `payara.security.openid.proxyHostname`
+| `false`
+| Defines the hostname of the proxied server.
+| 
+| N/A.
+
+| `proxyDefinition.port`
+| `payara.security.openid.proxyPort`
+| `false`
+| Defines the port of the proxied server.
+| 
 | N/A.
 
 | `extraParameters`
@@ -232,8 +250,7 @@ The annotation and MicroProfile properties has several configuration options. Th
 | 
 |===
 
-NOTE: If both an annotation attribute and a MicroProfile Config property are defined for the same option
-then the MicroProfile Config property value always takes precedence over the `@OpenIdAuthenticationDefinition` annotation value.
+NOTE: If both an annotation attribute and a MicroProfile Config property are defined for the same option then the MicroProfile Config property value always takes precedence over the `@OpenIdAuthenticationDefinition` annotation value.
 
 .Configuration Options For `@OpenIdProviderMetadata`
 |===
@@ -267,21 +284,24 @@ public class SecurityBean {
 }
 ----
 
-IMPORTANT: By default, the EL expressions are evaluated only once after the application is loaded and the evaluated values are then remembered until the application is reloaded, for performance reasons. This means that although the configuration can be evaluated dynamically the first time it's needed, it's not possible to change the configuration later on. If you need to dynamically modify the configuration during the lifetime of the application, follow the next section about multitenancy support.
+IMPORTANT: By default, the EL expressions are evaluated only once after the application is loaded and the evaluated values are then remembered until the application is reloaded, for performance reasons. This means that although the configuration can be evaluated dynamically the first time it's needed, it's not possible to change the configuration later on. +
+If you need to dynamically modify the configuration during the lifetime of the application, follow the next section about multi-tenancy support.
 
 [[multitenancy]]
-== Multitenancy Support (Session-scoped Configuration)
+== Multi-tenancy Support (Session-scoped Configuration)
 
-By default, the same configuration of the OpenID connector is applied for the whole application, for all authentication attempts. This is for performance reasons. The OpenID connector also supports re-evaluating the configuration for each user session, before each authentication attempt. This is useful in a multitenant scenario to define a different configuration for each tenant. It's also useful if the user should be able to select which provider they want to use to authenticate.
+By default, the same configuration of the OpenID connector is applied for the whole application, for all authentication attempts. This is for performance reasons. The OpenID connector also supports re-evaluating the configuration for each user session, before each authentication attempt.
 
-To enable re-evaluation of the configuration for each user session, set the MicroProfile Configuration property `payara.security.openid.sessionScopedConfiguration` to `true`. To specify it directly in the application, you can place it in the https://download.eclipse.org/microprofile/microprofile-config-1.4/microprofile-config-spec.html#default_configsources[microprofile-config.properties] file in the `META-INF` directory on the classpath (in a WAR application it could be in `WEB-INF/classes/META-INF`).
+This is useful in a multi-tenant scenario to define a different configuration for each tenant. It's also useful if the user should be able to select which provider they want to use to authenticate.
+
+To enable re-evaluation of the configuration for each user session, set the MicroProfile Configuration property `payara.security.openid.sessionScopedConfiguration` to `true`. To specify it directly in the application, you can place it in the link:https://download.eclipse.org/microprofile/microprofile-config-1.4/microprofile-config-spec.html#default_configsources[microprofile-config.properties] file in the `META-INF` directory on the classpath (in a WAR application it could be in `WEB-INF/classes/META-INF`).
 
 With this enabled, it's possible to use EL expressions to dynamically adjust the configuration before each authentication attempt, e.g. based on any information in the incoming HTTP request. The information about the HTTP request can be retrieved from a `HttpServletRequest` object injected using `@Inject`.
 
 IMPORTANT: It's not possible to use a different configuration for just a subset of secured resources. Once a user is authenticated, the authentication information is saved in the HTTP session. All secured resources will be accessed using the same user, having the same roles, until the user logs out.
 
 [[example-multitenant]]
-=== Example Multitenant Authentication
+=== Example of Multi-tenant Authentication
 
 This example should showcase the following steps:
 
@@ -295,7 +315,7 @@ TIP: The tenant can also be resolved from a cookie, which is set the first time 
 . Create a file `microprofile-config.properties` in your application (for a WAR application it would be in the `WEB-INF/classes/META-INF` directory), with the following contents:
 +
 .microprofile-config.properties
-[source, xml]
+[source, properties]
 ----
 payara.security.openid.tenant1.providerURI=<TENANT1_OPENID_PROVIDER_URI>
 payara.security.openid.tenant2.providerURI=<TENANT2_OPENID_PROVIDER_URI>
@@ -363,46 +383,87 @@ With the `logout` parameter of the `OpenIdAuthenticationDefinition` you can defi
 | Option | MP Config property | Required | Description | Default value 
 
 | `notifyProvider`
-| payara.security.openid.provider.notify.logout
-| false
-| Notify the OIDC provider (OP) that the user has logged out of
-    the application and might want to log out of the OP as well. If true then
-    after having logged out the user from RP, redirects the End-User's User
-    Agent to the OP's logout endpoint URL. This URL is normally obtained via
-    the `end_session_endpoint` element of the OP's metadata or can be
-    customized via `fish.payara.security.annotations.OpenIdProviderMetadata#endSessionEndpoint`
-| false
+| `payara.security.openid.provider.notify.logout`
+| `false`
+| Notify the OIDC provider (OP) that the user has logged out of the application and might want to log out of the OP as well.
+If `true` then after having logged out the user from RP, redirects the End-User's User Agent to the OP's logout endpoint URL. This URL is normally obtained via the `end_session_endpoint` element of the OP's metadata or can be customized via `fish.payara.security.annotations.OpenIdProviderMetadata#endSessionEndpoint`
+| `false`
 
 | `redirectURI`
-| payara.security.openid.logout.redirectURI
-| false
-| The post logout redirect URI to which the RP is requesting that
-   the End-User's User Agent be redirected after a logout has been
-   performed. If redirect URI is empty then redirect to OpenID connect
-  provider _authorization_endpoint_ for re-authentication.
+| `payara.security.openid.logout.redirectURI`
+| `false`
+| The post logout redirect URI to which the RP is requesting that the End-User's User Agent be redirected after a logout has been performed.
+
+If the redirect URI is empty then redirect to OpenID connect provider _authorization_endpoint_ for re-authentication.
 | 
 
 | `accessTokenExpiry`
-| payara.security.openid.logout.access.token.expiry
-| false
+| `payara.security.openid.logout.access.token.expiry`
+| `false`
 | Whether the application session times out when the Access Token expires.
-| false 
+| `false`
 
 | `identityTokenExpiry`
-| payara.security.openid.logout.identity.token.expiry
-| false
+| `payara.security.openid.logout.identity.token.expiry`
+| `false`
 | Whether the application session times out when the Identity Token expires.
-| false
+| `false`
 |===
 
-A programmatic logout is performed by calling `OpenIdContext#logout()` which invalidates the RP's active OpenId Connect session. If `fish.payara.security.annotations.LogoutDefinition#notifyProvider` is set to true then it redirects the End-User's User Agent to the `end_session_endpoint` to notify the OP that the user has logged out of the RP's application. It will also ask the user whether they want to logout from the OP as well. After successful logout, the End-User's User Agent redirects back to the RP's `_post_redirect_uri_` configured via the `fish.payara.security.annotations.LogoutDefinition#redirectURI` property.
+A programmatic logout is performed by calling `OpenIdContext#logout()` which invalidates the RP's active OpenId Connect session.
+
+If `fish.payara.security.annotations.LogoutDefinition#notifyProvider` is set to true then it redirects the End-User's User Agent to the `end_session_endpoint` to notify the OP that the user has logged out of the RP's application.
+
+It will also ask the user whether they want to log out from the OP as well. After successful logout, the End-User's User Agent redirects back to the RP's `_post_redirect_uri_` configured via the `fish.payara.security.annotations.LogoutDefinition#redirectURI` property.
+
+[[proxy-support]]
+=== Proxy Definition 
+
+Using the `proxyDefinition` parameter of the `@OpenIdAuthenticationDefinition` annotation you can specify details regarding proxy mapping within the OpenID Connect client configuration. It contains attributes to specify the `hostName` and `port` of the proxied server. This addition facilitates the configuration of proxy mapping for requests traversing through reverse web proxies.
+
+Moreover, the proxy configuration details (`hostName` and `port`) can be dynamically utilized to define the `redirectURI` within the `OpenIdAuthenticationDefinition`, replacing the `baseURL` placeholder if present. This allows for a more flexible setup, especially in scenarios involving reverse web proxies.
+
+[[scenarios-without-proxy]]
+==== Scenarios without Proxy
+
+* *Case 1*
+** `redirectURI` employs the `${baseURL}` placeholder, which defaults to `${baseURL}/Callback` when `redirectURI` is not explicitly defined.
+** Proxy definition is also absent.
+** -> *Outcome:* The generated `redirectURI` should include the request's host and port. The registered Authorized Redirect URI in Google Cloud must contain a URL with the Payara Server instance's host and port.
+
+* *Case 2*
+** `redirectURI` is explicitly defined with the Payara Server instance's host and port.
+** Proxy definition is not present.
+** -> *Outcome:* The registered Authorized Redirect URI in Google Cloud must contain a URL with the Payara Server instance's host and port.
+
+[[scenarios-with-proxy]]
+==== Scenarios with Proxy
+
+* *Case 3*
+** `redirectURI` employs the `${baseURL}` placeholder, defaulting to `${baseURL}/Callback` when `redirectURI` is not explicitly defined.
+** Proxy definition is included.
+** -> *Outcome:* The generated `redirectURI` should include the proxy's host and port. The registered Authorized Redirect URI in Google Cloud must contain a URL with the proxy's host and port.
+
+* *Case 4*
+** `redirectURI` is explicitly defined with the Payara Server instance's host and port.
+** Proxy definition is also present.
+** -> *Outcome:* The registered Authorized Redirect URI in Google Cloud must contain a URL with the Payara Server instance's host and port.
+
+* *Case 5*
+** `redirectURI` is explicitly defined with the Proxy's host and port.
+** Proxy definition is included.
+** -> *Outcome:* The registered Authorized Redirect URI in Google Cloud must contain a URL with the proxy's host and port.
 
 [[provider-metadata]]
 === Provider Metadata
 
-If the OpenId server doesn't provide autoconfiguration or it is necessary to customize it, it is possible to set these values in the `providerMetadata` attribute of the `@OpenIdAuthenticationDefinition` annotation. It's also possible to specify all values by using MicroProfile Config properties. None of the attributes are required in the annotation, but some options are required and must be specified either in the annotation or a MicroProfile property or must be provided by the OIDC provider. The order of evaluation is: MicroProfile Config -->  `@OpenIdProviderMetadata` --> automatic configuration on `providerURI` address.
+If the OpenId server doesn't provide autoconfiguration, or it is necessary to customize it, it is possible to set these values in the `providerMetadata` attribute of the `@OpenIdAuthenticationDefinition` annotation.
 
-When these values, which correspond to lists (e.g. `scopesSupported`, `responseTypesSupported`), are loaded from MicroProfile Config, they are separated by a comma, following https://download.eclipse.org/microprofile/microprofile-config-2.0/microprofile-config-spec-2.0.html#_array_converters[MicroProfile Config Array conventions].
+It's also possible to specify all values by using MicroProfile Config properties. None of the attributes are required in the annotation, but some options are required and must be specified either in the annotation or a MicroProfile property or must be provided by the OIDC provider.
+
+TIP: The order of evaluation is: MicroProfile Config ->  `@OpenIdProviderMetadata` -> automatic configuration on `providerURI` address.
+
+When these values, which correspond to lists (e.g. `scopesSupported`, `responseTypesSupported`), are loaded from MicroProfile Config, they are separated by a comma, following link:https://download.eclipse.org/microprofile/microprofile-config-2.0/microprofile-config-spec-2.0.html#_array_converters[MicroProfile Config Array conventions].
 
 .Provider Metadata Options
 |===
@@ -410,32 +471,32 @@ When these values, which correspond to lists (e.g. `scopesSupported`, `responseT
 
 | `issuer`
 | `payara.security.openid.provider.issuer`
-| true
+| `true`
 | The base address of OpenId Connect Provider (OIDC Provider).
 
 | `authorizationEndpoint`
 | `payara.security.openid.provider.authorizationEndpoint`
-| true
+| `true`
 | The URL for the OAuth2 provider to provide authentication.
 
 | `tokenEndpoint`
 | `payara.security.openid.provider.tokenEndpoint`
-| true
+| `true`
 | The URL for the OAuth2 provider to give the authorization token.
 
 | `userinfoEndpoint`
 | `payara.security.openid.provider.userinfoEndpoint`
-| true
+| `true`
 | An OAuth 2.0 Protected Resource that returns Claims about the authenticated End-User.
 
 | `endSessionEndpoint`
 | `payara.security.openid.provider.endSessionEndpoint`
-| false
+| `false`
 | OIDC Provider's endpoint to notify that the End-User has logged out of the site and might want to log out of the OIDC Provider as well.
 
 | `jwksURI`
 | `payara.security.openid.provider.jwksURI`
-| true
+| `true`
 | An OIDC Provider's JSON Web Key Set document.
 
 | `scopesSupported`
@@ -445,27 +506,27 @@ When these values, which correspond to lists (e.g. `scopesSupported`, `responseT
 
 | `responseTypesSupported`
 | `payara.security.openid.provider.responseTypeSupported`
-| true
+| `true`
 | List of the OAuth 2.0 response_type values that this OIDC Provider supports, e.g. `code`, `id_token`, `token id_token`.
 
 | `subjectTypesSupported`
 | `payara.security.openid.provider.subjectTypesSupported`
-| true
+| `true`
 | List of the Subject Identifier types that this OIDC Provider supports. Valid types include `pairwise` and `public`.
 
 | `idTokenSigningAlgValuesSupported`
 | `payara.security.openid.provider.idTokenSigningAlgorithmsSupported`
-| true
+| `true`
 | List of the JWS signing algorithms (algorithm values) supported by the OIDC Provider for the ID Token to encode the Claims in a JWT, e.g. `RS256`.
 
 | `idTokenEncryptionAlgValuesSupported`
 | `payara.security.openid.provider.idTokenEncryptionAlgValuesSupported`
-| false
+| `false`
 | List of the JWE encryption algorithms (`alg` values) supported by the OIDC Provider for the ID Token to encode the Claims in a JWT.
 
 | `idTokenEncryptionEncValuesSupported`
 | `payara.security.openid.provider.idTokenEncryptionEncValuesSupported`
-| false
+| `false`
 | List of the JWE encryption algorithms (`enc` values) supported by the OIDC Provider for the ID Token to encode the Claims in a JWT.
 
 | `claimsSupported`
@@ -488,22 +549,24 @@ As the OpenId Connect Client is built on top of Jakarta EE Security API, therefo
 
 The Payara Public API also provides a `fish.payara.security.openid.api.OpenIdContext` interface which is also available as a CDI bean and consist of the following methods:
 
-- The `getCallerName()` method - Gets the caller name of the currently authenticated user.
-- The `getCallerGroups()` method - Gets the groups associated with the caller.
-- The `getSubject()` method - Subject Identifier. A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client.
-- The `getTokenType()` method - Gets the token type value. The value MUST be `Bearer` or another token type value that the client has negotiated with the authorization server. 
-- The `getAccessToken()` method - Gets the authorization token that was received from the OpenId Connect provider.
-- The `getIdentityToken()` method - Gets the identity token that was received from the OpenId Connect provider.
-- The `getRefreshToken()` method - Returns the refresh token that is used by OIDC client to get a new access token.
-- The `getExpiresIn()` method - Return the time that the access token is granted for, if it is set to expire.
-- The `getClaimsJson()` method - Gets the User Claims JSON that was received from the `userinfo` endpoint.
-- The `getClaims()` method - Gets the User Claims that were received from the `userinfo` endpoint.
-- The `getProviderMetadata()` method - The OpenId Connect Provider's metadata document fetched via provider URI.
+* The `getCallerName()` method - Gets the caller name of the currently authenticated user.
+* The `getCallerGroups()` method - Gets the groups associated with the caller.
+* The `getSubject()` method - Subject Identifier. A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client.
+* The `getTokenType()` method - Gets the token type value. The value MUST be `Bearer` or another token type value that the client has negotiated with the authorization server.
+* The `getAccessToken()` method - Gets the authorization token that was received from the OpenId Connect provider.
+* The `getIdentityToken()` method - Gets the identity token that was received from the OpenId Connect provider.
+* The `getRefreshToken()` method - Returns the refresh token that is used by OIDC client to get a new access token.
+* The `getExpiresIn()` method - Return the time that the access token is granted for, if it is set to expire.
+* The `getClaimsJson()` method - Gets the User Claims JSON that was received from the `userinfo` endpoint.
+* The `getClaims()` method - Gets the User Claims that were received from the `userinfo` endpoint.
+* The `getProviderMetadata()` method - The OpenId Connect Provider's metadata document fetched via provider URI.
 
 [[user-information-from-the-id-token]]
 == User Information from the ID Token
 
-The `userClaimsFromIDToken` attribute that belongs to the `@OpenIdAuthenticationDefinition` will instruct the container to retrieve the user information details from the ID Token instead of calling the `userinfo` endpoint, as defined by the OpenID Connect standard workflow. As such, this behaviour is non-standard and should be used on special cases.
+The `userClaimsFromIDToken` attribute that belongs to the `@OpenIdAuthenticationDefinition` will instruct the container to retrieve the user information details from the ID Token instead of calling the `userinfo` endpoint, as defined by the OpenID Connect standard workflow.
+
+As such, this behaviour is non-standard and should be used on special cases.
 
 TIP: To properly connect an application with Microsoft ADFS this property is required because by default Microsoft ADFS doesn't allow calls to the `userinfo` endpoint.
 
@@ -513,9 +576,9 @@ TIP: To properly connect an application with Microsoft ADFS this property is req
 
 | `userClaimsFromIDToken`
 | `payara.security.openid.userClaimsFromIDToken`
-| false
+| `false`
 | Instructs the container to retrieve user information from the ID Token
-| false
+| `false`
 
 |===
 
@@ -539,7 +602,9 @@ public class SecurityBean {
 [[disable-scope-validation]]
 == Disable Scope Validation
 
-By default, the OpenID Connect connector validates that a scope is reported as a supported scope by the provider. However, some providers support more scopes than they actually report as supported scopes. In order to disable the validation and allow using such scopes, it's possible to use the `disableScopeValidation` property of `OpenIdProviderMetadata`. See the <<configuration>> section for more details about this option.
+By default, the OpenID Connect connector validates that a scope is reported as a supported scope by the provider. However, some providers support more scopes than they actually report as supported scopes.
+
+To disable the validation and allow using such scopes, it's possible to use the `disableScopeValidation` property of `OpenIdProviderMetadata`. See the <<configuration>> section for more details about this option.
 
 [[disable-scope-validation-example]]
 === Example
@@ -560,12 +625,14 @@ public class SecurityBean {
 [[bearer-auth]]
 == Bearer Authentication and Authorization
 
-In order to authenticate and authorize calls between services using the OpenID mechanism, it is possible to use authorization compatible with https://datatracker.ietf.org/doc/html/rfc6750[RFC 6750]. In this case, the access token presented to the resource service is an JWT token that is used to verify that the caller has access to OAuth2 protected resources.
+In order to authenticate and authorize calls between services using the OpenID mechanism, it is possible to use authorization compatible with link:https://datatracker.ietf.org/doc/html/rfc6750[RFC 6750].
+
+In this case, the access token presented to the resource service is an JWT token that is used to verify that the caller has access to OAuth2 protected resources.
 
 [[obtaining-token]]
 === Obtaining JWT Token
 
-Obtaining the token is specific to the OAuth provider and the application. The usual approach is using https://datatracker.ietf.org/doc/html/rfc6749#section-4.4[Client Credentials Grant], where an application posts its clientId and secret to identity provider and receives access and refresh tokens in return.
+Obtaining the token is specific to the OAuth provider and the application. The usual approach is using link:https://datatracker.ietf.org/doc/html/rfc6749#section-4.4[Client Credentials Grant], where an application posts its clientId and secret to identity provider and receives access and refresh tokens in return.
 
 [[passing-token]]
 === Passing Token To The Resource Service
@@ -624,7 +691,9 @@ The Payara Public API provides built-in support for Google OpenID Provider via t
 ==== Request Refresh Token
 To enable the refresh token feature, set the `tokenAutoRefresh` to true and add the `access_type` parameter value to `offline` so that application can refresh access tokens when the user is not present at the browser. 
 
-If application requests `offline` access then the application can receive access and refresh token. Once the application has a refresh token, it can obtain a new access token at any time or as older ones expire. Otherwise, If application requests `online` access, your application will only receive an access token
+If application requests `offline` access then the application can receive access and refresh token. Once the application has a refresh token, it can obtain a new access token at any time or as older ones expire.
+
+Otherwise, if an application requests `online` access, your application will only receive an access token
 
 [source, java]
 ----
@@ -632,7 +701,6 @@ If application requests `offline` access then the application can receive access
     providerURI="#{openidConfigBean.tokenEndpointURL}",
     clientId="#{openidConfigBean.clientId}",
     clientSecret="#{openidConfigBean.clientSecret}",
-    ...
     tokenAutoRefresh = true,
     extraParameters = {"access_type=offline", "approval_prompt=force"}
 )
@@ -647,6 +715,7 @@ The Payara Public API also provides built-in support for Azure AD OpenID Provide
 
 [[azure-token]]
 ==== Request Refresh Token
+
 To receive the refresh token, set the `tokenAutoRefresh` to true and explicitly add the `offline_access` scope to the definition.
 
 [source, java]
@@ -655,7 +724,6 @@ To receive the refresh token, set the `tokenAutoRefresh` to true and explicitly 
     providerURI="#{openidConfigBean.tokenEndpointURL}",
     clientId="#{openidConfigBean.clientId}",
     clientSecret="#{openidConfigBean.clientSecret}",
-    ...
     tokenAutoRefresh = true,
     scope = {OPENID_SCOPE, EMAIL_SCOPE, PROFILE_SCOPE, OFFLINE_ACCESS_SCOPE}
 )
@@ -666,28 +734,32 @@ public class SecurityBean {
 [[azure-groups]]
 ==== Groups Mapping
 
-- To add the groups to the registered application, Sign in to the Azure portal > Azure Active Directory > Manage > App registrations > select your application:
+. To add the groups to the registered application, Sign in to the Azure portal > Azure Active Directory -> Manage -> App registrations -> select your application:
++
 image:security-connector/oidc/azure/app_registrations.png[Select application]
 
-- You may also add the custom roles via **Roles and administrators** under the **Manage** section:
+. You may also add the custom roles via **Roles and administrators** under the **Manage** section:
++
 image:security-connector/oidc/azure/custom_role.png[Add Custom Roles]
 
-- Now to map group claims, select **Token configuration** under the **Manage** section:
+. Now to map group claims, select **Token configuration** under the **Manage** section:
++
 image:security-connector/oidc/azure/token_configuration.png[Token configuration]
 
-- Press **Add groups claim** button to select group types and customize Id and/or Access token properties:
+. Press **Add groups claim** button to select group types and customize the ID and/or Access Token properties:
++
 image:security-connector/oidc/azure/add_groups_claim.png[Add Groups Claim]
 
-- Groups claim can also be defined via Azure **Manifest** under the **Manage** section which is a JSON configuration file.
+. Groups claim can also be defined via Azure **Manifest** under the **Manage** section which is a JSON configuration file.
 
-- To retrieve and map the caller name & groups from token claims, set the caller name & group claim definition to `preferred_username` & `groups`.
+. To retrieve and map the caller name & groups from token claims, set the caller name & group claim definition to `preferred_username` & `groups`.
++
 [source, java]
 ----
 @AzureAuthenticationDefinition(
     providerURI="#{openidConfigBean.tokenEndpointURL}",
     clientId="#{openidConfigBean.clientId}",
     clientSecret="#{openidConfigBean.clientSecret}",
-    ...
     claimsDefinition = @ClaimsDefinition(
             callerGroupsClaim = "groups",
             callerNameClaim = "preferred_username"
@@ -700,52 +772,70 @@ public class SecurityBean {
 [[microsoft-adfs-integration]]
 ==== Microsoft ADFS Integration
 
-To enable integration for Microsoft ADFS it is needed to use the `userClaimsFromIDToken` annotation attribute. See <<user-information-from-the-id-token>> for more information.
+To enable integration for Microsoft ADFS it is needed to use the `userClaimsFromIDToken` annotation attribute.
+
+See <<user-information-from-the-id-token>> for more information.
 
 [[azure-ad-scope-validation]]
 ==== Azure AD Scope Validation
 
-To disable the scope validation for Azure AD integration it is needed to use the `disableScopeValidation` annotation attribute. See <<disable-scope-validation>> for more information.
+To disable the scope validation for Azure AD integration it is needed to use the `disableScopeValidation` annotation attribute.
+
+See <<disable-scope-validation>> for more information.
 
 [[keycloak-oidc-integration]]
 === Keycloak Integration
 
-Keycloak is an Open Source Identity and Access Management Server, which is a OAuth2 and OpenID Connect(OIDC) protocol complaint. In this section,the basic steps are described to setup Keycloak OpenId provider.
+Keycloak is an Open Source Identity and Access Management Server, which is a OAuth2 and OpenID Connect(OIDC) protocol complaint. In this section,
 
-- Refer to Keycloak https://www.keycloak.org/docs/latest/getting_started/index.html[getting started documentation] to run and setup keycloak.
+the basic steps are described to set up a Keycloak OpenId provider:
 
-- After Keycloak setup done, login to Keycloak admin console and add the new realm by pressing the **Add Realm** button: image:security-connector/oidc/keycloak/add-realm.png[Add Realm]
+. Refer to the Keycloak https://www.keycloak.org/docs/latest/getting_started/index.html[getting started documentation] to run and setup Keycloak.
 
-- Copy the OpenId endpoint configuration URL from endpoint section:
+. After Keycloak setup done, login to Keycloak admin console and add the new realm by pressing the **Add Realm** button:
++
+image:security-connector/oidc/keycloak/add-realm.png[Add Realm]
+
+. Copy the OpenId endpoint configuration URL from endpoint section:
++
 image:security-connector/oidc/keycloak/realm-endpoint.png[Realm Endpoint]
 
-- Now add the **Role** that will be used by the application to define which users will be authorized to access the application.
+. Now add the **Role** that will be used by the application to define which users will be authorized to access the application.
++
 image:security-connector/oidc/keycloak/add-role.png[Add role]
 
-- Create the **Groups**:
+. Create the **Groups**:
++
 image:security-connector/oidc/keycloak/create-group.png[Create Groups]
 
-- Add the **User**:
+. Add the **User**:
++
 image:security-connector/oidc/keycloak/add-user.png[Add User]
 
-- After the user is created, set a new **password** for the user:
+. After the user is created, set a new **password** for the user:
++
 image:security-connector/oidc/keycloak/set-user-password.png[Set Password]
 
-- Now map the user to roles. Click on **Role Mappings** tab and assign the roles to the user from the available roles:
+. Now map the user to roles. Click on **Role Mappings** tab and assign the roles to the user from the available roles:
++
 image:security-connector/oidc/keycloak/user-role-mapping.png[User Role Mapping]
 
-- Assign the user to the groups. Click on **Groups** tab and join the groups from the available groups:
+. Assign the user to the groups. Click on **Groups** tab and join the groups from the available groups:
++
 image:security-connector/oidc/keycloak/join-group.png[Join Groups]
 
-- Create the OpenId Client by clicking the **Client** option from sidebar and press the **create** button:
+. Create the OpenId Client by clicking the **Client** option from sidebar and press the **create** button:
++
 image:security-connector/oidc/keycloak/create-client.png[Create OpenID Client]
 
 Enter the Client ID and select the Client Protocol **openid-connect** and press **Save**.
 
-- After the OpenId client is created change its **Access Type** to **confidential** and enter the valid **Redirect URIs**:
+. After the OpenId client is created change its **Access Type** to **confidential** and enter the valid **Redirect URIs**:
++
 image:security-connector/oidc/keycloak/client-access-type-confidentail.png[Access Type]
 
-- Next copy the client **secret** from **Credentials** tab.
+. Next copy the client **secret** from **Credentials** tab.
++
 image:security-connector/oidc/keycloak/client-secret.png[Client Secret]
 
 Here's an example that configures a OpenID Connect client for Keycloak provider. To test the KeyCloak OpenId provider, enter the copied client secret, client ID (client name) and the endpoint configuration URL:
@@ -753,10 +843,9 @@ Here's an example that configures a OpenID Connect client for Keycloak provider.
 [source, java]
 ----
 @OpenIdAuthenticationDefinition(
-    providerURI = "http://${keycloak-host}:${keycloak-port}/auth/realms/test-realm",
+    providerURI = "https://${keycloak-host}:${keycloak-port}/auth/realms/test-realm",
     clientId = "test-client",
     clientSecret = "1f6744ae-d7e7-4876-bc44-78fb691316a1"
-    ...
 )
 public class SecurityBean {
 }
@@ -765,17 +854,18 @@ public class SecurityBean {
 [[keycloak-groups]]
 ==== Groups Mapping
 
-- To get the groups details in token claims, navigate to KeyCloak admin console > OpenId **Client** > **Mappers** tab > press **create** button > Select **Group Membership** mapper type > enter the **Name** and **Token Claim Name** > press **Save**.
+. To get the groups details in token claims, navigate to KeyCloak admin console -> *OpenId Client* -> *Mappers* tab -> press *Create* button -> Select *Group Membership* mapper type -> enter the *Name* and *Token Claim Name* > press *Save*.
++
 image:security-connector/oidc/keycloak/groups-claim.png[Groups Claim]
 
-- To retrieve and map the caller name & groups from token claims, set the caller name & group claim definition to `preferred_username` & `groups`.
+. To retrieve and map the caller name & groups from token claims, set the caller name & group claim definition to `preferred_username` & `groups`.
++
 [source, java]
 ----
 @OpenIdAuthenticationDefinition(
-    providerURI = "http://${keycloak-host}:${keycloak-port}/auth/realms/test-realm",
+    providerURI = "https://${keycloak-host}:${keycloak-port}/auth/realms/test-realm",
     clientId = "test-client",
-    clientSecret = "1f6744ae-d7e7-4876-bc44-78fb691316a1"
-    ...
+    clientSecret = "1f6744ae-d7e7-4876-bc44-78fb691316a1",
     claimsDefinition = @ClaimsDefinition(
             callerGroupsClaim = "groups",
             callerNameClaim = "preferred_username"
