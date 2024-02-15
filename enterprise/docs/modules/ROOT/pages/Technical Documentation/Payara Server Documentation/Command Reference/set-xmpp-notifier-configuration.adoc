@@ -1,0 +1,90 @@
+[[set-xmpp-notifier-configuration]]
+= set-xmpp-notifier-configuration
+
+Configures the settings of the XMPP notifier.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-xmpp-notifier-configuration [--help]
+[--target target]
+[--enabled={false|true}]
+[--dynamic={false|true}]
+[--noisy={false|true}]
+[--hostname hostname]
+[--xmppPort port]
+[--securityDisabled={false|true}]
+[--userName username]
+[--password password]
+[--roomId roomId]
+----
+
+[[description]]
+== Description
+
+This command can be used to configure the behaviour of the XMPP notifier in Payara Server.
+
+IMPORTANT: This command is available as long as the XMPP notifier's core module is installed in the server. +
+This notifier's extension is installed by default on Payara Server Enterprise.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are configuring the XMPP notifier. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified sever instance.
+`--enabled`::
+Defaults to `false`. Enables or disables the log notifier
+`--dynamic`::
+Defaults to `false`. When set to `true`, applies the changes without a server restart.
++
+Otherwise, a restart is required.
+`--noisy`::
+Defaults to `false`. Whether the notifier is active even if the notification event threshold is set to `FINE`.
+`--hostName`::
+Defines the hostname of the XMPP server.
+`--xmppPort`::
+Defaults to `5222`. Defines the port number of the XMPP server.
+`--securityDisabled`::
+Defaults to `true`. If `false` will disable secure communication with the XMPP server.
+`--userName`::
+The username of the account that will post notifications in the XMPP room.
+`--password`::
+The password credentials of the user account that will post notifications in the XMPP room.
+`--roomId`::
+The ID of the room where the notifications will be posted.
+
+[[examples]]
+== Examples
+
+*Example 1 Enable the XMPP notifier and configure its authentication and room settings*
+
+[source, shell]
+----
+asadmin set-xmpp-notifier-configuration --enabled=true --dynamic=true --hostname="172.28.128.3" --xmppPort=5222 --username="payaraNotifications" --password="******" --securityDisabled=false --roomId=server
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-xmpp-notifier-configuration.adoc#get-xmpp-notifier-configuration[`get-xmpp-notifier-configuration`]
