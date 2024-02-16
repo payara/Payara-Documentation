@@ -10,7 +10,12 @@ Instructions for accomplishing these tasks and editing logging service propertie
 
 Logging is the process by which Payara Server captures information about events that occur, such as configuration errors, security failures, or server malfunction. This data is recorded in log files and is usually the first source of information when problems occur. Analyzing the log files can help you to follow events that occur in the server runtime and determine the overall health of the server.
 
-Although application components can use the Apache Commons Logging Library to record messages, the platform standard JSR 47 Logging API is recommended for better log configuration. For more information about JSR 47, see `http://jcp.org/en/jsr/detail?id=47`.
+Although application components can use the Apache Commons Logging Library to record messages, the platform standard JSR 47 Logging API is recommended for better log configuration.
+
+For more information about Logging in Java, see:
+
+* link:http://jcp.org/en/jsr/detail?id=47[JSR 47 Specification]
+* link:https://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html[Logging Overview]
 
 [[log-files]]
 === Log Files
@@ -20,7 +25,7 @@ Payara Server log records are captured in the server log file, which captures in
 [[log-file-names-and-locations]]
 ==== *Log File Names and Locations*
 
-In an Payara Server domain, log files have the following name and location by default:
+In a Payara Server domain, log files have the following name and location by default:
 
 [width="100%",cols="27%,73%",options="header",]
 |===
@@ -28,13 +33,13 @@ In an Payara Server domain, log files have the following name and location by de
 |Default Log File Name and Location
 
 |DAS
-|domain-dir`/logs/server.log`
+|`domain-dir/logs/server.log`
 
-|Each server instance
-|instance-dir`/logs/server.log`
+|Server instance
+|`instance-dir/logs/server.log`
 
 |Cluster instance
-|instance-dir`/logs/server.log`
+|`instance-dir/logs/server.log`
 |===
 
 For example, in a domain hosted on a given machine that includes a cluster with two managed servers (`ClusterServer1` and `ClusterServer1`) and a standalone instance (`StandaloneServer`), the log files might be arranged in the following directory structure. In this directory structure, the `server.log` file for the DAS is located in `domain-dir/logs`.
@@ -67,25 +72,30 @@ You can change the default name or location of a log file by modifying the loggi
 
 Payara Server writes log records in either the Oracle Diagnostics Logging (ODL) format or the Uniform Log Formatter (ULF) format. The default format is ODL. For information about changing the format, see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#setting-the-log-file-format[Setting the Log File Format].
 
-A custom formatter can also be used by specifying the fully qualified name of a class that extends the `java.util.logging.Formatter` class. The custom formatter class can be packaged in a JAR file and placed in the domain-dir`/lib/ext` directory, or implemented as a Hundred-Kilobyte Kernel (HK2) service and the JAR containing the formatter implementation placed in the as-install`/modules` directory.
+A custom formatter can also be used by specifying the fully qualified name of a class that extends the `java.util.logging.Formatter` class. The custom formatter class can be packaged in a JAR file and placed in the `domain-dir/lib/ext` directory, or implemented as a Hundred-Kilobyte Kernel (HK2) service and the JAR containing the formatter implementation placed in the `as-install/modules` directory.
 
 Log records formatted in the ODL format are displayed as follows:
 
-[source,shell]
+[source, log]
 ----
 [yyyy-mm-ddThh:mm:ss.SSS-Z][ProductName-Version][Log Level][Message ID][LoggerName][Key Value Pairs][[Message]]
 ----
 
 * `[` and `]` mark the beginning and end of fields in the record. Some fields may be empty.
-* yyyy-mm-dd`T`hh:mm:ss.SSSS-Z represents the date and time that the record was created. For example: `2013-04-12T08:08:30.154-0700`
+* `yyyy-mm-dd`T`hh:mm:ss.SSSS-Z` represents the date and time that the record was created. For example: `2013-04-12T08:08:30.154-0700`
 * ProductName-Version represents the current version of Payara Server. For example: `payara`
-* Log Level represents the log level. You can set any of the following values: `EMERGENCY`, `ALERT`, `SEVERE`, `WARNING`, `INFO`, `CONFIG`,
-`FINE`, `FINER`, and `FINEST`. The default is `INFO`.
+* Log Level represents the log level.
++
+You can set any of the following values: `EMERGENCY`, `ALERT`, `SEVERE`, `WARNING`, `INFO`, `CONFIG`,
+`FINE`, `FINER`, and `FINEST`.
++
+The default is `INFO`.
 * Message ID consists of a module code that indicates the origin of the message and the message number. For example: `AS-WEB-GLUE-00172`
 * LoggerName represents a hierarchical logger namespace that identifies the source of the log module. For example: `jakarta.enterprise.web`
-* Key Value Pairs represents pairs of key names and values. For example:`timeMillis: 1365779310154`
-* Message represents the text of the log message. For multiline messages, `\[[` marks the end of the first line, and `]]` marks the end
-of the message. Multiline messages start on a new line after the message header and are indented.
+* Key Value Pairs represents pairs of key names and values. For example: `timeMillis: 1365779310154`
+* Message represents the text of the log message.
++
+For multiline messages, `\[[` marks the end of the first line, and `]]` marks the end of the message. Multiline messages start on a new line after the message header and are indented.
 
 The following is an example of a log record formatted in the ODL format:
 
@@ -98,7 +108,7 @@ The following is an example of a log record formatted in the ODL format:
 
 Log records formatted in the ULF format are displayed as follows:
 
-[source,text]
+[source,log]
 ----
 [#|yyyy-mm-ddThh:mm:ss.SSS-Z|Log Level|ProductName-Version|LoggerName|Key Value Pairs|Message|#]
 ----
@@ -109,7 +119,8 @@ Log records formatted in the ULF format are displayed as follows:
 * Log Level represents the log level. You can set any of the following values: `EMERGENCY`, `ALERT`, `SEVERE`, `WARNING`, `INFO`, `CONFIG`, `FINE`, `FINER`, and `FINEST`. The default is `INFO`.
 * ProductName-Version represents the current version of Payara Server. For example: `Payara Server {page-version}`
 * LoggerName represents a hierarchical logger namespace that identifies the source of the log module. For example: `jakarta.enterprise.web.core`
-* Key Value Pairs represents pairs of key names and values and can include a message ID. For example: `_MessageID=AS-WEB-CORE-00306`. +
+* Key Value Pairs represents pairs of key names and values and can include a message ID. For example: `_MessageID=AS-WEB-CORE-00306`.
++
 Message IDs are included for all Payara Server `EMERGENCY`, `ALERT`, `SEVERE`, and `WARNING` messages, and for many `INFO` messages.
 * Message represents the text of the log message. Multiline messages start on a new line after the message header and are indented.
 
@@ -213,31 +224,31 @@ The following subcommands optionally accept a target specification. A target can
 |Description
 |Target Specification
 
-|xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/collect-log-files.adoc[`collect-log-files`]
+|xref:Technical Documentation/Payara Server Documentation/Command Reference/collect-log-files.adoc[`collect-log-files`]
 |Collects all available log files into a ZIP archive.
 |`--target``=`target-name
 
-|xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-log-attributes.adoc[`list-log-attributes`]
+|xref:Technical Documentation/Payara Server Documentation/Command Reference/list-log-attributes.adoc[`list-log-attributes`]
 |Lists logging attributes in the logging properties file.
 |target-name operand
 
-|xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-log-levels.adoc[`list-log-levels`]
+|xref:Technical Documentation/Payara Server Documentation/Command Reference/list-log-levels.adoc[`list-log-levels`]
 |Lists the loggers in the logging properties file and their log levels
 |target-name operand
 
-|xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/rotate-log.adoc[`rotate-log`]
+|xref:Technical Documentation/Payara Server Documentation/Command Reference/rotate-log.adoc[`rotate-log`]
 |Rotates the log file by renaming it and creating a new log file to store new messages.
 |`--target``=`target-name
 
-|xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`]
+|xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`]
 |Sets the specified logging attributes in the logging properties file.
 |`--target``=`target-name
 
-|xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-file-format.adoc[`set-log-file-format`]
+|xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-file-format.adoc[`set-log-file-format`]
 |Sets the log file formatter.
 |`--target``=`target-name
 
-|xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-levels.adoc[`set-log-levels`]
+|xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-levels.adoc[`set-log-levels`]
 |Sets the log level for one or more loggers listed in the logging properties file.
 |`--target``=`target-name
 |====
@@ -261,16 +272,16 @@ By default, in a Payara Server domain, logging properties files are created in t
 |Default Location of Logging Properties File
 
 |DAS
-|domain-dir`/config``/logging.properties`
+|`domain-dir/config/logging.properties`
 
 |A configuration
-|domain-dir`/config/`config-name`/logging.properties`, where config-name represents the name of a configuration that is shared by one or more instances or clusters.
+|`domain-dir/config/<config-name>/logging.properties`, where `<config-name>` represents the name of a configuration that is shared by one or more instances or clusters.
 
 |An instance
-|domain-dir`/config``/`instance-name`-config/logging.properties`, where instance-name represents the name of the instance.
+|`domain-dir/config/<instance-name>-config/logging.properties`, where `<instance-name>` represents the name of the instance.
 
 |A cluster
-|domain-dir`/config/`cluster-name`-config/logging.properties`, where cluster-name represents the name of the cluster.
+|`domain-dir/config/<cluster-name>-config/logging.properties`, where `<cluster-name>` represents the name of the cluster.
 |====
 
 [[configuring-the-logging-service]]
@@ -287,7 +298,9 @@ This section explains how to change the name and location of the following loggi
 [[to-change-the-name-and-location-of-the-log-file]]
 ==== *To Change the Name and Location of the Log File*
 
-To change the name and location of the log file, first use the `list-log-attributes` subcommand to obtain the current log attribute setting for the log file name and location. Then use the `set-log-attributes` subcommand to specify the new name or location. The default target for these two subcommands is the DAS. However, you can optionally specify one of the following targets:
+To change the name and location of the log file, first use the `list-log-attributes` subcommand to obtain the current log attribute setting for the log file name and location.
+
+Then use the `set-log-attributes` subcommand to specify the new name or location. The default target for these two subcommands is the DAS. However, you can optionally specify one of the following targets:
 
 * Configuration name — to target all instances or clusters that share a specific configuration name.
 * Server name — to target only a specific server.
@@ -295,18 +308,24 @@ To change the name and location of the log file, first use the `list-log-attribu
 * Cluster name — to target only a specific cluster.
 
 . Ensure that the target server or cluster is running. Remote subcommands require a running server.
-. Use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-log-attributes.adoc[`list-log-attributes`] subcommand in remote mode to obtain the current log attribute settings. The name and location of the log file is set with the `com.sun.enterprise.server.logging.GFFileHandler.file` attribute of the logging properties file. Optionally you can target a configuration, server, instance, or cluster. If you do not specify a target, the log attribute settings for the DAS are displayed.
-. Use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand in remote  mode to define a custom name or location of the log file. +
+. Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-log-attributes.adoc[`list-log-attributes`] subcommand in remote mode to obtain the current log attribute settings.
++
+The name and location of the log file is set with the `com.sun.enterprise.server.logging.GFFileHandler.file` attribute of the logging properties file. Optionally you can target a configuration, server, instance, or cluster.
++
+If you do not specify a target, the log attribute settings for the DAS are displayed.
+. Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand in remote  mode to define a custom name or location of the log file.
++
 If you do not specify a target, the log file for the DAS is targeted by default. If you target a cluster, the name of the cluster log file for each member instance can be changed (the server log file name cannot).
 
 [[example-to-change-the-name-and-location-of-the-log-file]]
-==== *Example 7-1 To Change the Name and Location of the Log File*
+==== *Example - To Change the Name and Location of the Log File*
 
 This example changes the name of the cluster log file for `Cluster1` to `cluster1.log`. `Cluster1` has two server instances: `ClusterServer1` and `ClusterServer2`.
 
-[source,shell]
+[source, shell]
 ----
-asadmin> list-log-attributes Cluster1
+asadmin list-log-attributes Cluster1
+
 com.sun.enterprise.server.logging.GFFileHandler.alarms <false>
 com.sun.enterprise.server.logging.GFFileHandler.file 
 <${com.sun.aas.instanceRoot}/logs/server.log>
@@ -346,12 +365,20 @@ You can set the name and location of the logging properties file by setting the 
 
 NOTE: Setting the `java.util.logging.config.file` system property causes all other Payara Server  logging properties files on the host to be overridden.
 
-. Set the `java.util.logging.config.file` system property. +
-For example, you can use the following `java` command: `java -Djava.util.logging.config.file=properties_file` Alternatively, you can use the Administration Console to set this system property.
+. Set the `java.util.logging.config.file` system property.
++
+For example, you can use the following command:
++
+[source, shell]
+----
+java -Djava.util.logging.config.file=properties_file
+----
++
+Alternatively, you can use the Administration Console to set this system property.
 . To apply your change, restart Payara Server.
 
 [[example-to-change-the-name-and-location-of-the-logging-properties-file]]
-==== *Example 7-2 To Change the Name and Location of the Logging Property File*
+==== *Example - To Change the Name and Location of the Logging Property File*
 
 The following example changes the location of the logging properties file to `/space/mylogging/logging.properties`:
 
@@ -363,7 +390,9 @@ java -Djava.util.logging.config.file=/space/mylogging/logging.properties
 [[setting-log-levels]]
 === Setting Log Levels
 
-The log level determines the granularity of the message that is logged, from error only (`EMERGENCY`) to detailed debug (`FINEST`). The following values apply: `EMERGENCY`, `ALERT`, `SEVERE`, `WARNING`, `INFO`, `CONFIG`, `FINE`, `FINER`, and `FINEST`. These log levels are hierarchically inclusive, which means that if you set a particular log level, such as INFO, the messages that have log levels above that level (`EMERGENCY`, `ALERT`, `SEVERE`, and `WARNING`,) are also included. If you set the log level to the lowest level, `FINEST`, your output includes all the messages in the file. The default setting is `INFO`.
+The log level determines the granularity of the message that is logged, from error only (`EMERGENCY`) to detailed debug (`FINEST`). The following values apply: `EMERGENCY`, `ALERT`, `SEVERE`, `WARNING`, `INFO`, `CONFIG`, `FINE`, `FINER`, and `FINEST`.
+
+These log levels are hierarchically inclusive, which means that if you set a particular log level, such as INFO, the messages that have log levels above that level (`EMERGENCY`, `ALERT`, `SEVERE`, and `WARNING`,) are also included. If you set the log level to the lowest level, `FINEST`, your output includes all the messages in the file. The default setting is `INFO`.
 
 You can list current log levels of all loggers specified in the `logging properties` file. In some cases, loggers that have not been created by the respective containers will also appear in the list.
 
@@ -386,16 +415,17 @@ Use the `list-log-levels` subcommand in remote mode to list the modules and thei
 * Cluster name — to target a specific cluster.
 
 . Ensure that the DAS is running. Remote subcommands require a running server.
-. List the existing module loggers and log levels by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-log-levels.adoc[`list-log-levels`] subcommand.
+. List the existing module loggers and log levels by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-log-levels.adoc[`list-log-levels`] subcommand.
 
 [[example-to-list-log-levels]]
-==== *Example 7-3 To List Log Levels*
+==== *Example - To List Log Levels Part 1*
 
 This example shows a partial list of the existing loggers and their log levels in the DAS.
 
 [source,shell]
 ----
-asadmin> list-log-levels 
+asadmin list-log-levels
+
 jakarta.enterprise.system.container.cmp <INFO>
 jakarta.enterprise.system.tools.admin <INFO>
 java.util.logging.ConsoleHandler <FINEST>
@@ -409,13 +439,14 @@ Command list-log-levels executed successfully.
 ----
 
 [[example-to-list-log-levels-2]]
-==== *Example 7-4 To List Log Levels 2*
+==== *Example - To List Log Levels Part 2*
 
 This example shows a partial list of the loggers and log levels for the instance `MyServer2`.
 
 [source,shell]
 ----
-asadmin> list-log-levels MyServer2
+asadmin list-log-levels MyServer2
+
 java.util.logging.ConsoleHandler <FINEST>
 jakarta.enterprise.resource.corba  <INFO>
 jakarta.enterprise.resource.javamail   <INFO>
@@ -443,7 +474,8 @@ Use the `set-log-levels` subcommand in remote mode to set the global log level. 
 * Cluster name — to target a specific cluster.
 
 . Ensure that the target server or cluster is running.
-. Set the global log level by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-levels.adoc[`set-log-levels`] subcommand, specifying the log level of the `java.util.logging.ConsoleHandler` logger. +
+. Set the global log level by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-levels.adoc[`set-log-levels`] subcommand, specifying the log level of the `java.util.logging.ConsoleHandler` logger.
++
 The `ConsoleHandler` has a separate log level setting that limits the messages that are displayed. For example:
 +
 [source,shell]
@@ -452,13 +484,14 @@ java.util.logging.ConsoleHandler <FINEST>
 ----
 
 [[example-to-set-the-global-log-level]]
-==== *Example 7-5 To Set the Global Log Level*
+==== *Example - To Set the Global Log Level*
 
 By setting the log level of the `ConsoleHandler`, you set the global log level for all loggers. This example sets the global log level in the DAS to `INFO`:
 
 [source,shell]
 ----
-asadmin> set-log-levels java.util.logging.ConsoleHandler=INFO
+asadmin set-log-levels java.util.logging.ConsoleHandler=INFO
+
 java.util.logging.ConsoleHandler package set with log level INFO.
 These logging levels are set for server.
 
@@ -472,7 +505,7 @@ You can view the full syntax and options of the subcommand by typing `asadmin he
 
 A module log level specifies the events that are logged for a particular logger. The default level for messages output to the console is `INFO` (which also includes `EMERGENCY`, `ALERT`, `SEVERE`, and `WARNING` messages). The global log level is overridden by a module-specific log level.
 
-By default, the module log level is set to `FINE`. The lines for the loggers in the logging properties file might look like this (the modules are indicated in bold):
+By default, the module log level is set to `FINE`. The lines for the loggers in the logging properties file might look like this:
 
 [source,text]
 ----
@@ -486,21 +519,24 @@ jakarta.enterprise.system.container.web.level=FINE
 
 Because setting log levels is a dynamic operation, you do not need to restart Payara Server for changes to take effect.
 
-. Ensure that the target server or cluster is running. +
+. Ensure that the target server or cluster is running.
++
 Remote subcommands require a running server.
-. List the existing module loggers and their log levels by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-log-levels.adoc[`list-log-levels`] subcommand.
+. List the existing module loggers and their log levels by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-log-levels.adoc[`list-log-levels`] subcommand.
 . Set the log level for a module by using the
-xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-levels.adoc[`set-log-levels`] subcommand. +
+xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-levels.adoc[`set-log-levels`] subcommand.
++
 Your choices are `EMERGENCY`, `ALERT`, `SEVERE`, `WARNING`, `INFO`, `CONFIG`, `FINE`, `FINER`, and `FINEST`.
 
 [[example-to-set-module-log-levels]]
-==== *Example 7-6 To Set the Module Log Levels*
+==== *Example - To Set the Module Log Levels Part 1*
 
 This example sets the log level for the web container logger to WARNING on the target instance `ManagedServer1`:
 
 [source,shell]
 ----
-asadmin> set-log-levels --target ManagedServer1
+asadmin set-log-levels --target ManagedServer1
+
 jakarta.enterprise.system.container.web=WARNING
 jakarta.enterprise.system.container.web package set with log level WARNING.
 These logging levels are set for ManagedServer1.
@@ -511,15 +547,15 @@ These logging levels are set for ManagedServer1.
 Command set-log-levels executed successfully.
 ----
 
-
 [[example-to-set-module-log-levels-2]]
-==== *Example 7-7 To Set the Module Log Levels 2*
+==== *Example - To Set the Module Log Levels Part 2*
 
 The following example sets the log level for security and web container loggers in the DAS.
 
 [source,shell]
 ----
-asadmin> set-log-levels jakarta.enterprise.system.core.security=FINE:
+asadmin set-log-levels jakarta.enterprise.system.core.security=FINE:
+
 jakarta.enterprise.system.container.web=WARNING
 jakarta.enterprise.system.container.web package set with log level WARNING.
 jakarta.enterprise.system.core.security package set with log level FINE.
@@ -538,7 +574,9 @@ You can set the format for log records in log files.
 [[to-set-the-log-file-format]]
 ==== *To Set the Log File Format*
 
-Use the `set-log-file-format` subcommand in remote mode to set the formatter used by Payara Server to format log records in log files. You can also use the `set-log-attributes` subcommand. Log formats for all server instances in a cluster will be the same. For information about log formats, see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#log-records[Log Records].
+Use the `set-log-file-format` subcommand in remote mode to set the formatter used by Payara Server to format log records in log files. You can also use the `set-log-attributes` subcommand.
+
+Log formats for all server instances in a cluster will be the same. For information about log formats, see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#log-records[Log Records].
 
 NOTE: Changing the log format forces log rotation to avoid mixed format in the same file.
 
@@ -547,25 +585,27 @@ NOTE: Changing the log format forces log rotation to avoid mixed format in the s
 . To apply your change, restart Payara Server.
 
 [[example-to-set-the-log-file-format]]
-==== *Example 7-8 To Set the Log File Format*
+==== *Example - To Set the Log File Format Part 1*
 
 This example sets the log file format to `ULF` for standalone instance `ManagedServer1` using the `set-log-file-format` subcommand.
 
 [source,shell]
 ----
-asadmin> set-log-file-format --target ManagedServer1 ulf
+asadmin set-log-file-format --target ManagedServer1 ulf
+
 The log file formatter is set to com.sun.enterprise.server.logging.UniformLogFormatter for instance ManagedServer1.
 Command set-log-file-format executed successfully.
 ----
 
 [[example-to-set-the-log-file-format-2]]
-==== *Example 7-9 To Set the Log File Format 2*
+==== *Example - To Set the Log File Format Part 2*
 
 This example sets the log file format to `ULF` for standalone instance `ManagedServer1` using the `set-log-attributes` subcommand.
 
 [source,shell]
 ----
-asadmin> set-log-attributes --target ManagedServer1 com.sun.enterprise.server.logging.GFFileHandler.formatter=ulf
+asadmin set-log-attributes --target ManagedServer1 com.sun.enterprise.server.logging.GFFileHandler.formatter=ulf
+
 com.sun.enterprise.server.logging.GFFileHandler.formatter logging attribute value set to ulf.
 The logging attributes are saved successfully for ManagedServer1-config.
 Command set-log-attributes executed successfully.
@@ -573,32 +613,114 @@ Command set-log-attributes executed successfully.
 
 You can view the full syntax and options of the `set-log-file-format` subcommand by typing `asadmin help set-log-file-format` at the command line. You can view the full syntax and options of the `set-log-attributes` subcommand by typing `asadmin help set-log-attributes` at the command line.
 
+[[ansi-coloured-logs]]
+==== ANSI Coloured Logging
+
+Payara Server supports the use of ANSI coloured log entries when running in verbose mode under the uniform log format (ULF).
+
+To enable ANSI colours run the following command using the Asadmin CLI:
+
+[source, shell]
+----
+asadmin> set-log-attributes com.sun.enterprise.server.logging.UniformLogFormatter.ansiColor=true
+----
+
+IMPORTANT: This setting is enabled by default when a domain is started in Linux and macOS environments.
+
+[[json-log-formatte]]
+==== JSON Log Format
+
+Besides the standard Uniform Log Format (ULF) and Oracle Diagnostics Logging (ODL) formats Payara Server provides a JSON format. With this format, every entry is formatted as a JSON object string. These entries can be easily processed by any JSON parser for further data processing.
+
+Once the JSON formatter is enabled, the server's log file may look similar to this sample:
+
+image:logging/json_example.png[Example log file with JSON format]
+
+[[enable-json-formatter-via-admin-console]]
+===== Enable the JSON formatter using the Web Admin Console
+
+To enable the JSON formatter using the Admin Console, just select `JSON` from the list of Logging Formats, either for `Console` or `Log File`:
+
+image:logging/json_config.png[JSON format configuration in Web Console]
+
+[[enable-json-formatter-via-asadmin-cli]]
+===== Enable the JSON formatter using the Asadmin CLI
+
+The following command will enable the JSON formatter:
+
+[source, shell]
+----
+asadmin> set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.formatter='fish.payara.enterprise.server.logging.JSONLogFormatter'
+----
+
+[[configure-prefixed-field-names]]
+===== Configure Prefixed field names
+
+In some situations, the JSON representation of a log entry may use field names that clash with existing standard field names that logging gathering tools may use them for specific purposes.
+
+To solve this problem, Payara Server can be configured to automatically prefix all field names in the JSON object representation with an underscore (`_`) character. See the following sample to get an idea of how such a JSON payload would look like:
+
+image:logging/json_underscore_prefix_example.png[Example log file with underscore prefix in JSON fields]
+
+The following Asadmin command will enable this configuration setting:
+
+[source, shell]
+----
+asadmin set-log-attributes fish.payara.deprecated.jsonlogformatter.underscoreprefix=true
+----
+
+[[support-additional-fields]]
+===== Support for Additional Fields
+
+The JSON Log Formatter also supports the customization of additional fields through the `setParameters` method of the https://docs.oracle.com/javase/8/docs/api/java/util/logging/LogRecord.html[LogRecord] class. This action is done when logging a new entry at runtime, so it is limited to an application business logic context.
+
+Here's a quick example of how to pass additional fields to the resulting JSON object by using a map with a single entry:
+
+[source, java]
+----
+public class ApplicationComponent{
+
+    public void businessMethod(){
+        var lr = new LogRecord(Level.INFO, "Sample message");
+        lr.setParameters(new Object[]{Collections.singletonMap("key", "value")});
+        logger.log(lr);
+    }
+}
+----
+
 [[to-exclude-fields-in-log-records]]
 ==== *To Exclude Fields in Log Records*
 
-Use the `set-log-attributes` subcommand in remote mode to exclude specific name-value fields from log records. If the `excludeFields` attribute is not specified, all name-value fields are included. The following fields can be excluded:
+Use the `set-log-attributes` subcommand in remote mode to exclude specific name-value fields from log records. If the `excludeFields` attribute is not specified, all name-value fields are included.
+
+The following fields can be excluded:
 
 * `tid`
 * `userId`
-
 * `ecid`
 * `timeMillis`
 * `levelVal`
+* `version`
 
-. Ensure that the target server or cluster is running. +
+Follow these instructions:
+
+. Ensure that the target server or cluster is running.
++
 Remote commands require a running server.
-. Exclude fields by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand, specifying the following attribute and the fields to exclude: `com.sun.enterprise.server.logging.GFFileHandler.excludeFields=fields` where `fields` is a comma-separated list of the name-value fields to exclude from the log file.
+
+. Exclude fields by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand, specifying the following attribute and the fields to exclude: `com.sun.enterprise.server.logging.GFFileHandler.excludeFields=fields` where `fields` is a comma-separated list of the name-value fields to exclude from the log file.
 . To apply your change, restart Payara Server.
 
 [[example-to-exclude-fields-in-log-records]]
-==== *Example 7-10 To Execute Fields in Log Records*
+===== *Example - To Exclude Fields in Log Records*
 
 This example excludes the `userId` and `levelVal` name-value fields in log records for standalone instance `ManagedServer1`:
 
 [source,shell]
 ----
-asadmin> set-log-attributes --target ManagedServer1
+asadmin set-log-attributes --target ManagedServer1
 com.sun.enterprise.server.logging.GFFileHandler.excludeFields=userId,levelVal
+
 com.sun.enterprise.server.logging.GFFileHandler.excludeFields logging attribute value set to userId,levelVal.
 The logging attributes are saved successfully for ManagedServer1-config.
 
@@ -613,21 +735,22 @@ You can view the full syntax and options of the subcommand by typing `asadmin he
 Use the `set-log-attributes` command in remote mode to set multiline
 mode. When multiline mode is enabled (the default), the body of a log message starts on a new line after the message header and is indented.
 
-. Ensure that the target server or cluster is running. +
+. Ensure that the target server or cluster is running.
++
 Remote commands require a running server.
 . Set multiline mode by using the
-xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand, specifying the
-following attribute and its value (`true` or `false`): `com.sun.enterprise.server.logging.GFFileHandler.multiLineMode=value`
+xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand, specifying the following attribute and its value (`true` or `false`): `com.sun.enterprise.server.logging.GFFileHandler.multiLineMode=value`
 .  To apply your change, restart Payara Server.
 
 [[example-to-set-multiline-mode]]
-==== *Example 7-11 To Set Multiline Mode*
+==== *Example - To Set Multiline Mode*
 
 Multiline mode is enabled by default. The following example disables multiline mode in log files for standalone instance `ManagedServer1`:
 
 [source,shell]
 ----
-asadmin> set-log-attributes --target ManagedServer1
+asadmin set-log-attributes --target ManagedServer1
+
 com.sun.enterprise.server.logging.GFFileHandler.multiLineMode=false
 com.sun.enterprise.server.logging.GFFileHandler.multiLineMode logging attribute value set to false.
 The logging attributes are saved successfully for ManagedServer1-config.
@@ -640,12 +763,19 @@ You can view the full syntax and options of the subcommand by typing `asadmin he
 [[setting-log-file-rotation]]
 === Setting Log File Rotation
 
-As explained in xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#log-files[Log Files],Payara Server  by default rotates log files when they reach 2 MB in size.
-However, you can change the default rotation settings. For example, you can change the file size at which the server rotates the log file or you can configure a server to rotate log files based on a time interval. In addition to changing when rotation occurs, you can also:
+As explained in xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#log-files[Log Files], Payara Server by default rotates log files when they reach `2 MB` in size.
 
-* Specify the maximum number of rotated files that can accumulate. +
-By default, Payara Server does not limit the number of rotated log files that are retained. However, you can set a limit. After the number of log files reaches this limit, subsequent file rotations delete the oldest rotated log file.
-* Rotate the log file manually. +
+However, you can change the default rotation settings. For example, you can change the file size at which the server rotates the log file, or you can configure a server to rotate log files based on a time interval.
+
+In addition to changing when rotation occurs, you can also:
+
+* Specify the maximum number of rotated files that can accumulate.
++
+By default, Payara Server does not limit the number of rotated log files that are retained. However, you can set a limit.
++
+After the number of log files reaches this limit, subsequent file rotations delete the oldest rotated log file.
+* Rotate the log file manually.
++
 A manual rotation forces the immediate rotation of the target log file.
 
 Changing the default log rotation settings is done using the `set-log-attributes` subcommand, and rotating log files manually is done using the `rotate-log` subcommand.
@@ -653,21 +783,24 @@ Changing the default log rotation settings is done using the `set-log-attributes
 [[to-change-the-rotation-file-size]]
 ==== *To Change the Rotation File Size*
 
-Use the `set-log-attributes` subcommand in remote mode to change the log rotation file size. The default target of this subcommand is the DAS. Optionally, you can target a configuration, server, instance, or cluster. The minimum size that can be set is 500 KB.
+Use the `set-log-attributes` subcommand in remote mode to change the log rotation file size. The default target of this subcommand is the DAS.
+
+Optionally, you can target a configuration, server, instance, or cluster. The minimum size that can be set is `500 KB`.
 
 . Ensure that the target server or cluster is running.
-. Change the rotation file size limit by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand, specifying the following attribute and the desired limit in bytes: `com.sun.enterprise.server.logging.GFFileHandler.rotationLimitInBytes=bytes`
+. Change the rotation file size limit by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand, specifying the following attribute and the desired limit in bytes: `com.sun.enterprise.server.logging.GFFileHandler.rotationLimitInBytes=bytes`
 . To apply your change, restart Payara Server.
 
 [[example-to-change-the-rotation-file-size]]
-==== *Example 7-12 To Change the Rotation File Size*
+==== *Example - To Change the Rotation File Size*
 
 The following example sets the log file rotation size to 1 MB for the standalone instance `ManagedServer1`:
 
 [source,shell]
 ----
-asadmin> set-log-attributes --target ManagedServer1
+asadmin set-log-attributes --target ManagedServer1
 com.sun.enterprise.server.logging.GFFileHandler.rotationLimitInBytes=1000000
+
 com.sun.enterprise.server.logging.GFFileHandler.rotationLimitInBytes
 logging attribute set with value 1000000.
 These logging attributes are set for ManagedServer1.
@@ -687,18 +820,19 @@ You can view the full syntax and options of the subcommand by typing `asadmin he
 Use the `set-log-attributes` subcommand in remote mode to change the log file rotation time limit interval. The default target of this subcommand is the DAS. Optionally, you can target a configuration, server, instance, or cluster. The default value is `0`.
 
 . Ensure that the target server or cluster is running.
-. Change the rotation time limit by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand, specifying the following attribute and the desired limit in minutes: `com.sun.enterprise.server.logging.GFFileHandler.rotationTimelimitInMinutes=minutes`
+. Change the rotation time limit by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand, specifying the following attribute and the desired limit in minutes: `com.sun.enterprise.server.logging.GFFileHandler.rotationTimelimitInMinutes=minutes`
 . To apply your change, restart Payara Server.
 
 [[example-to-change-the-file-rotation-interval]]
-==== *Example 7-13 To Change the File Rotation Interval*
+==== *Example - To Change the File Rotation Interval*
 
 The following example sets the log file rotation time limit for the cluster `Cluster1`, which has the instances `ClusterServer1` and `ClusterServer2`.
 
 [source,shell]
 ----
-asadmin> set-log-attributes --target Cluster1
+asadmin set-log-attributes --target Cluster1
 com.sun.enterprise.server.logging.GFFileHandler.rotationTimelimitInMinutes=10
+
 com.sun.enterprise.server.logging.GFFileHandler.rotationTimelimitInMinutes
 logging attribute set with value 10.
 These logging attributes are set for Cluster1.
@@ -733,13 +867,14 @@ The behavior of the `com.sun.enterprise.server.logging.GFFileHandler.maxHistoryF
 . To apply your change, restart Payara Server.
 
 [[example-to-change-the-limit-number-of-retained-files]]
-==== *Example 7-14 To Change the Limit Number of Retained Files*
+==== *Example - To Change the Limit Number of Retained Files*
 
 The following example sets the log limit number of retained log files for the DAS to `10`.
 
 [source,shell]
 ----
-asadmin> set-log-attributes
+asadmin set-log-attributes
+
 com.sun.enterprise.server.logging.GFFileHandler.maxHistoryFiles=10
 com.sun.enterprise.server.logging.GFFileHandler.maxHistoryFiles 
 logging attribute set with value 10.
@@ -748,6 +883,28 @@ Command set-log-attributes executed successfully.
 ----
 
 You can view the full syntax and options of the subcommand by typing `asadmin help set-log-attributes` at the command line.
+
+[[compress-on-rotation]]
+==== Log File Compression on Rotation
+
+Payara Server can be configured to automatically compress rotated log files in an automatic manner to save disk space.
+
+[[compress-on-rotation-via-admin-console]]
+===== Using the Web Admin Console
+
+When log rotation is enabled, you can turn on automatic compression in the `Logger Settings` section of the Admin Console, by ticking the `Compress on Rotation` checkbox:
+
+image:logging/compress_on_rotation.png[Compress on rotation enabled]
+
+[[compress-on-rotation-via-asadmin-cli]]
+===== Using the Asadmin CLI
+
+Use the following command to enable or disabled the automatic compression of log files on rotation:
+
+[source, shell]
+----
+asadmin> set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.compressOnRotation='true'
+----
 
 [[to-rotate-log-files-manually]]
 ==== *To Rotate Log Files Manually*
@@ -760,9 +917,9 @@ Because log rotation is a dynamic operation, you do not need to restart Payara S
 . Rotate log files by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/rotate-log.adoc[`rotate-log`] subcommand.
 
 [[example-to-rotate-log-files-manually]]
-==== *Example 7-15 To Rotate Log Files Manually*
+==== *Example - To Rotate Log Files Manually*
 
-The following example rotates the `server.log` file for `ManagedServer2` to `server.log_`yyyy-mm-dd`T`hh-mm-ss`, where yyyy-mm-dd`T`hh-mm-ss represents the time when the file is rotated, and creates a new `server.log` file in the default location.
+The following example rotates the `server.log` file for `ManagedServer2` to `server.log_`yyyy-mm-dd`T`hh-mm-ss`, where `yyyy-mm-dd`T`hh-mm-ss` represents the time when the file is rotated, and creates a new `server.log` file in the default location.
 
 [source,shell]
 ----
@@ -775,79 +932,192 @@ You can view the full syntax and options of the subcommand by typing `asadmin he
 [[adding-a-custom-logging-handler]]
 === Adding a Custom Logging Handler
 
-By default, Payara Server log records are captured in a server log file using the format described in xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#viewing-log-records[Log Records].  However, you may find that you want to log messages to a different location, such as a database or a remote server, or log messages from specific loggers to your own file. This can be done by implementing a custom log handler. This section explains how to add a custom log handler to the Payara Server logging service.
+By default, Payara Server log records are captured in a server log file using the format described in xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#viewing-log-records[Log Records].
+
+However, you may find that you want to log messages to a different location, such as a database or a remote server, or log messages from specific loggers to your own file. This can be done by implementing a custom log handler.
+
+This section explains how to add a custom log handler to the Payara Server logging service.
 
 [[to-add-a-custom-log-handler]]
 ==== *To Add a Custom Log Handler*
 
-A comma-separated list of log handlers is installed during startup of the Java Virtual Machine (JVM) host. The default log handler that is
-provided in the `logging.properties` file, `ConsoleHandler`, is configured as follows:
+A comma-separated list of log handlers is installed during startup of the Java Virtual Machine (JVM) host. The default log handler that is provided in the `logging.properties` file, `ConsoleHandler`, is configured as follows:
 
-[source,text]
+[source,properties]
 ----
 handlers=java.util.logging.ConsoleHandler
 ----
 
 In Payara Server, the best approach to developing a custom handler is to define a Hundred-Kilobyte Kernel (HK2) component that implements the handler contract. Payara Server registers this handler automatically because it is an HK2 component. There is no task required of the administrator.
 
-NOTE: The custom handler class should be packaged in an OSGi module and the JAR file placed in the as-install`/modules` directory.
+NOTE: The custom handler class should be packaged in an OSGi module and the JAR file placed in the `as-install/modules` directory.
 
-To configure a custom handler that is not developed as an HK2 component, add the new handler to the `logging.properties` file after the developer has put the custom handler JAR file into the domain-dir`/lib/ext` directory.
+To configure a custom handler that is not developed as an HK2 component, add the new handler to the `logging.properties` file after the developer has put the custom handler JAR file into the `domain-dir/lib/ext` directory.
 
 *Before You Begin*
 
 If you set a handler by setting the handlers attribute in the logging properties file, the class that extends `java.util.logging.Handler` must be in the server classpath.
 
 . Ensure that the target server or cluster is running. Remote subcommands require a running server.
-. Use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand to add the
-handler to the `handlers` attribute. The default target of this subcommand is the DAS. Optionally you can target a configuration, server, instance, or cluster.
-. To apply your changes, restart Payara Server. +
-See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-log-attributes.adoc[`set-log-attributes`] subcommand to add the
+handler to the `handlers` attribute.
++
+The default target of this subcommand is the DAS. Optionally you can target a configuration, server, instance, or cluster.
+. To apply your changes, restart Payara Server.
 
 [[example-to-add-a-custom-log-handler]]
-==== *Example 7-16 To Add a Custom Log Handler*
+==== *Example - To Add a Custom Log Handler*
 
 This example adds the custom logger `com.example.logging.MyHandler` to the logging properties file of the DAS.
 
 [source,shell]
 ----
-asadmin> set-log-attributes
-handlers=java.util.logging.ConsoleHandler,com.example.logging.MyHandler
-handlers logging attribute set with value
-java.util.logging.ConsoleHandler,com.example.logging.MyHandler.
+asadmin set-log-attributes handlers=java.util.logging.ConsoleHandler,com.example.logging.MyHandler
+
+handlers logging attribute set with value java.util.logging.ConsoleHandler,com.example.logging.MyHandler.
 These logging attributes are set for server.
+
 Command set-log-attributes executed successfully.
 ----
 
 You can view the full syntax and options of the subcommand by typing `asadmin help set-log-attributes` at the command line.
+
+[[log-to-file]]
+=== Log to File
+
+The *Log to File* option allow you to enable and disable the action of logging to a file. When disabled this should help to minimize disk usage.
+
+TIP: This option will be more accommodating if Payara Server is running in cloud environment where disk space is scarce.
+
+[[enable-log-to-file-via-admin-console]]
+==== Enable Log to File using the Admin Console
+
+To configure the `Log to File` option using theAdmin Console:
+
+image:logging/log_to_file.png[Log to File enabled]
+
+[[enable-log-to-file-via-asadmin-cli]]
+==== Enable Log to File using the Asadmin CLI
+
+Use the following command to enable or disable the logging to a file feature:
+
+[source, shell]
+----
+asadmin set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.logtoFile=false
+----
+
+[[log-to-console]]
+=== Log To Console
+
+The `Log to Console` option controls if the server writes the logging entries directly to the console. The property only has an effect when the server or instance is started in verbose mode.
+
+To enable the log to console option you simply have to start the domain or instance using the `verbose` option:
+
+[source, shell]
+----
+asadmin start-domain --verbose
+----
+
+When the server or domain is not started in verbose mode, the `java.util.ConsoleHandler` will not be active for logging, although it is defined as handler in the `logging.properties` file because there is no console attached with the corresponding server process.
+
+NOTE: When in verbose mode, the *Log to Console* option will also be active, regardless of the initial value set in the `logging.properties` file as otherwise, no log output would be visible on the console.
+
+Once the server is run in verbose mode, you can use either the Admin Console or the Asadmin CLI to modify this setting.
+
+[[configure-log-to-console-via-admin-console]]
+==== Configure Logging To Console using the Admin Console
+
+To configure the `Log to Console` option using the Admin Console:
+
+image:logging/log_to_file.png[Log to Console disabled]
+
+[[configure-log-to-console-via-asadmin-cli]]
+==== Configure Logging To Console using the Asadmin CLI
+
+Use the following command to enable or disable the log to console feature:
+
+[source, shell]
+----
+asadmin> set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.logtoConsole=false
+----
+
+[[fast-logging]]
+=== Fast Logging
+
+Whenever logging occurs on an application, if the `LogRecord` in question contains set parameters, they will undergo a forced transformation by having a `toString()` method call.
+
+In most cases this is the desirable outcome, but will not provide the best performance. You can enable the **Fast Logging** setting to skip this forced parameter transformation at runtime.
+
+A common use case of this feature would be to prevent database access done by JPA entities, as it is a common occurrence for entity data to be logged out for auditing purposes.
+
+CAUTION: Enabling this setting can cause log entries that contain mutable parameters to be out of sync when they are resolved. +
+Exert caution when using fast logging, as it may cause stale information to be printed out to the log.
+
+[[fast-logging-using-admin-console]]
+==== Using the Admin Console
+
+To configure the `Fast Logging` option, set it in the Logger settings.
+
+image:logging/fast_logging.png[Fast Logging enabled]
+
+[[fast-logging-using-asadmin-cli]]
+==== Using Asadmin CLI
+
+Use the following command to enable or disable fast logging:
+
+[source, shell]
+----
+asadmin set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.fastLogging=true
+----
+
+[[env-var-replacement]]
+== Environment Variable Support
+
+The `logging.properties` configuration file supports environment variable substitution like in this example:
+
+[source, properties]
+----
+.level=${ENV=logLevel}
+----
+
+Whenever the server starts up or the logging properties are updated, the value for the `.level` property will be taken from the environment variable `logLevel`.
 
 [[viewing-log-records]]
 == Viewing Log Records
 
 The recommended means for general viewing of logging information is to use the Log Viewer in the Administration Console. The Log Viewer simplifies reading, searching, and filtering log file contents. For instructions, see the Administration Console online help.
 
-Payara Server also allows you to collect log files into a ZIP archive, which provides the means to obtain and view log files for an instance or cluster even when it is not currently running. The following section explains how to collect all available log files for an instance or cluster and compile them into a single ZIP archive, which is done by using the `collect-log-files` subcommand.
+Payara Server also allows you to collect log files into a ZIP archive, which provides the means to obtain and view log files for an instance or cluster even when it is not currently running.
+
+The following section explains how to collect all available log files for an instance or cluster and compile them into a single ZIP archive, which is done by using the `collect-log-files` subcommand.
 
 [[to-collect-log-files-into-a-zip-archive]]
 === To Collect Log Files into a ZIP Archive
 
 Use the `collect-log-files` subcommand in remote mode to collect log files into a ZIP archive. The default target of this subcommand is the DAS. Optionally you can target a configuration, server, instance, or cluster.
 
-. Ensure that the target server or cluster is running. Remote subcommands require a running server.
-. Use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/collect-log-files.adoc[`collect-log-files`] subcommand to create the ZIP archive. The default location in which the ZIP archive is created is the domain-dir`/collected-logs` directory. The `collect-log-files` subcommand allows you to specify a non-default directory in which the ZIP archive is to be created by using the `--retrieve` option set to `true`, followed by the directory name. The name of the ZIP file contains the timestamp, as follows: +
-`log_`yyyy-mm-dd_hh-min-sec`.zip`
+. Ensure that the target server or cluster is running.
++
+Remote subcommands require a running server.
+. Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/collect-log-files.adoc[`collect-log-files`] subcommand to create the ZIP archive.
++
+The default location in which the ZIP archive is created is the `domain-dir/collected-logs` directory. The `collect-log-files` subcommand allows you to specify a non-default directory in which the ZIP archive is to be created by using the `--retrieve` option set to `true`, followed by the directory name.
++
+The name of the ZIP file contains the timestamp, as follows: `log_`yyyy-mm-dd_hh-min-sec`.zip`
 
 [[example-to-collect-log-files-into-a-zip-archive]]
-==== *Example 7-17 To Collect Log Files into a .zip Archive*
+==== *Example - To Collect Log Files into a .zip Archive*
+
 This example shows collecting the log files for the cluster `MyCluster` and compiling them into a ZIP archive in the `/space/output` directory.
 
 [source,shell]
 ----
-asadmin> collect-log-files --target MyCluster
---retrieve true /space/output
+asadmin collect-log-files --target MyCluster --retrieve true /space/output
+
 Log files are downloaded for ClusterServer1.
 Log files are downloaded for ClusterServer2.
- Created Zip file under /space/output/log_2011-02-10_13-35-25.zip.
+Created Zip file under /space/output/log_2011-02-10_13-35-25.zip.
+
 Command collect-log-files executed successfully.
 ----
 
@@ -879,17 +1149,20 @@ You can list and view information about all public loggers in your distribution 
 
 Use the `list-loggers` subcommand in remote mode to list the logger name, subsystem, and description of loggers in your distribution of Payara Server. Internal loggers are not listed.
 
-. Ensure that the target server or cluster is running. Remote commands require a running server.
-. List loggers by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-loggers.adoc[`list-loggers`] subcommand.
+. Ensure that the target server or cluster is running.
++
+Remote commands require a running server.
+. List loggers by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-loggers.adoc[`list-loggers`] subcommand.
 
 [[example-to-list-loggers]]
-==== *Example 7-18 To List Loggers*
+==== *Example - To List Loggers*
 
 This example lists the logger name, subsystem, and description for each logger. Some lines of output are omitted from this example for readability.
 
 [source,shell]
 ----
-asadmin> list-loggers
+asadmin list-loggers
+
 Logger Name                            Subsystem         Logger Description
 ...
 jakarta.enterprise.monitoring            Monitoring        Monitoring Logger
@@ -901,3 +1174,237 @@ Command list-loggers executed successfully.
 ----
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help list-loggers` at the command line.
+
+[[access-logging-max-file-size]]
+== Access Logging Max File Size
+
+Payara Server provides different ways to rotate HTTP access log files. This section will detail the use of the max size of the log file to trigger a rotation.
+
+The **Max File Size** option provides a way to change the file size at which the server rotates the access log file. This option accepts an integer value specifying the maximum size of the log file, after which a file rotation will occur.
+
+IMPORTANT: If the value for this option is set to `0`, HTTP access log rotation will be disabled.
+
+[[max-file-size-via-admin-console]]
+=== Using the Admin Console
+
+To configure the **Max File Size** option using the Admin Console:
+
+image:logging/max_file_size.png[Max File Size]
+
+[[max-file-size-via-asadmin-cli]]
+=== Using the Asadmin CLI
+
+Use the following command to set maximum file size option:
+
+[source, shell]
+----
+asadmin> set configs.config.server-config.http-service.access-log.maximum-file-size=5000000
+----
+
+For more information on how to configure HTTP Access logging, see xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#administering-http-configurations[Administering HTTP Configurations].
+
+[[notification-logging]]
+== Notification Service Logging
+
+The Notification Service captures information about events which come from other services, such as the JMX Monitoring Service, the HealthCheck service or the Request Tracing service and captures this information so that xref:Technical Documentation/Payara Server Documentation/General Administration/notification-service.adoc#notifiers[all configured notifiers] can redirect these events. The Log Notifier, turned on by default, will print these notifications events in the server's log.
+
+It is possible to configure the Log Notifier to store its output in a
+separate log file.
+
+NOTE: If this setting is enabled, the default log file will be found at `domain-dir/logs/notification.log`
+
+The Notification Logging Service uses its own collection of logging properties which are separate from the standard logging facilities of Payara Server. However, they are stored in the same configuration file.
+
+[[configuring-the-notification-logging-service]]
+=== Configuring the Notification Logging Service
+
+[[enabling-or-disabling-logging-to-a-file]]
+==== Enabling or Disabling Logging to a File
+
+The **Log to File** option will provide a way to enable and disable logging to a file of Payara Server Notifications. When disabled this should help to minimize disk usage. This option will be more accommodating if Payara Server is running in cloud environment where disk space is scarce.
+
+[[log-to-file-using-admin-console]]
+===== Using the Admin Console
+
+To configure the **Log to File** option using Admin Console:
+
+image:logging/notification-logging/payara_notification_log_to_file.png[Log to File enabled]
+
+[[log-to-file-using-asadmin-cli]]
+===== Using the Asadmin CLI
+
+You use the following Asadmin command to enable/disable the logging to a file setting:
+
+[source, shell]
+----
+asadmin set-log-attributes fish.payara.enterprise.server.logging.PayaraNotificationFileHandler.logtoFile=false
+----
+
+[[configuring-notification-log-file-rotation]]
+=== Configuring Log File Rotation
+
+By default, The notification log rotation is set to rotate when the log file reaches 2 Megabytes(MB). Nonetheless, there are number of ways log rotation can be configured.
+
+Size of file at which the log rotates can be changed, it can be set to rotate at date change, rotate when time limit is reached and, finally based on maximum number of history files.
+
+[[notification-rotation-on-date-change]]
+==== Rotation on Date Change
+
+The **Rotation On Date Change** option provides a way to set the log rotation when the system date changes (at midnight, by default).
+
+[[notification-rotate-on-date-change-using-admin-console]]
+===== Using the Admin Console
+
+To configure the **Rotation on Date Change** option using the Admin Console:
+
+image:logging/notification-logging/payara_notification_rotation_on_date_change.png[Rotation on Date Change enabled]
+
+[[notification-rotate-on-date-change-using-asadmin-cli]]
+===== Using the Asadmin CLI
+
+Use the following Asadmin command to enable or disabled the log rotation on date change setting:
+
+[source, shell]
+----
+asadmin set-log-attributes fish.payara.enterprise.server.logging.PayaraNotificationFileHandler.rotationOnDateChange=false
+----
+
+[[rotation-on-file-size]]
+==== Rotation on File Size
+
+The **File Rotation Limit** option provides a way to change the file size at which the server triggers the log file rotation. This option accepts an integer value specifying the maximum size of the log file, after which a file rotation will occur.
+
+The minimum size it can be set to is `500KB` (`500.000` bytes).
+
+IMPORTANT: If the value for this option is set to `0`, log rotation will be disabled.
+
+[[notification-file-rotation-limit-using-admin-console]]
+===== Using the Admin Console
+
+To configure the **File Rotation Limit** option using the Admin Console:
+
+image:logging/notification-logging/payara_notification_rotation_on_file_size.png[File Rotation Limit]
+
+[[notification-file-rotation-limit-using-asadmin-cli]]
+===== Using the Asadmin CLI
+
+Use the following Asadmin command to set the file rotation limit:
+
+[source, shell]
+----
+asadmin set-log-attributes fish.payara.enterprise.server.logging.PayaraNotificationFileHandler.rotationLimitInBytes=500000
+----
+
+[[notification-rotation-on-time-limit]]
+==== Rotation on Time Limit
+
+The **File Rotation Time Limit** option provides a way to trigger the notification log file rotation based on a fixed time limit. The value of this setting is an integer that defines the time limit in minutes until the log rotation gets triggered.
+
+[[notification-rotation-on-time-limit-via-admin-console]]
+===== Using the Admin Console*
+
+To configure the **File Rotation Time Limit** option using the Admin Console:
+
+image:logging/notification-logging/payara_notification_rotation_on_time_limit.png[File Rotation Time Limit]
+
+[[notification-rotation-on-time-limit-via-asadmin-cli]]
+===== Using the Asadmin CLI
+
+Use the following command to set the fixed time limit used to trigger the log rotation:
+
+[source, shell]
+----
+asadmin set-log-attributes fish.payara.enterprise.server.logging.PayaraNotificationFileHandler.rotationTimelimitInMinutes=4
+----
+
+[[change-notification-logging-format]]
+==== Change the Logging Format
+
+The **Log File Logging Format** option can be used to change the notification log entries' format. There are 3 logging formats available: `ULF`, `ODL` and `JSON`, each one represented by a specific formatter class present in the Payara Platform API.
+
+[[change-notification-logging-format-via-admin-console]]
+===== Using the Admin Console
+
+To configure the **Log File Logging Format** option using the Admin Console:
+
+image:logging/notification-logging/payara_notification_change_logging_format.png[Change Logging Format]
+
+[[change-notification-logging-format-via-asadmin-cli]]
+===== Using the Asadmin CLI
+
+Use the following command to change the logging format:
+
+[source, shell]
+----
+asadmin set-log-attributes fish.payara.enterprise.server.logging.PayaraNotificationFileHandler.formatter=fish.payara.enterprise.server.logging.JSONLogFormatter
+----
+
+[[set-maximum-number-of-historic-notification-files]]
+==== Set the Maximum Number of Historic Files
+
+The `Maximum History Files` option provides a way to set the limit on the number of notification log files that can be created by Payara Server.
+
+Once the number of files reaches the set limit, the oldest rotated log file is deleted. If the value for this option is set `0`, all the rotated log files are preserved.
+
+[[set-maximum-number-of-historic-notification-files-via-admin-console]]
+===== Using the Admin Console
+
+To configure the `Maximum History File` option using the Admin Console:
+
+image:logging/notification-logging/payara_notification_set_maximum_number_of_history_files.png[Maximum History File]
+
+[[set-maximum-number-of-historic-notification-files-via-asadmin-cli]]
+===== Using the Asadmin CLI
+
+Use the following command to set the limit on the number of log files that can be created by Payara Server:
+
+[source, shell]
+----
+asadmin set-log-attributes fish.payara.enterprise.server.logging.PayaraNotificationFileHandler.maxHistoryFiles=20
+----
+
+[[change-the-name-and-location-of-notification-log-file]]
+==== Change the Name and Location of the Log File
+
+The `Log File` option provides a way to change the default name and location of the notification log files.
+
+[[change-the-name-and-location-of-notification-log-file-via-admin-console]]
+===== Using the Admin Console
+
+To configure `Log File` option using Admin Console:
+
+image:logging/notification-logging/payara_notification_change_name_and_location_of_log_file.png[Log File]
+
+[[change-the-name-and-location-of-notification-log-file-via-asadmin-cli]]
+===== Using the Asadmin CLI
+
+Use the following command to change the default name and location of the server log files:
+
+[source, shell]
+----
+asadmin set-log-attributes fish.payara.enterprise.server.logging.PayaraNotificationFileHandler.file=${com.sun.aas.instanceRoot}/notification/testNotification.log
+----
+
+TIP: As seen in the sample command, you can use the `${com.sun.aas.instanceRoot}` system property to reference the current domain directory location.
+
+[[enable-notification-file-compression-on-rotation]]
+==== Enable File Compression on Rotation
+
+The `Compress on Rotation` option provides a way to enable the automatic compression of notification log files on rotation.
+
+[[enable-notification-file-compression-on-rotation-via-admin-console]]
+===== Using the Admin Console
+
+To configure the `Compress on Rotation` option using the Admin Console:
+
+image:logging/notification-logging/payara_notification_set_compress_on_rotation.png[Compress on Rotation Enabled]
+
+[[enable-notification-file-compression-on-rotation-via-asadmin-cli]]
+===== Using the Asadmin CLI
+
+Use the following command to enable or disable compression of log files on rotation:
+
+[source, shell]
+----
+asadmin> set-log-attributes fish.payara.enterprise.server.logging.PayaraNotificationFileHandler.compressOnRotation=true
+----
