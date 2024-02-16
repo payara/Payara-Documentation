@@ -1,0 +1,93 @@
+[[healthcheck-stuckthreads-configure]]
+= healthcheck-stuckthreads-configure
+
+Configures the specifics of the Healthcheck stuck threads performance metric service.
+
+IMPORTANT: This command is deprecated and will be removed in a future release as it has been replaced by the `set-healthcheck-service-configuration` command.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] healthcheck-stuckthreads-configure
+[--help]
+[--target target]
+[--enabled={false|true}]
+[--dynamic={false|true}]
+[--checkername=checkerName]
+[--time=time]
+[--unit={DAYS|HOURS|MINUTES|SECONDS|MILLISECONDS}]
+[--threshold=threshold]
+[--thresholdunit={DAYS|HOURS|MINUTES|SECONDS|MILLISECONDS}]
+----
+
+[[description]]
+== Description
+
+Configures the Stuck Thread checker.
+
+The Stuck Threads checker is comparable to the request tracing service, in that it is triggered by exceeding a configured threshold. but in this case it reports on all threads that, when the healthcheck runs, have taken longer than the threshold time.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are configuring the stuck threads checker service. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified server instance.
+`--enabled`::
+Defaults to `false`. Enables or disables the healthcheck service
+`--dynamic`::
+Defaults to `false`. When set to `true`, applies the changes without a server restart.
+`--name`::
+Unused option.
+`--checkername`::
+Unused option.
+
+`--time`::
+Defaults to `1`. The amount of time units that the service will use to periodically monitor the metric.
+`unit`::
+Defaults to `MINUTES`. The time unit to set the frequency of the metric monitoring.
++
+NOTE: Must correspond to a valid https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/TimeUnit.html[`java.util.concurrent.TimeUnit`]
+`--threshold`::
+The threshold above which a thread is considered stuck. Must be `1` or greater.
+`--thresholdunit`::
+The unit for the threshold for when a thread should be considered stuck.
++
+NOTE: Must correspond to a valid https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/TimeUnit.html[`java.util.concurrent.TimeUnit`]
+
+[[examples]]
+== Examples
+
+*Example 1 Identifying stuck threads*
+
+The following example configures the stuck threads checker to check every 30 seconds for any threads which have been stuck for more than 5 minutes and applies the configuration change without needing a restart:
+
+[source, Shell]
+----
+asadmin healthcheck-stuckthreads-configure --enabled=true --dynamic=true --time=30 --unit=SECONDS --threshold=5 --thresholdUnit=MINUTES
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-healthcheck-service-configuration.adoc[`set-healthcheck-service-configuration`]

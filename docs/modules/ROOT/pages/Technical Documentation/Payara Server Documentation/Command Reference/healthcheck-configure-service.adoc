@@ -1,0 +1,114 @@
+[[healthcheck-configure-service]]
+= healthcheck-configure-service
+
+Enables or disables the Healthcheck of a specific performance metric service.
+
+IMPORTANT: This command is deprecated and will be removed in a future release as it has been replaced by the `set-healthcheck-service-configuration` command.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] healthcheck-configure-service
+[--help]
+[--target target]
+[--enabled={false|true}]
+[--dynamic={false|true}]
+[--time=time]
+[--unit={DAYS|HOURS|MINUTES|SECONDS|MILLISECONDS}]
+[--servicename=serviceName]
+[--checkername=checkerName]
+[--addtomicroprofile-health={true|false}]
+----
+
+[[description]]
+== Description
+
+Enables and disables the monitoring of a HealthCheck performance metric service. The command also configures the frequency of monitoring for that metric.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are configuring the Healthcheck performance metric service. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified server instance.
+`--enabled`::
+Defaults to `false`. Enables or disables the healthcheck service
+`--dynamic`::
+Defaults to `false`. When set to `true`, applies the changes without a server restart.
+`--servicename`::
+The performance service metric name. Required.
++
+One of:
+
+* `connection-pool` or `cp`
+* `cpu-usage` or  `cu`
+* `garbage-collector` or `gc`
+* `heap-memory-usage` or `hmu`
+* `hogging-threads` or `ht`
+* `machine-memory-usage` or `mmu`
+* `stuck-thread` or `st`
+* `mp-health` or `mh`
+* `mp-metrics` or `mm`
+
+`--checkername`::
+A user determined name for easy identification of the checker.
++
+This should be unique among the services you have configured, to avoid confusion on the notification messages.
++
+Depends on the service checker. One of:
+
+* `CONP`
+* `CPUC`
+* `GBGC`
+* `HEAP`
+* `HOGT`
+* `MEMM`
+* `MP`
+* `MPM`
+
+`--add-to-microprofile-health`::
+Defaults to `false`. When enabled, the checker results are displayed on MicroProfile Health xref:Technical Documentation/MicroProfile/HealthCheck.adoc#rest-endpoints[REST endpoints] as a readiness check.
+
+`--time`::
+Defaults to `5`. The amount of time units that the service will use to periodically monitor the metric.
+`--unit`::
+Defaults to `MINUTES`. The time unit to set the frequency of the metric monitoring.
++
+NOTE: Must correspond to a valid https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/TimeUnit.html[`java.util.concurrent.TimeUnit`]
+
+[[examples]]
+== Examples
+
+*Example 1 Basic Configuration*
+
+A very basic example command to simply enable the GC checker and activate it without needing a restart would be as follows:
+
+[source, shell]
+----
+asadmin healthcheck-configure-service --enabled=true --serviceName=healthcheck-gc --name=MYAPP-GC --dynamic=true
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-healthcheck-service-configuration.adoc[`set-healthcheck-service-configuration`]
