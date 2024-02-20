@@ -394,6 +394,286 @@ So the second time your custom realm executes it returns an array with `null` el
 Ideally, your custom realm should not return member variables from the `authenticate` method. It should return local variables
 Your custom realm can create a local `String` array in its `authenticate` method, copy the values from the member variables, and return the `String` array.
 
+[[advanced-group-configuration]]
+== Advanced Groups Configuration
+:ordinal: 2
+
+Payara Server allows the advanced configuration mapping of a client certificate's distinguished name (DN) to specific realm groups, which allows the realm to automatically assign groups based on the values of each DN part to all principals registered in the realm.
+
+This feature can be configured by using the `dn-parts-used-for-groups` property  of any security realm of type `com.sun.enterprise.security.auth.realm.certificate.CertificateRealm`. It must define a comma separated list of identifiers of DN parts, i.e. `EMAILADDRESS,DC,OU`,
+and it is empty by default.
+
+NOTE: The default empty value means that only content of the `assign-groups` property value will be used as the list of assigned groups.
+
+If both properties are set, a principal who completed the certificate validation will have all groups from both `assign-groups` settings.
+
+Not all DN parts are supported. The following is the list of all parts that are supported, categorized by their OIDs:
+
+.Supported OIDs
+
+[cols="2,4,6", options="header"]
+|===
+|DN Part | Description |Object ID
+|CN |Common Name |2.5.4.3
+|SURNAME |Surname |2.5.4.4
+|SERIALNUMBER |Serial Number of the certificate |2.5.4.5
+|C |Country |2.5.4.6
+|L |Locality |2.5.4.7
+|ST |State |2.5.4.8
+|STREET |Street |2.5.4.9
+|O |Organisation |2.5.4.10
+|OU |Organisation Unit |2.5.4.11
+|T |Title |2.5.4.12
+|GIVENNAME |Given Name |2.5.4.42
+|INITIALS |Initials |2.5.4.43
+|GENERATION |Generation |2.5.4.44
+|DNQUALIFIER |DN Qualifier |2.5.4.46
+|UID |User ID |0.9.2342.19200300.100.1.1
+|DC |Domain Component |0.9.2342.19200300.100.1.25
+|EMAILADDRESS |E-Mail address |1.2.840.113549.1.9.1
+|IP |IP Address |1.3.6.1.4.1.42.2.11.2.1
+|===
+
+[[configuration]]
+=== Payara Server Configuration
+
+[[configuration-using-admin-console]]
+==== Using the Admin Console
+
+This feature can be configured on the default certificate realm with the following steps:
+
+. Navigate to the applicable configuration page for your use (e.g. `server-config`) under the `Configurations` option in the side menu
+. Head to `Security` -> `Realms` and select the `certificate` realm
+. Click the `Add Property` button
+. Set the property _Name_ to be `dn-parts-used-for-groups` and set the _Value_ to a comma separated list of OID names.
+
+[[configuration-using-asadmin-cli]]
+==== Using the Asadmin CLI
+
+You can also use the following asadmin command to set the value of the property in the security realm:
+
+[source, shell]
+----
+asadmin> set configs.config.${YOUR_INSTANCE_CONFIG}.security-service.auth-realm.certificate.property.dn-parts-used-for-groups=EMAILADDRESS,DC,OU
+----
+
+IMPORTANT: After setting the value of the property, make sure that you **restart the server instance** for the changes to take effect.
+
+CAUTION: Keep in mind that the set of DN parts used to configure the realm groups must be predictable to be useful, so be careful to use DN parts that do not create group name collisions.
+
+[[mapping-groups-to-roles-in-applications]]
+=== Mapping Groups to Security Roles in Applications
+
+After configuring the realm groups, you can map these groups to application roles as you'd do by using the Payara Server specific deployment descriptors. You can even map these roles to principals that are configured as documented in the xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Security Configuration/Client Certificates/Advanced Principal Name Configuration.adoc[advanced Principal Name configuration] section.
+
+Here's a quick summary of the authentication and authorization process would work in this scenario:
+
+* The principal receives principal name as configured (whole DN or only CN part)
+* The principal receives all groups from realm's `assign-groups` list
+* The principal receives all groups from certificate's DN parts listed in `dn-parts-used-for-groups` realm property
+(limited to those listed in table)
+* The server allows the principal to access the application
+* The client receives all roles from application's security role mapping, where at least one of his principal names
+or groups matches their respective element.
+* The security roles are then used for authorization to access application resources
+
+For example, if user roles were mapped like this in the `payara-web.xml` deployment descriptor of an application and we
+enabled using `CN` as a principal name and set the `dn-parts-used-for-groups` to `OU`:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}">
+<payara-web-app error-url="">
+  <context-root>/health-services</context-root>
+  <security-role-mapping>
+    <role-name>role1</role-name>
+    <principal-name>C=UK, S=lak, L=zak, OU=unitA, CN=foo1</principal-name>
+    <principal-name>C=UK, S=lak, L=zak, OU=unitA, CN=foo2</principal-name>
+    <principal-name>C=UK, S=lak, L=zak, OU=unitC, CN=foo4</principal-name>
+    <principal-name>C=UK, S=lak, L=zak, OU=unitD, CN=foo-director</principal-name>
+  </security-role-mapping>
+  <security-role-mapping>
+    <role-name>role2</role-name>
+    <principal-name>C=UK, S=lak, L=zak, OU=unitB, CN=foo3</principal-name>
+    <principal-name>C=UK, S=lak, L=zak, OU=unitD, CN=foo-director</principal-name>
+  </security-role-mapping>
+</payara-web-app>
+----
+
+Then the role mapping can be based on organizational unit in this case. But you can still use the principal name as in any normal case:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}">
+<payara-web-app error-url="">
+  <context-root>/health-services</context-root>
+  <security-role-mapping>
+    <role-name>role1</role-name>
+    <group-name>unitA</group-name>
+    <group-name>unitC</group-name>
+    <group-name>unitD</group-name>
+  </security-role-mapping>
+  <security-role-mapping>
+    <role-name>role2</role-name>
+    <group-name>unitB</group-name>
+    <principal-name>foo-director</principal-name>
+  </security-role-mapping>
+</payara-web-app>
+----
+
+[[configure-the-principal-name-on-certificate-realms]]
+== Advanced Principal Name Configuration
+:ordinal: 1
+
+Payara Server allows the use of the Common-Name (`CN`) attribute of a client certificate's DN to be used as the full principal's name when the certificated is authenticated in an application. This simplifies the authentication process, as the common name will replace the full name in the validation process of the certificate's authentication.
+
+To configure this behaviour, the `common-name-as-principal-name` property can be used in any security realm of type `com.sun.enterprise.security.auth.realm.certificate.CertificateRealm`.
+
+NOTE: The `common-name-as-principal-name` property is set to false by default if no configuration is provided.
+
+[[Configuration]]
+=== Configuration
+
+[[configuration-using-admin-console]]
+==== Using the Admin Console
+
+This feature can be configured on the default certificate realm as follows on the Admin Console:
+
+. Navigate to the applicable configuration page for your use (e.g. `server-config`) under the `Configurations` option in the side menu
+. Head to `Security` -> `Realms` and select the `certificate` realm
+. Click the `Add Property` button
+. Set the property _Name_ to be `common-name-as-principal-name` and set the _Value_ to `true`
+
+image:security/common-name-as-principal-name.png[Common Name As Principal Name Setting]
+
+[[configuration-using-asadmin-cli]]
+==== Using the Asadmin CLI
+
+You can also use the following asadmin command to set the value of the property:
+
+[source, shell]
+----
+asadmin> set configs.config.${YOUR_INSTANCE_CONFIG}.security-service.auth-realm.certificate.property.common-name-as-principal-name=true
+----
+
+IMPORTANT: After setting the value of the property, make sure that you **restart the server instance** for the changes to take effect.
+
+[[using-cn-as-subject-in-applications]]
+=== Using `CN` as Subject in Applications
+
+Once this feature is enabled, users can be authenticated when a valid certificate uses the common name instead of the full domain name. It is also possible to map users to roles in this directly.
+
+For example, if user authorization roles were mapped like this in the `payara-web.xml` deployment descriptor:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}">
+<payara-web-app error-url="">
+  <context-root>/health-services</context-root>
+  <security-role-mapping>
+    <role-name>gl</role-name>
+    <principal-name>C=UK, S=lak, L=zak, O=kaz, CN=foo</principal-name>
+  </security-role-mapping>
+</payara-web-app>
+----
+
+Then the `principal-name` can be simplified by using only the common name like this:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}">
+<payara-web-app error-url="">
+  <context-root>/health-services</context-root>
+  <security-role-mapping>
+    <role-name>gl</role-name>
+    <principal-name>foo</principal-name>
+  </security-role-mapping>
+</payara-web-app>
+----
+
+[[client-certificate-validator]]
+== Client Certificate Custom Validations
+:ordinal: 3
+
+By default, the Payara Server runtime checks only if the submitted Client Certificate is present in the trust store and that it hasn't expired already. If these conditions are met, it is accepted without any additional checks.
+
+Custom Client Certificate Validation allows you to perform extra checks in addition to checking for the presence of the certificate in the trust store.
+
+You can perform a check on the validity date, and use the Online Certificate Status Protocol (OCSP) to validate the certificate when it has a Certificate Revocation List entry (CRL), or lookup the DN name in a database for example, and determine based on this information if the certificate is still accepted.
+
+[[create-custom-validator]]
+=== Creating a Custom Validator
+
+When you want to implement custom validation, implement the `fish.payara.security.client.ClientCertificateValidator` interface and define your class through the `ServiceLoader` mechanism.
+
+To have the `ClientCertificateValidator` interface available in your application, add the `payara-api` artifact to your application with the provided scope. When using maven, add the following snippet if not already defined.
+
+[source, xml]
+----
+<dependency>
+    <groupId>fish.payara.api</groupId>
+    <artifactId>payara-api</artifactId>
+    <version>{page-version}</version>
+    <scope>provided</scope>
+</dependency>
+----
+
+Now that you have the interface available, you can implement it in your application.
+
+[source, java]
+----
+public class MyCertificateValidator implements ClientCertificateValidator {
+
+    @Override
+    public boolean isValid(Subject subject, X500Principal principal, X509Certificate certificate) {
+         //
+         return ...
+    }
+}
+----
+
+The most important parameter here is the `principal` parameter which contains the user information contained in the Client Certificate presented in the request. The Certificate itself is in the last parameter and in the case you like to have access already to the `Subject` for this validation, it is passed in as the first parameter.
+
+When you return `true` as the method result, the processing of the request continues. In the case false is returned, a `LoginException` is thrown resulting in a status 401 for the request.
+
+This class is loaded through the Java ServiceLoader mechanism. Make sure you have the following file. _META-INF/services/fish.payara.security.client.ClientCertificateValidator_ containing the fully qualified name of your implementation.
+
+----
+com.company.certificate.MyCertificateValidator
+----
+
+[[client-certificate-expiration-validator]]
+=== Certificate Expiration Validation
+
+By default, certificate expiration validation is enabled. This validation checks if the certificates in the trust store haven't expired yet. If the client certificate has expired or is not valid yet, a warning message will be printed in the server logs.
+
+[[using-the-asadmin-cli]]
+==== Using the Asadmin CLI
+
+You can use the following asadmin command to set the value of the property through:
+
+[source, shell]
+----
+asadmin> set configs.config.${YOUR_INSTANCE_CONFIG}.security-service.auth-realm.certificate.property.certificate-validation=[true/false]
+----
+
+[[using-the-admin-console]]
+==== Using the Admin Console
+
+This feature can be configured on the default certificate realm as follows on the Admin Console:
+
+. Navigate to the applicable configuration page for your use (e.g. `server-config`) under the `Configurations` option in the side menu
+. Head to `Security` -> `Realms` and select the `certificate` realm
+. Set the property `certificate-validation` _value_ to `[true/false]`
+
+image:security/default-certificate-expiration-validation.png[Certificate Expiration Validation Setting]
+
+IMPORTANT: After setting the value of the property, make sure that you **restart the server instance** for the changes to take effect.
+
 [[pluggable-audit-module-support]]
 == Pluggable Audit Module Support
 
@@ -1463,3 +1743,128 @@ After you install and configure the SAM, you can bind it for use by the containe
 * Another approach is to develop your own `AuthConfigProvider` and register it with the server's `AuthConfigFactory` for use on behalf of your applications. For example, a simple `AuthConfigProvider` can obtain, through its initialization properties, the classname of a SAM to configure on behalf of the applications for which the provider is registered.
 
 TIP: You can find a description of the functionality of an `AuthConfigProvider` and of the registration facilities provided by an `AuthConfigFactory` in the Jakarta Authentication specification.
+
+[[jce-provider-support]]
+== JCE Provider Support
+:ordinal: 3
+
+Payara Server supports using the JCE framework to configure custom security providers. Custom providers can be installed statically in the JDK, via the service loader mechanism, or via the programmatic API.
+
+NOTE: Although the provider can be changed while the server is running, this can influence other processes that already use the previous preferred provider.
+
+[[example]]
+== Example
+
+The example below uses an existing provider (https://bouncycastle.org/[Bouncy Castle]), to which a custom service is added programmatically. As suggested above, this is not the suggested way to do this since it is being changed dynamically. Rather, this example is here for an idea of how it _could_ be used.
+
+[[custom-certificate-factory]]
+=== Custom Certificate Factory
+
+[source, java]
+----
+public class MyJCECertificateFactory extends CertificateFactory {
+
+    @Override
+    public Certificate engineGenerateCertificate(InputStream in) throws CertificateException {
+        Certificate certificate = super.engineGenerateCertificate(in);
+
+        if (certificate instanceof X509Certificate == false) {
+            return certificate;
+        }
+
+        return new MyJCEX509Certificate((X509Certificate) certificate);
+    }
+
+}
+----
+
+This factory is based on the https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/cert/CertificateFactorySpi.html[CertificateFactory SPI] type, but instead of implementing it fully the Bouncy Castle's CertificateFactory is used. The returned https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/cert/Certificate.html[Certificate] is then wrapped in our own. A custom certificate type might then look as follows:
+
+
+[[custom-certificate]]
+=== Custom Certificate
+
+[source, java]
+----
+public class MyJCEX509Certificate extends X509Certificate {
+
+    private final X509Certificate certificate;
+
+    public MyJCEX509Certificate(X509Certificate certificate) {
+        this.certificate = certificate;
+    }
+
+    @Override
+    public X500Principal getSubjectX500Principal() {
+
+        X500Principal principal = certificate.getSubjectX500Principal();
+
+        if ("C=UK,ST=lak,L=zak,O=kaz,OU=bar,CN=lfoo".equals(principal.getName())) {
+            return new X500Principal("CN=u1");
+        }
+
+        return principal;
+    }
+
+    @Override
+    public Principal getSubjectDN() {
+
+        Principal principal = certificate.getSubjectDN();
+
+        if ("CN=lfoo,OU=bar,O=kaz,L=zak,ST=lak,C=UK".equals(principal.getName())) {
+            return new X500Principal("CN=u1");
+        }
+
+        return principal;
+    }
+
+    // Other methods omitted for brevity
+}
+----
+
+This custom certificate is where the "principal mapping" is performed. For the example only "CN=lfoo,OU=bar,O=kaz,L=zak,ST=lak,C=UK" to "CN=u1" is mapped though. Note that the example above overrides two methods. The getSubjectDN() one is actually deprecated (or denigrated as in the Certificate's terminology), but it's still being used all over the place. getSubjectX500Principal() is the preferred method to use.
+
+Finally, the factory can be installed for example via a Servlet that we can easily ping (as mentioned, this would not normally be the advisory way to do this):
+
+[[custom-install-file]]
+=== Custom Installation File
+
+[source, java]
+----
+@WebServlet(urlPatterns = { "/BouncyServlet" })
+public class BouncyServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        BouncyCastleProvider provider = new BouncyCastleProvider();
+        provider.put("CertificateFactory.X.509", MyJCECertificateFactory.class.getName());
+
+        int pos = Security.insertProviderAt(provider, 1);
+
+        response.getWriter().print("pos:" + pos);
+    }
+
+}
+----
+
+The above code instantiates the bouncy castle provider, and registers the previous custom certificate factory with it. In this example you can see the type and algorithm being combined into the single key for registering our factory class.
+
+The modified provider is then inserted at provider position 1 (the first, there's no 0), using a static method of the https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/Security.html[Security] class.
+
+After pinging this Servlet, and requesting another Servlet over HTTPS that's protected with the client-cert authentication mechanism, a principal with name `CN=lfoo,OU=bar,O=kaz,L=zak,ST=lak,C=UK` will be replaced at nearly the lowest level in the system with "CN=u1", and Payara will only see this principal name. We can use this principal name for instance to map groups and roles to it:
+
+[source, xml]
+----
+<glassfish-web-app>
+    <security-role-mapping>
+        <role-name>g1</role-name>
+        <group-name>g1</group-name>
+        <principal-name>CN=u1</principal-name>
+    </security-role-mapping>
+</glassfish-web-app>
+----
+
+A fully working sample demonstrating exactly this can be found in the https://github.com/javaee-samples/javaee7-samples/tree/master/servlet/security-clientcert-jce[Java EE 7 samples repo].

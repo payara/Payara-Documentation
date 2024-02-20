@@ -1116,6 +1116,9 @@ keytool -delete -alias keyAlias -keystore cacerts.p12 -storepass password
 [[administering-jacc-providers]]
 == Administering Jakarta Authorization / JACC Providers
 
+JACC stands for *Java Authentication Contract for Containers*. It's defined in  the https://jcp.org/en/jsr/detail?id=115[JSR 115 specification] and all Java EE complaint servers are mandated to provide a JACC Policy by default.
+
+
 The Jakarta Authorization specification (formerly known as Java Authorization Contract for Containers - JACC) defines an interface for pluggable authorization providers (commonly known as JACC providers) based on policies. This enables the administrator to set up third-party plug-in modules to perform authorization.
 
 Payara Server includes Administration Console support and subcommands to support JACC providers, as follows:
@@ -1176,3 +1179,116 @@ default
 
 Command list-jacc-providers executed successfully.
 ----
+
+
+
+[[how-to-install-a-custom-jacc-provider-per-server]]
+== How to install a custom JACC provider per Server (Global)
+
+Having coded a JACC provider, the first thing to do it is to make these classes available for the server. For that purpose, you need to put the implementation JAR, with all its dependencies, under the `{PAYARA_HOME}/lib` folder.
+
+The next thing to do is to tell Payara you want to use the custom JACC provider. To do this, you have to execute the following administration command:
+
+[source, shell]
+----
+create-jacc-provider --policyConfigurationFactoryProvider=com.example.CustomPolicyConfigurationFactory --policyProvider=com.example.CustomPolicy --target=server-config custom-provider set configs.config.server-config.security-service.jacc=custom-provider
+----
+
+This will result in the following configuration element added to the _domain.xml_ file:
+
+[source, xml]
+----
+<security-service jacc="custom-provider">
+    <jacc-provider policy-provider="com.example.CustomPolicy" name="custom-provider"
+      policy-configuration-factory-provider="com.example.CustomPolicyConfigurationFactory">
+    </jacc-provider>
+    <!-- More providers can be defined -->
+</security-service>
+----
+
+As you can see on the XML excerpt, more JACC providers can be defined (by default, the `simple` and `default` providers are already defined), but only one will be used at runtime, specified by the `jacc` attribute on the `security-service` element.
+
+[[how-to-install-a-custom-jacc-provider-per-application]]
+=== How to install a custom JACC provider per Application (Local)
+
+With a custom JACC provide per server, applications deployed to a single server can't have their own custom authorization contracts. In this case, having a custom JACC Provider per application makes more sense by using the `fish.payara.jacc.JaccConfigurationFactory` API.
+
+IMPORTANT: To access this API, you will need to add a dependency to the xref:/Technical Documentation/Public API/Overview.adoc[Payara Public API] first.
+
+In the example below, when an application is deployed, a custom JACC provider is registered programmatically using the `JaccConfigurationFactory (consisting of a JACC `PolicyConfigurationFactory` and `Policy` implementation objects) in the `contextInitialized` method of `ServletContextListener`.
+
+[source, java]
+----
+@WebListener
+public class JaccInstaller implements ServletContextListener {
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+
+        JaccConfigurationFactory
+                .getJaccConfigurationFactory()
+                .registerContextProvider(
+                        getAppContextId(sce.getServletContext()),
+                        new CustomPolicyConfigurationFactory(),
+                        new CustomPolicy()
+                );
+
+    }
+
+    private String getAppContextId(ServletContext servletContext) {
+        return servletContext.getVirtualServerName() + " " + servletContext.getContextPath();
+    }
+
+}
+----
+
+
+[[multiple-httpauthenticationmechanism-ear]]
+== Multiple HttpAuthenticationMechanisms in EAR Application
+:ordinal: 2
+
+Within the Security API specification, an `HttpAuthenticationMechanism` can be defined to retrieve the user credentials from the HTTP Request. These credentials are then used by any configured identity stores to validate the user.
+
+However, a restriction of the Security API specification is that only one `HttpAuthenticationMechanism` can be defined per application. This restriction is also in place for EAR applications file where it's possible to have multiple web modules.
+
+Payara Server allows to circumvent this restriction so that multiple authentication mechanisms are used in an EAR application that hosts more than one Web module. To this effect, each web module must configure its own authentication mechanism separately.
+
+IMPORTANT: In order to use this feature, there must not be any custom `HttpAuthenticationMechanism` implementations bundled in any of the modules hosted in the EAR artifact. If this is the case, the feature will not work as intended.
+
+NOTE: This behaviour is specific to the Payara Platform and not compatible with the Jakarta Security specification.
+
+[[configure]]
+=== How to Configure
+
+In order to configure a specific `HttpAuthenticationMechanism` for a Web application, define the `fish.payara.security.mechanism` parameter in the _web.xml_ deployment descriptor like in the following case:
+
+[source, xml]
+----
+<context-param>
+    <param-name>fish.payara.security.mechanism</param-name>
+    <param-value>JWT</param-value>
+</context-param>
+----
+
+The following mechanisms can be used:
+
+[cols="2,10", options="header"]
+|===
+|Value |Description
+|Basic |Use _BasicAuthenticationMechanism_ as mechanism.
+|Form |Use _FormAuthenticationMechanism_ as mechanism.
+|CustomForm | Use _CustomFormAuthenticationMechanism_ as mechanism.
+|JWT | Use the custom Payara _JWTAuthenticationMechanism_ as mechanism.
+|Certificate | Use the custom Payara _CertificateAuthenticationMechanism_ as mechanism.
+|Azure | Use the custom Payara _AzureOpenIdAuthenticationMechanism_ as mechanism.
+|Google | Use the custom Payara _GoogleOpenIdAuthenticationMechanism_ as mechanism.
+|OAuth2 |Use the custom Payara _OAuth2AuthenticationMechanism_ as mechanism.
+|<any Fully Qualified Class Name> |Use the `HttpAuthenticationMechanism` indicated by the class name.
+|===
+
+NOTE: When no parameter is specified, the standard rules of the Security API are active (only 1 allowed per artifact).
+
+[[see-also]]
+== See Also
+
+* https://blog.payara.fish/ee-security-jaspic-jacc-loginmodules-realms[Introduction to JASPIC Login Modules]
