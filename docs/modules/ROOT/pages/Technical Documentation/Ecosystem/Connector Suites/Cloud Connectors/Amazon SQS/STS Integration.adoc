@@ -124,7 +124,11 @@ public class SendSQSMessage {
  @PostConstruct
  public void init() {
     try (AmazonSQSConnection connection = factory.createConnection()) {
-        connection.sendMessage(new SendMessageRequest("<queueURL>", "Hello World"));
+        SendMessageRequest sendMsgRequest = SendMessageRequest.builder()
+                        .queueUrl("<queueURL>")
+                        .messageBody("Hello World")
+                        .build();
+        connection.sendMessage(sendMsgRequest);
     }
     catch (Exception ex) {
     }
