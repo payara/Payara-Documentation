@@ -1,14 +1,27 @@
 [[payara-server-deployment-descriptor-files]]
 = Payara Server Deployment Descriptor Files
+:ordinal: 1
 
-This appendix describes the element hierarchies in the Payara Server deployment descriptors that are included in this release of the Payara Server software.
+By default, the Payara Platform allows the use of standard GlassFish Server deployment descriptor files to configure application behaviour.
 
-[[about-the-payara-server-deployment-descriptors]]
-== About the Payara Server Deployment Descriptors
+[[payara-web-info]]
+== Payara Platform Deployment Descriptors
 
-Each deployment descriptor XML file has a corresponding Document Type Definition (DTD) file, which defines the elements, data, and attributes that the deployment descriptor file can contain.
+The `payara-web.xml` deployment descriptor can be used instead of `glassfish-web.xml`. The top level element for the `payara-web.xml` file must be `_payara-web-app_` and the schema is referenced by the following declaration:
 
-For example, the `glassfish-application_6_0-1.dtd` file defines the structure of the `glassfish-application.xml` file. The DTD files for the Payara Server deployment descriptors are located in the `as-install/lib/dtds` directory.
+[source,xml,subs=attributes+]
+----
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}">
+----
+
+The `payara-resources.xml` can be used instead of `glassfish-resources.xml`. Its structure is exactly the same, and the schema is referenced by the following declaration:
+
+[source,xml,subs=attributes+]
+----
+<!DOCTYPE resources PUBLIC "-//Payara.fish//DTD Payara Server 4 Resource Definitions//EN" "{payaraResourcesDtd}">
+----
+
+See the xref:/Appendix/Schemas/Overview.adoc[schema reference] for the list of deployment descriptor DTD files.
 
 The Payara Server deployment descriptor files must be readable and writable by the file owners. In each deployment descriptor file, sub-elements must be defined in the order in which they are listed under each Sub-elements heading, unless otherwise noted.
 
@@ -16,52 +29,16 @@ For general information about DTD files and XML, see the XML specification at `h
 
 IMPORTANT: Do not edit the DTD files; their contents change only with new versions of Payara Server.
 
-The following table lists the Payara Server deployment descriptors and their DTD files.
 
-.Payara Server Deployment Descriptors and DTDs
+== Allowed configuration elements
 
-[cols="3,3,4",options="header"]
-|===
-|Deployment Descriptor |DTD File |Description
+The following elements are supported in Payara Server on top of elements supported by GlassFish:
 
-| `glassfish-application.xml`
-| `glassfish-application_6_0-1.dtd`
-| Configures an entire Jakarta EE application (EAR file).
-
-| `glassfish-web.xml`
-| `glassfish-web-app_3_0-1.dtd`
-| Configures a web application (WAR file).
-
-| `glassfish-ejb-jar.xml`
-| `glassfish-ejb-jar_3_1-1.dtd`
-|Configures an enterprise bean (EJB JAR file).
-
-| `sun-cmp-mappings.xml`
-| `sun-cmp-mapping_1_2.dtd`
-| Configures container-managed persistence for an EJB 2.0 or 2.1 entity bean.
-
-| `glassfish-application-client.xml`
-| `glassfish-application-client_6_0-1.dtd`
-| Configures an Application Client Container (ACC) client (JAR file).
-
-| `sun-acc.xml`
-| `sun-application-client-container_1_2.dtd`
-| Configures the Application Client Container. This is more of a configuration file than a deployment descriptor.
-Payara Server provides a default file in the domain-dir`/config` directory.  Specifying a different file is optional.
-
-| `glassfish-resources.xml`
-| `glassfish-resources_1_5.dtd`
-| Configures application-scoped resources.
-
-|===
-
-NOTE: The `sun-application.xml`, `sun-web.xml`, `sun-ejb-jar.xml`, `sun-application-client.xml`, and `sun-resources.xml` deployment descriptors are supported
-for backward compatibility.
-
-[[the-glassfish-application.xml-file]]
-== The glassfish-application.xml File
+[[glassfish-application.xml]]
+== _glassfish-application.xml_
 
 The `glassfish-application.xml` file configures an entire Jakarta EE application (EAR file). The element hierarchy is as follows:
+
 
 [source,text]
 ----
@@ -129,23 +106,30 @@ glassfish-application
 .  compatibility
 .  keep-state
 .  version-identifier
+.  classloading-delegate
+.  enable-implicit-cdi
+.  default-role-mapping
+.  .  property (with attributes)
+.  whitelist-package
+.  scanning-exclude
+.  scanning-include
 ----
 
 .sample `glassfish-application.xml` file:
 [source,xml]
 ----
-<!DOCTYPE glassfish-application PUBLIC "-//GlassFish.org//DTD 
-GlassFish Application Server 3.1 Java EE Application 6.0//EN" 
+<!DOCTYPE glassfish-application PUBLIC "-//GlassFish.org//DTD
+GlassFish Application Server 3.1 Java EE Application 6.0//EN"
 "http://glassfish.org/dtds/glassfish-application_6_0-1.dtd">
 <glassfish-application>
    <unique-id>67488732739338240</unique-id>
 </glassfish-application>
 ----
 
-[[the-glassfish-web.xml-file]]
-== The glassfish-web.xml File
+[[glassfish-web.xml]]
+== _glassfish-web.xml_ and _payara-web.xml_
 
-The `glassfish-web.xml` file configures a web application (WAR file). The element hierarchy is as follows:
+The `glassfish-web.xml` or `payara-web.xml` file configures a web application (WAR file). The element hierarchy is as follows:
 
 [source,text]
 ----
@@ -280,34 +264,45 @@ glassfish-web-app
 .  .  wsdl-publish-location
 .  keep-state
 .  version-identifier
+.  container-initialized-enabled
+.  default-role-mapping
+.  .  property (with attributes)
+.  jaxrs-roles-allowed-enabled
+.  scanning-exclude
+.  scanning-include
+.  jsp-config
+.  whitelist-package
+
+
 ----
 
-.A sample `glassfish-web.xml` file:
+.A sample `payara-web.xml` file:
 [source,xml]
 ----
-<!DOCTYPE glassfish-web-app PUBLIC "-//GlassFish.org//DTD 
-GlassFish Application Server 3.1 Servlet 3.0//EN" 
-"http://glassfish.org/dtds/glassfish-web-app_3_0-1.dtd">
-<glassfish-web-app>
-   <session-config>
-      <session-manager/>
-   </session-config>
-   <resource-ref>
-      <res-ref-name>mail/Session</res-ref-name>
-      <jndi-name>mail/Session</jndi-name>
-   </resource-ref>
-   <jsp-config/>
-</glassfish-web-app>
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 5.2020//EN"
+        "http://www.payara.fish/dtd/payara-web-app_5.2020.dtd">
+<payara-web-app>
+    <session-config>
+        <session-manager/>
+    </session-config>
+    <resource-ref>
+        <res-ref-name>mail/Session</res-ref-name>
+        <jndi-name>mail/Session</jndi-name>
+    </resource-ref>
+    <jsp-config/>
+</payara-web-app>
+
 ----
 
-[[the-glassfish-ejb-jar.xml-file]]
-== The glassfish-ejb-jar.xml File
 
-The `glassfish-ejb-jar.xml` file configures an enterprise bean (EJB JAR file). The element hierarchy is as follows:
+[[payara-ejb-jar.xml]]
+== payara-ejb-jar.xml
+
+The `payara-ejb-jar.xml` file configures an enterprise bean (EJB JAR file).  The element hierarchy is as follows:
 
 [source,text]
 ----
-glassfish-ejb-jar
+payara-ejb-jar
 .  security-role-mapping
 .  .  role-name
 .  .  principal-name
@@ -502,17 +497,28 @@ glassfish-ejb-jar
 .  disable-nonportable-jndi-names
 .  keep-state
 .  version-identifier
+.  webservice-default-login-config
+.  default-role-mapping
+.  .  property (with attributes)
+.  enterprise-beans
+.  .  ejb
+.  .  .  ejb-name
+.  .  .  clustered-bean
+.  .  .  clustered-key-name
+.  .  .  clustered-lock-type
+.  .  .  clustered-attach-postconstruct
+.  .  .  clustered-detach-predestroy
 ----
 
-NOTE: If any configuration information for an enterprise bean is not specified in the `glassfish-ejb-jar.xml` file, it defaults to a corresponding setting in the EJB container if an equivalency exists.
 
-.A sample `glassfish-ejb-jar.xml` file:
+NOTE: If any configuration information for an enterprise bean is not specified in the `payara-ejb-jar.xml` file, it defaults to a corresponding setting in the EJB container if an equivalency exists.
+
+.A sample `payara-ejb-jar.xml` file:
 [source,xml]
 ----
-<!DOCTYPE glassfish-ejb-jar PUBLIC "-//GlassFish.org//
-DTD GlassFish Application Server 3.1 EJB 3.1//EN" 
-"http://glassfish.org/dtds/glassfish-ejb-jar_3_1-1.dtd">
-<glassfish-ejb-jar>
+<!DOCTYPE payara-ejb-jar PUBLIC "-//Payara.fish//DTD Payara Server 5.2020 EJB 3.2//EN"
+        "http://www.payara.fish/dtd/payara-ejb-jar_5.2020.dtd">
+<payara-ejb-jar>
     <enterprise-beans>
         <ejb>
             <ejb-name>CustomerEJB</ejb-name>
@@ -537,315 +543,15 @@ DTD GlassFish Application Server 3.1 EJB 3.1//EN"
         </cmp-resource>
     </enterprise-beans>
     <keep-state>true</keep-state>
-</glassfish-ejb-jar>
+</payara-ejb-jar>
+
 ----
 
-[[the-sun-cmp-mappings.xml-file]]
-== The sun-cmp-mappings.xml File
 
-The `sun-cmp-mappings.xml` file configures container-managed persistence for an EJB 2.0 or 2.1 entity bean. The element hierarchy is as follows:
+[[payara-resources.xml]]
+== _payara-resources.xml_
 
-[source,text]
-----
-sun-cmp-mappings
-.  sun-cmp-mapping
-.  .  schema
-.  .  entity-mapping
-.  .  .  ejb-name
-.  .  .  table-name
-.  .  .  cmp-field-mapping
-.  .  .  .  field-name
-.  .  .  .  column-name
-.  .  .  .  read-only
-.  .  .  .  fetched-with
-.  .  .  .  .  default
-.  .  .  .  .  level
-.  .  .  .  .  named-group
-.  .  .  .  .  none
-.  .  .  cmr-field-mapping
-.  .  .  .  cmr-field-name
-.  .  .  .  column-pair
-.  .  .  .  .  column-name
-.  .  .  .  fetched-with
-.  .  .  .  .  default
-.  .  .  .  .  level
-.  .  .  .  .  named-group
-.  .  .  .  .  none
-.  .  .  secondary-table
-.  .  .  .  table-name
-.  .  .  .  column-pair
-.  .  .  .  .  column-name
-.  .  .  consistency
-.  .  .  .  none
-.  .  .  .  check-modified-at-commit
-.  .  .  .  lock-when-loaded
-.  .  .  .  check-all-at-commit
-.  .  .  .  lock-when-modified
-.  .  .  .  check-version-of-accessed-instances
-.  .  .  .  .  column-name
-----
-
-.A sample database schema definition:
-
-[source, sql]
-----
-create table TEAMEJB (
-   TEAMID varchar2(256) not null,
-   NAME varchar2(120) null,
-   CITY char(30) not null,
-   LEAGUEEJB_LEAGUEID varchar2(256) null,
-   constraint PK_TEAMEJB primary key (TEAMID)
-);
-
-create table PLAYEREJB (
-   POSITION varchar2(15) null,
-   PLAYERID varchar2(256) not null,
-   NAME char(64) null,
-   SALARY number(10, 2) not null,
-   constraint PK_PLAYEREJB primary key (PLAYERID)
-);
-
-create table LEAGUEEJB (
-   LEAGUEID varchar2(256) not null,
-   NAME varchar2(256) null,
-   SPORT varchar2(256) null,
-);
-
-create table PLAYEREJBTEAMEJB (
-   PLAYEREJB_PLAYERID varchar2(256) null,
-   TEAMEJB_TEAMID varchar2(256) null
-);
-
-alter table TEAMEJB add constraint FK_LEAGUE foreign key (LEAGUEEJB_LEAGUEID) references LEAGUEEJB (LEAGUEID);
-
-alter table PLAYEREJBTEAMEJB add constraint FK_TEAMS foreign key (PLAYEREJB_PLAYERID) references PLAYEREJB (PLAYERID);
-
-alter table PLAYEREJBTEAMEJB add constraint FK_PLAYERS foreign key (TEAMEJB_TEAMID) references TEAMEJB (TEAMID);
-----
-
-.A corresponding sample `sun-cmp-mappings.xml` file:
-[source,xml]
-----
-<?xml version="1.0" encoding="UTF-8"?>
-<sun-cmp-mappings>
-<sun-cmp-mapping>
-    <schema>Roster</schema>
-    <entity-mapping>
-        <ejb-name>TeamEJB</ejb-name>
-        <table-name>TEAMEJB</table-name>
-        <cmp-field-mapping>
-            <field-name>teamId</field-name>
-            <column-name>TEAMEJB.TEAMID</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>name</field-name>
-            <column-name>TEAMEJB.NAME</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>city</field-name>
-            <column-name>TEAMEJB.CITY</column-name>
-        </cmp-field-mapping>
-        <cmr-field-mapping>
-            <cmr-field-name>league</cmr-field-name>
-            <column-pair>
-                <column-name>TEAMEJB.LEAGUEEJB_LEAGUEID</column-name>
-                <column-name>LEAGUEEJB.LEAGUEID</column-name>
-            </column-pair>
-            <fetched-with>
-                <none/>
-            </fetched-with>
-        </cmr-field-mapping>
-        <cmr-field-mapping>
-            <cmr-field-name>players</cmr-field-name>
-            <column-pair>
-                <column-name>TEAMEJB.TEAMID</column-name>
-                <column-name>PLAYEREJBTEAMEJB.TEAMEJB_TEAMID</column-name>
-            </column-pair>
-            <column-pair>
-                <column-name>PLAYEREJBTEAMEJB.PLAYEREJB_PLAYERID</column-name>
-                <column-name>PLAYEREJB.PLAYERID</column-name>
-            </column-pair>
-            <fetched-with>
-                <none/>
-            </fetched-with>
-        </cmr-field-mapping>
-    </entity-mapping>
-    <entity-mapping>
-        <ejb-name>PlayerEJB</ejb-name>
-        <table-name>PLAYEREJB</table-name>
-        <cmp-field-mapping>
-            <field-name>position</field-name>
-            <column-name>PLAYEREJB.POSITION</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>playerId</field-name>
-            <column-name>PLAYEREJB.PLAYERID</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>name</field-name>
-            <column-name>PLAYEREJB.NAME</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>salary</field-name>
-            <column-name>PLAYEREJB.SALARY</column-name>
-        </cmp-field-mapping>
-        <cmr-field-mapping>
-            <cmr-field-name>teams</cmr-field-name>
-            <column-pair>
-                <column-name>PLAYEREJB.PLAYERID</column-name>
-                <column-name>PLAYEREJBTEAMEJB.PLAYEREJB_PLAYERID</column-name>
-            </column-pair>
-            <column-pair>
-                <column-name>PLAYEREJBTEAMEJB.TEAMEJB_TEAMID</column-name>
-                <column-name>TEAMEJB.TEAMID</column-name>
-            </column-pair>
-            <fetched-with>
-                <none/>
-            </fetched-with>
-        </cmr-field-mapping>
-    </entity-mapping>
-    <entity-mapping>
-        <ejb-name>LeagueEJB</ejb-name>
-        <table-name>LEAGUEEJB</table-name>
-        <cmp-field-mapping>
-            <field-name>leagueId</field-name>
-            <column-name>LEAGUEEJB.LEAGUEID</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>name</field-name>
-            <column-name>LEAGUEEJB.NAME</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>sport</field-name>
-            <column-name>LEAGUEEJB.SPORT</column-name>
-        </cmp-field-mapping>
-        <cmr-field-mapping>
-            <cmr-field-name>teams</cmr-field-name>
-            <column-pair>
-                <column-name>LEAGUEEJB.LEAGUEID</column-name>
-                <column-name>TEAMEJB.LEAGUEEJB_LEAGUEID</column-name>
-            </column-pair>
-            <fetched-with>
-                <none/>
-            </fetched-with>
-        </cmr-field-mapping>
-    </entity-mapping>
-</sun-cmp-mapping>
-</sun-cmp-mappings>
-----
-
-[[the-glassfish-application-client.xml-file]]
-== The glassfish-application-client.xml file
-
-The `glassfish-application-client.xml` file configures an Application Client Container (ACC) client (JAR file). The element hierarchy is as follows:
-
-[source,text]
-----
-glassfish-application-client
-.  ejb-ref
-.  .  ejb-ref-name
-.  .  jndi-name
-.  resource-ref
-.  .  res-ref-name
-.  .  jndi-name
-.  .  default-resource-principal
-.  .  .  name
-.  .  .  password
-.  resource-env-ref
-.  .  resource-env-ref-name
-.  .  jndi-name
-.  service-ref
-.  .  service-ref-name
-.  .  port-info
-.  .  .  service-endpoint-interface
-.  .  .  wsdl-port
-.  .  .  .  namespaceURI
-.  .  .  .  localpart
-.  .  .  stub-property
-.  .  .  .  name
-.  .  .  .  value
-.  .  .  call-property
-.  .  .  .  name
-.  .  .  .  value
-.  .  .  message-security-binding
-.  .  .  .  message-security
-.  .  .  .  .  message
-.  .  .  .  .  .  java-method
-.  .  .  .  .  .  .  method-name
-.  .  .  .  .  .  .  method-params
-.  .  .  .  .  .  .  .  method-param
-.  .  .  .  .  .  operation-name
-.  .  .  .  .  request-protection
-.  .  .  .  .  response-protection
-.  .  call-property
-.  .  .  name
-.  .  .  value
-.  .  wsdl-override
-.  .  service-impl-class
-.  .  service-qname
-.  .  .  namespaceURI
-.  .  .  localpart
-.  message-destination-ref
-.  .  message-destination-ref-name
-.  .  jndi-name
-.  message-destination
-.  .  message-destination-name
-.  .  jndi-name
-.  java-web-start-access
-.  .  context-root
-.  .  eligible
-.  .  vendor
-.  .  jnlp-doc
-.  version-identifier
-----
-
-.A sample `glassfish-application-client.xml` file:
-[source,xml]
-----
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE glassfish-application-client
-"http://glassfish.org/dtds/glassfish-application-client_6_0-2.dtd">
-<glassfish-application-client>
-  <message-destination-ref>
-    <message-destination-ref-name>ClientQueue</message-destination-ref-name>
-    <jndi-name>jms/security_mdb_OutQueue</jndi-name>
-  </message-destination-ref>
-</glassfish-application-client>
-----
-
-[[the-sun-acc.xml-file]]
-== The sun-acc.xml File
-
-The `sun-acc.xml` file configures the Application Client Container. This is more of a configuration file than a deployment descriptor.
-
-Payara Server provides a default file in the `domain-dir/config` directory. Specifying a different file is optional. The element hierarchy is as follows:
-
-[source,text]
-----
-client-container
-.  target-server
-.  .  description
-.  .  security
-.  .  .  ssl
-.  .  .  cert-db
-.  auth-realm
-.  .  property (with attributes)
-.  client-credential
-.  .  property (with attributes)
-.  log-service
-.  .  property (with attributes)
-.  message-security-config
-.  .  provider-config
-.  .  .  request-policy
-.  .  .  response-policy
-.  .  .  property (with attributes)
-.  property (with attributes) 
-----
-
-[[the-glassfish-resources.xml-file]]
-== The glassfish-resources.xml File
-
-The `glassfish-resources.xml` file configures application-scoped resources. The element hierarchy is as follows:
+The `payara-resources.xml` file configures application-scoped resources. The element hierarchy is as follows:
 
 [source,text]
 ----
@@ -879,6 +585,7 @@ resources
 .  .  .  description
 .  jdbc-connection-pool
 .  .  description
+.  .  log-jdbc-calls
 .  .  property (with attributes)
 .  .  .  description
 .  connector-connection-pool
@@ -893,6 +600,38 @@ resources
 .  .  description
 .  .  principal-map
 .  .  group-map
+.  managed-executor-service
+.  managed-scheduled-executor-service
+.  managed-thread-factory
+----
+
+[[deployment-descriptor-precedence-order]]
+== Deployment Descriptor Precedence Order
+
+When multiple vendor deployment descriptors are present in the same module (including deployment descriptors of the old *Sun Application Server*), the descriptors are processed with the following precedence order in default mode:
+
+----
+WebLogic Server > Payara Platform > GlassFish Server > Sun Application Server
+----
+
+The default precedence order can be customized and configured via the system properties documented in the following sections.
+
+[[gfdd-over-wlsdd]]
+=== `gfdd.over.wlsdd`
+
+This system property controls the precedence between GlassFish Server and WebLogic Server deployment descriptors when they are both present. When the `gfdd.over.wlsdd` property is set to true, the descriptors are processed in this order:
+
+----
+Payara Platform > GlassFish Server > WebLogic Server > Sun Application Server
+----
+
+[[ignore-wlsdd]]
+=== `ignore.wlsdd`
+
+When the `ignore.wlsdd` property is set to true, the WebLogic Server deployment descriptors will be completely ignored and other descriptors will be processed in the following order:
+
+----
+GlassFish Server > Payara Platform > Sun Application Server
 ----
 
 //TODO - Assess whether such support should be properly removed in the future
