@@ -1293,6 +1293,30 @@ Command import-sync-bundle executed successfully.
 * xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/export-sync-bundle.adoc[`export-sync-bundle`]
 * xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/import-sync-bundle.adoc[`import-sync-bundle`]
 
+[[the-extra-terse-option]]
+== The Extra Terse Option
+
+The _extraterse_ option is intended for use with scripts, adding an extra level of terseness to the command output to the CLI.
+
+NOTE: Currently, this feature only works with the `create-instance` and `create-local-instance` commands.
+
+When enabled, the `create-instance` and `create-local-instance` commands should only return the name of the instance created. The intention behind this feature being that you should be able to set variables from this output for use with scripts, since you can’t know beforehand what the name of an instance is if a name conflict is resolved or a name is generated from scratch.
+
+This option can be enabled either by specifying `--extraterse` or simply `-T` on the command line (in comparison, the normal terse option is enabled with `--terse` or `-t`) before or after the command name. Being a CLI option rather than a command parameter, it is recommended that you specify it before the command name, as the ability to specify asadmin options (like `--host`) after the command name is technically deprecated syntax and will be ignored in certain circumstances.
+
+IMPORTANT: The _extraterse_ option implicitly enables the terse option - this is true for *all* commands (not just `create-instance` and `create-local-instance`).
+
+[[ExtraTerse-example]]
+=== ExtraTerse Examples
+
+[source,shell]
+----
+$INSTANCE_NAME = asadmin create-local-instance --node localhost-domain1 --autoname --extraterse
+asadmin start-instance $INSTANCE_NAME
+
+$SECOND_INSTANCE_NAME = asadmin -a -T create-local-instance --node localhost-domain1
+----
+
 [[migrating-ejb-timers]]
 == Migrating EJB Timers
 
