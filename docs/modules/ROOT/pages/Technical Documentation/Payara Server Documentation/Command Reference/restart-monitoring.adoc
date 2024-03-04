@@ -1,0 +1,91 @@
+[[restart-monitoring]]
+= restart-monitoring
+
+This command can be used to set restart/reset the monitoring levels of the server
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] restart-monitoring
+[--help]
+[--verbose={false|true}]
+[--target target]
+----
+
+[[description]]
+== Description
+
+This command can be used to restart the monitoring levels of all modules per the specified target.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are configuring the monitoring level of a server module. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified server instance.
+`--verbose`::
+Enable verbose output.
+
+[[examples]]
+== Examples
+
+*Example 1 Restart monitoring in the DAS*
+
+[source, shell]
+----
+asadmin restart-monitoring --target=server
+----
+
+This will generate an output similar to the following:
+
+[source, log]
+----
+Restarted 3 modules
+----
+
+*Example 2 Restart monitoring in the DAS using verbose mode*
+
+You can use the verbose mode to see which modules were affected and what monitoring level they are currently set to:
+
+[source, shell]
+----
+asadmin restart-monitoring --target=server --verbose
+----
+
+This will generate an output similar to the following:
+
+[source, log]
+----
+Module                       Monitoring Level
+cloud                        HIGH
+cloud-elasticity             LOW
+cloud-orchestrator           HIGH
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/monitoring.adoc[Monitoring Basics],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-monitoring-service-configuration.adoc[`set-monitoring-service-configuration`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-monitoring.adoc[`enable-monitoring`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/disable-monitoring.adoc[`disable-monitoring`]

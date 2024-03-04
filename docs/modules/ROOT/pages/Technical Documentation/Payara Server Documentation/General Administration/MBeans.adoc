@@ -1,7 +1,9 @@
 [[mbeans]]
-= MBeans in Payara Server
+= MBeans Inventory
 
-Below is a non-exhaustive list of MBeans which are useful to monitor in Payara Server. Other MBeans not listed show static information or are JDK-specific.
+Below is a non-exhaustive list of MBeans which are useful to monitor in any Payara Server environment.
+
+Other MBeans not listed show static information or are JDK-specific.
 
 [[jvm-beans]]
 == JVM MBeans
@@ -24,7 +26,7 @@ In JMX Monitoring logging set the value to `java.lang:type=ClassLoading` to moni
 
 | `unloadedclass-count`
 | Total number of classes unloaded since the Java virtual machine has started execution
-| Classes are only unloaded from Payara when the application they are in is undeployed.
+| Classes are only unloaded from Payara when the application they are in is un-deployed.
 |===
 
 [[compilation]]
@@ -140,14 +142,17 @@ In JMX Monitoring logging set the value to `java.lang:type=Threading` to monitor
 |
 |===
 
-[[payara-mbeans]]
-== Payara MBeans
+[[payara-platform-mbeans]]
+== Payara Platform MBeans
 
-These MBeans are part of Payara and provide additional information about current usage. They are all in the form of `amx:pp=amx:pp=/mon/server-mon[instance-name],type=type-of-mbean,name=MBeanName` where `instance-name` is replaced by the name of the instance i.e. `amx:pp=/mon/server-mon[server],type=web-request-mon,name=web/request`.
+These MBeans are registered exclusively by Payara Server and provide additional information about current usage.
 
-See xref:/Technical Documentation/Payara Server Documentation/Logging and Monitoring/Monitoring Service/JMX Monitoring.adoc#enable-jmx-view[Viewing JMX Monitoring Data] for how to view all available MBeans.
+They are all in the form of `amx:pp=amx:pp=/mon/server-mon[instance-name],type=type-of-mbean,name=MBeanName` where `instance-name` is replaced by the name of the instance i.e. `amx:pp=/mon/server-mon[server],type=web-request-mon,name=web/request`.
 
-IMPORTANT: Payara MBeans are only available when AMX is booted. This is done automatically once a JMX client connects. For all other cases, AMX must be either configured to boot at server startup (through domain config) or booted via a JMX operation `bootAMX` on the `amx-support:type=boot-amx` MBean using a non-JMX client (e.g. over a local socket). Programmatic activation during application deployment (by means of a Startup EJB singleton for example) will not work.
+See xref:Technical Documentation/Payara Server Documentation/General Administration/monitoring.adoc#enable-jmx[enable JMX Monitoring] for how to view all available MBeans.
+
+IMPORTANT: Payara Platform MBeans are only available when AMX is booted. This is done automatically once a JMX client connects. For all other cases, AMX must be either configured to boot at server startup (through domain config) or booted via a JMX operation `bootAMX` on the `amx-support:type=boot-amx` MBean using a non-JMX client (e.g. over a local socket). +
+Programmatic activation during application deployment (by means of a Startup EJB singleton for example) will not work.
 
 [[connection-queue]]
 === Connection Queue
@@ -156,9 +161,9 @@ IMPORTANT: Payara MBeans are only available when AMX is booted. This is done aut
 ==== Network Connection Queue Statistics
 
 In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=connection-queue-mon,name=network//connection-queue`
-to use this MBean. To monitor a specific network connection set the name value
-to be `network/name-of-listener/connection-queue` i.e. `name=network/http-listener-1/connection-queue`.
+`amx:pp=/mon/server-mon[server],type=connection-queue-mon,name=network//connection-queue` to use this MBean.
+
+To monitor a specific network connection set the name value to be `network/name-of-listener/connection-queue` i.e. `name=network/http-listener-1/connection-queue`.
 
 |===
 | Attribute | Description | Comment
@@ -206,9 +211,7 @@ to be `network/name-of-listener/connection-queue` i.e. `name=network/http-listen
 [[connector-container-work-statistics]]
 ==== Connector Container Work Management Statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=connector-service-mon,name=jms-service/work-management`
-to monitor this MBean.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=connector-service-mon,name=jms-service/work-management` to monitor this MBean.
 
 |===
 | Attribute | Description | Comment
@@ -244,9 +247,7 @@ to monitor this MBean.
 [[deployment-module-statistics]]
 ==== Deployment Module Statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=deployment-mon,name=deployment/lifecycle`
-to monitor this MBean.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=deployment-mon,name=deployment/lifecycle` to monitor this MBean.
 
 |===
 | Attribute | Description | Comment
@@ -266,20 +267,18 @@ to monitor this MBean.
 [[ejb-security-deployment-statistics]]
 ==== EJB Security Deployment statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=ejb-security-mon,name=security/ejb` to
-monitor this MBean.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=ejb-security-mon,name=security/ejb` to monitor this MBean.
 
 |===
 | Attribute | Description | Comment
 
 | `policyconfigurationcount`
-|
 | Count of EJB policy configurations
+|
 
 | `securitymanagercount`
-|
 | Count of EJB security managers
+|
 |===
 
 [[thread-pool-executor]]
@@ -288,9 +287,7 @@ monitor this MBean.
 [[thread-pool-executor-statistics]]
 ==== `ThreadPoolExecutor` Statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=exec-pool-mon,name=ejb/default-exec-pool`
-to monitor this MBean.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=exec-pool-mon,name=ejb/default-exec-pool` to monitor this MBean.
 
 |===
 | Attribute | Description | Comment
@@ -334,10 +331,7 @@ to monitor this MBean.
 [[jdbc-connection-statistics]]
 ==== JDBC Connection Statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=jdbc-connection-pool-mon,name=resources/NameOfPool`
-to monitor this MBean, replacing `NameOfPool` to whatever the actual name of
-the pool is i.e. *DerbyPool*.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=jdbc-connection-pool-mon,name=resources/NameOfPool` to monitor this MBean, replacing `NameOfPool` to whatever the actual name of the pool is i.e. *H2Pool*.
 
 |===
 | Attribute | Description | Comment
@@ -361,10 +355,8 @@ the pool is i.e. *DerbyPool*.
 | `numconnfailedvalidation`
 | The total number of connections in the connection pool that failed validation from the start time until the last sample time
 |
-
 | `connrequestwaittime`
-| The longest and shortest wait times of connection requests. The current value
-indicates the wait time of the last request that was serviced by the pool.
+| The longest and shortest wait times of connection requests. The current value indicates the wait time of the last request that was serviced by the pool.
 | Unit is milliseconds
 
 | `numconnacquired`
@@ -392,8 +384,7 @@ indicates the wait time of the last request that was serviced by the pool.
 |
 
 | `numconntimedout`
-| The total number of connections in the pool that timed out between the start
-time and the last sample time
+| The total number of connections in the pool that timed out between the start time and the last sample time
 |
 |===
 
@@ -403,14 +394,11 @@ time and the last sample time
 [[keep-alive-statistics]]
 ==== Keep-Alive Statistics
 
-This MBean is for network connections in keep-alive mode. For more details on
-`keep-alive` see https://tools.ietf.org/html/rfc7230#section-6.3[RFC 7230 6.3].
-As of *HTTP 1.1* all connections are `keep-alive` unless declared otherwise.
+This MBean is for network connections in keep-alive mode. For more details on `keep-alive` see https://tools.ietf.org/html/rfc7230#section-6.3[RFC 7230 6.3].
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=keep-alive-mon,name=network//keep-alive`
-to use this MBean. To monitor a specific network connection set the name value
-to be `network/name-of-listener/keep-alive` i.e. `name=network/http-listener-1/keep-alive`.
+NOTE: As of *HTTP 1.1* all connections are `keep-alive` unless declared otherwise.
+
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=keep-alive-mon,name=network//keep-alive` to use this MBean. To monitor a specific network connection set the name value to be `network/name-of-listener/keep-alive` i.e. `name=network/http-listener-1/keep-alive`.
 
 |===
 | Attribute | Description | Comment
@@ -442,10 +430,7 @@ to be `network/name-of-listener/keep-alive` i.e. `name=network/http-listener-1/k
 [[managed-executor-service-statistics]]
 ==== `ManagedExecutorService` Statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=managed-executor-service-mon,name=executorService/concurrent/NameOfManagedExecutorService`
-to use this MBean, replacing `NameOfManagedExecutorService` to whatever the actual
-name of the service is i.e. `__defaultManagedExecutorService`.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=managed-executor-service-mon,name=executorService/concurrent/NameOfManagedExecutorService` to use this MBean, replacing `NameOfManagedExecutorService` to whatever the actual name of the service is i.e. `__defaultManagedExecutorService`.
 
 |===
 | Attribute | Description | Comment
@@ -474,11 +459,7 @@ name of the service is i.e. `__defaultManagedExecutorService`.
 [[message-driven-beans]]
 === Message Driven Beans
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=message-driven-bean-mon,name=applicationName/ClassUsingBean`
-to use this MBean, replacing `applicationName` with the name of your application
-using JMS and `ClassUsingBean` with the class that has the `@MessageDriven`
-annotation on it.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=message-driven-bean-mon,name=applicationName/ClassUsingBean` to use this MBean, replacing `applicationName` with the name of your application  using JMS and `ClassUsingBean` with the class that has the `@MessageDriven` annotation on it.
 
 |===
 | Attribute | Description | Comment
@@ -502,25 +483,20 @@ annotation on it.
 [[web-container-http-statistics]]
 ==== Web Container HTTP Service Statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=request-mon,name=http-service/VirtualServer/request`
-to use this MBean, replacing `VirtualServer` name of the virtual server it is
-running on. This MBean differs from Connection Queue statistics by being selected
-by virtual server rather than by listener, as well as providing some additional
-information about responses.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=request-mon,name=http-service/VirtualServer/request` to use this MBean, replacing `VirtualServer` name of the virtual server it is  running on.
+
+This MBean differs from Connection Queue statistics by being selected  by virtual server rather than by listener, as well as providing some additional  information about responses.
 
 |===
 | Attribute | Description | Comment
 
 | `method`
 | The method of the last request serviced
-| This will be one of `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `TRACE`, `OPTIONS`,
-`CONNECT` or `PATCH`
+| This will be one of `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `TRACE`, `OPTIONS`, `CONNECT` or `PATCH`
 
 | `countopenconnections`
 | The number of open connections
-| Unlike most other attributes with count in the name, this one is the current
-number rather than total over the server lifetime
+| Unlike most other attributes with count in the name, this one is the current number rather than total over the server lifetime
 
 | `countrequests`
 | The number of requests received
@@ -531,8 +507,7 @@ number rather than total over the server lifetime
 |
 
 | `maxtime`
-| Longest response time for a request; not a cumulative value, but the largest
-response time from among the response times
+| Longest response time for a request; not a cumulative value, but the largest response time from among the response times
 |
 
 | `count200`
@@ -592,8 +567,7 @@ response time from among the response times
 |
 
 | `errorcount`
-| Cumulative value of the error count, with error count representing the number
-of cases where the response code was greater than or equal to *400*
+| Cumulative value of the error count, with error count representing the number of cases where the response code was greater than or equal to *400*
 |
 
 | `processingtime`
@@ -604,8 +578,7 @@ of cases where the response code was greater than or equal to *400*
 [[security-realm]]
 === Security Realm
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=security-realm-mon,name=security/realm`
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=security-realm-mon,name=security/realm`
 to use this MBean.
 
 |===
@@ -619,8 +592,7 @@ to use this MBean.
 [[server]]
 === Server
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=server-runtime-mon` to use this MBean.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=server-runtime-mon` to use this MBean.
 
 |===
 | Attribute | Description | Comment
@@ -640,11 +612,9 @@ In JMX Logging set value to
 [[web-container-servlet-statistics]]
 ==== Web Container Servlet Statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=servlet-mon,name=ApplicationName/InstanceName/ServletName`
-to use this MBean, where `ApplicationName` is the name of your application and
-`InstanceName` is the instance it is running. This MBean provides information on
-all servlets within an application.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=servlet-mon,name=ApplicationName/InstanceName/ServletName` to use this MBean, where `ApplicationName` is the name of your application and `InstanceName` is the instance it is running.
+
+This MBean provides information on all servlets within an application.
 
 |===
 | Attribute | Description | Comment
@@ -665,13 +635,9 @@ all servlets within an application.
 [[web-container-servlet-instance-statistics]]
 ==== Web Container Servlet Instance Statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=servlet-instance-mon,name=ApplicationName/VirtualServerName/ServletName`
-to use this MBean, where `ApplicationName` is the name of your application,
-`VirtualServerName` is the virtual server it is running on and `ServletName`
-is the name of the servlet to access. If the servlet is annotation with
-`@WebServlet(name = "ServletName")` then the servlet name will be the name in the
-annotation, otherwise it is the fully qualified class name.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=servlet-instance-mon,name=ApplicationName/VirtualServerName/ServletName` to use this MBean, where `ApplicationName` is the name of your application, `VirtualServerName` is the virtual server it is running on and `ServletName` is the name of the servlet to access.
+
+If the servlet is annotation with  `@WebServlet(name = "ServletName")` then the servlet name will be the name in the annotation, otherwise it is the fully qualified class name.
 
 |===
 | Attribute | Description | Comment
@@ -700,10 +666,7 @@ annotation, otherwise it is the fully qualified class name.
 [[singleton-bean]]
 === Singleton Bean
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=singleton-bean-mon,name=ApplicationsName/ClassName`
-where `ApplicationName` is the name of your application and `ClassName` of the
-name of the Singleton EJB class.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=singleton-bean-mon,name=ApplicationsName/ClassName` where `ApplicationName` is the name of your application and `ClassName` of the  name of the Singleton EJB class.
 
 |===
 | Attribute | Description | Comment
@@ -748,10 +711,7 @@ name of the Stateful EJB class.
 [[stateless-bean]]
 === Stateless Bean
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=stateless-bean-mon,name=ApplicationsName/ClassName`
-where `ApplicationName` is the name of your application and `ClassName` of the
-name of the Stateless EJB class.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=stateless-bean-mon,name=ApplicationsName/ClassName` where `ApplicationName` is the name of your application and `ClassName` of the  name of the Stateless EJB class.
 
 |===
 | Attribute | Description | Comment
@@ -775,11 +735,9 @@ name of the Stateless EJB class.
 [[thread-pool-statistics]]
 ==== Thread Pool Statistics
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=thread-pool-mon,name=network/NetworkListenerName/thread-pool`
-where `NetworkListenerName` is the name of the network listener to monitor.
-Alternatively set the value to `amx:pp=/mon/server-mon[server],type=thread-pool-mon,name=network//global-thread-pool-stats`
-for totals across all thread pools.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=thread-pool-mon,name=network/NetworkListenerName/thread-pool` where `NetworkListenerName` is the name of the network listener to monitor.
+
+Alternatively set the value to `amx:pp=/mon/server-mon[server],type=thread-pool-mon,name=network//global-thread-pool-stats` for totals across all thread pools.
 
 |===
 | Attribute | Description | Comment
@@ -808,9 +766,7 @@ for totals across all thread pools.
 [[transaction-service]]
 === Transaction Service
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=transaction-service-mon,name=transaction-service`
-to use this MBean.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=transaction-service-mon,name=transaction-service` to use this MBean.
 
 |===
 | Attribute | Description | Comment
@@ -835,9 +791,7 @@ to use this MBean.
 [[virtual-server]]
 === Virtual Server
 
-In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=virtualserverinfo-mon,name=http-service/VirtualServerName`
-where `VirtualServerName` is the name of the virtual server.
+In JMX Logging set value to `amx:pp=/mon/server-mon[server],type=virtualserverinfo-mon,name=http-service/VirtualServerName` where `VirtualServerName` is the name of the virtual server.
 
 |===
 | Attribute | Description | Comment
@@ -863,17 +817,13 @@ where `VirtualServerName` is the name of the virtual server.
 ==== Web Request
 
 In JMX Logging set value to
-`amx:pp=/mon/server-mon[server],type=web-request-mon,name=ApplicationName/VirtualServer`
-where `ApplicationName` is the name of your application and `VirtualServer` is
-the name of the virtual server it is running on. There is also the special value of
-`web/request` for all requests to every virtual server and application.
+`amx:pp=/mon/server-mon[server],type=web-request-mon,name=ApplicationName/VirtualServer` where `ApplicationName` is the name of your application and `VirtualServer` is  the name of the virtual server it is running on. There is also the special value of `web/request` for all requests to every virtual server and application.
 
 |===
 | Attribute | Description | Comment
 
 | `errorcount`
-| Cumulative value of the error count, with error count representing the number of
-cases where the response code was greater than or equal to *400*
+| Cumulative value of the error count, with error count representing the number of cases where the response code was greater than or equal to *400*
 |
 
 | `requestcount`
@@ -885,14 +835,11 @@ cases where the response code was greater than or equal to *400*
 |
 
 | `maxtime`
-| Longest response time for a request; not a cumulative value, but the largest
-response time from among the response times
+| Longest response time for a request; not a cumulative value, but the largest response time from among the response times
 |
 |===
 
+[[openmq-mbeans]]
 == OpenMQ MBeans
 
-Payara Server includes OpenMQ as a JMS broker, which includes its own MBeans.
-Documentation on them can be found in the official
-https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-jmx.pdf[GlassFish reference guide for coding JMX clients].
-Check section 3: _Message Queue MBean Reference_
+Payara Server includes OpenMQ as a JMS broker, which includes its own MBeans.Documentation on them can be found in the official link:https://eclipse-ee4j.github.io/openmq/guides/mq-dev-guide-java/toc.html[Eclipse Open Message Queue Developer's Guide for Java Clients].
