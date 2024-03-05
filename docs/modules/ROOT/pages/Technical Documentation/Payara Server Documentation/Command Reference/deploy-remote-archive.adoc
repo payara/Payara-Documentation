@@ -1,20 +1,20 @@
-[[deploy]]
-= deploy
+[[deploy-remote-archive]]
+= deploy-remote-archive
 
-Deploys the specified component.
+Deploys the specified component from a remote location.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin [asadmin-options] deploy [--help] 
+asadmin [asadmin-options] deploy-remote-archive [--help]
 [--force={false|true}] 
 [--virtualservers virtual_servers]
 [--contextroot context_root] 
 [--precompilejsp={false|true}] 
 [--verify={false|true}]
-[--name component_name] 
+[--name component_name]
 [--upload={true|false}]
 [--retrieve local_dirpath] 
 [--dbvendorname dbvendorname]
@@ -35,19 +35,21 @@ asadmin [asadmin-options] deploy [--help]
 [--type pkg-type]
 [--properties(name=value)[:name=value]*]
 [--skipdsfailure]
-[file_archive|filepath]
+[--additionalRepositories (repo1,repo2,...,repoN)]
+[url|(groupId,artefactId,versionNumber)]
 ----
 
 [[description]]
 == Description
 
-The `deploy` subcommand deploys applications to the server. Applications can be enterprise applications, web applications, Enterprise JavaBeans (EJB) modules, connector modules, and application client modules. If the component is already deployed or already exists, it is forcibly redeployed if the `--force` option is set to `true` (default is `false`).
+The `deploy-remote-archive` subcommand deploys applications to the server and works in exactly the same as the xref:Technical Documentation/[`deploy`] subcommand, but instead of accepting a local file path as its operand this command deploys an artifact that is available on a remote location via:
 
-The `--createtables` and `--dropandcreatetables` options are boolean flags and therefore can take the values of true or false. These options are only used during deployment of CMP beans that have not been mapped to a database (that is, no `sun-cmp-mappings.xml` descriptor is provided in the module's `META-INF` directory). They are ignored otherwise.
-
-The `--createtables` and `--dropandcreatetables` options are mutually exclusive; only one should be used. If drop and/or create tables fails, the deployment does not fail; a warning message is provided in the log file.
+* A public URL where the artifact is hosted.
+* A set of Maven GAV coordinates where the artifact is hosted.
 
 This subcommand is supported in remote mode only.
+
+WARNING: Although the command can accept a set Maven GAV coordinates, it does not actually make use of Maven, and so artefacts will not be saved into your local Maven repository.
 
 [[options]]
 == Options
@@ -84,8 +86,8 @@ asadmin-options::
   If a directory filepath is specified, this option is ignored.
 `--retrieve`::
   Retrieves the client stub JAR file from the server machine to the local directory.
-`--dbvendorname`::
 //TODO - Consider removing JavaDB/Derby support
+`--dbvendorname`::
   Specifies the name of the database vendor for which tables are created. Supported values include `db2`, `mssql`, `h2`, `mysql`, `oracle`, `derby`, `javadb`, `postgresql`, and `sybase`. These values are case-insensitive. If not specified, the value of the `database-vendor-name` attribute in `glassfish-ejb-jar.xml` is used. If no value is specified, a connection is made to the resource specified by the `jndi-name` subelement of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file, and the database vendor name read. If the connection cannot be established, or if the value is not valid, SQL-92 compliance is presumed.
 `--createtables`::
   If specified as true, creates tables at deployment of an application with unmapped CMP beans. If specified as false, tables are not created. If not specified, the value of the `create-tables-at-deploy` entry in the `cmp-resource` element of the `glassfish-ejb-jar.xml` file determines whether or not tables are created. No unique constraints are created for the tables.
@@ -113,9 +115,9 @@ asadmin-options::
 `--lbenabled`::
   This option controls whether the deployed application is available for load balancing. The default is true.
 `--keepstate`::
-  This option controls whether web sessions, SFSB instances, and persistently created EJB timers are retained between redeployments. +
+  This option controls whether web sessions, SFSB instances, and persistently created EJB timers are retained between re-deployments. +
   The default is false. This option is supported only on the default server instance, named `server`. It is not supported and ignored for any other target. +
-  Some changes to an application between redeployments prevent this feature from working properly. For example, do not change the set of instance variables in the SFSB bean class. +
+  Some changes to an application between re-deployments prevent this feature from working properly. For example, do not change the set of instance variables in the SFSB bean class. +
   For web applications, this feature is applicable only if in the `glassfish-web-app.xml` file the `persistence-type` attribute of the `session-manager` element is `file`. +
   For stateful session bean instances, the persistence type without high availability is set in the server (the `sfsb-persistence-type` attribute) and must be set to `file`, which is the default and recommended value. +
   If any active web session, SFSB instance, or EJB timer fails to be preserved or restored, none of these will be available when the redeployment is complete. However, the redeployment continues and a warning is logged. +
@@ -169,7 +171,6 @@ asadmin-options::
     If set to `true`, preserves any application-scoped resources and restores them during redeployment. Default is `false`. +
   Other available properties are determined by the implementation of the component that is being redeployed. +
   For components packaged as OSGi bundles (`--type=osgi`), the `deploy` subcommand accepts properties arguments to wrap a WAR file as a WAB (Web Application Bundle) at the time of deployment. The subcommand looks for a key named `UriScheme` and, if present, uses the key as a URL stream handler to decorate the input stream. Other properties are used in the decoration process. For example, the Payara Server OSGi web container registers a URL stream handler named `webbundle`, which is used to wrap a plain WAR file as a WAB. For more information about usage, see the example in this help page.
-
 `--skipdsfailure`::
 This option will skip over a data source failure. This means an application can be deployed with a data source set up, but the database need not be running at the time.
 +
@@ -179,130 +180,64 @@ Without this option the deployment would fail if a data source is defined and th
 ----
 asadmin deploy --skipdsfailure /home/mark/clusterjsp-1.1.war
 ----
+`--additionalRepositories`::
+This option is used to instruct the command additional Maven2 remote repositories on top of Maven Central that the command can use to look for the artifact when a set of GAV coordinates are used in the operand. The value this option takes is a comma-separated string of all remote repositories URLs, like this:
++
+----
+https://nexus.payara.fish/payara-artifacts,https://google.co.uk
+----
++
+NOTE:  If an application artifact matching the GAV coordinates exists on multiple repositories, the first artifact found will be deployed. The order that the repositories are searched is the order that you specify them in. +
+For example, if this option's value is _repo1,repo2_, the order that the repositories would be searched is: _Maven Central_ -> _repo1_ -> _repo2_.
 
 [[operands]]
 == Operands
 
-file_archive|filepath::
-  The path to the archive that contains the application that is being deployed. This path can be a relative path or an absolute path. The archive can be in either of the following formats:
-  * An archive file, for example, `/export/JEE_apps/hello.war`. +
-  If the `--upload` option is set to `true`, this is the path to the deployable file on the local client machine. If the `--upload` option is set to `false`, this is the path to the file on the server machine.
-  * A directory that contains the exploded format of the deployable archive. This is the path to the directory on the server machine. If you specify a directory, the `--upload` option is ignored.
+url|(groupId,artifactId,versionNumber)::
+This operand supports 2 type of values:
++
+* The URL where the archive that contains the application that is being deployed is located. This URL must correspond to publicly available HTTP(S) resources.
+* A set of Maven GAV coordinates (`groupId`, `artifactId`, `versionNumber`) where the application artifact can be located in a remote Maven repository. The three coordinates are specified in a comma-separated string.
++
+TIP: By default, the command will look for a matching artifact in Maven Central. Additional Maven repositories can be configured using the `--additionalRepositories` option
 
 [[examples]]
 == Examples
 
-*Example 1 Deploying an Enterprise Application*
+*Example 1 Deploying an Application hosted on a public HTTP(S) location*
 
-This example deploys the enterprise application packaged in the `Cart.ear` file to the default server instance `server`. You can use the `--target` option to deploy to a different server instance or to a cluster.
-
-[source,shell]
-----
-asadmin> deploy Cart.ear
-Application deployed successfully with name Cart.
-Command deploy executed successfully
-----
-
-*Example 2 Deploying a Web Application With the Default Context Root*
-
-This example deploys the web application in the `hello.war` file to the default server instance `server`. You can use the `--target` option to deploy to a different server instance or to a cluster.
+This example deploys the enterprise application packaged in the `clusterjsp-1.1.war` file to the default server instance `server`, which is hosted in the remote location pointed by the `https://nexus.payara.fish/repository/payara-artifacts/fish/payara/testing/clusterjsp/1.1/clusterjsp-1.1.war` URL:
 
 [source,shell]
 ----
-asadmin> deploy hello.war
-Application deployed successfully with name hello.
-Command deploy executed successfully
+asadmin deploy-remote-archive --name clusterjsp https://nexus.payara.fish/repository/payara-artifacts/fish/payara/testing/clusterjsp/1.1/clusterjsp-1.1.war
+
+Application deployed successfully with name clusterjsp.
+Command deploy-remote-archive executed successfully
 ----
 
-*Example 3 Forcibly Deploying a Web Application With a Specific Context Root*
+*Example 2 Deploying a Web Application Using GAV coordinates*
 
-This example forcibly deploys the web application in the `hello.war` file. The context root of the deployed web application is `greetings`. If the application has already been deployed, it is redeployed.
+This example deploys the web application in the `clusterjsp-1.1.war` file to the default server instance `server`. This application can be located in the `fish.payara.testing:clusterjsp:1.1` GAV coordinates:
 
 [source,shell]
 ----
-asadmin> deploy --force=true --contextroot greetings hello.war
-Application deployed successfully with name hello.
-Command deploy executed successfully
+asadmin deploy-remote-archive --name clusterjsp fish.payara.testing,clusterjsp,1.1
+
+Application deployed successfully with name clusterjsp.
+Command deploy-remote-archive executed successfully
 ----
 
-*Example 4 Deploying an Enterprise Bean*
+*Example 3 Deploying a Web Application Using GAV coordinates using an additional remote repository*
 
-This example deploys a component based on the EJB specification (enterprise bean) with CMP and creates the database tables used by the bean.
-
-This example uses the `--target` option. The target in this example is an existing cluster, `cluster1`.
+This example deploys the web application in the `clusterjsp-1.1.war` file to the default server instance `server` like the previous one, but configures the command to search for the Maven artifact on the remote repository `https://nexus.payara.fish/repository/payara-artifacts`:
 
 [source,shell]
 ----
-asadmin> deploy --createtables=true --target cluster1 EmployeeEJB.jar
-Application deployed successfully with name EmployeeEJB.
-Command deploy executed successfully
-----
+asadmin deploy-remote-archive --name clusterjsp --additionalRepositories https://nexus.payara.fish/repository/payara-artifacts fish.payara.testing,clusterjsp,1.1
 
-*Example 5 Deploying a Connector Module*
-
-This example deploys a connector module that is packaged in a RAR file.
-
-This example uses the `--target` option. The target in this example is an existing standalone server instance that does not belong to a cluster.
-
-[source,shell]
-----
-asadmin> deploy --target myinstance jdbcra.rar
-Application deployed successfully with name jdbcra.
-Command deploy executed successfully
-----
-
-*Example 6 Specifying the Deployment Order for an Application*
-
-This example specifies the deployment order for two applications. The `cart` application is loaded before the `horse` application at server startup.
-
-Some lines of output are omitted from this example for readability.
-
-[source,shell]
-----
-asadmin> deploy --deploymentorder 102 --name cart cart.war
-...
-asadmin> deploy --deploymentorder 110 --name horse horse.war
-...
-----
-
-*Example 7 Deploying an Application Using an Alternate Jakarta EE 8 Deployment Descriptor File*
-
-This example deploys an application using a Jakarta EE standard deployment descriptor file that resides outside the application archive.
-
-[source,shell]
-----
-asadmin> deploy --altdd path_to_alternate_descriptor cart.ear
-Application deployed successfully with name cart.
-Command deploy executed successfully
-----
-
-*Example 8 Deploying an Application Using an Alternate Payara Server Deployment Descriptor File*
-
-This example deploys an application using a Payara Server runtime deployment descriptor file that resides outside the application archive.
-
-[source,shell]
-----
-asadmin> deploy --runtimealtdd path_to_alternate_runtime_descriptor horse.ear
-Application deployed successfully with name horse.
-Command deploy executed successfully
-----
-
-*Example 9 Wrapping a WAR File as a WAB*
-
-This example wraps a plain WAR file as a WAB when an OSGi bundle is deployed, and is specific to components packaged as OSGi bundles.
-
-The backslash (\) character is used to escape characters in the command. For more information about escape characters in options for the `asadmin` utility, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
-
-[source,shell]
-----
-asadmin deploy --type osgi \
---properties "UriScheme=webbundle:Bundle-SymbolicName=bar:\
-Import-Package=javax.servlet;javax.servlet.http;
-%20version\\=3.0;resolution\\:
-=mandatory:Web-ContextPath=/foo" \
-/tmp/test_sample1.war
-Application deployed successfully with name sample1.
-Command deploy executed successfully
+Application deployed successfully with name clusterjsp.
+Command deploy-remote-archive executed successfully
 ----
 
 [[exit-status]]
@@ -318,9 +253,4 @@ Command deploy executed successfully
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/get.adoc#get[`get`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/list-components.adoc#list-components[`list-components`],
-* xref:Technical Documentation/Payara Server Documentation/Command Reference/redeploy.adoc#redeploy[`redeploy`],
-* xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc#set[`set`],
-* xref:Technical Documentation/Payara Server Documentation/Command Reference/undeploy.adoc#undeploy[`undeploy`]
-* link:../application-deployment-guide/toc.html#GSDPG[Payara Server Application Deployment section]
-
-
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/deploy.adoc#deploy[`deploy`]

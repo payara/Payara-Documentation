@@ -1,7 +1,7 @@
-[[elements-of-the-payara-server-deployment-descriptors]]
-= Elements of the Payara Server Deployment Descriptors
+[[elements-of-the-payara-platform-deployment-descriptors]]
+= Elements of the Payara Platform Deployment Descriptors
 
-This appendix describes the elements of the Payara Server deployment descriptors.
+This appendix describes the elements of the Payara Platform deployment descriptors.
 
 [[activation-config]]
 == `activation-config`
@@ -27,8 +27,7 @@ The following table describes subelements for the `activation-config` element.
 
 a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#description[`description`]
 |zero or one
-|Specifies a text description of the activation
-configuration.
+|Specifies a text description of the activation configuration.
 
 a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#activation-config-property[`activation-config-property`]
 |one or more
@@ -170,6 +169,7 @@ a|
 === Properties
 
 Properties of the `admin-object-resource` element are the names of setter methods of the class referenced by the `adminobject-class` of the `ra.xml` file.
+
 Some of the property names can be specified in the `adminobjectType` element.
 
 [[as-context]]
@@ -210,8 +210,8 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 == `archive-name`
 
 Specifies the name of the archive file. The value of the `archive-name` element is used to derive the default application name when `display-name` is not present in the `application.xml` file.
-The default application name is the `archive-name` value minus the file extension.
-For example, if `archive-name` is `foo.ear`, the default application name is `foo`.
+
+The default application name is the `archive-name` value minus the file extension. For example, if `archive-name` is `foo.ear`, the default application name is `foo`.
 
 [[superelements-6]]
 === Superelements
@@ -938,18 +938,18 @@ The following table describes properties for the `class-loader` element.
 
 |===
 
-
 [[classloading-delegate]]
 == `classloading-delegate`
 
 With this option its possible to enable/disable *class loading delegation*. This allows deployed application to use libraries included on them, overriding the versions included on the server.
 
-For more information about how class delegation can be configured on Payara Server, see the xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Classloading/Enhanced Classloading.adoc[Enhanced Class loading] section.
+For more information about how class delegation can be configured on Payara Server, see the xref:Technical Documentation/Application Development/class-loaders.adoc#enhanced-classloading[Enhanced Class loading] section.
 
 [[superelements-223]]
 === Superelements
 
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-web-app[`payara-web-app`] (`glassfish-web.xml` and `payara-web.xml`)
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-web-app[`payara-web-app`] (`glassfish-web.xml` and `payara-web.xml`),
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`)
 
 [[subelements-214]]
 === Subelements
@@ -1097,7 +1097,9 @@ The following table describes attributes for the `client-credential` element.
 [[clustered-attach-postconstruct]]
 == `clustered-attach-postconstruct`
 
-Describes whether to call @PostConstruct each time the bean is created on a different node. Will result in multiple calls. Valid values are true or false. The default value is true.
+Describes whether to call a `@PostConstruct` event listener each time the corresponding singleton bean is created on a different node. This setup will result in multiple calls. Valid values are `true` or `false`.
+
+The default value is `true`.
 
 [[superelements-231]]
 === Superelements
@@ -1112,9 +1114,9 @@ none
 [[clustered-bean]]
 == `clustered-bean`
 
-Describes whether this bean should be a Clustered Singleton. Can be applied only to singleton EJBs.
+Describes whether this bean should be a xref:Technical Documentation/Public API/Clustered Singleton.adoc[Clustered Singleton]. Can be applied only to singleton EJBs.
 
-Valid values are true or false. The default value is false.
+Valid values are `true` or `false`. The default value is `false`.
 
 [[superelements-232]]
 === Superelements
@@ -1129,8 +1131,9 @@ none
 [[clustered-detach-predestroy]]
 == `clustered-detach-predestroy`
 
-Whether to call @PreDestroy when the singleton is destroyed on an instance while still being available on another. Will result in multiple calls.
-Valid values are true or false. The default value is true.
+Whether to call a `@PreDestroy` event listener when a singleton EJB bean is destroyed on an instance while still being available on another. This setup will result in multiple calls.
+
+Valid values are `true` or `false`. The default value is `true`.
 
 [[superelements-233]]
 === Superelements
@@ -1145,9 +1148,9 @@ none
 [[clustered-key-name]]
 == `clustered-key-name`
 
-The key used for replication of clustered beans. Applies to singleton EJBs when `clustered-bean` is set to `true`.
+The key used for replication of clustered singletons beans. Applies to a singleton EJBs when the `clustered-bean` element is set to `true`.
 
-WARNING: This element is optional. If not set, the default value is the value of the `ejb-name` element.
+WARNING: This element is optional. If not set, the default key is the value of the `ejb-name` element.
 
 [[superelements-234]]
 === Superelements
@@ -1162,13 +1165,12 @@ none
 [[clustered-lock-type]]
 == `clustered-lock-type`
 
-Describes the type of distributed locking to be performed.
+Describes the type of distributed locking to be performed for a clustered singleton bean:
 
-For EJB beans, only `INHERIT` and `LOCK_NONE` are valid.
+* For EJB beans, only `INHERIT` and `LOCK_NONE` are valid.
+* For CDI beans, valid values are `LOCK` and `INHERIT`, which is equivalent to using `LOCK_NONE`.
 
-For CDI beans, valid values are `LOCK` and `INHERIT`, which is equivalent to using `LOCK_NONE`.
-
-Default value is `INHERIT`
+The default value is `INHERIT`
 
 [[superelements-235]]
 === Superelements
@@ -1866,26 +1868,6 @@ If `match-expr` is `greater` or `lesser`, the value must be a number. If
 
 |===
 
-[[container-initializer-enabled]]
-== `container-initializer-enabled`
-
-This property configures whether to enable or disable the calling of `ServletContainerInitializer` component classes defined in JAR files bundled inside a WAR assembly.
-
-For performance considerations, you can explicitly disable the servlet container initializer by setting the `container-initializer-enabled` element to `false`. This can help solve the deployment of web applications that can suffer from conflicts with a custom bootstrapping process.
-
-The default value for this configuration element is `true`.
-
-[[superelements-226]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-web-app[`glassfish-web-app`] (`glassfish-web.xml` and `payara-web.xml`)
-
-[[subelements-216]]
-=== Subelements
-
-none - contains data
-
-
 [[context-root]]
 == `context-root`
 
@@ -1943,7 +1925,7 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 The following table describes properties for the `cookie-properties` element.
 
 .`cookie-properties` Properties
-[cols="3,2,6",options="header"]
+[cols="3,2,6a",options="header"]
 |===
 |Property |Default |Description
 
@@ -1969,14 +1951,19 @@ Sets the `Secure` attribute of any `JSESSIONID` cookies associated with the web 
 
 * `true` — Sets `Secure` to `true`.
 * `false` — Sets `Secure` to `false`.
-* `dynamic` — The `JSESSIONID` cookie inherits the `Secure` setting of
-the request that initiated the session.
+* `dynamic` — The `JSESSIONID` cookie inherits the `Secure` setting of the request that initiated the session.
 
 To set the `Secure` attribute of a `JSESSIONIDSSO` cookie, use the `ssoCookieSecure` `virtual-server` property.
+
 For details, see xref:Technical Documentation/Payara Server Documentation/Command Reference/create-virtual-server.adoc[`create-virtual-server`].
 
 |`cookieHttpOnly` |none |Specifies that the cookie is marked HTTP only. Allowed values are `true` or `false`.
-|`cookieSameSite` |none |Users can set up the SameSite Cookie attribute at the application level by using the payara-web.xml deployment descriptor. Set this attribute by using the cookie-properties tag with a child property named cookieSameSite. Example: <property name="cookieSameSite" value="Strict" />
+|`cookieSameSite` |none |Users can set up the link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value[`SameSite`] Cookie attribute for the corresponding web application. Can be one of `Strict`, `Lax` or `None`. For example:
+
+[source, xml]
+----
+<property name="cookieSameSite" value="Strict" />
+----
 
 |===
 
@@ -2195,45 +2182,6 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 |Specifies password of the default resource principal.
 
 |===
-
-[[default-role-mapping]]
-== `default-role-mapping`
-
-With this property, you can set whether to enable the default group to role mappings for your application's security settings. This element is set up as a `property` element with a `Boolean` value attribute like this:
-
-[source, xml]
-----
-<property name="default-role-mapping" value="true">
-  <description>Enable default group to role mapping</description>
-</property>
-----
-
-Enabling the default group to role mappings will cause all named groups in the application's linked security _realm_ to be mapped to a role of the same name. This will save you the time of having to redefine the same roles and map them to the realm groups each time they are modified.
-
-This will have the same effect as executing the following `asadmin` command:
-
-[source, shell]
-----
-asadmin set configs.config.server-config.security-service.activate-default-principal-to-role-mapping=true
-----
-
-Except its effect will only limit itself to the application instead of all applications deployed on the server.
-
-The default value of this property is `false`. This property can be set in the `glassfish-web.xml`, `glassfish-ejb-jar.xml` and `glassfish-application.xml` deployment descriptors.
-
-In an EAR assembly, only the property set in the `glassfish-application.xml` will take effect and if set in the `glassfish-web.xml` and `glassfish-ejb-jar.xml`, it will be ignored. Setting this configuration property in any of these files will always take precedence over any setting configured on the server.
-
-[[superelements-227]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`),
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-web-app[`glassfish-web-app`] (`glassfish-web-app.xml`),
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-ejb-jar[`glassfish-ejb-jar`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-217]]
-=== Subelements
-
-property (with attributes)
 
 [[description]]
 == `description`
@@ -2462,6 +2410,26 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 |zero or one
 |Specifies the per-request load balancing behavior of EJB 2.x and 3.x remote client invocations on a stateless session bean.
 
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#clustered-attach-postconstruct[`clustered-attach-postconstruct`]
+|zero or one
+|Used for clustered singletons. Defines whether the bean's `@PostConstruct` event is called each time it is created on different nodes.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#clustered-bean[`clustered-bean`]
+|zero or one
+|Defines whether the bean is treated as a clustered singleton.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#clustered-detach-predestroy[`clustered-detach-predestroy`]
+|zero or one
+|Used for clustered singletons. Defines whether the bean's `@PreDestroy` event is called when the bean is destroyed on a node while available on another.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#clustered-key-name[`clustered-key-name`]
+|zero or one
+|Used for clustered singletons. Defines the name of the key used for the replication mechanism of the bean across the Data Grid.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#clustered-lock-type[`clustered-lock-type`]
+|zero or one
+|Used for clustered singletons. Defines the type of distributed lock to be performed on the bean.
+
 |===
 
 [[attributes-14]]
@@ -2596,7 +2564,9 @@ none - contains data
 [[enable-implicit-cdi]]
 == `enable-implicit-cdi`
 
-In a *WAR* file, it is possible to set the property `bean-discovery-mode` equal to `none` to turn off implicit scanning of the archive for bean defining annotations, as defined by the _CDI 1.1_ specification. The default value of this setting is defined as `annotated` in the specification, so the archive is scanned for any bean-defining annotations, which can cause unwanted side effects.
+In a *WAR* file, it is possible to set the property `bean-discovery-mode` equal to `none` to turn off implicit scanning of the archive for bean defining annotations, as defined by the CDI 1.1 specification.
+
+The default value of this setting is defined as `annotated` in the specification, so the archive is scanned for any bean-defining annotations, which can cause unwanted side effects.
 
 In the `glassfish-application.xml` deployment descriptor for an EAR file, the property `enable-implicit-cdi` can be set to `false` to achieve the same goal for all modules inside the EAR assembly. The default value is `true`, in line with the default value for WAR files.
 
@@ -2611,7 +2581,7 @@ If implicit CDI scanning causes problems for an EAR assembly, the value `false` 
 
 The default behavior of the admin console is for the *Implicit CDI* checkbox to be enabled, but this will *not* override the application configuration.
 
-IMPORTANT: When implicit CDI is configured by using either the `enable-implicit-cdi` property in the `glassfish-application.xml` or the attribute `bean-discovery-mode="none"` from the `beans.xml` file in a WAR, the admin console checkbox _*is always ignored*_.
+IMPORTANT: When implicit CDI is configured by using either the `enable-implicit-cdi` property in the `glassfish-application.xml` or the attribute `bean-discovery-mode="none"` from the `beans.xml` file in a WAR, the admin console checkbox _is always ignored_.
 
 [[superelements-225]]
 === Superelements
@@ -2747,6 +2717,31 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
  </ejb>
 </enterprise-beans>
 ----
+
+[[properties-enterprise-beans]]
+=== Properties
+
+The following table describes properties for the `enterprise-beans` element.
+
+.`enterprise-beans` Properties
+[cols="3,2,6",options="header"]
+|===
+|Property |Default |Description
+
+|`default-role-mapping`
+|`false`
+a|
+With this property, you can set whether to enable the default group to role mappings for your application's security settings. This element is set up as a `property` element with a `Boolean` value attribute like this:
+
+[source, xml]
+----
+<property name="default-role-mapping" value="true">
+  <description>Default role mapping</description>
+</property>
+----
+
+Enabling the default group to role mappings will cause all named groups in the module's linked *security realm* to be mapped to a role of the same name. This will save you the time of having to redefine the same roles and map them to the realm groups each time they are modified.
+|===
 
 [[entity-mapping]]
 == `entity-mapping`
@@ -3095,11 +3090,10 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 
 |===
 
-
 [[glassfish-application]]
 == `glassfish-application`
 
-Defines the Payara Server specific configuration for an application. This is the root element; there can only be one `glassfish-application` element in a `glassfish-application.xml` file. See xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#glassfish-application.xml[The glassfish-application.xml File].
+Defines the Payara Server specific configuration for an application. This is the root element; there can only be one `glassfish-application` element in a `glassfish-application.xml` file. See xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#the-glassfish-application.xml-file[The glassfish-application.xml File].
 
 [[superelements-73]]
 === Superelements
@@ -3178,6 +3172,62 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 |zero or one
 |Contains version information for an application.
 
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#classloading-delegate[`classloading-delegate`]
+|zero or one
+|Configures classloading delegation for the enterprise application.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#enable-implicit-cdi[`enable-implicit-cdi`]
+|zero or one
+|Enables implicit CDI bean scanning for the enterprise archive.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#scanning-exclude-and-scanning-include[`scanning-include`]
+|zero or one
+|Includes third party JAR files for CDI scanning using pattern matching.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#scanning-exclude-and-scanning-include[`scanning-exclude`]
+|zero or one
+|Excludes third party JAR files for CDI scanning using pattern matching.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#whitelist-package[`whitelist-package`]
+|zero or one
+|Marks packages to be whitelisted for extreme classloading isolation.
+
+|===
+
+[[properties-glassfish-application]]
+=== Properties
+
+The following table describes properties for the `glassfish-application` element.
+
+.`glassfish-application` Properties
+[cols="3,2,6",options="header"]
+|===
+|Property |Default |Description
+
+|`default-role-mapping`
+|`false`
+a|
+With this property, you can set whether to enable the default group to role mappings for your application's security settings. This element is set up as a `property` element with a `Boolean` value attribute like this:
+
+[source, xml]
+----
+<property name="default-role-mapping" value="true">
+  <description>Enable default group to role mapping</description>
+</property>
+----
+
+Enabling the default group to role mappings will cause all named groups in the application's linked *security realm* to be mapped to a role of the same name. This will save you the time of having to redefine the same roles and map them to the realm groups each time they are modified.
+
+This will have the same effect as executing the following `asadmin` command:
+
+[source, shell]
+----
+asadmin set configs.config.server-config.security-service.activate-default-principal-to-role-mapping=true
+----
+
+Except its effect will only limit itself to the application instead of all applications deployed on the server.
+
+WARNING: When set using this property, this configuration will ALWAYS take effect and if set in the `glassfish-web.xml` or `glassfish-ejb-jar.xml` deployment descriptors, it will be ignored.
 |===
 
 [[glassfish-application-client]]
@@ -3281,14 +3331,18 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 |zero or one
 |Contains version information for an EJB module.
 
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#webservice-default-login-config[`webservice-default-login-config`]
+|zero or one
+|Configures the default login module settings that will apply to all EJBs hosted in this archive.
+
 |===
 
 [[glassfish-web-app]]
 == `glassfish-web-app` or `payara-web-app`
 
-Defines Payara Server specific configuration for a web module. This
-is the root element; there can only be one `glassfish-web-app` element
-in a `glassfish-web.xml` and `payara-web.xml` file. See xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#glassfish-web.xml[The glassfish-web.xml File].
+Defines Payara Server specific configuration for a web module. This is the root element; there can only be one `glassfish-web-app` element in a `glassfish-web.xml` and `payara-web.xml` file.
+
+See xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#the-glassfish-web.xml-file[The glassfish-web.xml and payara-web.xml Files].
 
 [[superelements-76]]
 === Superelements
@@ -3389,6 +3443,26 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#version-identifier[`version-identifier`]
 |zero or one
 |Contains version information for a web application.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#classloading-delegate[`classloading-delegate`]
+|zero or one
+|Configures classloading delegation for the web application.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#jaxrs-roles-allowed-enabled[`jaxrs-roles-allowed-enabled`]
+|zero or one
+|Configures out of the box support for the `@RolesAllowed` annotation in a web application.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#scanning-exclude-and-scanning-include[`scanning-include`]
+|zero or one
+|Includes third party JAR files for CDI scanning using pattern matching.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#scanning-exclude-and-scanning-include[`scanning-exclude`]
+|zero or one
+|Excludes third party JAR files for CDI scanning using pattern matching.
+
+a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#whitelist-package[`whitelist-package`]
+|zero or one
+|Marks packages to be whitelisted for extreme classloading isolation.
 
 |===
 
@@ -3508,6 +3582,27 @@ is used to construct the value of the `javax.servlet.context.tempdir`
 context attribute. Compiled JSP files are also placed in this directory.
 
 |`useResponseCTForHeaders` |`false` |If `true`, response headers are encoded using the response's charset instead of the default (UTF-8).
+
+|`default-role-mapping`
+|`false`
+a|
+With this property, you can set whether to enable the default group to role mappings for your application's security settings. This element is set up as a `property` element with a `Boolean` value attribute like this:
+
+[source, xml]
+----
+<property name="default-role-mapping" value="true">
+  <description>Enable default group to role mapping</description>
+</property>
+----
+
+Enabling the default group to role mappings will cause all named groups in the application's linked *security realm* to be mapped to a role of the same name. This will save you the time of having to redefine the same roles and map them to the realm groups each time they are modified.
+a|`container-initializer-enabled`
+|`true`
+|This property configures whether to enable or disable the calling of `ServletContainerInitializer` component classes defined in JAR files bundled inside a WAR assembly.
+
+For performance considerations, you can explicitly disable the servlet container initializer by setting the `container-initializer-enabled` element to `false`.
+
+This can help solve the deployment of web applications that can suffer from conflicts with a custom bootstrapping process.
 
 |===
 
@@ -3784,11 +3879,9 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 [[jaxrs-roles-allowed-enabled]]
 == `jaxrs-roles-allowed-enabled`
 
-Payara Server and Micro both support using the `@RolesAllowed` annotation out of the box to secure JAX-RS resources.
+The Payara Platform both support using the `@RolesAllowed` annotation out of the box to secure JAX-RS resources. In some cases this may clash with existing code that interprets the same annotation using custom code.
 
-In some cases this may clash with existing code that interprets the same annotation using custom code.
-
-The out-of-the-box support of `@RolesAllowed` for JAX-RS resources can be switched off by setting the `<jaxrs-roles-allowed-enabled>` tag in `WEB-INF/glassfish-web.xml` of a war archive to `false`. E.g.
+The out-of-the-box support of `@RolesAllowed` for JAX-RS resources can be switched off by setting the `<jaxrs-roles-allowed-enabled>` element like this:
 
 [source, xml]
 ----
@@ -3799,6 +3892,7 @@ The out-of-the-box support of `@RolesAllowed` for JAX-RS resources can be switch
 === Superelements
 
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-web-app[`glassfish-web-app or payara-web-app`] (`glassfish-web-app.xml`)
+
 [[subelements-218]]
 === Subelements
 none
@@ -4712,13 +4806,10 @@ The following table describes attributes for the `mail-resource` element.
 
 |`store-protocol-` `class` |`com.sun.mail.imap.IMAPStore` a| (optional) Specifies the service provider implementation class for storage. Allowed values are:
 
-`com.sun.mail.imap.IMAPStore`
-
-`com.sun.mail.pop3.POP3Store`
-
-`com.sun.mail.imap.IMAPSSLStore`
-
-`com.sun.mail.pop3.POP3SSLStore`
+* `com.sun.mail.imap.IMAPStore`
+* `com.sun.mail.pop3.POP3Store`
+* `com.sun.mail.imap.IMAPSSLStore`
+* `com.sun.mail.pop3.POP3SSLStore`
 
 |`transport-protocol` |`smtp` |(optional) Specifies the transport protocol service, which sends messages. Allowed values are `smtp` and `smtps`.
 
@@ -4730,7 +4821,7 @@ The following table describes attributes for the `mail-resource` element.
 
 |`host` |none |The mail server host name.
 
-|`user` |none |The mail server user name.
+|`user` |none |The mail server username.
 
 |`from` |none |The email address the mail server uses to indicate the message sender.
 
@@ -4751,8 +4842,8 @@ The following table describes attributes for the `mail-resource` element.
 === Properties
 
 You can set properties for the `mail-resource` element and then get these properties in a Jakarta Mail `Session` object later. Every property name must start with a `mail-` prefix.
-The Payara Server changes the dash (`-`) character to a period (`.`) in the name of the property, then saves the property to the `MailConfiguration` and Jakarta Mail `Session` objects.
-If the name of the property doesn't start with `mail-`, the property is ignored.
+
+The Payara Server changes the dash (`-`) character to a period (`.`) in the name of the property, then saves the property to the `MailConfiguration` and Jakarta Mail `Session` objects. If the name of the property doesn't start with `mail-`, the property is ignored.
 
 For example, to define the property `mail.password` in a Jakarta Mail Session object, first edit `glassfish-resources.xml` and `payara-resources.xml` as follows:
 
@@ -4768,10 +4859,15 @@ After getting the Jakarta Mail `Session` object, get the `mail.password` propert
 
 [source, java]
 ----
-var password = session.getProperty("mail.password");
+public class Component{
+
+    public void businessMethod(){
+        var password = session.getProperty("mail.password");
+    }
+}
 ----
 
-For more information about Jakarta Mail properties, see ttps://jakarta.ee/specifications/mail[Jakarta Mail API Documentation] (`https://jakarta.ee/specifications/mail`).
+For more information about Jakarta Mail properties, see link:https://jakarta.ee/specifications/mail[Jakarta Mail API Documentation] (`https://jakarta.ee/specifications/mail`).
 
 [[manager-properties]]
 == `manager-properties`
@@ -5746,9 +5842,9 @@ The following table describes attributes for the `principal-map` element.
 [[principal-name]]
 == `principal-name`
 
-Contains the principal (user) name.
+Contains the principal username.
 
-In an enterprise bean, specifies the principal (user) name that has the `run-as` role specified.
+In an enterprise bean, specifies the principal username that has the `run-as` role specified.
 
 [[superelements-145]]
 === Superelements
@@ -5799,7 +5895,8 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#connector-resource[`connector-resource`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#custom-resource[`custom-resource`],
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#external-jndi-resource[`external-jndi-resource`],
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#jdbc-connection-pool[`jdbc-connection-pool`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#jdbc-resource[`jdbc-resource`],
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#mail-resource[`mail-resource`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#resource-adapter-config[`resource-adapter-config`] (`glassfish-resources.xml` and `payara-resources.xml`)
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#mail-resource[`mail-resource`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#resource-adapter-config[`resource-adapter-config`] (`glassfish-resources.xml` and `payara-resources.xml`),
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-web-app[`glassfish-web-app`/`payara-web-app`] (`glassfish-web.xml` and `payara-web.xml`)
 
 [[subelements-138]]
 === Subelements
@@ -6490,11 +6587,11 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 [[resources]]
 == `resources`
 
-Defines application-scoped resources for an enterprise application, web module, EJB module, connector module, or application client module.
-This is the root element; there can only be one `resources` element in a `glassfish-resources.xml` and `payara-resources.xml` file. See xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#payara-resources.xml[The glassfish-resources.xml File].
+Defines application-scoped resources for an enterprise application, web module, EJB module, connector module, or application client module. This is the root element; there can only be one `resources` element in a `glassfish-resources.xml` or `payara-resources.xml` file.
 
-NOTE: You must specify a Java Naming and Directory Interface (JNDI) name for each resource.
-To avoid collisions with names of other enterprise resources in JNDI, and to avoid portability problems, all names in a Payara Server application should begin with the string `java:app/`.
+See xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#the-glassfish-resources.xml-file[The glassfish-resources.xml and payara-resources Files].
+
+NOTE: You must specify a Java Naming and Directory Interface (JNDI) name for each resource. To avoid collisions with names of other enterprise resources in JNDI, and to avoid portability problems, all names in a Payara Server application should begin with the string `java:app/`.
 
 [[superelements-171]]
 === Superelements
@@ -6667,9 +6764,11 @@ Both the `glassfish-application.xml` and the `glassfish-web.xml` files support t
 
 [source, xml]
 ----
-<scanning-exclude>*</scanning-exclude>
-<scanning-include>ejb*</scanning-include>
-<scanning-include>conflicting-web-library</scanning-include>
+<webapp>
+    <scanning-exclude>*</scanning-exclude>
+    <scanning-include>ejb*</scanning-include>
+    <scanning-include>conflicting-web-library</scanning-include>
+</webapp>
 ----
 
 In the above example, all JARs will be excluded by default, then all JARs beginning with `ejb` will be scanned along with the JAR named `conflicting-web-library`.
@@ -6688,10 +6787,9 @@ none
 [[schema]]
 == `schema`
 
-Specifies the file that contains a description of the database schema to which the beans in this `sun-cmp-mappings.xml` file are mapped.
-If this element is empty, the database schema file is automatically generated at deployment time.
-Otherwise, the `schema` element names a `.dbschema` file with a pathname relative to the directory containing the `sun-cmp-mappings.xml` file, but without the `.dbschema` extension.
-See "xref:ROOT:Technical Documentation/Application Development/container_managed-persistence.adoc#automatic-database-schema-capture[Automatic Database Schema Capture]" in the Payara Server Application Development section.
+Specifies the file that contains a description of the database schema to which the beans in this `sun-cmp-mappings.xml` file are mapped. If this element is empty, the database schema file is automatically generated at deployment time. Otherwise, the `schema` element names a `.dbschema` file with a pathname relative to the directory containing the `sun-cmp-mappings.xml` file, but without the `.dbschema` extension.
+
+See "xref:Technical Documentation/Application Development/container_managed-persistence.adoc#automatic-database-schema-capture[Automatic Database Schema Capture]" in the Payara Server Application Development section.
 
 [[superelements-176]]
 === Superelements
@@ -6895,7 +6993,7 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 
 a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#backend-principal[`backend-principal`]
 |only one
-|Specifies the user name and password required by the EIS.
+|Specifies the username and password required by the EIS.
 
 |===
 
@@ -7502,6 +7600,7 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 == `sun-cmp-mappings`
 
 Defines the Payara Server specific CMP mapping configuration for an EJB JAR file. This is the root element; there can only be one `sun-cmp-mappings` element in a `sun-cmp-mappings.xml` file.
+
 See xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#the-sun-cmp-mappings.xml-file[The sun-cmp-mappings.xml File].
 
 [[superelements-198]]
@@ -7988,41 +8087,45 @@ none - contains data
 [[webservice-default-login-config]]
 == `webservice-default-login-config`
 
-When declaring a secured Web Service based on an EJB using the _glassfish-ejb-jar.xml_ deployment descriptor, it's necessary to define the login configuration (authentication method, security realm name, etc.) for each EJB Web Service that is secured inside the assembly. For example, if an application contains 2 EJB web services called *EJBWS1* and *EJBWS2*, and they need to be secured using `BASIC` authentication against the _file_ security realm, the following configuration would be needed:
+When declaring a secured Web Service based on an EJB using the `glassfish-ejb-jar.xml` deployment descriptor, it's necessary to define the login configuration (authentication method, security realm name, etc.) for each EJB Web Service that is secured inside the assembly.
+
+For example, if an application contains 2 EJB web services called *EJBWS1* and *EJBWS2*, and they need to be secured using `BASIC` authentication against the _file_ security realm, the following configuration would be needed:
 
 [source, xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE glassfish-ejb-jar PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 EJB 3.1//EN" "http://glassfish.org/dtds/glassfish-ejb-jar_3_1-1.dtd">
 <glassfish-ejb-jar>
-  <ejb>
-    <ejb-name>EJBWS1</ejb-name>
-    <webservice-endpoint>
-      <port-component-name>EJBWS1Port</port-component-name>
-      <endpoint-address-uri>EJBWS1/EJBWebService</endpoint-address-uri>
-      <login-config>
-        <auth-method>BASIC</auth-method>
-        <realm>file</realm>
-      </login-config>
-    </webservice-endpoint>
-  </ejb>
-  <ejb>
-    <ejb-name>EJBWS2</ejb-name>
-    <webservice-endpoint>
-      <port-component-name>EJBWS2Port</port-component-name>
-      <endpoint-address-uri>EJBWS2/EJBWebService</endpoint-address-uri>
-      <login-config>
-        <auth-method>BASIC</auth-method>
-        <realm>file</realm>
-      </login-config>
-    </webservice-endpoint>
-  </ejb>
+    <enterprise-beans>
+        <ejb>
+            <ejb-name>EJBWS1</ejb-name>
+            <webservice-endpoint>
+              <port-component-name>EJBWS1Port</port-component-name>
+              <endpoint-address-uri>EJBWS1/EJBWebService</endpoint-address-uri>
+              <login-config>
+                <auth-method>BASIC</auth-method>
+                <realm>file</realm>
+              </login-config>
+            </webservice-endpoint>
+          </ejb>
+        <ejb>
+            <ejb-name>EJBWS2</ejb-name>
+            <webservice-endpoint>
+              <port-component-name>EJBWS2Port</port-component-name>
+              <endpoint-address-uri>EJBWS2/EJBWebService</endpoint-address-uri>
+              <login-config>
+                <auth-method>BASIC</auth-method>
+                <realm>file</realm>
+              </login-config>
+            </webservice-endpoint>
+          </ejb>
+    </enterprise-beans>
 </glassfish-ejb-jar>
 ----
 
 Notice that the `login-config` element is repeated exactly like it is in the 2 EJB definitions. Not only that, but if these Web services are defined using annotations for each EJB component, then the *JAX-WS* information (Port Component Name, Endpoint Address, etc.) would be duplicated too, which is too cumbersome for cases when there are lots of EJB Web service definitions.
 
-For this scenario, the `webservice-default-login-config` has been introduced to simplify this configuration. When this element is declared, the login configuration inside it will apply to all of the EJB defined Web Services by default.
+For this scenario, the `webservice-default-login-config` has been introduced to simplify this configuration. When this element is declared, the login configuration inside it will apply to all the EJB defined Web Services by default.
 
 The previous example can be simplified like this:
 
@@ -8040,8 +8143,7 @@ The previous example can be simplified like this:
 
 NOTE: All sub-elements tags of the `login-config` can be used inside this element.
 
-IMPORTANT: If an EJB Web service definition needs a different login configuration from the default, just redefine it as shown in the example and it will override the default configuration.
-
+IMPORTANT: If an EJB Web service definition needs a different login configuration from the default, just redefine it as shown in the example, and it will override the default configuration.
 
 [[superelements-230]]
 === Superelements
@@ -8067,7 +8169,6 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 |Specifies the name of the realm used to process all authentication requests.
 
 |===
-
 
 [[webservice-description]]
 == `webservice-description`
@@ -8180,19 +8281,19 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 [[whitelist-package]]
 == `whitelist-package`
 
-Used to whitelist packages on xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Classloading/Enhanced Classloading.adoc#extreme-classloading-isolation[*extreme class loading isolation*]. Whitelisted packages are taken into account by the server when scanning
-libraries.
+This element can be used to whitelist packages on xref:Technical Documentation/Application Development/class-loaders.adoc#extreme-classloading-isolation[*extreme class loading isolation*].
 
-For more information about how extreme class loading isolation works on Payara Server, see the xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Classloading/Enhanced Classloading.adoc[Enhanced Classloading] section.
+Whitelisted packages are taken into account by the server when scanning libraries.
 
+For more information about how extreme class loading isolation works on Payara Server, see the xref:Technical Documentation/Application Development/class-loaders.adoc#enhanced-classloading[Enhanced Classloading] section.
 
-[[superelements-224]]
+[[superelements-219]]
 === Superelements
 
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-application[`glassfish-application`] (`glassfish-application.xml`),
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#enterprise-beans[`enterprise-beans`] (`glassfish-ejb-jar.xml`)
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#glassfish-web-app[`glassfish-web-app` or `payara-web-app`] (`glassfish-web.xml`)
 
-[[subelements-215]]
+[[subelements-230]]
 === Subelements
 none
 
