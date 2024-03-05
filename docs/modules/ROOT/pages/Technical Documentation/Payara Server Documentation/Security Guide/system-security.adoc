@@ -118,9 +118,9 @@ All Payara Server subcommands work as expected with the default master password 
 
 The `change-master-password --savemasterpassword` option indicates whether the master password should be written to the file system in the `master-password` file for the DAS or a node. The default setting is `false`.
 
-* For a domain, the master password is kept in the `${domain-dir}/master-password` file.
+* For a domain, the master password is kept in the `domain-dir/master-password` file.
 
-* For a node, the master-password file is kept in `${as_install}/nodes/<node-name>/agent/master-password`.
+* For a node, the master-password file is kept in `as_install/nodes/<node-name>/agent/master-password`.
 +
 You can set a master password at the node level and all instances created on that node will use that master-password file. To do this, use the `--nodedir` option and provide the corresponding node name.
 
@@ -149,7 +149,7 @@ For instructions, see xref:Technical Documentation/Payara Server Documentation/S
 
 Files that contain encoded passwords need to be protected using file system permissions. These files include the following:
 
-* `${domain-dir}/master-password`
+* `domain-dir/master-password`
 +
 This file contains the encoded master password and should be protected with the default file system permissions set to `600` (in most *Nix systems).
 
@@ -191,11 +191,10 @@ Roles are defined in the standard deployment descriptor for the application. The
 users, groups, and roles, like this:
 
 .Role Mappings
-image:securityrolemapping.png["Shows how users are assigned to groups, how users and groups are assigned to roles, and how applications use groups and roles."]
+image:security/securityrolemapping.png["Shows how users are assigned to groups, how users and groups are assigned to roles, and how applications use groups and roles."]
 
 IMPORTANT: By default, group principal names are mapped to roles of the same name. Therefore, the Default Principal To Role Mapping setting is enabled by default on the _Security_ page of the Administration Console. +
 With this setting enabled, if the group name defined on Payara Server matches the role name defined in the application, there is no need to use the runtime deployment descriptor to provide a mapping. The application server will implicitly make this mapping, as long as the names of the groups and roles match (case sensitivity considered).
-
 
 [[jakarta-authorization]]
 ==== Jakarta Authorization
@@ -205,11 +204,11 @@ Jakarta Authorization is the specification that defines an interface for pluggab
 [[working-with-the-server.policy-policy-file]]
 ==== Working With the `server.policy` Policy File
 
-Each Payara Server domain has its own global Java policy file, located in `${domain-dir}/config`. The file is named `server.policy`.
+Each Payara Server domain has its own global Java policy file, located in `domain-dir/config`. The file is named `server.policy`.
 
 A sample `server.policy` file is as follows. Comments in the file describe why various permissions are granted. These permissions are described in more detail in the next section.
 
-[source, java]
+[source, policy]
 ----
 // classes in lib get all permissions by default
 grant codeBase "file:${com.sun.aas.installRoot}/lib/-" {
@@ -308,7 +307,7 @@ The section beginning with the comment _"Basic set of required permissions..."_ 
 
 Specifically, the following permission allows all applications to read and write all properties and read and write all files on the file system:
 
-[source, java]
+[source, policy]
 ----
 permission java.util.PropertyPermission "*", "read,write";
 permission java.io.FilePermission       "<<ALL FILES>>", "read,write";
@@ -318,7 +317,7 @@ While this grant provides optimum flexibility, it is inherently unsecure. For en
 
 For example, consider removing this permission and assign default read and write permissions only to the application's install directory (context-root). This example uses `com.sun.aas.instanceRoot`, which specifies the top level directory for a server instance:
 
-[source,java]
+[source,policy]
 ----
 grant codeBase "file:${com.sun.aas.instanceRoot}/applications/MyApp/-"{
     permission java.io.FilePermission "file:${com.sun.aas.instanceRoot} /applications/MyApp/-", "read,write";
@@ -394,7 +393,7 @@ Each certificate in the chain (after the first) thus authenticates the public ke
 [[certificate-files]]
 ==== Certificate Files
 
-During Payara Server installation, a self-signed certificate is generated in Java Secure Socket Extension (JSSE) format suitable for internal testing. By default, Payara Server stores its certificate information in certificate databases in the `${domain-dir}/config` directory:
+During Payara Server installation, a self-signed certificate is generated in Java Secure Socket Extension (JSSE) format suitable for internal testing. By default, Payara Server stores its certificate information in certificate databases in the `domain-dir/config` directory:
 
 Keystore file::
   The `keystore.jks` file contains the certificate, including its private key. The keystore file is protected with a password. +
@@ -501,9 +500,9 @@ After you create your LoginModule, you must plug it in to a jaas-context, which 
 
 To do this, perform the following steps:
 
-. Specify a new jaas-context for the Certificate realm in the `${domain-dir}/config/login.conf` file. Using the previous example configuration would look like this:
+. Specify a new jaas-context for the Certificate realm in the `domain-dir/config/login.conf` file. Using the previous example configuration would look like this:
 +
-[source,shell]
+[source,policy]
 ----
 certRealm {
     fish.payara.security.examples.CustomCertificateLoginModule required;
@@ -552,7 +551,7 @@ Use the `change-master-password` subcommand in local mode to modify the master p
 
 CAUTION: If you change the master password and are not using a master password file, the `start-instance` and `start-cluster` subcommands are not able to determine the master password. In this case, you must start those instances locally by using the `start-local-instance` command.
 
-When the master password is saved, it is saved in the `${domain-dir}/config/master-password` file.
+When the master password is saved, it is saved in the `domain-dir/config/master-password` file.
 
 Follow these steps to correctly change the master password on an existing domain:
 
@@ -985,18 +984,14 @@ The following is an example on how to create a Self-Signed Certificate in a PKCS
 
 [source,shell]
 ----
-keytool -genkey -noprompt -trustcacerts -keyalg RSA -alias ${cert.alias} 
--dname ${dn.name} -keypass ${key.pass} -keystore ${keystore.file} 
--storepass ${keystore.pass}
+keytool -genkey -noprompt -trustcacerts -keyalg RSA -alias ${cert.alias} -dname ${dn.name} -keypass ${key.pass} -keystore ${keystore.file} -storepass ${keystore.pass}
 ----
 
 The following is an example on how to create a Self-Signed Certificate in a PKCS12 Keystore by using the default key algorithm:
 
 [source,shell]
 ----
-keytool -genkey -noprompt -trustcacerts -alias ${cert.alias} -dname 
-${dn.name} -keypass ${key.pass} -keystore ${keystore.file} -storepass 
-${keystore.pass}
+keytool -genkey -noprompt -trustcacerts -alias ${cert.alias} -dname ${dn.name} -keypass ${key.pass} -keystore ${keystore.file} -storepass ${keystore.pass}
 ----
 
 The following command will display detailed information about all certificates present in a keystore:
@@ -1116,9 +1111,6 @@ keytool -delete -alias keyAlias -keystore cacerts.p12 -storepass password
 [[administering-jacc-providers]]
 == Administering Jakarta Authorization / JACC Providers
 
-JACC stands for *Java Authentication Contract for Containers*. It's defined in  the https://jcp.org/en/jsr/detail?id=115[JSR 115 specification] and all Java EE complaint servers are mandated to provide a JACC Policy by default.
-
-
 The Jakarta Authorization specification (formerly known as Java Authorization Contract for Containers - JACC) defines an interface for pluggable authorization providers (commonly known as JACC providers) based on policies. This enables the administrator to set up third-party plug-in modules to perform authorization.
 
 Payara Server includes Administration Console support and subcommands to support JACC providers, as follows:
@@ -1141,7 +1133,7 @@ To use the Administration Console to administer JACC providers, perform the foll
 . Select _Security_ and expand the entry.
 . Select _JACC Providers_. The existing JACC providers are shown on this page.
 +
-image:jacc-providers.png[Configured JACC Providers]
+image:security/jacc-providers.png[Configured JACC Providers]
 +
 . To create a new provider, click _New_.
 +
@@ -1180,18 +1172,16 @@ default
 Command list-jacc-providers executed successfully.
 ----
 
-
-
 [[how-to-install-a-custom-jacc-provider-per-server]]
-== How to install a custom JACC provider per Server (Global)
+=== How to install a custom JACC provider per Server (Global)
 
-Having coded a JACC provider, the first thing to do it is to make these classes available for the server. For that purpose, you need to put the implementation JAR, with all its dependencies, under the `{PAYARA_HOME}/lib` folder.
+Having coded a JACC provider, the first thing to do it is to make these classes available for the server. For that purpose, you need to put the implementation JAR, with all its dependencies, under the `as-install/lib` folder.
 
 The next thing to do is to tell Payara you want to use the custom JACC provider. To do this, you have to execute the following administration command:
 
 [source, shell]
 ----
-create-jacc-provider --policyConfigurationFactoryProvider=com.example.CustomPolicyConfigurationFactory --policyProvider=com.example.CustomPolicy --target=server-config custom-provider set configs.config.server-config.security-service.jacc=custom-provider
+asadmin create-jacc-provider --policyConfigurationFactoryProvider=com.example.CustomPolicyConfigurationFactory --policyProvider=com.example.CustomPolicy --target=server-config custom-provider set configs.config.server-config.security-service.jacc=custom-provider
 ----
 
 This will result in the following configuration element added to the _domain.xml_ file:
@@ -1213,7 +1203,7 @@ As you can see on the XML excerpt, more JACC providers can be defined (by defaul
 
 With a custom JACC provide per server, applications deployed to a single server can't have their own custom authorization contracts. In this case, having a custom JACC Provider per application makes more sense by using the `fish.payara.jacc.JaccConfigurationFactory` API.
 
-IMPORTANT: To access this API, you will need to add a dependency to the xref:/Technical Documentation/Public API/Overview.adoc[Payara Public API] first.
+IMPORTANT: To access this API, you will need to add a dependency to the xref:Technical Documentation/Public API/Overview.adoc[Payara Public API] first.
 
 In the example below, when an application is deployed, a custom JACC provider is registered programmatically using the `JaccConfigurationFactory (consisting of a JACC `PolicyConfigurationFactory` and `Policy` implementation objects) in the `contextInitialized` method of `ServletContextListener`.
 
@@ -1238,57 +1228,5 @@ public class JaccInstaller implements ServletContextListener {
     private String getAppContextId(ServletContext servletContext) {
         return servletContext.getVirtualServerName() + " " + servletContext.getContextPath();
     }
-
 }
 ----
-
-
-[[multiple-httpauthenticationmechanism-ear]]
-== Multiple HttpAuthenticationMechanisms in EAR Application
-:ordinal: 2
-
-Within the Security API specification, an `HttpAuthenticationMechanism` can be defined to retrieve the user credentials from the HTTP Request. These credentials are then used by any configured identity stores to validate the user.
-
-However, a restriction of the Security API specification is that only one `HttpAuthenticationMechanism` can be defined per application. This restriction is also in place for EAR applications file where it's possible to have multiple web modules.
-
-Payara Server allows to circumvent this restriction so that multiple authentication mechanisms are used in an EAR application that hosts more than one Web module. To this effect, each web module must configure its own authentication mechanism separately.
-
-IMPORTANT: In order to use this feature, there must not be any custom `HttpAuthenticationMechanism` implementations bundled in any of the modules hosted in the EAR artifact. If this is the case, the feature will not work as intended.
-
-NOTE: This behaviour is specific to the Payara Platform and not compatible with the Jakarta Security specification.
-
-[[configure]]
-=== How to Configure
-
-In order to configure a specific `HttpAuthenticationMechanism` for a Web application, define the `fish.payara.security.mechanism` parameter in the _web.xml_ deployment descriptor like in the following case:
-
-[source, xml]
-----
-<context-param>
-    <param-name>fish.payara.security.mechanism</param-name>
-    <param-value>JWT</param-value>
-</context-param>
-----
-
-The following mechanisms can be used:
-
-[cols="2,10", options="header"]
-|===
-|Value |Description
-|Basic |Use _BasicAuthenticationMechanism_ as mechanism.
-|Form |Use _FormAuthenticationMechanism_ as mechanism.
-|CustomForm | Use _CustomFormAuthenticationMechanism_ as mechanism.
-|JWT | Use the custom Payara _JWTAuthenticationMechanism_ as mechanism.
-|Certificate | Use the custom Payara _CertificateAuthenticationMechanism_ as mechanism.
-|Azure | Use the custom Payara _AzureOpenIdAuthenticationMechanism_ as mechanism.
-|Google | Use the custom Payara _GoogleOpenIdAuthenticationMechanism_ as mechanism.
-|OAuth2 |Use the custom Payara _OAuth2AuthenticationMechanism_ as mechanism.
-|<any Fully Qualified Class Name> |Use the `HttpAuthenticationMechanism` indicated by the class name.
-|===
-
-NOTE: When no parameter is specified, the standard rules of the Security API are active (only 1 allowed per artifact).
-
-[[see-also]]
-== See Also
-
-* https://blog.payara.fish/ee-security-jaspic-jacc-loginmodules-realms[Introduction to JASPIC Login Modules]
