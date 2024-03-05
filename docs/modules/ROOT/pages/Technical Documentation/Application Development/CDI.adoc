@@ -1,7 +1,37 @@
 [[cdi]]
-= CDI Tools
+= CDI Specifics
 
-This section lists existing development tools available from the CDI implementation shipped in Payara Server.
+This section lists additional available enhancements to the CDI implementation shipped in the Payara Platform.
+
+[[concurrent-cdi-bean-loading]]
+== Concurrent CDI Bean Loading
+
+It is possible to concurrently load CDI beans and potentially speed up an application's load time by enabling Weld's Multi-Threaded Bean Loading feature.
+
+IMPORTANT: By default, this feature is disabled for all applications on Payara Server, and enabled for all applications on Payara Micro.
+
+[[enable-concurrent-cdi-bean-loading]]
+=== Enable Concurrent CDI Bean Loading
+
+Concurrent CDI bean loading is configured on a per-configuration basis using the `set` on the `cdi-service.enable-concurrent-deployment` property like this:
+
+[source, bash]
+----
+asadmin set configs.config.server-config.cdi-service.enable-concurrent-deployment=true
+----
+
+It is possible to configure the number of pre-loader threads like this:
+
+[source, bash]
+----
+asadmin set configs.config.server-config.cdi-service.pre-loader-thread-pool-size=4
+----
+
+When configuring the number of the pre-loader threads, use a sensible value that is consistent with the number of CPU cores available for the server instance, otherwise this setting may introduce performance degradation on the deployment times.
+
+NOTE: Concurrent deployment of CDI Beans is enabled by default with 2 pre-loader threads in Payara Micro.
+
+WARNING: There are no equivalent configuration views for these commands in the Web admin console. They'll be reserved for a future release.
 
 [[cdi-development-mode]]
 == CDI Development Mode
@@ -170,6 +200,42 @@ image::probe/cdi-probe-in-web-app.png[CDI Probe via Sample Application]
 If the application uses CDI beans to process the HTTP request used to serve the webpage in question, the toolbar will also contain a link to see all bean invocations as a tree of events, which may look like this:
 
 image::probe/cdi-probe-bean-invocations.png[CDI Invocation Event Tree sample]
+
+[[legacy-mode-of-empty-beans.xml]]
+== Legacy mode of empty beans.xml
+
+Starting with CDI 4.0, bean archives with empty beans.xml have discovery mode `annotated`. It is possible to activate the legacy mode option to switch this back to `all` discovery mode.
+
+[[enable-legacy-mode-of-empty-beans.xml]]
+=== Enable legacy mode of empty beans.xml
+
+The legacy mode of empty beans.xml can be enabled using the following mechanisms:
+
+[[legacy-mode-via-asadmin-cli]]
+==== Via asadmin CLI
+
+Using the asadmin CLI it is possible to enable legacy mode for a single application or for ALL deployed applications.
+
+[[legacy-mode-asadmin-enabling-single-application]]
+===== Enabling for a single application
+
+The legacy mode can be enabled for a single application with the `deploy` command. Add the `emptyBeansXmlModeALL=true` property to the `--properties` argument's value of the `deploy` command.
+
+Here's an example of enabling development mode for an application named `application.war`:
+
+[source, shell]
+----
+asadmin deploy --properties emptyBeansXmlModeALL=true myapplication.war
+----
+
+Legacy mode is configured on a per-configuration basis using the `create-system-properties` on the `fish.payara.deployment.emptyBeansXmlModeALL` property like this:
+
+[source, bash]
+----
+asadmin create-system-properties fish.payara.deployment.emptyBeansXmlModeALL=true
+----
+
+NOTE: The legacy mode is enabled by default for any transformed Jakarta EE 8 applications that are converted via the Eclipse Transformer.
 
 [[see-also]]
 == See Also
