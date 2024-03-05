@@ -1,0 +1,77 @@
+[[set-admin-audit-configuration]]
+= set-admin-audit-configuration
+
+Configures the Administrative Audit Service.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-admin-audit-configuration [--help]
+[--dynamic=false]
+[--enabled={true|false}]
+[--auditlevel=auditlevel]
+[--target=server]
+[--enablenotifiers=enablenotifiers]
+[--disablenotifiers=disablenotifiers]
+[--setnotifiers=setnotifiers]
+----
+
+[[description]]
+== Description
+
+The `set-admin-audit-configuration` subcommand can be used to set the configuration settings of the Admin Audit Configuration.
+
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+--dynamic::
+Applies changes dynamically to the running system without the need for a restart, allowing for immediate effect of the audit configuration adjustments.
+--enabled::
+Turns the audit service on or off, controlling whether administrative actions are tracked and logged for security and compliance purposes.
+--auditlevel::
+Sets the auditing level. One of:
++
+    * MODIFIERS (default)
+    * ACCESSORS
+    * INTERNAL
+--target:: Specifies the target for which to configure the audit settings, in this case, a server.
+--enablenotifiers:: Enables selected notification services for audit events.
+--disablenotifiers:: Disables selected notification services without affecting others.
+--setnotifiers:: Configures notification services, specifying event types and settings.
+
+
+[[examples]]
+== Examples
+
+*Example 1*
+
+[source, shell]
+----
+asadmin> set-admin-audit-configuration --dynamic --enabled --auditlevel=MODIFIERS --target=server --enablenotifiers=email,alert --disablenotifiers=log --setnotifiers="email:critical,alert:all"
+
+Command set-admin-audit-configuration executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-admin-audit-configuration.adoc#get-admin-audit-configuration[`get-admin-audit-configuration`]
+
+
+

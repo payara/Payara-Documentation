@@ -5,8 +5,6 @@ This chapter explains how to monitor the Payara Server components and services b
 
 Instructions for monitoring by using the Administration Console are contained in the Administration Console online help.
 
-For information on using REST interfaces for monitoring, see xref:Technical Documentation/Payara Server Documentation/General Administration/general-administration.adoc#using-rest-interfaces-to-administer-payara-server[Using REST Interfaces to Administer Payara Server].
-
 [[about-monitoring]]
 == About Monitoring
 
@@ -54,7 +52,6 @@ Although an object is monitorable, it is not necessarily being actively monitore
 === Tree Structure of Monitorable Objects
 
 Each monitorable object has a hierarchical tree structure. In the tree, a replaceable such as *statistics represents the name of the attribute that you can show statistics for.
-
 
 [[applications-tree-hierarchy]]
 ==== *Applications Tree Hierarchy*
@@ -333,11 +330,11 @@ xref:Technical Documentation/Payara Server Documentation/General Administration/
 [[configuring-monitoring]]
 == Configuring Monitoring
 
-By default, the monitoring service is enabled for Payara Server, but monitoring for the individual modules is not. To enable monitoring for a module, you change the monitoring level for that module to LOW or HIGH, You can choose to leave monitoring OFF for objects that do not need to be monitored.
+By default, the monitoring service is enabled for Payara Server, but monitoring for the individual modules is not. To enable monitoring for a module, you change the monitoring level for that module to `LOW` or `HIGH`, You can choose to leave monitoring `OFF` for objects that do not need to be monitored.
 
-* LOW. Simple statistics, such as create count, byte count, and so on
-* HIGH. Simple statistics plus method statistics, such as method count, duration, and so on
-* OFF. No monitoring, no impact on performance
+* `LOW`. Simple statistics, such as create count, byte count, and so on
+* `HIGH`. Simple statistics plus method statistics, such as method count, duration, and so on
+* `OFF`. No monitoring, no impact on performance
 
 [[to-enable-monitoring]]
 === To Enable Monitoring
@@ -364,7 +361,7 @@ configs.config.server-config.monitoring-service.module-monitoring-levels.web-con
 *  Enable monitoring by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/enable-monitoring.adoc[`enable-monitoring`] subcommand. Server restart is not required.
 
 [[example-to-enable-monitoring]]
-==== *Example 8-1 Enable Monitoring*
+==== *Example - Enable Monitoring*
 
 This example enables the monitoring service without affecting monitoring for individual modules.
 
@@ -374,22 +371,21 @@ asadmin> enable-monitoring
 Command enable-monitoring executed successfully
 ----
 
-////
-[[example-to-enable-monitoring-2]]
-== Example
+[[example-to-configure-monitoring]]
+==== *Example - Configure Monitoring*
 
-This example enables monitoring for the `ejb-container` module.
+This example enables the monitoring service and enables the use of MBeans (JMX Monitoring) and the AMX subsystem in one command:
 
-[source,shell]
+[source, shell]
 ----
-asadmin> enable-monitoring --level ejb-container=HIGH
-Command enable-monitoring executed successfully
+asadmin> set-monitoring-service-configuration --enabled=true --mbeansenabled=true --amxenabled=true --target=server
+Command set-monitoring-service-configuration executed successfully
 ----
-////
-[[example-to-enable-monitoring-2]]
-==== *Example 8-2 Enable Monitoring 2*
 
-This example enables monitoring for the HTTP service by setting the monitoring level to HIGH (you must restart the server for changes to take effect).
+[[example-to-enable-monitoring-2]]
+==== *Example - Enable Monitoring Levels*
+
+This example enables monitoring for the HTTP service by setting the monitoring level to `HIGH` (you must restart the server for changes to take effect).
 
 [source,shell]
 ----
@@ -397,34 +393,66 @@ asadmin> set server.monitoring-service.module-monitoring-levels.http-service=HIG
 Command set executed successfully
 ----
 
-You can also view the full syntax and options of the subcommand by typing `asadmin help enable-monitoring` at the command line.
+An alternative to the previous command that doesn't require a server restart is the following:
+
+[source, shell]
+----
+asadmin> set-monitoring-level --module=http-service --level=HIGH --target=server
+----
+
+The `set-monitoring-level` command can be used to configure the monitoring levels of multiple modules as well:
+
+[source, shell]
+----
+asadmin> set-monitoring-level --module=jvm,http-service --level=HIGH --target=server
+----
 
 [[to-disable-monitoring]]
 === To Disable Monitoring
 
 Use the `disable-monitoring` subcommand to disable the monitoring service itself, or to disable monitoring for individual modules. Monitoring is immediately stopped, without restarting Payara Server.
 
-You can also use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc#set[`set`] subcommand to disable monitoring for a module. Using the `set` command is not a dynamic procedure, so you need to restart Payara Server for your changes to take effect.
+You can also use the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-monitoring-level.adoc#set-monitoring-level[`set-monitoring-level`] subcommand to disable monitoring for a module. To do this, set its `--level` option to `OFF`.
 
-*  Determine which services and components currently are enabled for monitoring.
+*  Determine which modules are enabled for monitoring using the `get-monitoring-level` command:
 +
-[source,shell]
+[source, shell]
 ----
-asadmin get server.monitoring-service.module-monitoring-levels.*
+asadmin get-monitoring-level --target=server
+
+Module                       Monitoring Level
+cloud                        OFF
+cloud-elasticity             OFF
+cloud-orchestrator           OFF
+cloud-tenant-manager         OFF
+cloud-virt-assembly-service  OFF
+connector-connection-pool    OFF
+connector-service            OFF
+deployment                   OFF
+ejb-container                OFF
+http-service                 LOW
+jdbc-connection-pool         OFF
+jersey                       OFF
+jms-service                  OFF
+jpa                          OFF
+jvm                          HIGH
+orb                          OFF
+security                     OFF
+thread-pool                  OFF
+transaction-service          OFF
+web-container                OFF
+web-services-container       OFF
+
+Command get-monitoring-level executed successfully.
+
 ----
-This example output shows that monitoring is enabled for `web-container`, `http-service`, and `jvm`:
 +
-[source,text]
-----
-configs.config.server-config.monitoring-service.module-monitoring-levels.web-container=HIGH
-       configs.config.server-config.monitoring-service.module-monitoring-levels.http-service=HIGH
-              configs.config.server-config.monitoring-service.module-monitoring-levels.jvm=HIGH 
-----
+As the io
 *  Disable monitoring for a service or module by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/disable-monitoring.adoc[`disable-monitoring`] subcommand. +
 Server restart is not required.
 
 [[example-to-disable-monitoring]]
-==== *Example 8-3 Disable Monitoring*
+==== *Example Disable Monitoring*
 
 This example disables the monitoring service without changing the monitoring levels for individual modules.
 
@@ -435,29 +463,15 @@ Command disable-monitoring executed successfully
 ----
 
 [[example-to-disable-monitoring-2]]
-==== *Example 8-4 Disable Monitoring*
+==== *Example Disable Monitoring for specific modules*
 
-This example disables monitoring for specific modules. Their monitoring levels are set to OFF.
+This example disables monitoring for specific modules. Their monitoring levels are set to `OFF`.
 
 [source,shell]
 ----
 asadmin> disable-monitoring --modules web-container,ejb-container
 Command disable-monitoring executed successfully
 ----
-
-
-[[example-to-disable-monitoring-3]]
-==== *Example 8-5 Disable Monitoring*
-
-This example disables monitoring for the HTTP service (you must restart the server for changes to take effect).
-
-[source,shell]
-----
-asadmin> set server.monitoring-service.module-monitoring-levels.http-service=OFF
-Command set executed successfully
-----
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help disable-monitoring` at the command line.
 
 [[viewing-common-monitoring-data]]
 == Viewing Common Monitoring Data
@@ -603,7 +617,6 @@ The statistics available for the `webmodule` type are shown in the following tab
 |`tslc`
 |Total number of servlets that are loaded
 |====
-
 
 [[viewing-comprehensive-monitoring-data]]
 == Viewing Comprehensive Monitoring Data
@@ -1999,7 +2012,7 @@ last sampling time
 
 |`numconnused`
 |RangeStatistic
-|Number of connections that are currentlybeing used, as well as information about the maximum number of connections that were used (high watermark)
+|Number of connections that are currently being used, as well as information about the maximum number of connections that were used (high watermark)
 |===
 
 
@@ -2478,7 +2491,6 @@ The available web session statistics are shown in the following table.
 |Total number of sessions created
 |===
 
-
 [[configuring-jconsole-to-view-payara-server-monitoring-data]]
 == Configuring JConsole to View Payara Server Monitoring Data
 
@@ -2528,3 +2540,322 @@ NOTE: Another host name can be substituted for `localhost`. The default port num
 In the JConsole window you will see all your MBeans, JVM information, and so on, in various tabs. Most of the useful MBeans are to be found in the `amx` and `java.lang` domains.
 
 For more information about JConsole, see `http://docs.oracle.com/javase/8/docs/technotes/guides/management/jconsole.html`.
+
+[[jmx-monitoring-service]]
+== JMX Monitoring
+
+Payara Server offers a customized JMX Monitoring Service. Once configured, Payara Server will monitor and log the values of all MBean attributes that have been added for explicit monitoring.
+
+The metrics are logged together in a single log message as a series of key-value pairs prefixed by the string `JMX-MONITORING:`.
+
+NOTE: The default JMX listener is unauthenticated and open for local access. +
+In an unsecure environment, open JMX ports should be disabled to prevent unwanted access.
+
+To see a non-exhaustive inventory of existing MBeans that are currently available for Payara Server, see xref:Technical Documentation/Payara Server Documentation/General Administration/MBeans.adoc[here].
+
+[[enable-jmx]]
+=== Enabling JMX Monitoring
+
+IMPORTANT: Payara Server uses the AMX API for working with _JMX MBeans_. AMX is not fully exposed by default and as such needs to be loaded to access most _JMX MBean_ objects. +
+The JMX Monitoring Service can be used without AMX but there is a limit to what can be monitored without it.
+
+[[boot-amx]]
+=== Boot AMX
+
+To boot AMX at startup or independently of the JMX Monitoring service, run the command below:
+
+[source, shell]
+----
+asadmin set-amx-enabled --enabled true --dynamic true --target server
+----
+
+[[using-web-admin-console]]
+==== Boot AMX Using the Admin Console
+
+image:jmx-monitoring-service/enable_amx.png[Enable AMX]
+
+[[configure-jmx-monitoring]]
+=== Configure JMX Monitoring
+
+You can enable JMX Monitoring using the `set-jmx-monitoring-configuration` asadmin command
+
+JMX Monitoring can either be enabled for next startup or the service can be dynamically enabled on a running instance of Payara Server (provided a non-empty configuration exists at server startup).
+
+To enable the service dynamically on the default server instance run the following command:
+
+[source, shell]
+----
+asadmin> set-jmx-monitoring-configuration --dynamic true --enabled true
+----
+
+//TODO - Document how to configure notifiers by use of the --setNotifiers option.
+[[configure-jmx]]
+=== Setting The JMX Monitoring Configuration
+
+You can configure JMX Monitoring using the `set-jmx-monitoring-configuration` asadmin command.
+
+[[adding-the-monitoring-attribute]]
+==== Adding a monitoring attribute
+
+To add the `HeapMemoryUsage` attribute to the list of MBean attributes to monitor using the service the following command can be used:
+
+[source, shell]
+-----
+asadmin set-jmx-monitoring-configuration --addattribute 'attributeName=HeapMemoryUsage objectName=java.lang:type=Memory' --enabled false
+-----
+
+Breaking this command down, two arguments have been used:
+
+* `--addattribute`
+* `--enabled`
+
+Passing `--addattribute` to `set-jmx-monitoring-configuration` provides a way to  add a new **MBean** attribute to monitor using the service. This argument takes  in a string of space-delimited key-value pairs corresponding to the values listed  earlier.
+
+The `attributeName` and `objectName` fields are required, but `description` is not. Providing `attributeName=HeapMemoryUsage` denotes that the name of the **MBean** attribute to log is `HeapMemoryUsage`, while `objectName=java.lang:type=Memory` denotes the `ObjectName` of the **MBean** to look for the attribute on is `java.lang:type=Memory`.
+
+The second argument, `--enabled`, is the only required option for the `asadmin` command. The only valid values to give this option are `true` or `false`. Passing `false` to the option will disable the logging service on next startup if it is currently enabled, but will otherwise do nothing.
+
+Under this scenario the monitoring service has not been configured yet so `false` was passed.
+
+[[dealing-with-composite-mbean-attributes]]
+==== Dealing with composite MBean attributes
+
+The **MBean** attribute added, `HeapMemoryUsage`, is a composite attribute.
+
+It has metrics for the `commited`, `init`, `max` and `used` attributes. The monitoring service will by default monitor each metric and log it as `{$metric}{$attribute_name}:{$attribute_value}`.
+
+If this is not the desired result, it is possible to monitor a single metric for a composite **MBean** attribute.
+
+To monitor a single metric for the attribute the value of `attributeName` passed to the `--addattribute` option should be modified like so:
+
+[source, text]
+----
+attributeName=HeapMemoryUsage.metric
+----
+
+So to log only the used heap memory the asadmin command would be:
+
+[source, shell]
+----
+asadmin set-jmx-monitoring-configuration --addattribute 'attributeName=HeapMemoryUsage.used objectName=java.lang:type=Memory' --enabled false
+----
+
+[[setting-logging-frequency]]
+==== Setting Logging frequency
+
+There are two configuration attributes related to the frequency at which log messages are written: `logfrequency` and `logfrequencyunit`. The first is a numerical value used for the rate, while the second is the unit for the rate. The default configuration is set to have a message logged every _15 seconds_.
+
+If the value of `logfrequencyunit` is the default of `SECONDS` then to have the monitoring service log messages every one minute execute the following command:
+
+[source, shell]
+----
+asadmin set-jmx-monitoring-configuration --logfrequency 60 --enabled false
+----
+
+[[rest-monitoring]]
+== Rest Monitoring
+
+This section covers how to use the REST monitoring functionality in Payara Server. The REST monitoring is implemented through an internal application that functions similarly to link:https://jolokia.org/[Jolokia], as it exposes MBeans over HTTP with a REST API to stop JMX monitoring requiring RMI.
+
+The REST monitoring is hosted on the admin-listener (port `4848`) on the default context root, `/rest-monitoring`.
+
+[[rest-monitoring-configuration]]
+=== Configuring REST monitoring
+
+REST monitoring is configurable through several Asadmin CLI commands.
+
+The `set-rest-monitoring-configuration` asadmin command is used to configure REST monitoring. This command requires the server to be running. Each configuration property can be configured individually or all together.
+
+To enable REST monitoring, run the command like this:
+
+[source, shell]
+----
+asadmin set-rest-monitoring-configuration --enabled true
+----
+
+[[getting-rest-configuration]]
+==== Getting REST monitoring Configuration
+
+[source, shell]
+----
+asadmin> get-rest-monitoring-configuration
+----
+
+The `get-rest-monitoring-configuration` asadmin command is used to get the configuration of the REST monitoring. This command requires the server to be running.
+
+If no target is specified, the command will get the REST monitoring configuration from the domain configuration (`server-config`). The `--target` option retrieves the REST monitoring from another instance or cluster.
+
+Here's an example of how to use the command:
+
+[source, shell]
+----
+asadmin> get-rest-monitoring-configuration --target server-config
+
+Enabled    Rest Monitoring Application Name    Context Root       Security Enabled
+true       __restmonitoring                    /rest-monitoring   false
+----
+
+[[rest-monitoring-security]]
+==== Rest Monitoring Security
+
+IMPORTANT: To enable security for the REST Monitoring application, you'll have to enable secure administration first.
+
+[source, shell]
+----
+asadmin set-rest-monitoring-configuration --securityEnabled=true
+----
+
+The `securityEnabled` property defines whether the REST monitoring application is available over HTTPS. Since the REST monitoring application is hosted on the `admin-listener`.
+
+Enabling secure admin can be done by first configuring the admin password with the `change-admin-password` command, then using the `enable-secure-admin` command.
+
+NOTE: Remember that enabling secure admin requires a server restart.
+
+When `securityenabled` is set to true, a username and password is required to use REST monitoring.
+
+NOTE: The default username is set to `payara` and the default password is set to `rest`. The user `payara` is defined in the `file` realm.
+
+The password can be changed with the following command:
+[source, shell]
+----
+asadmin update-file-user --groups=rest --target=server-config --authrealmname=file payara
+----
+
+This updates the `payara` user, which is part of the `rest` group. Any users who are able to log in to the REST monitoring must also be defined in the `file` realm and be part of the `rest` group.
+
+New users can be created by using the following command:
+
+[source, shell]
+----
+asadmin create-file-user --groups=rest --target=server-config --authRealmName=file <username>
+----
+
+[[performing-read-operations]]
+=== Performing READ Operations
+
+REST Monitoring supports a subset of operations in the Jolokia API.
+
+The `read` operation reads the details of the requested MBean. The `read` operation accepts GET requests on URLs in the following format:
+
+[source, text]
+----
+<REST_API_URL>/read/${mbean-name}/${attribute-name}
+----
+
+A list of attribute names can be found in the request of an empty attribute name under `value`.
+
+[[bulk-read-example]]
+==== Example Execution
+
+To read the MBean `java.lang:type=Memory` using the default configuration, you would make a GET request to: `http://localhost:4848/rest-monitoring/rest/read/java.lang:type=Memory`.
+
+*Example Output*
+
+[source, json]
+----
+{
+  "request": {
+    "mbean": "java.lang:type=Memory",
+    "type": "read"
+  },
+  "value": {
+    "HeapMemoryUsage": {
+      "committed": 450363392,
+      "init": 264241152,
+      "max": 477626368,
+      "used": 97480984
+    },
+    "ObjectPendingFinalizationCount": 0,
+    "NonHeapMemoryUsage": {
+      "committed": 139460608,
+      "init": 2555904,
+      "max": -1,
+      "used": 122389432
+    },
+    "Verbose": false,
+    "ObjectName": "java.lang:type=Memory"
+  },
+  "timestamp": 1502799650273,
+  "status": 200
+}
+----
+
+[[performing-bulk-read-operations]]
+==== Performing Bulk READ Operations
+
+It is possible to execute bulk operations using the REST monitoring API. To do this, issue a POST request to the REST API URL with the following JSON structure as the body payload.
+
+The payload is a JSON array consisting of objects of type, MBean, and attribute JSON objects. You may send a single operation request instead of an array also.
+
+[source, json]
+----
+[
+  {
+    "type" : "<OPERATION_TYPE>",
+    "mbean" : "<MBEAN_NAME>",
+    "attribute" : "<ATTRIBUTE_NAME>"
+  },
+  {
+    "type" : "<OPERATION_TYPE>",
+    "mbean" : "<MBEAN_NAME>",
+    "attribute" : "<ATTRIBUTE_NAME>"
+  }
+]
+----
+
+* *type* - The ‘type’ of operation to execute, e.g. read, search, write, etc.
+* *mbean* - The MBean attribute which the operation will be executed on.
+* *attribute* - The MBean attribute upon which the operation will be executed. If omitted, all attributes of the MBean will be involved in the operation.
+
+[[example-bulk-execution]]
+===== Example Execution
+
+Using `curl` and a sample REST API URL of `http://localhost:4848/rest-monitoring/rest`
+
+[source, shell]
+----
+curl -X POST http://localhost:4848/rest-monitoring/rest/ \
+  -H 'Content-Type: application/json' \
+  -d '[
+	{
+		"mbean": "java.lang:type=Compilation",
+		"type": "read"
+	},{
+		"mbean": "java.lang:type=Runtime",
+		"attribute" : "Uptime",
+		"type": "read"
+	}
+]'
+----
+
+*Example Output*
+
+[source, json]
+----
+[
+    {
+        "request": {
+            "mbean": "java.lang:type=Compilation",
+            "type": "read"
+        },
+        "value": {
+            "Name": "HotSpot 64-Bit Tiered Compilers",
+            "CompilationTimeMonitoringSupported": true,
+            "TotalCompilationTime": 106363,
+            "ObjectName": "java.lang:type=Compilation"
+        },
+        "timestamp": 1529353755633,
+        "status": 200
+    },
+    {
+        "request": {
+            "mbean": "java.lang:type=Runtime",
+            "attribute": "Uptime",
+            "type": "read"
+        },
+        "value": 8541422,
+        "timestamp": 1529353755636,
+        "status": 200
+    }
+]
+----

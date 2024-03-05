@@ -1,0 +1,87 @@
+[[set-snmp-notifier-configuration]]
+= set-snmp-notifier-configuration
+
+Configures the settings of the SNMP notifier.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-snmp-notifier-configuration [--help]
+[--target target]
+[--enabled={false|true}]
+[--dynamic={false|true}]
+[--noisy={false|true}]
+[--hostname hostname]
+[--snmpPort port]
+[--community community]
+[--oid oid]
+[--version version]
+----
+
+[[description]]
+== Description
+
+This command can be used to configure the behaviour of the SNMP notifier in Payara Server.
+
+IMPORTANT: This command is available as long as the SNMP notifier's core module is installed in the server. +
+This notifier's extension is installed by default on Payara Server Enterprise.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are configuring the SNMP notifier. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified sever instance.
+`--enabled`::
+Defaults to `false`. Enables or disables the log notifier
+`--dynamic`::
+Defaults to `false`. When set to `true`, applies the changes without a server restart.
++
+Otherwise, a restart is required.
+`--noisy`::
+Defaults to `false`. Whether the notifier is active even if the notification event threshold is set to `FINE`.
+`--hostName`::
+Defines the hostname of the SNMP server.
+`--snmpPort`::
+Defaults to `162`. Defines the port number of the SNMP server.
+`--version`::
+Defines the version of the SNMP protocol. Will be set to a default value if not set by the user.
+`--community`::
+The community string used in the SNMP query. Will be set to a default value if not set by the user.
+`--oid`::
+The Object ID used in the SNMP query. Will be set to a default value if not set by the user.
+
+[[examples]]
+== Examples
+
+*Example 1 Enable the SNMP notifier and configure the SNMP trap settings*
+
+[source, shell]
+----
+asadmin set-snmp-notifier-configuration --enabled=true --dynamic=true --hostname=localhost --snmpPort=162 --community=public --oid=".1.3.6.1.2.1.1.8" --version=v2c
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-snmp-notifier-configuration.adoc#get-snmp-notifier-configuration[`get-snmp-notifier-configuration`]

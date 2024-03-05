@@ -8,7 +8,6 @@ Payara Server includes a special notifier to send notifications from the Notific
 [[downloads]]
 == Downloads
 
-
 * link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/newrelic-notifier-core/2.0/newrelic-notifier-core-2.0.jar[New Relic Notifier Core 2.0]
 * link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/extensions/notifiers/newrelic-notifier-console-plugin/2.0/newrelic-notifier-console-plugin-2.0.jar[New Relic Notifier Console Plugin 2.0]
 
@@ -22,14 +21,14 @@ In order for the notifier to work correctly, you must complete the following req
 TIP: New Relic offers 14-days trial accounts that can be used to test the service for free.
 
 . Configure application performance monitoring (APM) for a Payara Server instance by installing a New Relic Java agent
-. Configure a New Relic Insights API key that will be used to setup the notifier.
+. Configure a New Relic Insights API key that will be used to set up the notifier.
 
 [[configure-apm]]
 === Configure Application Performance Monitoring for Payara Server
 
 The first task is to set up the New Relic Java agent in Payara Server. To do that, follow these steps:
 
-. Login to New Relic with your account credentials, and if you haven't setup a monitoring agent yet, the following screen will be shown:
+. Login to New Relic with your account credentials, and if you haven't set up a monitoring agent yet, the following screen will be shown:
 +
 image:notification-service/newrelic/agent-setup-1.png[New Relic agent setup welcome screen]
 
@@ -44,10 +43,12 @@ From the screen shown, copy the value of the _License Key_ (you need to press th
 [source, shell]
 ----
 unzip newrelic-java-3.XX.X.zip
-mv newrelic ${PAYARA_INSTALL_DIR}/glassfish/domains/domain1
+mv newrelic as-install/domains/domain1
 ----
 
-. Before proceeding to install the agent into the Payara Server domain, we need to configure the License Key we got earlier. To do this, modify the agent's configuration file that's located at _${PAYARA_DOMAIN_DIR}/newrelic/newrelic.yml_ by using the `license_key` property:
+. Before proceeding to install the agent into the Payara Server domain, we need to configure the License Key we got earlier.
++
+To do this, modify the agent's configuration file that's located at _domain-dir/newrelic/newrelic.yml_ by using the `license_key` property:
 +
 [source, yaml]
 ----
@@ -87,16 +88,16 @@ java -jar newrelic/newrelic.jar install
 +
 If the installation was successful, the output of the agent's installer will show it like this:
 +
-[source, text]
+[source, text, subs=attributes+]
 ----
 ***** ( ( o))  New Relic Java Agent Installer
 ***** Installing version 3.39.1 ...
 
-* Backed up start script to /opt/payara-4.1.2.172/glassfish/domains/domain1/config/domain.xml.20170613_180108
-* Added agent switch to start script /opt/payara-4.1.2.172/glassfish/domains/domain1/config/domain.xml
+* Backed up start script to /opt/{page-version}/glassfish/domains/domain1/config/domain.xml.20170613_180108
+* Added agent switch to start script /opt/{page-version}/glassfish/domains/domain1/config/domain.xml
 
 * No need to create New Relic configuration file because:
- A config file already exists: /opt/payara-4.1.2.172/glassfish/domains/domain1/newrelic/newrelic.yml
+ A config file already exists: /opt/{page-version}/glassfish/domains/domain1/newrelic/newrelic.yml
 
 ***** Install successful
 
@@ -108,6 +109,7 @@ You're almost done! To see performance data for your app:
 3) Log into http://rpm.newrelic.com
 
 Within two minutes, your app should show up, ready to monitor and troubleshoot.
+
 If app data doesn't appear, check newrelic/logs/newrelic_agent.log for errors.
 ----
 +
@@ -124,7 +126,8 @@ The installer will modify the domain.xml configuration file of your server's dom
 NOTE: The agent setup page has a different set of instructions for Windows and Linux environments, but they are so similar that the instructions mentioned here should be sufficient.
 +
 
-TIP: If you are considering installing the New Relic Java agent on a Payara Server standalone instance or a cluster of multiple instances, you need to manually add the JVM (the installer won't work) option with the `javaagent` configuration to the instance/cluster referenced configuration. Also, make sure that the directory where the _newrelic.jar_ resides also contains the _newrelic.yml_ configuration file
+TIP: If you are considering installing the New Relic Java agent on a Payara Server standalone instance or a cluster of multiple instances, you need to manually add the JVM (the installer won't work) option with the `javaagent` configuration to the instance/cluster referenced configuration. +
+Also, make sure that the directory where the _newrelic.jar_ resides also contains the _newrelic.yml_ configuration file
 
 . Now that the agent has been installed, start the Payara Server domain. You will observe the following messages at the start of the domain's log
 +
@@ -132,7 +135,6 @@ TIP: If you are considering installing the New Relic Java agent on a Payara Serv
 ----
 INFO: New Relic Agent: Loading configuration file "/opt/payara/glassfish/domains/domain1/newrelic/newrelic.yml"
 INFO: New Relic Agent: Writing to log file: /opt/payara/glassfish/domains/domain1/newrelic/logs/newrelic_agent.log
-...
 ----
 
 . After some minutes with the server working, you can login back to the New Relic portal and on the *APM* dashboard you can see a new entry for recently configured server:
@@ -179,7 +181,7 @@ To configure the Notification Service from the command line, use the `set-newrel
 
 [source, shell]
 ----
-asadmin> set-newrelic-notifier-configuration --dynamic=true --enabled=true --accountId=1658989 --key=b5815wdxj6lF_tmMBljQa5y1603JTiLh
+asadmin set-newrelic-notifier-configuration --dynamic=true --enabled=true --accountId=1658989 --key=b5815wdxj6lF_tmMBljQa5y1603JTiLh
 ----
 
 You can use the `--enabled` and `--dynamic` options to enable or disable the New Relic notifier on demand.
@@ -188,7 +190,7 @@ Also, you can retrieve the current configuration for the New Relic notifier usin
 
 [source, shell]
 ----
-asadmin > get-newrelic-notifier-configuration
+asadmin get-newrelic-notifier-configuration
 
 Enabled  Noisy  Key                               Account Id
 true     true   b5815wdxj6lF_tmMBljQa5y1603JTiLh  1658989

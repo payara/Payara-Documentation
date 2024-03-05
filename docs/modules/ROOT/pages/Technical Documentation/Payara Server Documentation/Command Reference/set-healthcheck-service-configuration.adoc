@@ -1,0 +1,217 @@
+[[set-healthcheck-service-configuration]]
+= set-healthcheck-service-configuration
+
+Enables or disables the Healthcheck of a specific performance metric service.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-healthcheck-service-configuration
+[--help]
+[--target target]
+[--enabled={false|true}]
+[--dynamic={false|true}]
+[--service=serviceName]
+[--checker-name=checkerName]
+[--add-to-microprofile-health={true|false}]
+[--time=time]
+[--time-unit={DAYS|HOURS|MINUTES|SECONDS|MILLISECONDS}]
+[--threshold-critical=threshold]
+[--threshold-warning=threshold]
+[--threshold-good=threshold]
+[--hogging-threads-threshold=threshold]
+[--hogging-threads-retry-count=count]
+[--stuck-threads-threshold=threshold]
+[--stuck-threads-threshold-unit={DAYS|HOURS|MINUTES|SECONDS|MILLISECONDS}]
+[--add-metric=metricName]
+[--delete-metric=metricName]
+----
+
+[[description]]
+== Description
+
+Enables and disables the monitoring of a HealthCheck performance metric service. The command also configures the frequency of monitoring for that metric.
+
+The command can also be used to configures performance metric specific properties.
+
+WARNING: If this command is run before running the `set-healthcheck-configuration` command, it will succeed and the configuration will be saved, but the Healthcheck service will not be enabled until the command is used.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are configuring the Healthcheck performance metric service. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified server instance.
+`--enabled`::
+Defaults to `false`. Enables or disables the healthcheck performance metric service
+`--dynamic`::
+Defaults to `false`. When set to `true`, applies the changes without a server restart.
+`--service`::
+The performance service metric name. Required.
++
+One of:
+
+* `connection-pool` or `cp`
+* `cpu-usage` or  `cu`
+* `garbage-collector` or `gc`
+* `heap-memory-usage` or `hmu`
+* `hogging-threads` or `ht`
+* `machine-memory-usage` or `mmu`
+* `stuck-thread` or `st`
+* `mp-health` or `mh`
+* `mp-metrics` or `mm`
+
+`--checker-name`::
+A user determined name for easy identification of the checker.
++
+This should be unique among the services you have configured, to avoid confusion on the notification messages.
++
+Depends on the service checker. One of:
+
+* `CONP`
+* `CPUC`
+* `GBGC`
+* `HEAP`
+* `HOGT`
+* `MEMM`
+* `MP`
+* `MPM`
+
+`--add-to-microprofile-health`::
+Defaults to `false`. When enabled, the checker results are displayed on MicroProfile Health xref:Technical Documentation/MicroProfile/HealthCheck.adoc#rest-endpoints[REST endpoints] as a readiness check.
+
+`--time`::
+Defaults to `5`. The amount of time units that the service will use to periodically monitor the metric.
+`--time-unit`::
+Defaults to `MINUTES`. The time unit to set the frequency of the metric monitoring.
++
+NOTE: Must correspond to a valid https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/TimeUnit.html[`java.util.concurrent.TimeUnit`]
+`--threshold-critical`::
+Defaults to `90`. The threshold value that this metric must surpass to generate a **`CRITICAL`** event.
++
+A value between _WARNING VALUE_ and `100` must be used.
++
+NOTE: Available for the `cp`, `cu`, `gc`, `hmu` and `mmu` metric services.
+`--threshold-warning`::
+Defaults to `50`. The threshold value that this metric must surpass to generate a *`WARNING`* event.
++
+A value between _GOOD VALUE_ and _WARNING VALUE_ must be used.
++
+NOTE: Available for the `cp`, `cu`, `gc`, `hmu` and `mmu` metric services.
+`--threshold-good`::
+Defaults to `0`. The threshold value that this metric must surpass to generate a *`GOOD`* event.
++
+A value between `0` and _WARNING VALUE_ must be used.
++
+NOTE: Available for the `cp`, `cu`, `gc`, `hmu` and `mmu` metric services.
+
+`--hogging-threads-threshold`::
+Defaults to `95`. The threshold value that this metric will be compared to mark threads as hogging the CPU.
++
+NOTE: Only available for the `ht` metric service.
+`--hogging-threads-retry-count`::
+Defaults to `3`. The number of retries that the checker service will execute in order to identify a hogging thread.
++
+NOTE: Only available for the `ht` metric service.
+`--stuck-threads-threshold`::
+The threshold above which a thread is considered stuck. Must be `1` or greater.
++
+NOTE: Only available for the `st` metric service.
+`--stuck-threads-threshold-unit`::
+The unit for the threshold for when a thread should be considered stuck.
++
+NOTE: Must correspond to a valid https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/TimeUnit.html[`java.util.concurrent.TimeUnit`]
++
+NOTE: Only available for the `st` metric service.
+
+`--add-metric`::
+Adds a metric exposed by Eclipse MicroProfile Metrics to monitor.
++
+Takes a string of the format `'metricName=MetricName description=Description'`, where `metricName` is a mandatory value.
+
+`--delete-metric`::
+Removes a metric exposed by MicroProfile Metrics that has been added to monitor. Takes a string of the format `'metricName=MetricName'`, where `metricName` is required.
+
+[[examples]]
+== Examples
+
+*Example 1 Basic Configuration*
+
+A very basic example command to simply enable the Garbage Collector checker service and activate it without needing a restart would be as follows:
+
+[source, shell]
+----
+asadmin set-healthcheck-service-configuration --enabled=true --service=gc --dynamic=true
+----
+
+*Example 2 Setting up thresholds for configuring JDBC Connection Pools health monitoring*
+
+Monitoring the health of JDBC connection pools is a common need. In that scenario, it is very unlikely that on-the-fly configuration changes would be made, so a very high `CRITICAL` threshold can be set.
+
+Likewise, a nonzero `GOOD` threshold is needed because an empty or unused connection pool may not be healthy either.
+
+The following command would apply these settings to the connection pool checker:
+
+[source, shell]
+----
+asadmin set-healthcheck-service-configuration --service=cp --dynamic=true --threshold-critical=95 --threshold-warning=70 --threshold-good=30
+----
+
+*Example 3 Setting up thresholds for identifying CPU hogging threads*
+
+Monitoring which threads hog the CPU is extremely important since this can lead to performance degradation, deadlocks and extreme bottlenecks issues that web applications can incur.
+
+In some cases the defaults are all that is needed, but imagine that in a critical system you want to set the threshold percentage to **90%**, and you want to make sure that the health check service guarantees the state of such threads with a retry count of *5*.
+
+Additionally, you want to set the frequency of this check for every _20 seconds_.
+
+The following command would apply these settings to the Hogging threads checker service:
+
+[source, shell]
+----
+asadmin> set-healthcheck-service-configuration --service=ht --dynamic=true --hogging-threads-threshold=90 --hogging-threads-retry-count=5 --time=20 --time-unit=SECONDS
+----
+
+*Example 4 Setting up thresholds for identifying stuck threads*
+
+The following example configures the stuck threads checker to check every 30 seconds for any threads which have been stuck for more than 5 minutes and applies the configuration change without needing a restart:
+
+[source, shell]
+----
+asadmin set-healthcheck-service-configuration --service=st --enabled=true --dynamic=true --time=30 --time-unit=SECONDS --stuck-threads-threshold=5 --stuck-threads-threshold-unit=MINUTES
+----
+
+*Example 5 Setting up thresholds adding a MicroProfile Metrics check for the maximum thread count:*
+
+The following example configures the Microprofile Metrics Checker to add  `base_thread_max_count` metrics for monitoring, adds the checker to MicroProfile Health to  display its result on MicroProfile Health xref:Technical Documentation/MicroProfile/HealthCheck.adoc#rest-endpoints[REST endpoints] and applies the configuration change without needing a restart:
+
+[source, shell]
+----
+asadmin set-healthcheck-service-configuration --service=mp-metrics --enabled=true --dynamic=true --add-to-microprofile-health=true --add-metric='metricName=base_thread_max_count'
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-healthcheck-configuration.adoc[`set-healthcheck-configuration`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-healthcheck-configuration.adoc[`get-healthcheck-configuration`]

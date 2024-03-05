@@ -1,0 +1,133 @@
+[[healthcheck-service-configure-checker-with-thresholds]]
+= healthcheck-service-configure-checker-with-thresholds
+
+Enables or disables the Healthcheck of a specific performance metric service and configures its event thresholds.
+
+IMPORTANT: This command is deprecated and will be removed in a future release as it has been replaced by the `set-healthcheck-service-configuration` command.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] healthcheck-service-configure-checker-with-thresholds
+[--help]
+[--target target]
+[--enabled={false|true}]
+[--dynamic={false|true}]
+[--time=time]
+[--unit={DAYS|HOURS|MINUTES|SECONDS|MILLISECONDS}]
+[--servicename=serviceName]
+[--checkername=checkerName]
+[--addtomicroprofile-health={true|false}]
+[--thresholdcritical=threshold]
+[--thresholdwarning=threshold]
+[--thresholdgood=threshold]
+----
+
+[[description]]
+== Description
+
+Enables and disables the monitoring of a HealthCheck performance metric service. The command also configures the frequency of monitoring for that metric along with the threshold values used to identify health check events.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are configuring the Healthcheck performance metric service. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified server instance.
+`--enabled`::
+Defaults to `false`. Enables or disables the healthcheck service
+`--dynamic`::
+Defaults to `false`. When set to `true`, applies the changes without a server restart.
+`--servicename`::
+The performance service metric name. Required.
++
+One of:
+
+* `connection-pool` or `cp`
+* `cpu-usage` or  `cu`
+* `garbage-collector` or `gc`
+* `heap-memory-usage` or `hmu`
+* `hogging-threads` or `ht`
+* `machine-memory-usage` or `mmu`
+* `stuck-thread` or `st`
+* `mp-health` or `mh`
+* `mp-metrics` or `mm`
+
+`--checkername`::
+A user determined name for easy identification of the checker.
++
+This should be unique among the services you have configured, to avoid confusion on the notification messages.
++
+Depends on the service checker. One of:
+
+* `CONP`
+* `CPUC`
+* `GBGC`
+* `HEAP`
+* `HOGT`
+* `MEMM`
+* `MP`
+* `MPM`
+
+`--add-to-microprofile-health`::
+Defaults to `false`. When enabled, the checker results are displayed on MicroProfile Health xref:Technical Documentation/MicroProfile/HealthCheck.adoc#rest-endpoints[REST endpoints] as a readiness check.
+
+`--time`::
+Defaults to `5`. The amount of time units that the service will use to periodically monitor the metric.
+`--unit`::
+Defaults to `MINUTES`. The time unit to set the frequency of the metric monitoring.
++
+NOTE: Must correspond to a valid https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/TimeUnit.html[`java.util.concurrent.TimeUnit`]
+`--thresholdcritical`::
+Defaults to `90`. The threshold value that this metric must surpass to generate a **`CRITICAL`** event.
++
+A value between _WARNING VALUE_ and `100` must be used.
+`--thresholdwarning`::
+Defaults to `50`. The threshold value that this metric must surpass to generate a *`WARNING`* event.
++
+A value between _GOOD VALUE_ and _WARNING VALUE_ must be used.
+`--thresholdgood`::
+Defaults to `0`. The threshold value that this metric must surpass to generate a *`GOOD`* event.
++
+A value between `0` and _WARNING VALUE_ must be used.
+
+[[examples]]
+== Examples
+
+*Example 1 Basic Configuration*
+
+*Example 1 JDBC Connection Pools Health monitoring*
+
+Monitoring the health of JDBC connection pools is a common need. In that scenario, it is very unlikely that on-the-fly configuration changes would be made, so a very high `CRITICAL` threshold can be set. Likewise, a nonzero `GOOD` threshold is needed because an empty or unused connection pool may not be healthy either.
+
+The following command would apply these settings to the connection pool checker to run every minute:
+
+[source, shell]
+----
+asadmin healthcheck-service-configure-checker-with-thresholds --enabled=true --time=1 --unit=MINUTES --serviceName=healthcheck-cpool --dynamic=true --thresholdCritical=95 --thresholdWarning=70 --thresholdGood=30
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-healthcheck-service-configuration.adoc[`set-healthcheck-service-configuration`]

@@ -1,0 +1,77 @@
+[[set-monitoring-level]]
+= set-monitoring-level
+
+This command can be used to set the monitoring level of a module.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-monitoring-level
+[--help]
+[--target target]
+[--module module]
+[--level={HIGH|LOW|OFF}]
+----
+
+[[description]]
+== Description
+
+This command can be used to set the monitoring level (`HIGH`/`LOW`) of a module. Monitoring can also be disabled by setting the level to `OFF`.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are configuring the monitoring level of a server module. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified server instance.
+`--module`::
+The name of the module. Mandatory value.
++
+NOTE: Multiple module names can be set in a comma separated string.
+`--level`::
+Allows you to change monitoring level for a module to `OFF`, `LOW` or `HIGH`.
+
+[[examples]]
+== Examples
+
+*Example 1 Configure the monitoring level of the JVM module to `HIGH`*
+
+[source, shell]
+----
+asadmin set-monitoring-level --module=jvm --level=HIGH --target=server
+----
+
+*Example 2 Configure the monitoring level of both the JVM and HTTP Service modules to `LOW`*
+
+[source, shell]
+----
+asadmin set-monitoring-level --module=jvm,http-service --level=LOW --target=server
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/monitoring.adoc[Monitoring Basics],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-monitoring-service-configuration.adoc[`set-monitoring-service-configuration`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-monitoring.adoc[`enable-monitoring`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/disable-monitoring.adoc[`disable-monitoring`]
