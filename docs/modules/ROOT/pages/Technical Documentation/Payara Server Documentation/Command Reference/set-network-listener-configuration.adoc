@@ -1,0 +1,115 @@
+[[set-network-listener-configuration]]
+= set-network-listener-configuration
+
+Helps to modify an existing network listener.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-network-listener-configuration [--help]
+[--enabled={true|false}]
+[--dynamic={}true|false}]
+[--address=address]
+[--listenerport=port]
+[--listenerportrange=portrange]
+[--threadpool=threadpool]
+[--protocol=protocol]
+[--transport=transport]
+[--jkenabled=true|false]
+[--target target]
+listener-name
+----
+
+[[description]]
+== Description
+
+The `set-network-listener-configuration` subcommand modifies an existing network listener.
+
+NOTE: If you edit the `admin-listener` network listener, you must restart the server for the changes to take effect. The Administration Console will not tell you that a restart is required in this case.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+
+`--address`::
+  The IP address or the hostname (resolvable by DNS).
+
+`--listenerport`::
+The port on which the network listener is going to be listening.
+
+`--listenerPortRange`::
+Port range which the network listener can bind to.
+
+`--threadpool`::
+The name of the thread pool for this listener. Specifying a thread pool is optional. The default is `http-thread-pool`.
+
+`--protocol`::
+The name of the protocol for this listener.
+
+`--transport`::
+The name of the transport for this listener. Specifying a transport is optional. The default value is `tcp`.
+
+`--enabled`::
+If set to `true`, the default, the listener is enabled at runtime.
+
+`--jkenabled`::
+If enabled, the network listener will become an Apache `mod-jk` listener. The default value is `false`.
+
+`--target`::
+Creates the network listener only on the specified target. Valid values are as follows: +
+`server`;;
+  Creates the network listener on the default server instance. This is the default value.
+`configuration-name`;;
+  Creates the network listener in the specified configuration.
+`cluster-name`;;
+  Creates the network listener on all server instances in the specified cluster.
+`standalone-instance-name`;;
+  Creates the network listener on the specified standalone server instance.
+
+[[operands]]
+== Operands
+
+name::
+  The name of the network listener.
+
+[[examples]]
+== Examples
+
+*Example 1 Modifying a Network Listener*
+
+The following command modifies a network listener named `sampleListener`:
+
+[source,shell]
+----
+asadmin set-network-listener-configuration --dynamic true --enabled=false --listenerport 8080 sampleListener
+
+Command set-network-listener-configuration executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-http-listener.adoc#create-http-listener[`create-http-listener`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-http-listeners.adoc#restart-http-listeners[`restart-http-listeners`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-protocol.adoc#create-protocol[`create-protocol`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-threadpool.adoc#create-threadpool[`create-threadpool`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-transport.adoc#create-transport[`create-transport`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-network-listener.adoc#create-network-listener[`create-network-listener`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-network-listener.adoc#delete-network-listener[`delete-network-listener`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-network-listeners.adoc#list-network-listeners[`list-network-listeners`]

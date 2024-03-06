@@ -1,0 +1,103 @@
+[[restart-cluster]]
+= restart-cluster
+
+Restarts all instances in a cluster.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] restart-cluster [--help]
+[--verbose=false]
+[--rolling=true]
+[--delay=0]
+[--instanceTimeout=instanceTimeout]
+[--timeout=timeout]
+[clustername]
+----
+
+[[description]]
+== Description
+
+The `restart-cluster` subcommand stops and starts a cluster by stopping and starting all Payara Server instances in the cluster that are  already running.
+
+This subcommand requires the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to be configured on the host where the domain administration server (DAS) is running and on all hosts where instances in the cluster reside.
+
+NOTE: If all instances reside on the same host as the DAS, DCOM or SSH is not required. You might require to restart a cluster in which instances reside on hosts where DCOM or SSH is not configured that are remote from the DAS. +
+In this situation, run the xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-local-instance.adoc#restart-local-instance[`restart-local-instance`] subcommand for each instance from the host where the instance resides.
+
+You may run this subcommand from any host that can contact the DAS.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+
+`--verbose`::
+Specifies whether additional status information is displayed when the cluster is started.
++
+Valid values are as follows:
++
+`true`;;
+Displays the command to start each instance in the cluster and whether the attempt to start each instance succeeded.
+`false`;;
+Displays no additional status information (default).
+
+`--rolling`::
+Performs a rolling restart which each instance restarted in turn. The default value is `true`.
+
+`--delay`::
+Delay in (ms) between each instance restart in a rolling restart. The default value is `0`.
+
+`--instanceTimeout`::
+Specify a timeout value of instances. The default value is `600`.
+
+`--timeout`::
+Specify a timeout value of the command. The default value is `600`.
+
+[[operands]]
+== Operands
+
+cluster-name::
+  The name of the cluster to restart.
+
+[[examples]]
+== Examples
+
+*Example 1 Restarting a Cluster*
+
+This example restarts the cluster `c1`.
+
+[source,shell]
+----
+asadmin> restart-cluster c1
+Command restart-cluster executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  command executed successfully
+1::
+  error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-cluster.adoc#create-cluster[`create-cluster`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-cluster.adoc#delete-cluster[`delete-cluster`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-clusters.adoc#list-clusters[`list-clusters`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/setup-ssh.adoc#setup-ssh[`setup-ssh`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-local-instance.adoc#start-local-instance[`start-local-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-cluster.adoc#start-cluster[`start-cluster`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-cluster.adoc#stop-cluster[`stop-cluster`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/validate-dcom.adoc#validate-dcom[`validate-dcom`]
