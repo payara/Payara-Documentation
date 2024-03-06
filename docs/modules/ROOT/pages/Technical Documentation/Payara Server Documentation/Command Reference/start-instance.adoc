@@ -16,16 +16,13 @@ asadmin [asadmin-options] start-instance [--help]
 [[description]]
 == Description
 
-The `start-instance` subcommand starts a Payara Server instance.This subcommand requires the Distributed Component Object Model (DCOM)
-remote protocol or secure shell (SSH) to be configured on the machine where the domain administration server (DAS) is running and on the machine where the instance resides.
+The `start-instance` subcommand starts a Payara Server instance.This subcommand requires the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to be configured on the machine where the domain administration server (DAS) is running and on the machine where the instance resides.
 
-NOTE: DCOM or SSH is not required if the instance resides on a node of type `CONFIG` that represents the local host. A node of type `CONFIG` is not
-enabled for remote communication over DCOM or SSH.
+NOTE: DCOM or SSH is not required if the instance resides on a node of type `CONFIG` that represents the local host. A node of type `CONFIG` is not enabled for remote communication over DCOM or SSH.
 
 You may run this subcommand from any machine that can contact the DAS.
 
-The subcommand can start any Payara Server instance, regardless of how the instance was created. For example, this subcommand can start an
-instance that was created by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-local-instance.adoc#create-local-instance[`create-local-instance`] subcommand.
+The subcommand can start any Payara Server instance, regardless of how the instance was created. For example, this subcommand can start an instance that was created by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-local-instance.adoc#create-local-instance[`create-local-instance`] subcommand.
 
 This command is supported in remote mode only.
 
@@ -76,11 +73,11 @@ This value is the default.
   `full`;;
     The DAS synchronizes the instance with all of the instance's files, regardless of whether the files have changed since the last
     synchronization. This type of synchronization might delay the startup of the instance while the DAS updates all files in the instance's directories.
-
++
 WARNING: Using full synchronization will cause the configuration to be deleted if the DAS cannot be reached.
 
 `--timeout`::
-Specifies how long to take for the instance to start in seconds. If starting the instance takes longer than this amount then this command will fail.
+Specifies how long to take for the instance to start in seconds. If starting the instance takes longer than this amount then this command will fail (but the instance may still continue its startup process).
 +
 The default value is `120`.
 
@@ -104,7 +101,7 @@ This example starts the Payara Server instance `pmdsa1`.
 
 [source,shell]
 ----
-asadmin> start-instance pmdsa1
+asadmin start-instance pmdsa1
 Waiting for the server to start ..............................
 Successfully started the instance: pmdsa1
 instance Location: /export/payara6/glassfish/nodes/localhost/pmdsa1
@@ -122,7 +119,7 @@ This example starts the Payara Server instance `ymlsa1` with JPDA debugging enab
 
 [source,shell]
 ----
-asadmin> start-instance --debug=true ymlsa1
+asadmin start-instance --debug=true ymlsa1
 Waiting for the server to start ...............................
 Successfully started the instance: ymlsa1
 instance Location: /export/payara6/glassfish/nodes/localhost/ymlsa1

@@ -9,25 +9,25 @@ Starts a Payara Server instance on the host where the subcommand is run.
 [source,shell]
 ----
 asadmin [asadmin-options] start-local-instance [--help] 
-[--nodedir node-dir] [--node node]
-[--debug={false|true}] [--dry-run={true|false}]
+[--nodedir node-dir]
+[--node node]
+[--debug={false|true}]
+[--dry-run={true|false}]
 [--sync={normal|full|none}]
-[--verbose={false|true}] [--watchdog={true|false}] 
-[--timeout timeout] [instance-name]
+[--verbose={false|true}]
+[--watchdog={true|false}]
+[--timeout timeout]
+[instance-name]
 ----
 
 [[description]]
 == Description
 
-The `start-local-instance` subcommand starts a Payara Server instance on the host where the subcommand is run. This subcommand does
-not require the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to be configured. You must run this command from the host where the instance resides.
+The `start-local-instance` subcommand starts a Payara Server instance on the host where the subcommand is run. This subcommand does not require the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to be configured. You must run this command from the host where the instance resides.
 
-The subcommand can start any Payara Server instance, regardless of how the instance was created. For example, this subcommand can start an
-instance that was created by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-instance.adoc#create-instance[`create-instance`] subcommand.
+The subcommand can start any Payara Server instance, regardless of how the instance was created. For example, this subcommand can start an instance that was created by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-instance.adoc#create-instance[`create-instance`] subcommand.
 
-The `start-local-instance` subcommand does not contact the domain administration server (DAS) to determine the node on which the instance
-resides. To determine the node on which the instance resides, the subcommand searches the directory that contains the node directories. If
-multiple node directories exist, the node must be specified as an option of the subcommand.
+The `start-local-instance` subcommand does not contact the domain administration server (DAS) to determine the node on which the instance resides. To determine the node on which the instance resides, the subcommand searches the directory that contains the node directories. If multiple node directories exist, the node must be specified as an option of the subcommand.
 
 This subcommand is supported in local mode. However, to synchronize the instance with the DAS, this subcommand must be run in remote mode.
 
@@ -85,19 +85,14 @@ Possible values are as follows:
     * For the `config` directory, the DAS synchronizes the instance with all changes.
     * For the `applications` directory and `docroot` directory, only a change to a top-level subdirectory causes the DAS to synchronize all files under that subdirectory.
 +
-If a file below a top level subdirectory is changed without a change to a file in the top level subdirectory, full synchronization is
-    required. In normal operation, files below the top level subdirectories of these directories are not changed. If an
-    application is deployed and undeployed, full synchronization is not necessary to update the instance with the change.
+If a file below a top level subdirectory is changed without a change to a file in the top level subdirectory, full synchronization is required. In normal operation, files below the top level subdirectories of these directories are not changed. If an application is deployed and un-deployed, full synchronization is not necessary to update the instance with the change.
 +
 This value is the default.
 
 `full`;;
-The DAS synchronizes the instance with all of the instance's files, regardless of whether the files have changed since the last
-    synchronization. This type of synchronization might delay the startup of the instance while the DAS updates all files in the instance's directories.
-
-CAUTION: If the DAS is not running or is unreachable from the host where you are running this subcommand, do not set the `--sync` option to
-`full`. To perform a full synchronization, the subcommand removes the instance's cache. If the DAS cannot be contacted to replace the cache,
-the subcommand fails and the instance cannot be restarted until it is resynchronized with the DAS.
+The DAS synchronizes the instance with all of the instance's files, regardless of whether the files have changed since the last synchronization. This type of synchronization might delay the startup of the instance while the DAS updates all files in the instance's directories.
++
+CAUTION: If the DAS is not running or is unreachable from the host where you are running this subcommand, do not set the `--sync` option to `full`. To perform a full synchronization, the subcommand removes the instance's cache. If the DAS cannot be contacted to replace the cache, the subcommand fails and the instance cannot be restarted until it is resynchronized with the DAS.
 
 `--verbose`::
 `-v`::
@@ -133,7 +128,7 @@ Possible values are as follows:
     Limited information is not displayed in the console window (default).
 
 `--timeout`::
-Specifies how long to take for the local instance to start in seconds. If starting the instance takes longer than this amount then this command will fail (but the instance may still continue its startup process…​)
+Specifies how long to take for the local instance to start in seconds. If starting the instance takes longer than this amount then this command will fail (but the instance may still continue its startup process)
 +
 The default value is `600`.
 
@@ -152,7 +147,7 @@ This example starts the instance `yml-i-sj01` on the host where the subcommand i
 
 [source,shell]
 ----
-asadmin> start-local-instance --node sj01 yml-i-sj01
+asadmin start-local-instance --node sj01 yml-i-sj01
 Waiting for the server to start .................................
 Successfully started the instance: yml-i-sj01
 instance Location: /export/payara6/glassfish/nodes/sj01/yml-i-sj01

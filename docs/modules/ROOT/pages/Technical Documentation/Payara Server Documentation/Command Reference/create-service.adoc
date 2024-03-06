@@ -22,15 +22,13 @@ asadmin [asadmin-options] create-service [--help]
 [[description]]
 == Description
 
-The `create-service` subcommand configures the starting of a domain administration server (DAS) or a Payara Server instance on an
-unattended boot on Windows, Linux, and Oracle Solaris systems.
+The `create-service` subcommand configures the starting of a domain administration server (DAS) or a Payara Server instance on an unattended boot on Windows, Linux, and Oracle Solaris systems.
 
-If no operand is specified and the domains directory contains only one domain, the subcommand configures the starting of the DAS for the
-default domain. If no operand is specified and the domains directory contains multiple domains, an error occurs.
+If no operand is specified and the domains directory contains only one domain, the subcommand configures the starting of the DAS for the default domain. If no operand is specified and the domains directory contains multiple domains, an error occurs.
 
-If the operand specifies an instance, the `create-service` subcommand does not contact the domain administration server (DAS) to determine the
-node on which the instance resides. To determine the node on which the instance resides, the subcommand searches the directory that contains
-the node directories. If multiple node directories exist, the node must be specified as an option of the subcommand.
+If the operand specifies an instance, the `create-service` subcommand does not contact the domain administration server (DAS) to determine the node on which the instance resides.
+
+To determine the node on which the instance resides, the subcommand searches the directory that contains the node directories. If multiple node directories exist, the node must be specified as an option of the subcommand.
 
 The subcommand contains internal logic to determine whether the supplied operand is a DAS or an instance.
 
@@ -38,7 +36,9 @@ This subcommand is supported in local mode only.
 
 *Behavior of `create-service` on Windows Systems*
 
-On Windows systems, this subcommand must be run as the OS-level administrator user and requires the http://www.microsoft.com/net/[Microsoft .NET Framework] (http://www.microsoft.com/net/), otherwise, the subcommand fails. It creates a Windows service to represent the DAS or instance. The service is created in the disabled state. After this subcommand creates the service, you must use the Windows Services Manager or the Windows Services Wrapper to start, stop, uninstall, or install the service.
+On Windows systems, this subcommand must be run as the OS-level administrator user and requires the link:http://www.microsoft.com/net/[Microsoft .NET Framework] (http://www.microsoft.com/net/), otherwise, the subcommand fails.
+
+It creates a Windows service to represent the DAS or instance. The service is created in the disabled state. After this subcommand creates the service, you must use the Windows Services Manager or the Windows Services Wrapper to start, stop, uninstall, or install the service.
 
 The subcommand creates the following Windows Services Wrapper files for the service in the `domain-dir\bin` directory or the `instance-dir\bin` directory:
 
@@ -63,32 +63,26 @@ instance. The service is created in the disabled state. After this subcommand cr
 * http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=SYSADV1hbrunlevels-25516[Managing Services (Overview)] in System Administration Guide: Basic Administration
 * http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=SYSADV1faauf[Managing Services (Tasks)] in System Administration Guide: Basic Administration
 
-On Oracle Solaris systems, this subcommand must be run as the OS-level user with superuser privileges. The configuration file for the DAS or
-instance must be stored in a directory to which the superuser has access and cannot be stored on a network file system. The service that is
-created is controlled by the OS-level user who owns the directory where the configuration of the DAS or instance resides.
+On Oracle Solaris systems, this subcommand must be run as the OS-level user with superuser privileges. The configuration file for the DAS or instance must be stored in a directory to which the superuser has access and cannot be stored on a network file system. The service that is created is controlled by the OS-level user who owns the directory where the configuration of the DAS or instance resides.
 
 On Oracle Solaris systems, the manifest file is created in the following directory by default:
 
-[source,shell]
+[source,text]
 ----
 /var/svc/manifest/application/GlassFish/domain-or-instance-name_domain-or-instance-root-dir
 ----
 
-To run this subcommand, you must have `solaris.smf.*` authorization. For information about how to grant authorizations to users, see the
-http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Museradd-1m[`useradd`]
-and http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Musermod-1m[`usermod`] man pages.
+To run this subcommand, you must have `solaris.smf.*` authorization. For information about how to grant authorizations to users, see the link:http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Museradd-1m[`useradd`] and link:http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Musermod-1m[`usermod`] man pages.
 
-To run these commands as non-root user, the system administrator must be
-contacted so that the relevant authorizations are granted. You must also ensure that the following conditions are met:
+To run these commands as non-root user, the system administrator must be contacted so that the relevant authorizations are granted. You must also ensure that the following conditions are met:
 
 * Oracle Solaris 10 administration commands such as http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1Msvccfg-1m[`svccfg`],
 http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1svcs-1[`svcs`], and
-http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1auths-1[`auths`]
-are available through the `PATH` statement, so that these commands can be executed. A simple test to do so is to run the command `which svccfg` in the shell.
+http://www.oracle.com/pls/topic/lookup?ctx=E18752&id=REFMAN1auths-1[`auths`] are available through the `PATH` statement, so that these commands can be executed. A simple test to do so is to run the command `which svccfg` in the shell.
 * You must have write permission for the path `/var/svc/manifest/application/GlassFish`. Usually, the superuser has write permission to this path.
 
-If you delete a service that you created by using the `create-service` subcommand, you must delete the directory that contains the manifest
-file and the entire contents of the directory. Otherwise, an attempt to re-create the service by using the `create-service` subcommand fails.
+If you delete a service that you created by using the `create-service` subcommand, you must delete the directory that contains the manifest file and the entire contents of the directory. Otherwise, an attempt to re-create the service by using the `create-service` subcommand fails.
+
 The Oracle Solaris command `svccfg` does not delete this directory.
 
 [[options]]
@@ -112,7 +106,7 @@ asadmin-options::
 To customize the display name of the service in the Windows Service list, set the `DISPLAY_NAME` property to the required name.
 +
 For Oracle Solaris 10 systems, if you specify `net_privaddr`, the service's processes will be able to bind to the privileged ports
-  (<1024) on the platform. You can bind to ports< 1024 only if the owner of the service is superuser, otherwise, this is not allowed.
+  (<1024) on the platform. You can bind to ports< `1024` only if the owner of the service is superuser, otherwise, this is not allowed.
 +
 On Linux systems using SystemD these properties are stored as Environment entries, accessible via Microprofile property in the applications.
 
@@ -132,21 +126,23 @@ Possible values are as follows:
     The service is not created (default).
 
 `--system-type`::
-If specified, system-type must be one of systemd, systemv, solaris or windows, which determine the type of init scripts to create. If not specified, the command performs autodetection of init system.
+If specified, system-type must be one of `systemd`, `systemv`, `solaris` or `windows`, which determine the type of init scripts to create.
++
+If not specified, the command performs auto-detection of init system.
 
 `--serviceuser`::
-  (Linux systems only) The user that is to run the Payara Server software when the service is started. The default is the user that is
-  running the subcommand. Specify this option if the Payara Server is to be run by a user other than the root user.
+(Linux systems only) The user that is to run the Payara Server software when the service is started. The default is the user that is running the subcommand. Specify this option if the Payara Server is to be run by a user other than the root user.
 
 `--domaindir`::
-  The absolute path of the directory on the disk that contains the configuration of the domain. If this option is specified, the operand must specify a domain.
+The absolute path of the directory on the disk that contains the configuration of the domain. If this option is specified, the operand must specify a domain.
 
 `--nodedir`::
-  Specifies the directory that contains the instance's node directory. The instance's files are stored in the instance's node directory. The
-  default is `as-install/nodes`. If this option is specified, the operand must specify an instance.
+Specifies the directory that contains the instance's node directory. The instance's files are stored in the instance's node directory.
++
+The default is `as-install/nodes`. If this option is specified, the operand must specify an instance.
 
 `--node`::
-Specifies the node on which the instance resides. This option may be omitted only if the directory that the --nodedir option specifies contains only one node directory. Otherwise, this option is required. If this option is specified, the operand must specify an instance.
+Specifies the node on which the instance resides. This option may be omitted only if the directory that the `--nodedir` option specifies contains only one node directory. Otherwise, this option is required. If this option is specified, the operand must specify an instance.
 
 [[operands]]
 == Operands
@@ -163,7 +159,7 @@ This example creates a service for the default domain on a system that is runnin
 
 [source,shell]
 ----
-asadmin> create-service
+asadmin create-service
 The Windows Service was created successfully.  It is ready to be started.  Here are the details:
 ID of the service: domain1
 Display Name of the service:domain1 Payara Server
