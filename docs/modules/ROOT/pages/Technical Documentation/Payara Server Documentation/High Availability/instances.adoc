@@ -33,7 +33,6 @@ A clustered instance is created if a cluster is specified in the command to crea
 Any instance that is not part of a cluster is considered an un-clustered server instance. Therefore, standalone instances and shared instances are un-clustered server instances.
 
 Docker instance::
-
 A Docker instance denotes an instance that is running within a Docker container and offers flexibility, portability, and scalability for deploying Payara Server applications in containerized environments.
 
 [[administering-payara-server-instances-centrally]]
@@ -261,9 +260,9 @@ Command delete-instance executed successfully.
 
 * xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-start-an-individual-instance-centrally[To Stop an Individual Instance Centrally]
 * xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-stop-an-individual-instance-locally[To Stop an Individual Instance Locally]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/change-master-broker.adoc[`change-master-broker`(1)]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-instance.adoc[`delete-instance`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/change-master-broker.adoc[`change-master-broker`(1)]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-instance.adoc[`delete-instance`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`]
 
 You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
 
@@ -477,11 +476,9 @@ TIP: Even SSH is set up, you can obtain information about instances in a domain 
 [[to-create-an-instance-locally]]
 === To Create an Instance Locally
 
-//TODO- This sections needs to be expanded for Docker Nodes
-
 Use the `create-local-instance` subcommand in remote mode to create a Payara Server instance locally. Creating an instance adds the instance to the DAS configuration and creates the instance's files on the host where the instance resides.
 
-NOTE: If the instance is a traditional clustered instance, system properties for the instance that relate to GMS must be configured correctly.
+NOTE: If the instance is a clustered instance, system properties for the instance that relate to GMS must be configured correctly. +
 If you change GMS-related system properties for an existing instance, the DAS and the instance must be restarted to apply the changes. For information about GMS, see xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#group-management-service[Group Management Service].
 
 *Before You Begin*
@@ -494,8 +491,7 @@ For information about how to create a node, see the following sections:
 
 * xref:Technical Documentation/Payara Server Documentation/High Availability/nodes.adoc#to-create-an-ssh-node[To Create an `SSH` Node]
 * xref:Technical Documentation/Payara Server Documentation/High Availability/nodes.adoc#to-create-a-config-node[To Create a `CONFIG` Node]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/nodes.adoc#creating-a-node[To Create a `DOCKER` Node]
-
+* xref:Technical Documentation/Payara Server Documentation/High Availability/nodes.adoc#creating-a-docker-node[To Create a `DOCKER` Node]
 
 If the instance is to reference an existing named configuration, ensure that the configuration exists. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/named-configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
 
@@ -503,7 +499,7 @@ If the instance is to reference an existing named configuration, ensure that the
 . Log in to the host that is represented by the node where the instance is to reside.
 . Run the `create-local-instance` subcommand.
 +
-NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for configuring the instance, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-local-instance.adoc[`create-local-instance`] help page.
+NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for configuring the instance, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-local-instance.adoc[`create-local-instance`] help page.
 
 * If you are creating a standalone instance, do not specify a cluster name.
 +
@@ -511,7 +507,7 @@ If the instance is to reference an existing configuration, specify a configurati
 +
 [source,shell]
 ----
-> asadmin --host das-host [--port admin-port] create-local-instance [--node node-name] [--config configuration-name] instance-name
+asadmin --host das-host [--port admin-port] create-local-instance [--node node-name] [--config configuration-name] instance-name
 ----
 +
 das-host::
@@ -539,7 +535,7 @@ instance-name::
 +
 [source,shell]
 ----
-> asadmin --host das-host [--port admin-port] create-local-instance [--node node-name] --config configuration-name instance-name
+asadmin --host das-host [--port admin-port] create-local-instance [--node node-name] --config configuration-name instance-name
 ----
 +
 das-host::
@@ -861,24 +857,28 @@ If the instance has become unresponsive and fails to stop, run the subcommand ag
 
 When this option is `true`, the subcommand uses functionality of the operating system to kill the instance process before restarting the instance.
 
+[[administering-docker-instances]]
 == Administering Docker instances
 
 A Docker instance is the term used to refer to an instance created on a Docker node.  These instances exist within their own Docker containers, with the lifecycle of Docker containers being tied to the instance it was created for.
 
-Note about pre-requisites of examples used in this part:
+This section will illustrate how to effectively administer these instances and correctly troubleshoot any issues that may arise on the Docker environment where they reside. Here are some considerations about the examples used below:
 
-- `payaraDas` and `dockerHost1` are hostnames known to local naming service (or you can use IP addresses)
-- DAS is listening on port 4848 on `payaraDas`
-- Docker is listening on port 2376 on `dockerHost1`
-- DAS can access `http://dockerHost1:2376`
-- Docker containers can access `https://payaraDas:4848`
-- user is on `payaraDas`
-- there are no Docker containers yet, no Docker nodes and no instances registered in the DAS
-- in `/app/passwordfile.txt` on `payaraDas` is at least one line with a correct password:
-`AS_ADMIN_PASSWORD=admin123`
-- in /app/passwordfile-docker.txt on `dockerHost1` is the same line.
+- `payaraDas` and `dockerHost1` are hostnames known to the local naming service (you can use an IP addresses when setting this up)
+- The DAS is listening on port `4848` on `payaraDas`
+- The Docker process is listening on port 2376 on `dockerHost1`
+- The DAS is able to reach this location: `http://dockerHost1:2376`
+- Docker containers can access this location: `https://payaraDas:4848`
+- There are no Docker containers created yet, no Docker nodes and no instances registered in the DAS.
+- We'll use the `/app/passwordfile.txt` file which is located on `payaraDas` to set up the DAS' admin password, with the following contents:
++
+[source, text]
+----
+AS_ADMIN_PASSWORD=admin123
+----
+- The `/app/passwordfile-docker.txt` file stored on `dockerHost1` has the same contents as the previous file.
 
-Avoid using the `payara/server-node:latest` tag, because it changes without warning. If you have the intention to use it, you can re-tag the image and use your own stable Docker image tag:
+TIP: Avoid using the `payara/server-node:latest` Docker image tag, because it changes without warning. If you have the intention to use it, you can re-tag the image and use your own stable Docker image tag like this:
 
 [source, shell]
 ----
@@ -888,25 +888,26 @@ Avoid using the `payara/server-node:latest` tag, because it changes without warn
 [[managing-an-instance]]
 === Managing Docker Instances
 
-Docker instances are manageable in much the same way as any other instance. Deployment of applications, assignation to Deployment Groups, editing of config, should all be done just as if the instance was a standard SSH or CONFIG instance.
+Docker instances are manageable in much the same way as any other instance. Deployment of applications, assignation to Deployment Groups, editing of their configuration, should all be done just as if the instance was hosted on a standard SSH or CONFIG node.
 
 IMPORTANT: Please note that it is required that secure-admin be enabled for Docker instances to start (which is why a password file is mandatory when creating a Docker node).
 
-[[creating-an-instance]]
-==== Creating an Instance
+[[creating-a-docker-instance]]
+==== Creating a Docker Instance
 
 There are two ways how to create a Payara Docker instance belonging to a Domain Administration Server (DAS). You can create a Docker container node and instances on it using the DAS, but you can also create a Docker container with a temporary node and instance directly from Docker. These two use cases differ a bit in their lifecycles.
 
-===== From Domain Administration Server
+[[create-docker-instnace-from-das]]
+===== From the DAS
 
-Creating a Docker instance is done in exactly the same way as when creating a normal one. You will create a Docker node and then you can create one or more Payara Server instances on it. The Payara DAS will use the same version of the Docker container as the DAS by default.
+Creating a Docker instance from the DAS is done in exactly the same way as when creating a regular instance. First, create a Docker node, and then you can create one or more Payara Server instances that are hosted on it:
 
 [source, shell]
 ----
->> asadmin --passwordfile /app/passwordfile.txt create-node-docker --nodehost dockerHost1 --dockerpasswordfile /app/passwordfile-docker.txt --dockerport 2376 DockerNode1
+asadmin --passwordfile /app/passwordfile.txt create-node-docker --nodehost dockerHost1 --dockerpasswordfile /app/passwordfile-docker.txt --dockerport 2376 DockerNode1
 Command create-node-docker executed successfully.
 
->> asadmin --passwordfile /app/passwordfile.txt create-instance --node DockerNode1 DockerInstance1
+asadmin --passwordfile /app/passwordfile.txt create-instance --node DockerNode1 DockerInstance1
 Port Assignments for server instance DockerInstance1:
 OSGI_SHELL_TELNET_PORT=26666
 JAVA_DEBUGGER_PORT=29009
@@ -923,36 +924,40 @@ Successfully registered instance with DAS, now attempting to create Docker conta
 Command create-instance executed successfully.
 ----
 
-When you invoke these commands, a Docker container of the name DockerInstance1 will be created. If a Docker container of the same name already exists, the create-instance command will fail, and Payara Server will attempt to unregister the instance from the DAS.
+When you invoke these commands, a Docker container of the name `DockerInstance1` will be created. If a Docker container of the same name already exists, the `create-instance` command will fail, and Payara Server will attempt to unregister the instance from the DAS.
 
-WARNING: When auto-naming is enabled, Payara Server will only attempt to resolve conflicts with instance names - it will not attempt to resolve conflicts in container name.
+WARNING: When xref:Technical Documentation/Payara Server Documentation/Command Reference/auto-naming.adoc[auto-naming] is enabled, Payara Server will only attempt to resolve conflicts with instance names - it will not attempt to resolve conflicts in container name.
 
-WARNING: This type of instance is completely managed by the DAS - when you delete it, it will be deleted also the Docker container including its logs.
+WARNING: This type of instance is completely managed by the DAS - when you delete it, it will be deleted along with the Docker container including its logs (unless they are re-mapped to an external volume location)
 
 [[from-docker]]
 ===== From Docker
 
-Payara Server supports creating instances from Docker itself, making use of the xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Asadmin Commands/Auto Naming.adoc[auto-naming] feature to resolve any conflicts.
+Payara Server supports creating instances by using Docker directly, making use of the xref:Technical Documentation/Payara Server Documentation/Command Reference/auto-naming.adoc[auto-naming] feature to resolve any conflicts.
 
-The `docker container create` command creates a Payara Docker container without any contact with the DAS. This is also the reason why Docker container has different name than the server instance - they have different contexts and it is not possible to avoid naming conflicts, only to minimize them.
+The `docker container create` command creates a Payara Server Docker container without the need to contact the DAS. This is also the reason why the Docker container has a different name than the server instance - they have different contexts, and it is not possible to avoid naming conflicts, only to minimize them.
 
-You can also specify an existing Docker node name in `PAYARA_NODE_NAME` property (and ideally also `DOCKER_CONTAINER_IP`) and/or xref:/Technical Documentation/Payara Server Documentation/Deployment Groups/Overview.adoc[Deployment Group] in `PAYARA_DEPLOYMENT_GROUP` property, then the Docker instance will be created as if it would be created from the DAS, except the fact that the DAS will be informed about that later with the first startup of the new Docker container.
+You can also specify an existing Docker node name in `PAYARA_NODE_NAME` system property (and ideally also `DOCKER_CONTAINER_IP`) and/or any relevant xref:Technical Documentation/Payara Server Documentation/Deployment Groups/Overview.adoc[deployment groups] by using the `PAYARA_DEPLOYMENT_GROUP` property. In this case, the Docker instance will be created as if it would be created from the DAS, except the fact that the DAS will be informed about that later when the container is properly started.
 
 If the property was not specified or the node does not exist, a temporary Docker node and instance will be created on the DAS. The temporary Docker node is bound to the instance, so when you delete the instance, the temporary Docker node will be deleted too. This type of node is also not listed in the DAS or offered in inputs and cannot be edited.
 
+CAUTION: Using a temporary Docker node and instance arrangement is not recommended for production scenarios.
+
 If the instance running on a temporary Docker node is stopped from the DAS, it is immediately unregistered from the DAS. The next start of the same Docker container creates new a Payara Server Instance and a new temporary Docker node again despite the fact that it uses the same Docker container.
 
-If the Docker containers are stopped externally to Payara (i.e. by the `docker` command), the node and instance will be marked for deletion and cleaned up on shutdown of the DAS.
+If the Docker containers are stopped externally (i.e. by the `docker` command), the node and instance will be marked for deletion and cleaned up on shutdown of the DAS.
 
-[source, shell]
+Here is an example of how to create a Docker instance using this method:
+
+[source, shell, subs=attributes+]
 ----
->> docker container create --network host --mount type=bind,source="/app/passwordfile-docker.txt",target="/pathInDocker/passwordfile.txt",readonly -e PAYARA_DAS_HOST=payaraDas -e PAYARA_DAS_PORT=4848 -e PAYARA_PASSWORD_FILE=/pathInDocker/passwordfile.txt payara/server-node:mytag
+docker container create --network host --mount type=bind,source="/app/passwordfile-docker.txt",target="/pathInDocker/passwordfile.txt",readonly -e PAYARA_DAS_HOST=payaraDas -e PAYARA_DAS_PORT=4848 -e PAYARA_PASSWORD_FILE=/pathInDocker/passwordfile.txt payara/server-node:{page-version}
 994e6d5db276304843481601932857fa224dfd9f9cda8578f3b09f8f11bf6004
 
->> docker start 994e6d5db276
+docker start 994e6d5db276
 994e6d5db276
 
->> docker logs 994e6d5db276
+docker logs 994e6d5db276
 Docker Container ID is: 994e6d5db276304843481601932857fa224dfd9f9cda8578f3b09f8f11bf6004
 No Docker container IP override given, setting to first result from 'hostname -I'
 Hostname is 192.168.1.103
@@ -971,29 +976,29 @@ Starting instance Cooperative-Spookfish
 ...
 ----
 
-IMPORTANT: Don't forget that you are configuring connection to DAS from the viewpoint of the instance container, so configure also the Docker networking appropriately.
+IMPORTANT: Don't forget that you are configuring a connection to DAS from the viewpoint of the instance container, so ensure that the container can reach the DAS in the same network.
 
-[[starting-an-instance]]
-==== Starting and Stopping an Instance
+[[starting-and-stopping-docker-instances]]
+==== Starting and Stopping a Docker Instance
 
-Instances on temporary Docker nodes have their lifecycle bound to a started container. So from the DAS point of view they are started or do not exist.
+Instances on temporary Docker nodes have their lifecycle bound to a started container. So from the DAS point of view, either they are running or do not exist.
 
 Starting a Docker instance on standard Docker node should be done just as if it were an instance on an SSH node. When the `asadmin start-instance` command is invoked, the DAS will contact the Docker Rest API as configured in the node config, and start the Docker container and the instance within it.
 
-WARNING: If the command hangs, the Docker instance probably failed to start. Use the `docker logs` command to see what happened.
+TIP: If the command remains unresponsive, the Docker instance probably failed to start. Use the `docker logs` command to see what happened.
 
 [source, shell]
 ----
->> asadmin --passwordfile /app/passwordfile.txt start-instance DockerInstance1
+asadmin --passwordfile /app/passwordfile.txt start-instance DockerInstance1
 Command start-instance executed successfully.
 
->> asadmin --passwordfile /app/passwordfile.txt stop-instance DockerInstance1
+asadmin --passwordfile /app/passwordfile.txt stop-instance DockerInstance1
 The instance, DockerInstance1, is stopped.
 Command stop-instance executed successfully.
 ----
 
-[[deleting-an-instance]]
-==== Deleting an Instance
+[[deleting-a-docker-instance]]
+==== Deleting a Docker Instance
 
 Much as with when creating a standard Docker instance, deleting a Docker instance is done in the same way as other instances: with the `asadmin delete-instance` command. This will unregister the instance from the DAS, and delete the Docker container.
 
@@ -1001,49 +1006,53 @@ Containers on temporary Docker nodes are not deleted by the DAS, they will be on
 
 [source, shell]
 ----
->> asadmin --passwordfile /app/passwordfile.txt delete-instance DockerInstance1
+asadmin --passwordfile /app/passwordfile.txt delete-instance DockerInstance1
+
 Successfully removed instance DockerInstance1 from the DAS configuration, and removed the container from node DockerNode1 (dockerHost1).
 Command delete-instance executed successfully.
 ----
 
-WARNING: if you would delete the container directly with the `docker` command, the DAS would not know it. Such inconsistency can be resolved only by deletion of the instance from the DAS. This is automatically done on DAS restart.
+WARNING: if you would delete the container directly with the `docker` command, the DAS would not be aware of it. Such inconsistency can be resolved only by deletion of the instance from the DAS. This is automatically done on DAS restart, to guarantee an eventual consistency of the instances state on the system.
 
 [[configuring-the-docker-container]]
 === Configuring the Docker Container
 
-Configuration of the Docker containers is done via system properties in an instances config (and so can be shared across multiple instances).
+Configuration of the Docker containers where server instances are hosted is done via system properties in the corresponding instance's configuration object (so can be shared across multiple instances that may belong to a deployment group).
 
-A complete list of the available configuration options can be found in the Docker Engine REST API here: https://docs.docker.com/engine/api/v1.39/#operation/ContainerCreate
+A complete list of the available configuration options can be found in the Docker Engine REST API here: link:https://docs.docker.com/engine/api/v1.39/#operation/ContainerCreate
 
-IMPORTANT: The image name is not configurable. Payara Server expects the image name to match the value from the node config
+IMPORTANT: The image name is not configurable. Payara Server expects the image name to match the value from the node configuration.
 
 The configuration within Payara Server of the settings denoted in the above link takes the form of dotted names. These names adhere to the following syntax:
 
-* Each property is prepended with "Docker"
+* Each property is prefixed with `Docker`
 * Each child object is specified individually, with all of its parents prepended to it
-* Arrays must be surrounded with square braces
-* Array values are separated using the vertical bar symbol "|"
-* The colon character is used to denote the value of an object within an array
-* Objects within an array are separated using a comma
+* Arrays must be surrounded with square braces (`[]`)
+* Array values are separated using the vertical bar symbol (`|`)
+* The colon character (`;`) is used to denote the value of an object within an array
+* Objects within an array are separated using a comma (`,`)
 
-Properties that are denoted by arrays of objects containing further objects or arrays are not currently supported. The Env property is unique in that the colon character is used to denote the equals sign, as Payara Server does not currently support properties that contain an equals in their value.
+NOTE: Properties that are denoted by arrays of objects containing further objects or arrays are not currently supported. The `Env` property is unique in that the colon character is used to denote the equals sign, as Payara Server does not currently support properties that contain an equals in their value.
 
 See below for some examples:
 
+[cols="50%,25%,25%", options="header"]
 |===
 |Example| Original JSON |Payara System Properties
 
-|Arrays must be surrounded with square braces & array values separated using the vertical bar symbol "\|"
+|Arrays must be surrounded with square braces & array values separated using the vertical bar symbol `\|`
 |`{ENV: [arg1=foo,arg2=bar]}`
 |`Docker.Env=[arg1:foo\|arg2:bar]`
 
 |Each child object of a parent object is specified individually
 |`{HostConfig: {Memory: 2048, CpuShares: 3}`
-|`Docker.HostConfig.Memory=2048`
+|
+`Docker.HostConfig.Memory=2048`
+
 `Docker.HostConfig.CpuShares=3`
 
 |The colon character is used to denote the value of an object within an array & objects within an array are
-separated using a comma
+separated using a comma `,`
 |`{HostConfig: {BlkioDeviceReadBps: [{Path: /opt/foo, Rate: 24},{Path: /opt/bar, Rate: 48}]}`
 |`Docker.HostConfig.BlkioDeviceReadBps=[Path:/opt/foo,Rate:24\|Path:/opt/bar,Rate:48]`
 |===
@@ -1051,54 +1060,55 @@ separated using a comma
 [[reserved-environment-properties]]
 ==== Reserved Environment Properties
 
-The following Docker Environment properties are used by the default Docker image, _payara/server-node_, which you may wish to override to match your configuration (particularly if creating containers directly from Docker):
+The following Docker Environment properties are used by the default Docker image, `payara/server-node:{page-version}`, which you may wish to override to match your configuration (particularly if creating containers directly from Docker):
 
 |===
 |Environment Property| Use| Default Value
 
-| PAYARA_DAS_HOST
+| `PAYARA_DAS_HOST`
 | The IP address or hostname of the Domain Administration Server that the instance will register itself to.
-| localhost
+| `localhost`
 
-| PAYARA_DAS_PORT
+| `PAYARA_DAS_PORT`
 | The port that the Domain Administration Server is running on
 | `4848`
 
-| PAYARA_NODE_NAME
+| `PAYARA_NODE_NAME`
 | The name of the node that the instance should be created on.
 | ""
 
-| PAYARA_INSTANCE_NAME
+| `PAYARA_INSTANCE_NAME`
 | The name of the instance to be created.
 | ""
 
-| PAYARA_CONFIG_NAME
+| `PAYARA_CONFIG_NAME`
 | The name of the config that the created instance should use.
 | ""
 
-| DOCKER_CONTAINER_IP
-| The IP address or hostname that the Docker Container should use. This is used for verifying that a given node's
-network config maps to this container, or for when creating new nodes and instances.
+| `DOCKER_CONTAINER_IP`
+| The IP address or hostname that the Docker Container should use. This is used for verifying that a given node's network config maps to this container, or for when creating new nodes and instances.
 | First result of `hostname -I` (all IP addresses, excluding loopback)
 
-| PAYARA_DEPLOYMENT_GROUP
-| The name of the xref:/Technical Documentation/Payara Server Documentation/Deployment Groups/Overview.adoc[Deployment Group] that the instance should join. Once the instance joins the Deployment Group, all the application targeted at the Deployment Group will automatically deploy to it.
-| ""
+| `PAYARA_DEPLOYMENT_GROUP`
+| The name of the xref:Technical Documentation/Payara Server Documentation/Deployment Groups/Overview.adoc[Deployment Group] that the instance should join.
 
+Once the instance joins the Deployment Group, all the application targeted at the Deployment Group will automatically deploy to it.
+| ""
 |===
 
-IMPORTANT: The DAS expects to be able to talk to each instance using the port listed in its config. Don't forget to properly configure used networks.
+IMPORTANT: The DAS expects to be able to reach each instance using the port listed in its configuration. Don't forget to ensure that the DAS and containers reside on the same network.
 
-[[other-examples]]
-==== Other examples
+[[other-examples-for-docker-instances]]
+==== Other examples for Docker Instances
 
+[[creating-docker-containter-using-rest-api]]
 ===== Creating a container using the Docker REST API
 
-Note: you can alternatively create a JSON file and then use curl syntax for sending files (i.e. `@create.json`).
+NOTE: You can alternatively create a JSON file and then use curl syntax for sending files (i.e. `@create.json`).
 
 [source, shell]
 ----
->> curl -H 'Accept: application/json' -H 'Content-Type: application/json' -i 'http://dockerHost1:2376/containers/create?name=ManagedContainer2' --data '{
+curl -H 'Accept: application/json' -H 'Content-Type: application/json' -i 'http://dockerHost1:2376/containers/create?name=ManagedContainer2' --data '{
   "Image": "payara/server-node:mytag",
   "HostConfig": {
     "Mounts": [
@@ -1140,17 +1150,18 @@ Server: Docker/18.09.7 (linux)
 Date: Mon, 04 Nov 2019 13:17:15 GMT
 ----
 
+[[creating-docker-container-set-instance-name]]
 ===== Creating a container with a set instance name, resolving conflicts
 
 [source, shell]
 -----
->> docker container create --network host --mount type=bind,source="/app/passwordfile-docker.txt",target="/pathInDocker/passwordfile.txt",readonly -e PAYARA_DAS_HOST=payaraDas -e PAYARA_DAS_PORT=4848 -e DOCKER_CONTAINER_IP=dockerHost1 -e PAYARA_PASSWORD_FILE=/pathInDocker/passwordfile.txt -e PAYARA_NODE_NAME=DockerNode1 -e PAYARA_INSTANCE_NAME=ManagedContainer2 payara/server-node:mytag
+docker container create --network host --mount type=bind,source="/app/passwordfile-docker.txt",target="/pathInDocker/passwordfile.txt",readonly -e PAYARA_DAS_HOST=payaraDas -e PAYARA_DAS_PORT=4848 -e DOCKER_CONTAINER_IP=dockerHost1 -e PAYARA_PASSWORD_FILE=/pathInDocker/passwordfile.txt -e PAYARA_NODE_NAME=DockerNode1 -e PAYARA_INSTANCE_NAME=ManagedContainer2 payara/server-node:mytag
 af48bec58c144bad8ac83c9344dcebc4b9a6d528dd8673a6e6f5275e8b3ed2a2
 
->> docker start af48bec58c14
+docker start af48bec58c14
 af48bec58c14
 
->> docker logs af48bec58c14
+docker logs af48bec58c14
 Docker Container ID is: af48bec58c144bad8ac83c9344dcebc4b9a6d528dd8673a6e6f5275e8b3ed2a2
 Docker Container IP is: dockerHost1
 Instance name provided, but local file system for instance missing, checking if file system or new instance needs to be created.
@@ -1172,10 +1183,10 @@ Command _set-docker-container-id executed successfully.
 Starting instance ManagedContainer2-PerfectZiege
 -----
 
-[[listings]]
-===== Listings
+[[listing-docker-containers]]
+===== Listing Docker Containers
 
-[source, shell]
+[source, shell, subs=attributes+]
 ----
 >> docker ps -a
 CONTAINER ID        IMAGE                              COMMAND                  CREATED             STATUS              PORTS               NAMES
@@ -1183,20 +1194,21 @@ af48bec58c14        payara/server-node:mytag   "/opt/payara/entrypo…"   3 minu
 e7803ce3ec96        payara/server-node:mytag   "/opt/payara/entrypo…"   7 minutes ago       Up 5 minutes                            ManagedContainer2
 994e6d5db276        payara/server-node:mytag   "/opt/payara/entrypo…"   16 minutes ago      Up 15 minutes                           musing_euclid
 
->> docker images payara/server-node
+docker images payara/server-node
 REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE
-payara/server-node   pandrex191104       386a996b3649        About an hour ago   511MB
-payara/server-node   dmatej191104        27fadc4f48ca        5 hours ago         511MB
-payara/server-node   5.193.1             f5cf02e10dc2        4 weeks ago         525MB
+payara/server-node   custom-{page-version}       386a996b3649        About an hour ago   511MB
+payara/server-node   {page-version}              f5cf02e10dc2        4 weeks ago         525MB
 payara/server-node   latest              f5cf02e10dc2        4 weeks ago         525MB
 payara/server-node   mytag               f5cf02e10dc2        4 weeks ago         525MB
 
->> asadmin --passwordfile /app/appservers/passwordfile.txt list-nodes
+asadmin --passwordfile /app/appservers/passwordfile.txt list-nodes
+
 localhost-domain1  CONFIG  localhost
 DockerNode1  DOCKER  dockerHost1
 Command list-nodes executed successfully.
 
->> asadmin --passwordfile /app/appservers/passwordfile.txt list-instances
+asadmin --passwordfile /app/appservers/passwordfile.txt list-instances
+
 Cooperative-Spookfish            running
 ManagedContainer2                running
 ManagedContainer2-PerfectZiege   running
@@ -1372,9 +1384,9 @@ Command start-local-instance executed successfully.
 
 *See Also*
 
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/start-instance.adoc[`start-instance`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/start-local-instance.adoc[`start-local-instance`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-instance.adoc[`start-instance`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-local-instance.adoc[`start-local-instance`]
 
 [[to-resynchronize-library-files]]
 === To Resynchronize Library Files
@@ -1428,7 +1440,7 @@ You can also view the full syntax and options of the subcommands by typing the c
 [[to-resynchronize-custom-configuration-files-for-an-instance]]
 === To Resynchronize Custom Configuration Files for an Instance
 
-Configuration files in the `domain-dir/config` directory that are resynchronized are resynchronized for the entire domain.
+Configuration files in the `domain-dir/config` directory that are resynchronized for the entire domain.
 
 If you create a custom configuration file for an instance or a cluster, the custom file is resynchronized only for the instance or cluster. You'll have to update any JVM options that reference this configuration file in the domain configuration settings.
 
@@ -1465,20 +1477,19 @@ This example updates the option for locating the `server.policy` file to specify
 
 [source,shell]
 ----
-asadmin> delete-jvm-options --target pmd
--Djava.security.policy=${com.sun.aas.instanceRoot}/config/server.policy
+asadmin> delete-jvm-options --target pmd -Djava.security.policy=${com.sun.aas.instanceRoot}/config/server.policy
 Deleted 1 option(s)
 Command delete-jvm-options executed successfully.
-asadmin> create-jvm-options --target pmd
--Djava.security.policy=${com.sun.aas.instanceRoot}/config/pmd-config/server.policy
+
+asadmin create-jvm-options --target pmd -Djava.security.policy=${com.sun.aas.instanceRoot}/config/pmd-config/server.policy
 Created 1 option(s)
 Command create-jvm-options executed successfully.
 ----
 
 *See Also*
 
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-jvm-options.adoc[`create-jvm-options`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-jvm-options.adoc[`delete-jvm-options`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-jvm-options.adoc[`create-jvm-options`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-jvm-options.adoc[`delete-jvm-options`]
 
 [[to-resynchronize-users-changes-to-files]]
 === To Resynchronize Users' Changes to Files

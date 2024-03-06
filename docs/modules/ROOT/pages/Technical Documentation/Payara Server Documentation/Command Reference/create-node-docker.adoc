@@ -1,0 +1,113 @@
+[[create-node-docker]]
+= create-node-docker
+
+Creates a node that hosts server instances on a Docker containers.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] create-node-ssh [--help]
+[--nodehost node-host]
+[--installdir as-install-parent]
+[--nodedir node-dir]
+[--dockerpasswordfile filepath]
+[--dockerimage imageName]
+[--dockerport port]
+[--useTls={false|true}]
+node-name
+----
+
+[[description]]
+== Description
+
+The `create-node-docker` subcommand creates a server node hosted on a Docker container.
+
+A node represents a host on which the Payara Server software is installed. A node must exist for every host on which Payara Server instances reside.
+
+The domain administration server (DAS) contacts a Docker node's host through the Docker engine's REST API on its specific configured host and port. By default, the subcommand fails and the node is not created if the DAS cannot reach the configured Docker engine's process.
+
+The setup of a Docker node is more involved that other types of nodes, so it is recommended reading about the requirements and conditions for this command to work properly in xref:Technical Documentation/Payara Server Documentation/High Availability/nodes.adoc#creating-a-docker-node[corresponding section] in Payara Server's High Availability section.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--nodehost`::
+The name of the host where the Docker engine process is listening through its REST API. This option is mandatory, otherwise the command fails.
+`--installdir`::
+The full path to the parent of the base installation directory of the Payara Server software on the host, for example, `/export/payara/`. The default is the parent of the default base installation directory of the Payara Server software for the DAS.
++
+When creating a Docker node this parameter is mostly irrelevant when using the official Payara Server Node images. Use this parameter to point to custom server installations in case of using different images.
+`--nodedir`::
+The path to the directory that is to contain Payara Server instances that are created on the node. The default is `as-install/nodes`, where as-install is the base installation directory of the Payara Server software on the host.
++
+If a relative path is specified, the path is relative to the `as-install` directory.
+`--dockerPasswordFile`::
+This is the fully-qualified path of the password file that the Docker instance will use for authentication against the DAS.
++
+Please note, that this path should be the path to the file on the *remote* machine where . This file should be a standard Payara Server password file as you would use with asadmin. This must be specified, as Docker instances require secure admin to be enabled to start.
+`--dockerImage`::
+The Docker image to use for creating the container.
++
+Defaults to `payara/server-node:{page-version}`.
+`--dockerPort`::
+The port where the Docker engine's REST API endpoint is exposed.
++
+Defaults to `2376`.
+`--useTls`::
+Specifies whether the Docker engine's REST API endpoint is contacted through secure communication, as recommended in most environments. Defaults to `false`.
+
+[[operands]]
+== Operands
+
+node-name::
+The name of the node. +
+The name must meet the following requirements: +
+* The name may contain only ASCII characters.
+* The name must start with a letter, a number, or an underscore.
+* The name may contain only the following characters:
+** Lowercase letters
+** Uppercase letters
+** Numbers
+** Hyphen
+** Period
+** Underscore
+* The name must be unique in the domain and must not be the name of another node, a cluster, a named configuration, or a Payara Server instance.
+* The name must not be `domain`, `server`, or any other keyword that is reserved by Payara Server.
+
+[[examples]]
+== Examples
+
+*Example 1 Creating a Node*
+
+This example creates the node `docker-node-1` by contacting the Docker REST API which is hosted in `http://localhost:2376` (locally using the default port):
+
+[source,shell]
+----
+asadmin create-node-docker --nodehost localhost --dockerPasswordFile /opt/passwordfile.txt --dockerport 2376 docker-node-1
+
+Command create-node-ssh executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+command executed successfully
+1::
+error in executing the command
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-docker.adoc#delete-node-docker[`delete-node-docker`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc#list-nodes[`list-nodes`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/update-node-docker.adoc#update-node-docker[`update-node-docker`]
