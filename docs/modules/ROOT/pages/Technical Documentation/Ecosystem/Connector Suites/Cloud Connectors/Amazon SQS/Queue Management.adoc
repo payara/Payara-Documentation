@@ -1,12 +1,10 @@
-[[managing-queues]]
-= Managing Queues
-Queues in Amazon SQS can be managed, including actions such as creating queues, deleting queues, listing queues, fetching queue URL, retrieving queue attributes, and additional features all via the JCA and an Amazon-specific API. To utilize this API for managing queues, a resource must be defined using the JCA API – a connection factory.
+= Managing Queues with Cloud Connector
 
-The connection factory should be assigned a name, typically within the `java:app` namespace. The type of the connection factory for Amazon SQS is `fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory`. Specify the resource adapter name, which in this case, is `amazon-sqs-rar-0.8.0.rar`.
+Managing queues in Amazon SQS is crucial for effective message handling. This guide outlines the process using the Java Connector Architecture (JCA) API, focusing on key operations like creating, listing, and deleting queues.
 
-Finally, AWS account details need to be specified in the properties of the corresponding JMS resource definitions.
+== Connection Factory Setup
 
-The following gives an example:
+To utilize the Amazon SQS API for managing queues, a connection factory must be defined using the JCA API. This involves specifying the connection factory type and resource adapter name. Additionally, AWS account details are required in the properties of the corresponding JMS resource definitions.
 
 [source, java]
 ----
@@ -14,31 +12,11 @@ The following gives an example:
   name = "java:app/amazonsqs/factory",
   interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
   resourceAdapter = "amazon-sqs-rar-0.8.0"
-  properties = {"awsAccessKeyId=<accessKeyID>", "awsSecretKey=<secretKey>", "region=eu-west-2"}
+  properties = {"awsAccessKeyId=<accessKeyID>", "awsSecretKey=<secretKey>", "region=<aws-region>"}
 )
-----
-
-[[create-queue]]
-== Create Queue:
-
-Creates a new Amazon SQS queue.
-
-[source, java]
-----
-CreateQueueRequest createQueueRequest = new CreateQueueRequest("MyNewQueue");
-CreateQueueResult createQueueResult = connection.createQueue(createQueueRequest);
-System.out.println("Queue Created: " + createQueueResult);
-----
-
-[[list-queues]]
-== List Queues:
-With the above definition, the following code provides an example of listing queues:
-
-[source, java]
-----
 @Singleton
 @Startup
-public class ListSQSQueues {
+public class ManageSQSQueues {
  
  @Resource(lookup = "java:app/amazonsqs/factory")
  private AmazonSQSConnectionFactory factory;
@@ -46,19 +24,8 @@ public class ListSQSQueues {
  @PostConstruct
  public void listQueues() {
     try (AmazonSQSConnection connection = factory.createConnection()) {
-        // List all queues
-        ListQueuesResult allQueues = connection.listQueues();
-        System.out.println("All Queues:");
-        for (String queueUrl : allQueues.getQueueUrls()) {
-            System.out.println(" - " + queueUrl);
-        }
-
-        // List queues with a specific name prefix
-        ListQueuesResult prefixedQueues = connection.listQueues("my-prefix");
-        System.out.println("Prefixed Queues:");
-        for (String queueUrl : prefixedQueues.getQueueUrls()) {
-            System.out.println(" - " + queueUrl);
-        }
+        // Manage queues using AmazonSQSConnection
+        ............
     }
     catch (Exception ex) {
         ex.printStackTrace();
@@ -67,55 +34,103 @@ public class ListSQSQueues {
 }
 ----
 
-[[delete-queue]]
-== Delete Queue:
+In the above example, The `@ConnectionFactoryDefinition` annotation sets up the connection factory, where properties like `awsAccessKeyId`, `awsSecretKey`, and `region` should be configured.
+Within the `try` block, an instance of `AmazonSQSConnection` is created using the connection factory (`factory.createConnection()`). Subsequently, the connection is used to perform various queue management operations, such as creating a new queue, listing all queues, and deleting an existing queue.
 
-Deletes an existing Amazon SQS queue.
+
+== Create Queue
+
+Creating a new Amazon SQS queue is a fundamental operation. The following code snippet demonstrates how to create a queue:
 
 [source, java]
 ----
-DeleteQueueRequest deleteQueueRequest = new DeleteQueueRequest("https://sqs.ap-south-1.amazonaws.com/185040379064/MyQueue");
+CreateQueueRequest createQueueRequest = new CreateQueueRequest("MyNewQueue");
+CreateQueueResult createQueueResult = connection.createQueue(createQueueRequest);
+System.out.println("Queue Created: " + createQueueResult);
+----
+
+In this example, "MyNewQueue" is the name of the new queue. Additional parameters can be added to customize the queue creation.
+
+== List Queues
+
+Listing queues provides insight into existing queues. The following code demonstrates how to list all queues and those with a specific name prefix:
+
+[source, java]
+----
+// List all queues
+ListQueuesResult allQueues = connection.listQueues();
+System.out.println("All Queues:");
+for (String queueUrl : allQueues.getQueueUrls()) {
+    System.out.println(" - " + queueUrl);
+}
+
+// List queues with a specific name prefix
+ListQueuesResult prefixedQueues = connection.listQueues("my-prefix");
+System.out.println("Prefixed Queues:");
+for (String queueUrl : prefixedQueues.getQueueUrls()) {
+    System.out.println(" - " + queueUrl);
+}
+----
+
+Listing queues aids in monitoring and managing existing queues, allowing for targeted actions.
+
+== Delete Queue
+
+Deleting an existing Amazon SQS queue is a critical operation. Ensure the complete queue URL is provided in the `DeleteQueueRequest`. The following code snippet illustrates how to delete a queue:
+
+[source, java]
+----
+DeleteQueueRequest deleteQueueRequest = new DeleteQueueRequest("https://sqs.<aws-region>.amazonaws.com/xxxxx/MyQueue");
 DeleteQueueResult deleteQueueResult = connection.deleteQueue(deleteQueueRequest);
 System.out.println("Queue Deleted: " + deleteQueueResult);
 ----
 
-[[list-queue-tags]]
-== List Queue Tags:
+Exercise caution, as deleting a queue is irreversible and results in the loss of all messages.
 
-Lists the tags for an Amazon SQS queue.
+== List Queue Tags
+
+Listing queue tags provides metadata about a queue. The following code snippet demonstrates how to list tags for a specific queue:
 
 [source, java]
 ----
-ListQueueTagsResult tagsResult = connection.listQueueTags("https://sqs.ap-south-1.amazonaws.com/185040379064/MyQueue");
+ListQueueTagsResult tagsResult = connection.listQueueTags("https://sqs.<aws-region>.amazonaws.com/xxxxx/MyQueue");
 Map<String, String> tags = tagsResult.tags();
 System.out.println("Queue Tags: " + tags);
 ----
 
-[[purge-queue]]
-== Purge Queue:
+Tags offer a way to categorize and organize queues based on specific attributes.
 
-Deletes all the messages in an Amazon SQS queue.
+== Purge Queue
+
+Purging a queue deletes all messages within it. Exercise caution, as this operation is irreversible. The following code snippet illustrates how to purge a queue:
 
 [source, java]
 ----
-PurgeQueueResult purgeResult = connection.purgeQueue("https://sqs.ap-south-1.amazonaws.com/185040379064/MyQueue");
+PurgeQueueResult purgeResult = connection.purgeQueue("https://sqs.<aws-region>.amazonaws.com/xxxxx/MyQueue");
 System.out.println("Queue Purged: " + purgeResult);
 ----
 
-[[tag-untag-queue]]
-== Tag and Untag Queue:
+Use this operation carefully, as it removes all messages from the specified queue.
 
-Adds and removes tags from an Amazon SQS queue.
+== Tag and Untag Queue
+
+Adding and removing tags from a queue provides additional context. The following code snippet shows how to tag and untag a queue:
 
 [source, java]
 ----
 Map<String, String> tagsToAdd = Map.of("Environment", "Production", "Team", "Dev");
-TagQueueRequest tagQueueRequest = new TagQueueRequest("https://sqs.ap-south-1.amazonaws.com/185040379064/MyQueue", tagsToAdd);
+TagQueueRequest tagQueueRequest = new TagQueueRequest("https://sqs.<aws-region>.amazonaws.com/xxxxx/MyQueue", tagsToAdd);
 TagQueueResult tagQueueResult = connection.tagQueue(tagQueueRequest);
 System.out.println("Queue Tagged: " + tagQueueResult);
 
 List<String> tagKeysToRemove = List.of("Environment");
-UntagQueueRequest untagQueueRequest = new UntagQueueRequest("https://sqs.ap-south-1.amazonaws.com/185040379064/MyQueue", tagKeysToRemove);
+UntagQueueRequest untagQueueRequest = new UntagQueueRequest("https://sqs.<aws-region>.amazonaws.com/xxxxx/MyQueue", tagKeysToRemove);
 UntagQueueResult untagQueueResult = connection.untagQueue(untagQueueRequest);
 System.out.println("Queue Untagged: " + untagQueueResult);
 ----
+
+Tagging allows for easy classification, while untagging removes unnecessary metadata.
+
+
+Effectively managing Amazon SQS queues using the JCA API empowers developers to streamline message processing and maintain a well-organized messaging system. 
+For more detailed information on the Amazon SQS Java SDK, including additional features and advanced usage, refer to the official Javadocs: link:https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/sqs/SqsClient.html[]
