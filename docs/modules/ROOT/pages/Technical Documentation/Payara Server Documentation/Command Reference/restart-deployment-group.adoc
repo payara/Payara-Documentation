@@ -1,0 +1,106 @@
+[[restart-deployment-group]]
+= restart-deployment-group
+
+Restarts all the instances in a Payara Server deployment group.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] restart-deployment-group [--help]
+[--instanceTimeout timeout]
+[--timeout timeout]
+[--verbose={false|true}]
+[--rolling={false|true}]
+[--delay delay]
+name
+----
+
+[[description]]
+== Description
+
+The `restart-deployment-group` subcommand will restart all instances that belong to a Payara Server deployment group. The command will fail if the deployment group doesn't contain any instances in it. To this effect, the command will:
+
+. Stop any running instances first and wait until all instances are stopped.
+. Start all instances that belong to the deployment group.
+
+You can configure the command to execute a "rolling restart", that is, instead of stopping all instances first and then starting them, stop and start each instance in order by using the `--rolling` option.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+
+`--verbose`::
+`-v`::
+Whether to start the instances in verbose mode. Defaults to `false`.
+
+`--timeout`::
+Specifies how long to take for command execution to be completed in seconds. If the execution takes longer than this amount then this command will fail.
++
+The default value is `600`.
+
+`--instanceTimeout`::
+Specifies how long to take for each instance to start/stop in seconds. If each operation takes longer than this amount then this command will fail.
++
+The default value is `600`.
+
+`--rolling`::
+Whether to execute a "rolling restart", that is, stop and start each instance in order to prevent a full shutdown of an application. Defaults to `false`.
+`--delay`::
+Only applies when `--rolling` is set to `true`. Sets a delay wait time in milliseconds between each instance restart. Defaults to `5000`.
+
+[[operands]]
+== Operands
+
+name::
+The name of the deployment group. If there are no deployment groups that match the name the command will exit with an error.
+
+[[examples]]
+== Examples
+
+*Example 1 Restart a Deployment Group*
+
+This example restarts a deployment group that is named `test-dgroup`:
+
+[source,shell]
+----
+asadmin restart-deployment-group test-dgroup
+Command restart-deployment-group executed successfully.
+----
+
+*Example 2 Execute a rolling restart of a Deployment Group*
+
+This example restarts a deployment group that is named `test-dgroup` in rolling mode using a delay of 30 seconds:
+
+[source,shell]
+----
+asadmin restart-deployment-group --rolling=true --delay=30000 test-dgroup
+Command restart-deployment-group executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+command executed successfully
+1::
+error in executing the command
+
+See Also
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-deployment-group.adoc#create-deployment-group[`create-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-instance.adoc#start-instance[`start-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-instance.adoc#stop-instance[`stop-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-deployment-groups.adoc#list-deployment-groups[`list-deployment-groups`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-deployment-group.adoc#start-deployment-group[`start-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-deployment-group.adoc#stop-deployment-group[`stop-deployment-group`]

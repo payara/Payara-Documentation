@@ -81,7 +81,7 @@ Payara Server provides a number of ways by which a read-only bean's state can be
 * Never refreshed
 * Programmatically refreshed
 
-NOTE: Read-only beans are best suited for situations where the underlying data never changes, or changes infrequently. For further information and usage guidelines, see xref:ejb.adoc#using-read-only-beans[Using Read-Only Beans].
+NOTE: Read-only beans are best suited for situations where the underlying data never changes, or changes infrequently. For further information and usage guidelines, see xref:#using-read-only-beans[Using Read-Only Beans].
 
 [[the-pass-by-reference-element]]
 === The `pass-by-reference` Element
@@ -183,7 +183,7 @@ Timer DataSource::
   Specifies the database used by the EJB Timer Service. The default is `jdbc/__TimerPool`.
 +
 CAUTION: Do not use the `jdbc/__TimerPool` resource for timers in clustered Payara Server environments.
-You must instead use a custom JDBC resource or the `jdbc/__default` resource. See the instructions below, in xref:ejb.adoc#to-deploy-an-ejb-timer-to-a-cluster[To Deploy an EJB Timer to a Cluster]. +
+You must instead use a custom JDBC resource or the `jdbc/__default` resource. See the instructions below, in xref:#to-deploy-an-ejb-timer-to-a-cluster[To Deploy an EJB Timer to a Cluster]. +
 Also refer to "xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#enabling-the-jdbc__default-resource-in-a-clustered-environment[Enabling the jdbc/__default Resource in a Clustered Environment]" in the Payara Server General Administration section.
 
 For information about migrating EJB timers, see "xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#migrating-ejb-timers[Migrating EJB Timers]" in the Payara Server High Availability section.
@@ -401,7 +401,7 @@ The passivated beans are stored on the file system. The Session Store Location s
 NOTE: Make sure the `delete` option is set in the `server.policy` file, or expired file-based sessions might not be deleted properly.
 For more information about `server.policy`, see xref:Technical Documentation/application-development-guide:securing-apps.adoc#the-server.policy-file[The `server.policy` File].
 
-The Session Store Location setting also determines where the session state is persisted if it is in a High Availability environment; see xref:ejb.adoc#choosing-a-persistence-store[Choosing a Persistence Store].
+The Session Store Location setting also determines where the session state is persisted if it is in a High Availability environment; see xref:#choosing-a-persistence-store[Choosing a Persistence Store].
 
 [[stateful-session-bean-failover]]
 === Stateful Session Bean Failover
@@ -514,7 +514,7 @@ If set to `false`, performance is reduced but availability is guaranteed. States
 [[server-instance-and-ejb-container-levels]]
 ===== Server Instance and EJB Container Levels
 
-To enable SFSB checkpointing at the server instance or EJB container level, see xref:ejb.adoc#choosing-a-persistence-store[Choosing a Persistence Store].
+To enable SFSB checkpointing at the server instance or EJB container level, see xref:#choosing-a-persistence-store[Choosing a Persistence Store].
 
 [[application-and-ejb-module-levels]]
 ===== Application and EJB Module Levels
@@ -697,20 +697,34 @@ public interface ReadOnlyBeanNotifier extends java.rmi.Remote {
  }
 ----
 
-The implementation of the ReadOnlyBeanNotifier interface is provided by the container. The bean looks up `ReadOnlyBeanNotifier` using a fragment of code such as the following example:
+The implementation of the `ReadOnlyBeanNotifier` interface is provided by the container. The bean looks up `ReadOnlyBeanNotifier` using a fragment of code such as the following example:
 
 [source,java]
 ----
-var helper = new com.sun.appserv.ejb.ReadOnlyBeanHelper();
-var notifier = helper.getReadOnlyBeanNotifier("java:comp/env/ejb/ReadOnlyCustomer");
-notifier.refresh(PrimaryKey);
+public class MyEJB{
+
+    public void execute(){
+        var helper = new com.sun.appserv.ejb.ReadOnlyBeanHelper();
+        var notifier = helper.getReadOnlyBeanNotifier("java:comp/env/ejb/ReadOnlyCustomer");
+        //Assume entity is a CMP entity bean
+        notifier.refresh(entity);
+    }
+}
 ----
 
 For a local read-only bean notifier, the lookup has this modification:
 
 [source,java]
 ----
-helper.getReadOnlyBeanLocalNotifier("java:comp/env/ejb/LocalReadOnlyCustomer");
+public class MyEJB{
+
+    public void execute(){
+        var helper = new com.sun.appserv.ejb.ReadOnlyBeanHelper();
+        var notifier = helper.getReadOnlyBeanNotifier("java:comp/env/ejb/LocalReadOnlyCustomer");
+        //Assume entity is a CMP entity bean
+        notifier.refresh(entity);
+    }
+}
 ----
 
 Beans that update any data that is cached by read-only beans need to call the `refresh` methods. The next (non-transactional) call to the read-only bean invokes `ejbLoad`.
@@ -812,6 +826,8 @@ It is also possible to configure the MDB bean pool size with the `ActivationConf
 [source, java]
 ----
 @ActivationConfigProperty(propertyName = "MaxPoolSize", propertyValue = "100")
+public class CustomerListener implements MessageListener{
+}
 ----
 
 The `MaxPoolSize`, `MaxWaitTimeInMillis`, `PoolResizeQuantity`, `SteadyPoolSize` and `PoolIdleTimeoutInSeconds` are all MDB pool properties that can configured using the `@ActivationConfigProperty` annotation.
@@ -847,6 +863,54 @@ A message-driven bean's `onMessage` method can use the `jakarta.jms.Message.getJ
 
 CAUTION: The `cmt-max-runtime-exceptions` property is deprecated and support for this feature may be removed in the future.
 
+[[ejb-timers-in-deployment-groups]]
+== EJB Timers in Deployment Groups
+
+NOTE: This section only applies to Payara Server environments.
+
+Timer facilities provided by the EJB APIs `TimerService` and `@Scheduled` need special configuration in order to work intuitively for applications targeting a deployment group. It is important to understand how EJB timers run (or expire) when configured on deployment group scenarios.
+
+Before stating the specifics, keep in mind that there are four types of timers distinguished by their lifecycle (*persistent*, *non-persistent*) and the means of their definition (*declarative*, *programmatic*).
+
+* Declarative timers are defined in EJB deployment descriptors or with the `@Scheduled` annotation.
+* Programmatic timers are created via calls to the `TimerService.createTimer` method and its equivalents.
+
+[[non-persistent-timers-in-deployment-groups]]
+=== Non-Persistent Timers
+
+Non-Persistent timers exist in memory only for the duration in which the application runs on the instances that belong to a deployment group.
+
+*Declarative non-persistent timers run/expire on every instance*, whereas *programmatic ones only run/expire on the instance that created them*. When the instance shuts down, the timer will stop its expiration.
+
+Standalone instances do not see each other's non-persistent timers, so calling `TimerService.getTimers()` only returns local non-persistent timers.
+
+Non-Persistent timers have a simpler lifecycle but are not the default option. To explicitly define a non-persistent timer, the `@Schedule` annotation needs the `persistent=false` attribute, or the `TimerConfig` objects need to have their property `persistent` set to `false` explicitly.
+
+[[persistent-timers-in-deployment-groups]]
+=== Persistent Timers
+
+Persistent timers exist in the persistent store for the entire time for which application is deployed to its corresponding domain.
+
+Contrary to non-persistent ones, each persistent timer is *only executed on a single instance of a deployment group*. When the instance shuts down, each persistent timer migrates to another instance in the application's deployment group and continues firing there.
+
+Since persistent timers are shared, the `TimerService.getTimers()` method returns all persistent timers in the deployment group, regardless of which instance created them.
+
+TIP: EJB Timers are persistent by default.
+
+[[preconditions-for-persistent-timers]]
+==== Preconditions for using Persistent Timers in Deployment Groups
+
+Because xref:Technical Documentation/Payara Server Documentation/High Availability/deployment-groups.adoc[deployment groups] do not need to share configurations amongst their instances, there are several configuration and operational constraints that are not enforced by the server.
+
+To ensure correct behaviour of persistent timers within a deployment group, the following conditions need to be met:
+
+* The EJB Timer Service needs to use shared storage --an external database-- or xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Domain Data Grid And Hazelcast/Overview.adoc[the DataGrid].
+* All instances of a deployment group, and the Domain Administration Server MUST share the same configuration settings for the EJB Timer Service (see xref:Technical Documentation/Application Development/ejb.adoc#ejb-timer-service[here] for more information).
+* Applications with persistent timers are deployed to a deployment group and not managed on instance level afterward.
+* Instances are members of only a single deployment group
+
+EJB Timers may behave in unexpected ways if these conditions are not met.
+
 [[tracing-remote-ejbs]]
 == Tracing Remote EJBs
 
@@ -866,16 +930,18 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.util.Properties;
 
-...
+public class MainClass{
+    public static void main(String[] args){
+        var contextProperties = new Properties();
+        contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
 
-Properties contextProperties = new Properties();
-contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
-
-try {
-    Context context = new InitialContext(contextProperties);
-    EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
-} catch (NamingException ne) {
-    logger.warning("Failed performing lookup:\n" + ne.getMessage());
+        try {
+            Context context = new InitialContext(contextProperties);
+            EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
+        } catch (NamingException ne) {
+            logger.warning("Failed performing lookup:\n" + ne.getMessage());
+        }
+    }
 }
 ----
 
@@ -900,18 +966,21 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.util.Properties;
 
-...
+public class MainClass{
 
-Properties contextProperties = new Properties();
-contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
+    public static void main(String[] args){
+        var contextProperties = new Properties();
+        contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
 
-try {
-    Context context = new InitialContext(contextProperties);
-    EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
+        try {
+            Context context = new InitialContext(contextProperties);
+            EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
 
-    Tracer tracer = GlobalTracer.get();
-} catch (NamingException ne) {
-    logger.warning("Failed performing lookup:\n" + ne.getMessage());
+            Tracer tracer = GlobalTracer.get();
+        } catch (NamingException ne) {
+            logger.warning("Failed performing lookup:\n" + ne.getMessage());
+        }
+    }
 }
 ----
 
@@ -919,8 +988,14 @@ Extra information on creating a Tracer instance and registering it to the `Globa
 
 [source, java]
 ----
-Tracer tracerImpl = new CustomTracer(...);
-GlobalTracer.register(tracerImpl);
+
+public class MainClass{
+
+    public static void main(String[] args){
+        Tracer tracerImpl = new CustomTracer();
+        GlobalTracer.register(tracerImpl);
+    }
+}
 ----
 
 [[starting-a-span]]
@@ -940,22 +1015,25 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.util.Properties;
 
-...
+public class TracerClass{
 
-Properties contextProperties = new Properties();
-contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
+    public static void main(String[] args){
+        var contextProperties = new Properties();
+        contextProperties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.enterprise.naming.SerialInitContextFactory");
 
-try {
-    Context context = new InitialContext(contextProperties);
-    EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
+        try {
+            Context context = new InitialContext(contextProperties);
+            EjbRemote ejb = (EjbRemote) context.lookup("java:global/myRemoteEjb/Ejb");
 
-    Tracer tracer = GlobalTracer.get();
+            Tracer tracer = GlobalTracer.get();
 
-    try (Scope scope = tracer.buildSpan("ExecuteEjb").startActive(true)) {
-        ejb.doTheThing();
+            try (Scope scope = tracer.buildSpan("ExecuteEjb").startActive(true)) {
+                ejb.doTheThing();
+            }
+        } catch (NamingException ne) {
+            logger.warning("Failed performing lookup:\n" + ne.getMessage());
+        }
     }
-} catch (NamingException ne) {
-    logger.warning("Failed performing lookup:\n" + ne.getMessage());
 }
 ----
 

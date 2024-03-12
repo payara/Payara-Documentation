@@ -1,0 +1,97 @@
+[[start-deployment-group]]
+= start-deployment-group
+
+Starts all the instances in a Payara Server deployment group.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] start-deployment-group [--help]
+[--instanceTimeout timeout]
+[--timeout timeout]
+[--verbose={false|true}]
+name
+----
+
+[[description]]
+== Description
+
+The `start-deployment-group` subcommand starts all instances that belong to a Payara Server deployment group. The command will fail if the deployment group doesn't contain any instances in it.
+
+Internally this command works in the same manner that the xref:Technical Documentation/Payara Server Documentation/Command Reference/start-instance.adoc[`start-instance`] subcommand.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+
+`--verbose`::
+`-v`::
+Whether to start the instances in verbose mode. Defaults to `false`.
+
+`--timeout`::
+Specifies how long to take for the instances to start in seconds. If starting the instances takes longer than this amount then this command will fail.
++
+The default value is `600`.
+
+`--instanceTimeout`::
+Specifies how long to take for each instance to start in seconds. If starting the instances takes longer than this amount then this command will fail.
++
+The default value is `600`.
+
+[[operands]]
+== Operands
+
+name::
+The name of the deployment group. If there are no deployment groups that match the name the command will exit with an error.
+
+[[examples]]
+== Examples
+
+*Example 1 Start a Deployment Group*
+
+This example starts a deployment group that is named `test-dgroup` that contains one instance:
+
+[source,shell]
+----
+asadmin start-deployment-group test-dgroup
+50%: start-deployment-group: Executing start-instance on 1 instances.
+Command start-deployment-group executed successfully.
+----
+
+*Example 2 Start a Deployment Group with timeout*
+
+This example starts a deployment group that is named `test-dgroup` that contains one instance using an instance timeout of 30 seconds:
+
+[source,shell]
+----
+asadmin start-deployment-group --instanceTimeout 30 test-dgroup
+50%: start-deployment-group: Executing start-instance on 1 instances.
+Command start-deployment-group executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+command executed successfully
+1::
+error in executing the command
+
+See Also
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-deployment-group.adoc#create-deployment-group[`create-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-instance.adoc#start-instance[`start-instance`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-deployment-groups.adoc#list-deployment-groups[`list-deployment-groups`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-deployment-group.adoc#stop-deployment-group[`stop-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-deployment-group.adoc#restart-deployment-group[`restart-deployment-group`]
