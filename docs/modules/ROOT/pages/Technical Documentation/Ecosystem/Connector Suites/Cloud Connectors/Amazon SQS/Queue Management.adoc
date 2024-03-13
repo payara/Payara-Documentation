@@ -3,7 +3,7 @@
 
 Amazon SQS Queues (and other resources) can be managed through the use of the official Amazon SQS API, which allows programmatic control over them. In general, managing queues in Amazon SQS is crucial for effective message handling.
 
-To simplify the setup needed to use the SQS API from a standard Jakarta EE application and manage SQS resources, the Payara Platform SQS connector offers access to the `com.amazonaws.services.sqs.AmazonSQSConnectionFactory` class through the Java Connector Architecture (JCA) API.
+To simplify the setup needed to use the SQS API from a standard Jakarta EE application and manage SQS resources, the Payara Platform SQS connector offers easy access to the `com.amazonaws.services.sqs.AmazonSQSConnectionFactory` class through the Java Connector Architecture (JCA) API.
 
 This section will show how to access these facilities and focus on key operations like creating, listing, and deleting queues.
 
@@ -20,21 +20,21 @@ Here's a complete example of a singleton bean that defines the connection factor
 
 [source, java]
 ----
-@ConnectionFactoryDefinition (
+@ConnectionFactoryDefinition ( 
     name = "java:app/amazonsqs/factory",
     interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
-    resourceAdapter = "amazon-sqs-rar-1.0.0",
+    resourceAdapter = "amazon-sqs-rar-1.1.0",
     properties = {"awsAccessKeyId=<accessKeyID>", "awsSecretKey=<secretKey>", "region=<aws-region>"}
 )
 @Singleton
 public class ManageSQSQueueBean {
-
+ 
     @Resource(lookup = "java:app/amazonsqs/factory")
     private AmazonSQSConnectionFactory factory;
 
     @PostConstruct
     public void listQueues() {
-        try (AmazonSQSConnection connection = factory.createConnection()) {
+        try (AmazonSQSConnection connection = factory.getConnection()) {
             // Manage queues using AmazonSQSConnection
         }
         catch (Exception ex) {
@@ -63,11 +63,14 @@ Creating a new Amazon SQS queue is a fundamental operation. The following code s
 @Singleton
 public class ManageSQSQueueBean {
 
-    public void createQueue(String name){
-        try (AmazonSQSConnection connection = factory.createConnection()) {
-            CreateQueueRequest createQueueRequest = new CreateQueueRequest(name);
-            CreateQueueResult createQueueResult = connection.createQueue(createQueueRequest);
-            System.out.println("Queue Created: " + createQueueResult);
+    public void createQueue(String name) {
+        try (AmazonSQSConnection connection = factory.getConnection()) {
+            CreateQueueRequest createQueueRequest = CreateQueueRequest.builder()
+                .queueName(name)
+                .build();
+
+            CreateQueueResponse createQueueResponse = connection.createQueue(createQueueRequest);
+            System.out.println("Queue Created: " + createQueueResponse);
         }
     }
 }
@@ -85,23 +88,23 @@ Listing queues provides insight into existing queues. The following code snippet
 @Singleton
 public class ManageSQSQueueBean {
 
-    public void listAllQueues(){
+    public void listAllQueues() {
         // List all queues
-        try (AmazonSQSConnection connection = factory.createConnection()) {
-            ListQueuesResult allQueues = connection.listQueues();
+        try (AmazonSQSConnection connection = factory.getConnection()) {
+            ListQueuesResponse allQueues = connection.listQueues();
             System.out.println("All Queues:");
-            for (String queueUrl : allQueues.getQueueUrls()) {
+            for (String queueUrl : allQueues.queueUrls()) {
                 System.out.println(" - " + queueUrl);
             }
         }
     }
 
-    public void listQueues(String prefix){
+    public void listQueues(String prefix) {
         // List queues with a specific name prefix
-        try (AmazonSQSConnection connection = factory.createConnection()) {
-            ListQueuesResult prefixedQueues = connection.listQueues(prefix);
+        try (AmazonSQSConnection connection = factory.getConnection()) {
+            ListQueuesResponse prefixedQueues = connection.listQueues(ListQueuesRequest.builder().queueNamePrefix(prefix).build());
             System.out.println("Prefixed Queues:");
-            for (String queueUrl : prefixedQueues.getQueueUrls()) {
+            for (String queueUrl : prefixedQueues.queueUrls()) {
                 System.out.println(" - " + queueUrl);
             }
         }
@@ -122,11 +125,15 @@ Deleting an existing SQS queue is a critical operation. Ensure the complete queu
 public class ManageSQSQueueBean {
 
     //Sample URL: https://sqs.<aws-region>.amazonaws.com/xxxxx/MyQueue
-    public void delete(String url){
-        try (AmazonSQSConnection connection = factory.createConnection()) {
-            DeleteQueueRequest deleteQueueRequest = new DeleteQueueRequest(url);
-            DeleteQueueResult deleteQueueResult = connection.deleteQueue(deleteQueueRequest);
-            System.out.println("Queue Deleted: " + deleteQueueResult);
+    public void delete(String url) {
+        try (AmazonSQSConnection connection = factory.getConnection()) {
+            DeleteQueueRequest deleteQueueRequest = DeleteQueueRequest
+                    .builder()
+                    .queueUrl(url)
+                    .build();
+
+            DeleteQueueResponse deleteQueueResponse = connection.deleteQueue(deleteQueueRequest);
+            System.out.println("Queue Deleted: " + deleteQueueResponse);
         }
     }
 }
@@ -144,10 +151,14 @@ Listing queue tags provides metadata about a queue. The following code snippet d
 @Singleton
 public class ManageSQSQueueBean {
 
-    public void listQueueTags(String url){
-        try (AmazonSQSConnection connection = factory.createConnection()) {
-            ListQueueTagsResult tagsResult = connection.listQueueTags(url);
-            Map<String, String> tags = tagsResult.tags();
+    public void listQueueTags(String url) {
+        try (AmazonSQSConnection connection = factory.getConnection()) {
+            ListQueueTagsRequest tagsRequest = ListQueueTagsRequest.builder()
+                    .queueUrl(url)
+                    .build();
+
+            ListQueueTagsResponse tagsResponse = connection.listQueueTags(tagsRequest);
+            Map<String, String> tags = tagsResponse.tags();
             System.out.println("Queue Tags: " + tags);
         }
     }
@@ -166,10 +177,14 @@ Purging a queue deletes all messages within it. The following code snippet illus
 @Singleton
 public class ManageSQSQueueBean {
 
-    public void purgeQueue(String url){
-        try (AmazonSQSConnection connection = factory.createConnection()) {
-            PurgeQueueResult purgeResult = connection.purgeQueue(url);
-            System.out.println("Queue Purged: " + purgeResult);
+    public void purgeQueue(String url) {
+        try (AmazonSQSConnection connection = factory.getConnection()) {
+            PurgeQueueRequest purgeRequest = PurgeQueueRequest.builder()
+                    .queueUrl(url)
+                    .build();
+
+            PurgeQueueResponse purgeResponse = connection.purgeQueue(purgeRequest);
+            System.out.println("Queue Purged: " + purgeResponse);
         }
     }
 }
@@ -187,17 +202,23 @@ Adding and removing tags from a queue provides additional context. The following
 @Singleton
 public class ManageSQSQueueBean {
 
-    public void tagUntagQueue(String url){
-        try (AmazonSQSConnection connection = factory.createConnection()) {
+    public void tagUntagQueue(String url) {
+        try (AmazonSQSConnection connection = factory.getConnection()) {
             Map<String, String> tagsToAdd = Map.of("Environment", "Production", "Team", "Dev");
-            TagQueueRequest tagQueueRequest = new TagQueueRequest(url, tagsToAdd);
-            TagQueueResult tagQueueResult = connection.tagQueue(tagQueueRequest);
-            System.out.println("Queue Tagged: " + tagQueueResult);
+            TagQueueRequest tagQueueRequest = TagQueueRequest.builder()
+                    .queueUrl(url)
+                    .tags(tagsToAdd)
+                    .build();
+            TagQueueResponse tagQueueResponse = connection.tagQueue(tagQueueRequest);
+            System.out.println("Queue Tagged: " + tagQueueResponse);
 
             List<String> tagKeysToRemove = List.of("Environment");
-            UntagQueueRequest untagQueueRequest = new UntagQueueRequest(url, tagKeysToRemove);
-            UntagQueueResult untagQueueResult = connection.untagQueue(untagQueueRequest);
-            System.out.println("Queue Untagged: " + untagQueueResult);
+            UntagQueueRequest untagQueueRequest = UntagQueueRequest.builder()
+                    .queueUrl(url)
+                    .tagKeys(tagKeysToRemove)
+                    .build();
+            UntagQueueResponse untagQueueResponse = connection.untagQueue(untagQueueRequest);
+            System.out.println("Queue Untagged: " + untagQueueResponse);
         }
     }
 }

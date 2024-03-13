@@ -28,7 +28,7 @@ The following gives an example:
 @ConnectionFactoryDefinition ( 
   name = "java:app/amazonsqs/factory",
   interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
-  resourceAdapter = "amazon-sqs-rar-1.1.0"
+  resourceAdapter = "amazon-sqs-rar-1.1.0",
   properties = {"awsAccessKeyId=<accessKeyID>", "awsSecretKey=<secretKey>", "region=eu-west-2"}
 )
 public class SendSQSMessage {
@@ -48,8 +48,12 @@ public class SendSQSMessage {
  
  @PostConstruct
  public void init() {
-    try (AmazonSQSConnection connection = factory.createConnection()) {
-        connection.sendMessage(new SendMessageRequest("<queueURL>", "Hello World"));
+    try (AmazonSQSConnection connection = factory.getConnection()) {
+        SendMessageRequest sendMsgRequest = SendMessageRequest.builder()
+                        .queueUrl("<queueURL>")
+                        .messageBody("Hello World")
+                        .build();
+        connection.sendMessage(sendMsgRequest);
     }
     catch (Exception ex) {
     }
@@ -75,10 +79,10 @@ The following gives an example:
 })
 public class ReceiveSQSMessage implements AmazonSQSListener {
 
- @OnSQSMessage
- public void receiveMessage(Message message) {
+    @OnSQSMessage
+    public void receiveMessage(Message message) {
      // Handle message
- }
+    }
 }
 ----
 
@@ -98,8 +102,8 @@ Before testing the larger message support feature, ensure the following prerequi
 * Create a new Amazon S3 bucket in your AWS account where larger messages will be stored.
 
 . IAM Role Permissions:
-* Add `AmazonS3FullAccess` or related permissions to the IAM role associated with your application.
-* This permission ensures that your application has the necessary access to the S3 bucket for storing and retrieving larger messages.
+- Add `AmazonS3FullAccess` or related permissions to the IAM role associated with your application.
+- This permission ensures that your application has the necessary access to the S3 bucket for storing and retrieving larger messages.
 
 [[sending-large-messages]]
 === Sending Large Messages
@@ -110,10 +114,10 @@ For example:
 
 [source, java]
 ----
-@ConnectionFactoryDefinition (
+@ConnectionFactoryDefinition ( 
     name = "java:app/amazonsqs/factory",
     interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
-    resourceAdapter = "amazon-sqs-rar-1.0.0",
+    resourceAdapter = "amazon-sqs-rar-1.1.0",
     properties = {"awsAccessKeyId=<accessKeyID>", "awsSecretKey=<secretKey>", "region=eu-west-2", "s3BucketName=MyS3Bucket"}
 )
 @Singleton

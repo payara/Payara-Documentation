@@ -78,11 +78,8 @@ Make sure to replace the values with your specific IAM user ARN and role ARN.
 
 It's crucial to establish a link between the IAM user's ARN and the IAM role's Trust Relationship by configuring the Trust Relationship with the user's ARN. This linkage ensures that the IAM user has the necessary permissions to assume the role. Additionally, for seamless integration, configure the `roleArn` and `roleSessionName` in the Payara Cloud Connector AWS SQS:
 
-[source, plaintext]
-----
-roleArn: The ARN of the IAM role you've just created.
-roleSessionName: A logical name for your session (e.g., "PayaraSQSSession").
-----
+* `roleArn`: The ARN of the IAM role you've just created.
+* `roleSessionName`: A logical name for your session (e.g., "PayaraSQSSession").
 
 These values play a crucial role in the configuration of Payara Cloud Connector AWS SQS, enabling your Jakarta EE application to establish the necessary connections securely.
 
@@ -91,7 +88,7 @@ These values play a crucial role in the configuration of Payara Cloud Connector 
 
 Sending messages to Amazon SQS can be done via the JCA and an Amazon specific API. In order to start using this API to send messages, a resource has to be defined via the JCA API; a connection factory.
 
-The connection factory has to be given a name, which can be any name that is valid for JNDI. The `java:app` namespace is typically recommended to be used. The type of the connection factory to be used for Amazon SQS is `fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory`, and we have to specify the resource adapter name which is here `amazon-sqs-rar-0.8.0.rar`.
+The connection factory has to be given a name, which can be any name that is valid for JNDI. The `java:app` namespace is typically recommended to be used. The type of the connection factory to be used for Amazon SQS is `fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory`, and we have to specify the resource adapter name which is here `amazon-sqs-rar-1.1.0.rar`.
 
 Finally, the AWS account details have to be specified in the properties of the corresponding JMS resource definitions, including the `roleArn` and `roleSessionName`.
 
@@ -102,9 +99,14 @@ See the following example:
 @ConnectionFactoryDefinition ( 
   name = "java:app/amazonsqs/factory",
   interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
-  resourceAdapter = "amazon-sqs-rar-0.8.0"
-  properties = {"awsAccessKeyId=<accessKeyID>", "awsSecretKey=<secretKey>",
-  "roleArn=arn:aws:iam::xxxxxxxxx:role/PayaraSQSRole", "roleSessionName=PayaraSQSSession", "region=eu-west-2"}
+  resourceAdapter = "amazon-sqs-rar-1.1.0",
+  properties = {
+        "awsAccessKeyId=<accessKeyID>",
+        "awsSecretKey=<secretKey>",
+        "roleArn=arn:aws:iam::xxxxxxxxx:role/PayaraSQSRole",
+        "roleSessionName=PayaraSQSSession",
+        "region=eu-west-2"
+    }
 )
 ----
 
@@ -121,8 +123,12 @@ public class SendSQSMessage {
  
  @PostConstruct
  public void init() {
-    try (AmazonSQSConnection connection = factory.createConnection()) {
-        connection.sendMessage(new SendMessageRequest("<queueURL>", "Hello World"));
+    try (AmazonSQSConnection connection = factory.getConnection()) {
+        SendMessageRequest sendMsgRequest = SendMessageRequest.builder()
+                        .queueUrl("<queueURL>")
+                        .messageBody("Hello World")
+                        .build();
+        connection.sendMessage(sendMsgRequest);
     }
     catch (Exception ex) {
     }
