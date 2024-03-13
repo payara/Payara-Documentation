@@ -1,4 +1,4 @@
-
+[[cloud-connectors]]
 = Cloud Connectors
 
 The Payara Cloud Connectors are a collection of JCA adapters for use with various popular cloud messaging providers. These connectors can be deployed to either Payara Server or Payara Micro.
@@ -10,6 +10,7 @@ The following connectors are available:
 * xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/MQTT.adoc[MQTT]
 * xref:/Technical Documentation/Ecosystem/Connector Suites/Cloud Connectors/Azure SB.adoc[Azure Service Bus]
 
+[[obtaining-connectors]]
 == Obtaining the connectors
 
 Cloud Connectors can be built from source as follows:
@@ -39,21 +40,23 @@ mvn clean install
 The connectors can be found in the following locations as JCA RARs:
 
 * Kafka -  ./Kafka/KafkaRAR/target/kafka-rar-0.8.0.rar
-* Amazon SQS - ./AmazonSQS/AmazonSQSRAR/target/amazon-sqs-rar-0.8.0.rar
+* Amazon SQS - ./AmazonSQS/AmazonSQSRAR/target/amazon-sqs-rar-1.1.0.rar
 * MQTT - ./MQTT/MQTTRAR/target/mqtt-rar-0.8.0.rar
 * Azure Service Bus - ./AzureServiceBus/AzureSBRAR/target/azure-sb-rar-0.8.0.rar
 
-[[Installing-a-connector]]
+[[installing-a-connector]]
 == Installing a connector
 
 Installing Cloud Connectors for Payara Server and Payara Micro both require the Cloud Connector jar to be deployed. However, Payara Server requires some additional configuration to classloading.
 
 A connector (JCA rar) is installed by deploying it in the same way as an application archive (e.g. a .war) is deployed:
 
+[[install-connector-server]]
 === Payara Server
 
 You can configure Payara Server through the Admin Console or through the Asadmin CLI.
 
+[[install-connector-server-admin-console]]
 ==== Using the Admin Console
 
 You can deploy the connector with the admin console;
@@ -66,12 +69,13 @@ image:cloud-connectors/classloading-configuration.png[Classloading Config]
 
 This allows the classes from the cloud connector to be globally available in the server.
 
+[[install-connector-server-asadmin]]
 ==== Using the Asadmin CLI
 
 Deploy the application with the CLI;
 
 ----
-asadmin> deploy --target=server amazon-sqs-rar-0.8.0.rar
+asadmin> deploy --target=server amazon-sqs-rar-1.1.0.rar
 ----
 
 Configure the classloading policy;
@@ -80,6 +84,7 @@ Configure the classloading policy;
 asadmin> set configs.config.server-config.connector-service.class-loading-policy=global
 ----
 
+[[install-connector-micro]]
 === Payara Micro
 
 ----
@@ -92,6 +97,7 @@ The connector is subsequently available to all other applications deployed to Pa
 java -jar payara-micro.jar --autobindhttp --deploy kafka-rar-0.8.0.rar --deploy myapp.war
 ----
 
+[[securing-credentials]]
 == Securing credentials
 
 In the documentation pages for the currently available cloud connectors, much of the configuration shown is done via annotations. This configuration
