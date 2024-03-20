@@ -162,70 +162,17 @@ IMPORTANT: A `--source` value of `jndi` is not supported for these asadmin comma
 
 *Usage*::
 `asadmin> set-config-ordinal --ordinal=<integer.value> --source=domain|config|server|application|module|cluster`
-*Aim*::
-Provides a way to set the ordinal for a given config source. Where multiple configuration properties exist, the property from a source with a higher ordinal number is preferred.
 
-===== Command Options
-
-[cols="2,10,1,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`ordinal`
-|The value of the ordinal to set. This must be a number greater than 1. A lower number ordinal means lower order of precedence.
-|-
-|yes
-
-|`source`
-|The value of the source to change. Must be one of: `domain`, `config`, `server`, `application`, `module`, `cluster`
-|-
-|yes
-
-|`target`
-|The target Payara config to apply the change to
-|server (the DAS)
-|no
-|===
-
-===== Example
-
-[source, shell]
-----
-asadmin> set-config-ordinal --ordinal=600 --source=application
-----
+Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-ordinal.adoc#set-config-ordinal[`set-config-ordinal`]
+ for more information.
 
 ==== `get-config-ordinal`
 
 *Usage*::
 `asadmin> get-config-ordinal --source=domain|config|server|application|module|cluster`
-*Aim*::
-Returns the ordinal value for the given ConfigSource type.
 
-===== Command Options
-
-[cols="1,10,1,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`source`
-|The ConfigSource to get the ordinal for. Must be one of: `domain`, `config`,
-`server`, `application`, `module`, `cluster`
-|-
-|yes
-|===
-
-===== Example
-
-[source, shell]
-----
-asadmin> get-config-ordinal --source=cluster
-----
+Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-ordinal.adoc#get-config-ordinal[`get-config-ordinal`]
+for more information.
 
 [[config-property-configuration]]
 == Config Property Configuration
@@ -246,174 +193,24 @@ image:microprofile/config-property.png[Set Config Property]
 
 *Usage*::
 `asadmin> set-config-property --propertyName=<property.name> --propertyValue= <property.val> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
-*Aim*::
-Sets the given property name and value in one of the built-in config sources. The source is specified with `--source` and, where there is ambiguity, the `--sourceName` and `--moduleName` options can be used. For example, where the source is `server`, the `--sourceName` can be used to specify the name of the server where the config property is to be stored.
 
-===== Command Options
-
-[cols="1,10,1,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`propertyName`
-|The name of the configuration property to set
-|-
-|yes
-
-|`propertyValue`
-|The value of the configuration property to set
-|-
-|yes
-
-|`source`
-|The ConfigSource where the property is to be stored
-|-
-|yes
-
-|`sourceName`
-|The name of the ConfigSource when there may be ambiguity, for example a ConfigSource of type `application` must specify the name of the application. This property is required for sources of type: `config`, `server`, `application` or `module`
-|-
-|no
-
-|`moduleName`
-|The name of the module when the ConfigSource is of type `module`. When this is specified, the `sourceName` parameter must be provided and must have the name of the application where the module is deployed.
-|-
-|no
-
-|`target`
-|The target configuration where the command should be run
-|server (the DAS)
-|no
-|===
-
-
-===== Example
-
-[source, shell]
-----
-asadmin> set-config-property
-    --propertyName=JMSBrokerURL
-    --propertyValue=my.jms.hostname
-    --source=module
-    --sourceName=myApplication
-    --moduleName=myModule
-    --target=myAppCluster
-----
-
+Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-property.adoc#set-config-property[`set-config-property`] for more information.
 
 ==== `delete-config-property`
 
 *Usage*::
 `asadmin> delete-config-property --propertyName=<property.name> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
-*Aim*::
-Deletes the given property name in one of the built-in config sources so that the property no longer exists. The source is specified with `--source` and, where there is ambiguity, the `--sourceName` and `--moduleName` options can be used. For example, where the source is `server`, the `--sourceName` can be used to specify the name of the server where the config property is to be stored. `moduleName` should only be used when the `--source=module`.
 
-===== Command Options
+Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-config-property.adoc#delete-config-property[`delete-config-property`] for more information.
 
-[cols="1,10,1,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`propertyName`
-|The name of the configuration property to delete
-|-
-|yes
-
-|`source`
-|The ConfigSource where the property is stored
-|-
-|yes
-
-|`sourceName`
-|The name of the ConfigSource when there may be ambiguity, for example a `ConfigSource` of type `application` must specify the name of the application. This property is required for sources of type: `config`, `server`, `application` or `module`
-|-
-|no
-
-|`moduleName`
-|The name of the module when the ConfigSource is of type `module`. When this is
-specified, the `sourceName` parameter must be provided and must have the name of
-the application where the module is deployed.
-|-
-|no
-
-|`target`
-|The target configuration where the command should be run
-|server (the DAS)
-|no
-|===
-
-===== Example
-
-[source, shell]
-----
-asadmin> delete-config-property
-    --propertyName=JMSBrokerURL
-    --source=module
-    --sourceName=myApplication
-    --moduleName=myModule
-    --target=myAppCluster
-----
 
 ==== `get-config-property`
 
 *Usage*::
 `asadmin> get-config-property --propertyName=<property.name> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
-*Aim*::
-Gets the value for the given property name in one of the built-in config sources. The source is specified with `--source` and, where there is ambiguity, the `--sourceName` and `--moduleName` options can be used. For example, where the source is `server`, the `--sourceName` can be used to specify the name of the server where the config property is to be stored.
 
-===== Command Options
+Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-property.adoc#get-config-property[`get-config-property`] for more information.
 
-[cols="1,10,1,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`propertyName`
-|The name of the configuration property to get
-|-
-|yes
-
-|`source`
-|The ConfigSource where the property is stored
-|-
-|yes
-
-|`sourceName`
-|The name of the ConfigSource when there may be ambiguity, for example a `ConfigSource` of type `application` must specify the name of the application. This property is required for sources of type: `config`, `server`, `application` or
-`module`
-|-
-|no
-
-|`moduleName`
-|The name of the module when the ConfigSource is of type `module`. When this is specified, the `sourceName` parameter must be provided and must have the name of the application where the module is deployed.
-|-
-|no
-
-|`target`
-|The target configuration where the command should be run
-|server (the DAS)
-|no
-|===
-
-===== Example
-
-[source, 1shell]
-----
-asadmin> get-config-property
-    --propertyName=JMSBrokerURL
-    --source=module
-    --sourceName=myApplication
-    --moduleName=myModule
-    --target=myAppCluster
-----
 
 [[config-cache-duration-configuration]]
 == Config Cache Duration
@@ -429,45 +226,5 @@ If properties were not resolved recently, the change can become visible faster t
 
 *Usage*::
 `asadmin> set-config-cache --duration=<duration.in.second> --target=<target[default:server]>`
-*Aim*::
-Sets the cache duration for the target instance(s). Any duration equal to or below zero disables the caching of MP config properties.
 
-===== Command Options
-
-[cols="1,10,1,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`duration`
-|Duration in seconds properties are cached
-|60
-|yes
-
-|`target`
-|The target configuration where the command should be run
-|server (the DAS)
-|no
-|===
-
-===== Example
-
-Disable caching:
-
-[source, shell]
-----
-asadmin> set-config-cache
-    --duration=0
-    --target=myAppCluster
-----
-
-Set cache TTL (time to live) for properties to 30 seconds.
-
-[source, shell]
-----
-asadmin> set-config-cache
-    --duration=30
-    --target=myAppCluster
-----
+Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-cache.adoc#set-config-cache[`set-config-cache`] for more information.

@@ -1,0 +1,62 @@
+[[set-config-dir]]
+= set-config-dir
+
+Provides a way to configure the Config Directory.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin> set-config-dir --directory=<full.path.to.dir> --target=<target[default:server]>`
+----
+
+[[description]]
+== Description
+
+The `set-config-dir` sets the directory to be used for the directory config source.
+
+* *Leaf directory cannot start with a dot*, rendering `/home/payara/.secret` an invalid path ("." means hidden on a POSIX filesystem).
+* If relative, will lookup beneath server instance location (usually to be found at `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/`)
+* Defaults to `secrets`, targeting `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/secrets/`
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+
+`--directory`::
+Full path to the directory containing configuration files. Leaf directory name cannot start with a dot. Defaults to `secrets`.
+`--target`::
+Defaults to `server-config`. The target configuration where the command should be run
+
+[[examples]]
+== Example
+
+*Example 1 Setting the Config Directory.*
+
+This example sets the directory to be used for the directory config source.
+
+[source,shell]
+----
+asadmin> set-config-dir
+    --directory=/home/payara/secrets
+    --target=myAppCluster
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-dir.adoc#get-config-dir[`get-config-dir`]
