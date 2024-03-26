@@ -16,6 +16,7 @@ asadmin [asadmin-options] create-local-instance [--help]
 [--savemasterpassword={false|true}]
 [--usemasterpassword={false|true}]
 [--systemproperties (name=value)[:name=value]* ]
+[--dataGridStartPort dataGridStartPort]
 instance-name
 ----
 
@@ -132,6 +133,8 @@ asadmin-options::
     This property specifies the port number on which the JMX connector listens. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
   `OSGI_SHELL_TELNET_PORT`;;
     This property specifies the port number of the port that is used for connections to the Apache Felix Remote Shell (`http://felix.apache.org/site/apache-felix-remote-shell.html`). This shell uses the Felix shell service to interact with the OSGi module management subsystem. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
+`--dataGridStartPort`::
+Sets Data Grid Start Port to the instance. If set to 0 the Domain wide start port will be used instead. The default value is `0`.
 
 [[operands]]
 == Operands
@@ -198,6 +201,33 @@ IIOP_LISTENER_PORT=23700
 OSGI_SHELL_TELNET_PORT=26666
 HTTP_SSL_LISTENER_PORT=28181
 IIOP_SSL_MUTUALAUTH_PORT=23920
+Command create-local-instance executed successfully.
+----
+
+*Example 3 Creating a Standalone Payara Instance with Specific Data Grid Start Port*
+
+This example creates a Standalone Payara instance `instance2` in the domain `domain1` on the local host. Setting the Data Grid Start Port when an instance is created to `2900`.
+
+[source,shell]
+----
+asadmin> create-local-instance --dataGridStartPort 2900 --node localhost-domain1 instance2
+Rendezvoused with DAS on localhost:4848.
+Using DAS host localhost and port 4848 from existing das.properties for node
+localhost-domain1. To use a different DAS, create a new node using create-node-ssh or
+create-node-config. Create the instance with the new node and correct
+host and port:
+asadmin --host das_host --port das_port create-local-instance --node node_name instance_name.
+Port Assignments for server instance instance2:
+OSGI_SHELL_TELNET_PORT=26667
+JAVA_DEBUGGER_PORT=29010
+JMS_PROVIDER_PORT=27677
+HTTP_LISTENER_PORT=28081
+IIOP_SSL_LISTENER_PORT=23821
+ASADMIN_LISTENER_PORT=24849
+IIOP_SSL_MUTUALAUTH_PORT=23921
+JMX_SYSTEM_CONNECTOR_PORT=28687
+HTTP_SSL_LISTENER_PORT=28182
+IIOP_LISTENER_PORT=23701
 Command create-local-instance executed successfully.
 ----
 
