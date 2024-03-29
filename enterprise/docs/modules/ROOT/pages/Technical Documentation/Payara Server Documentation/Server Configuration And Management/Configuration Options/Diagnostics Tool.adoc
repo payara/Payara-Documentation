@@ -1,0 +1,112 @@
+[[diagnostics-tool]]
+= Diagnostics Tool
+
+A tool that collects the following information from the specified target.
+
+* Domain.xml
+* Server Log
+* Thread Dump
+* Heap Dump
+* JVM Report
+
+Collection can be targeted towards specific a specific Instance, Deployment Group or Cluster. By default, everything is collect from the DAS, each Instance, Deployment Group and Cluster.
+
+If the target is offline, only the Domain.xml and Server Log will be collected.
+
+NOTE: If you are using a custom domain, you must specify that domain to collect diagnostics from.
+
+[[collect-diagnostics]]
+== `collect-diagnostics`
+
+Usage::
+`asadmin> collect-diagnostics --serverlog={true|false}
+--domainxml={true|false} --threaddump={true|false}
+--heapdump={true|false} --jvmreport={true|false}
+--domaindir domaindir --nodedir nodedir --dir dir
+--target target-name domainname`
+
+Aim::
+This command will collect useful information for diagnosing issues with Payara.
+
+The items collected are stored in a zip file in your user home directory, the output directory can be changed via the dir parameter.
+
+[[command-options-self]]
+=== Command Options
+
+[cols="3,1,5,1,1",options="header"]
+|===
+|Option
+|Type
+|Description
+|Default
+|Mandatory
+
+|`--serverlog`
+|Boolean
+|Whether to collect server logs. 
+|true
+|no
+
+|`--domainxml`
+|Boolean
+|Whether to collect the domain.xml. 
+|true
+|no
+
+|`--threaddump`
+|Boolean
+|Whether to collect the thread dump. 
+|true
+|no
+
+|`--heapdump`
+|Boolean
+|Whether to collect the heap dump. 
+|true
+|no
+
+|`--jvmreport`
+|Boolean
+|Whether to collect the jvm report. 
+|true
+|no
+
+|`--domaindir`
+|String
+|The path to the directory containing the target domain.
+|`${installDir}/glassfish/domains`
+|no
+
+|`--nodedir`
+|String
+|The path to the node directory containing the target instance.
+|`${installDir}/glassfish/nodes`
+|no
+
+|`--dir`
+|String
+|The path where the resultant zip file should be stored.
+|`{user.home}`
+|no
+
+|`--target`
+|String
+|The name of an Instance, Cluster or Deployment Group.
+|domain
+|no
+
+|`--domainname` (primary)
+|String
+|The name of the domain you would like to collect diagnostics for.
+|domain1
+|no
+
+|===
+
+[[example-self]]
+=== Example
+
+[source, shell]
+----
+asadmin> collect-diagnostics --target deploymentGroup1 mydomain
+----
