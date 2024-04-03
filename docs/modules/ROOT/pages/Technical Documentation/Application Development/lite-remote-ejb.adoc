@@ -273,19 +273,24 @@ NOTE: This prefix is stripped before invoking the downstream adapter.
 
 [source,java]
 ----
-Properties props = new Properties();
-props.put(Context.INITIAL_CONTEXT_FACTORY, RemoteEJBContextFactory.FACTORY_CLASS);
-props.put(Context.PROVIDER_URL, "http://not.relevant/");
-props.put(RemoteEJBContextFactory.CLIENT_ADAPTER,
-        CompositeClientAdapter.newBuilder()
-            .register(customize(new ConnectionFactoryAdapter()).matchPrefix("jms/")
-                    customize(QueueAdapter.class).matchPrefix("queue/"))
-            .build()
-        );
-Context context = new InitialContext(props);
+
+public class Application{
+    public static void main(String[] args){
+        Properties props = new Properties();
+        props.put(Context.INITIAL_CONTEXT_FACTORY, RemoteEJBContextFactory.FACTORY_CLASS);
+        props.put(Context.PROVIDER_URL, "http://not.relevant/");
+        props.put(RemoteEJBContextFactory.CLIENT_ADAPTER,
+                CompositeClientAdapter.newBuilder()
+                    .register(customize(new ConnectionFactoryAdapter()).matchPrefix("jms/"),
+                            customize(QueueAdapter.class).matchPrefix("queue/"))
+                    .build()
+                );
+        Context context = new InitialContext(props);
+    }
+}
 ----
 
-See https://javadoc.io/doc/fish.payara.extras/ejb-http-client[API documentation] of the client library for detailed description of `ClientAdapterCustomizer` methods and contracts of `CompositeClientAdapter`.
+See link:https://javadoc.io/doc/fish.payara.extras/ejb-http-client[API documentation] of the client library for detailed description of `ClientAdapterCustomizer` methods and contracts of `CompositeClientAdapter`.
 
 [[known-limitations]]
 == Known Limitations

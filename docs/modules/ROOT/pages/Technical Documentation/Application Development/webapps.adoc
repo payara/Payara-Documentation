@@ -25,7 +25,7 @@ To define how a web application handles response caching, you'll have to modify 
 
 WARNING: A servlet that uses caching is not portable.
 
-For information about JSP caching, see xref:webapps.adoc#jsp-caching[JSP Caching].
+For information about JSP caching, see xref:#jsp-caching[JSP Caching].
 
 [[caching-features]]
 ==== Caching Features
@@ -43,7 +43,7 @@ For example, a response from `/garden/catalog?category=roses` is different from 
 
 * To determine caching criteria programmatically, write a class that implements the `com.sun.appserv.web.cache.CacheHelper` interface. For example, if only a servlet knows when a back end data source was last modified, you can write a helper class to retrieve the last modified timestamp from the data source and decide whether to cache the response based on that timestamp.
 
-* To determine cache key generation programmatically, write a class that implements the `com.sun.appserv.web.cache.CacheKeyGenerator` interface. See xref:webapps.adoc#the-cachekeygenerator-interface[The CacheKeyGenerator Interface].
+* To determine cache key generation programmatically, write a class that implements the `com.sun.appserv.web.cache.CacheKeyGenerator` interface. See xref:#the-cachekeygenerator-interface[The CacheKeyGenerator Interface].
 
 * All non-ASCII request parameter values specified in cache key elements must be URL encoded. The caching subsystem attempts to match the raw parameter values in the request query string.
 
@@ -87,7 +87,7 @@ Here is an example cache element in the `glassfish-web.xml`/`payara-web.xml` fil
  </cache-mapping>
  <cache-mapping>
      <url-pattern> /catalog/* </url-pattern>
-     <!-- cache the best selling category; cache the responses to this resource only when the given parameters exist.
+     <!-- cache the best-selling category; cache the responses to this resource only when the given parameters exist.
          Cache only when the catalog parameter has 'lilies' or 'roses' but no other catalog varieties:
          * /orchard/catalog?best&category='lilies'
          * /orchard/catalog?best&category='roses'
@@ -175,7 +175,7 @@ NOTE: The standard tag libraries are automatically available to all web applicat
 
 JSP caching lets you cache tag invocation results within the servlet engine. Each view can be cached using different cache criteria. For example, suppose you have invocations to view stock quotes, weather information, and so on. The stock quote result can be cached for 10 minutes, the weather report result for 30 minutes, and so on.
 
-For more information about response caching as it pertains to servlets, see xref:webapps.adoc#caching-servlet-results[Caching Servlet Results].
+For more information about response caching as it pertains to servlets, see xref:#caching-servlet-results[Caching Servlet Results].
 
 [[enabling-jsp-caching]]
 ==== Enabling JSP Caching
@@ -189,7 +189,7 @@ asadmin set server-config.web-container.property.jspCachingEnabled=true
 
 To enable JSP caching for a single web application, follow these steps:
 
-. Extract the `/META-INF/jspcachtags.tld` file from the `${as-install}/glassfish/modules/web-glue.jar` file.
+. Extract the `/META-INF/jspcachtags.tld` file from the `as-install/glassfish/modules/web-glue.jar` file.
 
 . Create a new JAR file (for example, `jspcachtags.jar`) containing just the `/META-INF/jspcachtags.tld` file previously extracted.
 
@@ -264,7 +264,7 @@ To specify a different unit of time, add a suffix to the timeout value as follow
 |`scope` |`application`
 |(optional) The scope of the cache. Can be `request`, `session`, or `application`.
 
-See xref:webapps.adoc#caching-scope[Caching Scope].
+See xref:#caching-scope[Caching Scope].
 
 |===
 
@@ -315,7 +315,7 @@ If no key is specified, a number is generated according to the position of the t
 |`scope` |`application`
 |(optional) The scope of the cache. Can be `request`, `session`, or `application`.
 
-See xref:webapps.adoc#caching-scope[Caching Scope]
+See xref:#caching-scope[Caching Scope]
 |===
 
 [[examples-of-flush]]
@@ -360,7 +360,7 @@ This section describes how to create and manage HTTP sessions that allows users 
 To configure whether and how HTTP sessions use cookies and URL rewriting, edit the `session-properties` and `cookie-properties elements in the `glassfish-web.xml` or `payara-web.xml` file for an individual web application. For more details about the properties you can configure, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#session-properties[session-properties]" "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#cookie-properties[cookie-properties]" and in the Payara Server Application Deployment section.
 
 For information about configuring default session properties for the
-entire web container, see xref:webapps.adoc#using-the-default-web.xml-file[Using the `default-web.xml` File].
+entire web container, see xref:#using-the-default-web.xml-file[Using the `default-web.xml` File].
 
 [[saving-sessions-during-redeployment]]
 ==== Saving Sessions During Redeployment
@@ -382,7 +382,7 @@ If any active web session fails to be preserved or restored, none of the session
 
 The new class loader of the redeployed application is used to deserialize any sessions previously saved. The usual restrictions about serialization and deserialization apply. For example, any application-specific class referenced by a session attribute may evolve only in a backward-compatible fashion.
 
-For more information about class loaders, see xref:Technical Documentation/application-development-guide:class-loaders.adoc#class-loaders[Class Loaders].
+For more information about class loaders, see xref:Technical Documentation/Application Development/class-loaders.adoc[Class Loaders].
 
 [[logging-session-attributes]]
 ==== Logging Session Attributes
@@ -400,7 +400,7 @@ A distributed HTTP session can run in multiple Payara Server/Micro instances, pr
 
 * Each server instance has the same distributable web application deployed to it. The `web-app` element of the `web.xml` deployment descriptor file must have the `distributable` sub-element specified.
 
-* The web application uses high-availability session persistence. If a non-distributable web application is configured to use high-availability session persistence, a warning is written to the server log, and the session persistence type reverts to `memory`. See xref:webapps.adoc#the-memory-persistence-type[The `memory` persistence Type].
+* The web application uses high-availability session persistence. If a non-distributable web application is configured to use high-availability session persistence, a warning is written to the server log, and the session persistence type reverts to `memory`. See xref:#the-memory-persistence-type[The `memory` persistence Type].
 
 * All objects bound into a distributed session must be of the types listed in the table below.
 
@@ -455,9 +455,9 @@ A session manager automatically creates new session objects whenever a new sessi
 
 The Payara Platform offers these session management options, determined by the `session-manager` element's `persistence-type` attribute in the `glassfish-web.xml`/`payara-web.xml` file:
 
-* xref:webapps.adoc#the-memory-persistence-type[The `memory` Persistence Type], the default
-* xref:webapps.adoc#the-file-persistence-type[The `file` Persistence Type], which uses a file to store session data
-* xref:webapps.adoc#the-hazelcast-persistence-type[The `hazelcast` Persistence Type], which the Data grid to store session data
+* xref:#the-memory-persistence-type[The `memory` Persistence Type]
+* xref:#the-file-persistence-type[The `file` Persistence Type], which uses a file to store session data
+* xref:#the-hazelcast-persistence-type[The `hazelcast` Persistence Type], which uses the Data Grid to store session data
 
 NOTE: If the session manager configuration contains an error, the error is written to the server log and the default (`memory`) configuration is used.
 
@@ -517,7 +517,7 @@ The `file` persistence type supports all the manager properties listed under "xr
 [[the-hazelcast-persistence-type]]
 ==== The `hazelcast` Persistence Type
 
-The `hazelcast` persistence type uses Payara Server/Micro Data grid to store information in the internal distributed memory grid. All server instances that join the data grid (regardless of the deployment groups they belong to) will store partitioned information of the session data courtesy of Hazelcast. This allows sessions to be distributed properly with failover in place. For details, see xref:webapps.adoc#distributed-sessions-and-persistence[Distributed Sessions and Persistence]. This is the default persistence type for both Payara Server and Micro instances.
+The `hazelcast` persistence type uses Payara Server/Micro Data Grid to store information in the internal distributed memory grid. All server instances that join the data grid (regardless of the deployment groups they belong to) will store partitioned information of the session data courtesy of Hazelcast. This allows sessions to be distributed properly with failover in place. For details, see xref:#distributed-sessions-and-persistence[Distributed Sessions and Persistence]. This is the default persistence type for both Payara Server and Micro instances.
 
 IMPORTANT: Hazelcast and the Data Grid must be enabled for the Payara Server domain or a corresponding Payara Micro instance for this persistence type to work.
 
@@ -741,8 +741,8 @@ The `mime-mapping` elements in `default-web.xml` are global and inherited by all
 [[to-use-the-default-web.xml-file]]
 ==== To Use the `default-web.xml` File
 
-. Place the JAR file for the filter, security constraint, or any other specific web component features in the `${domain-dir}/lib` directory.
-. Edit the `${domain-dir}/config/default-web.xml` file to refer to the JAR file.
+. Place the JAR file for the filter, security constraint, or any other specific web component features in the `domain-dir/lib` directory.
+. Edit the `domain-dir/config/default-web.xml` file to refer to the JAR file.
 . Restart the domain and any server instances.
 
 [[configuring-logging-and-monitoring-in-the-web-container]]
@@ -774,17 +774,17 @@ In the `glassfish-web.xml`/`payara-web.xml` deployment descriptor, valve and lis
 <payara-web-app>
    <property name="valve_1" value="org.glassfish.extension.Valve"/>
    <property name="listener_1" value="org.glassfish.extension.MyLifecycleListener"/>
-</glassfish-web-app>
+</payara-web-app>
 ----
 
-You can define these same properties for a virtual server configuration. For more information, see xref:webapps.adoc#virtual-server-properties[Virtual Server Properties].
+You can define these same properties for a virtual server configuration. For more information, see xref:#virtual-server-properties[Virtual Server Properties].
 
 [[using-a-context.xml-file]]
 ==== Using a `context.xml` File
 
 You can define an Apache Tomcat `context.xml` configuration file for all web applications, for web applications assigned to a specific virtual server, or for a specific web application.
 
-To define a global `context.xml` file, place the file in the `${domain-dir}/config` directory and name it `context.xml`.
+To define a global `context.xml` file, place the file in the `domain-dir/config` directory and name it `context.xml`.
 
 Use the `contextXmlDefault` property to specify the name and the location, relative to the domain directory, of the `context.xml` file for a specific virtual server. Specify this property in one of the following ways:
 
@@ -808,7 +808,7 @@ asadmin set server-config.http-service.virtual-server.vs1.property.contextXmlDef
 
 To define a `context.xml` file for a specific web application, place the file in the `META-INF` directory of the corresponding application and name it `context.xml`.
 
-For more information about virtual server properties, see xref:webapps.adoc#virtual-server-properties[Virtual Server Properties]. For more information about the `context.xml` file, see http://tomcat.apache.org/tomcat-5.5-doc/config/context.html[The Context Container].
+For more information about virtual server properties, see xref:#virtual-server-properties[Virtual Server Properties]. For more information about the `context.xml` file, see http://tomcat.apache.org/tomcat-5.5-doc/config/context.html[The Context Container].
 
 NOTE: Not all context definitions are supported by the Payara Platform.
 
@@ -975,7 +975,7 @@ To enable CGI processing for all web modules, un-comment the corresponding secti
 
 Package the CGI program under the `cgiPathPrefix`. The default `cgiPathPrefix` is `WEB-INF/cgi`. For security, it is highly recommended that the contents and binaries of CGI programs be prohibited from direct viewing or download.
 
-For information about hiding directory listings, see xref:webapps.adoc#using-the-default-web.xml-file[Using the `default-web.xml` File].
+For information about hiding directory listings, see xref:#using-the-default-web.xml-file[Using the `default-web.xml` File].
 
 Invoke the CGI program using a URL of the following format:
 
@@ -1039,9 +1039,11 @@ For example, the following properties specify three `glassfish-web.xml`/ `payara
 
 [source,xml]
 ----
-<property name="alternatedocroot_1" value="from=/my.jpg dir=/srv/images/jpg"/>
-<property name="alternatedocroot_2" value="from=*.jpg dir=/srv/images/jpg"/>
-<property name="alternatedocroot_3" value="from=/jpg/* dir=/src/images"/>
+<payara-web-app>
+    <property name="alternatedocroot_1" value="from=/my.jpg dir=/srv/images/jpg"/>
+    <property name="alternatedocroot_2" value="from=*.jpg dir=/srv/images/jpg"/>
+    <property name="alternatedocroot_3" value="from=/jpg/* dir=/src/images"/>
+</payara-web-app>
 ----
 
 The `value` of each alternate document root has two components: The first component, `from`, specifies the alternate document root's URI pattern, and

@@ -23,11 +23,15 @@ You can inject both `CachingProvider` and `CacheManager` instances in any CDI be
 import javax.cache.CacheManager;
 import javax.cache.spi.CachingProvider;
 import jakarta.inject.Inject;
-...
-@Inject
-CacheManager manager;
-@Inject
-CachingProvider provider;
+
+@ApplicationScoped
+public class Component{
+
+    @Inject
+    CacheManager manager;
+    @Inject
+    CachingProvider provider;
+}
 ----
 
 NOTE: Your WAR or JAR artifact must be an implicit or explicit bean archive.
@@ -41,10 +45,15 @@ Both the `CachingProvider` and the `CachingManager` components can also be progr
 ----
 import javax.cache.spi.CachingProvider;
 import javax.cache.CacheManager;
-...
-Context ctx = new InitialContext();
-CachingProvider provider = (CachingProvider) ctx.lookup("payara/CachingProvider");
-CacheManager manager = (CacheManager) ctx.lookup("payara/CacheManager");
+
+public class Component{
+
+    public void businessMethod(){
+        Context ctx = new InitialContext();
+        CachingProvider provider = (CachingProvider) ctx.lookup("payara/CachingProvider");
+        CacheManager manager = (CacheManager) ctx.lookup("payara/CacheManager");
+    }
+}
 ----
 
 [[creating-a-cache-instance]]
@@ -61,12 +70,16 @@ Injecting a cache into a CDI bean is simple enough:
 ----
 import jakarta.inject.Inject;
 import javax.cache.Cache;
-...
-@Inject
-Cache cache;
+
+@ApplicationScoped
+public class Component{
+
+    @Inject
+    Cache cache;
+}
 ----
 
-The name of this cache will be the canonical name of the class it is created in. 
+The name of this cache will be the canonical name of the class it is created in.
 
 NOTE: Caches created in this way will also have JMX statistics and management enabled.
 
@@ -79,9 +92,13 @@ A typed cache can also be injected in the same manner:
 ----
 import jakarta.inject.Inject;
 import javax.cache.Cache;
-...
-@Inject
-Cache<Long, Property> cache;
+
+@ApplicationScoped
+public class Component{
+
+    @Inject
+    Cache<Long, Property> cache;
+}
 ----
 
 NOTE: Both key and value types must be `Serializable` so that the cache can be properly instantiated at runtime.
@@ -98,13 +115,17 @@ For example, to inject a cache with a custom name and with JMX management enable
 import fish.payara.cdi.jsr107.impl.NamedCache;
 import jakarta.inject.Inject;
 import javax.cache.Cache;
-...
-@NamedCache(cacheName = "custom", managementEnabled = true)
-@Inject
-Cache cache;
+
+@ApplicationScoped
+public class Component{
+
+    @NamedCache(cacheName = "custom", managementEnabled = true)
+    @Inject
+    Cache cache;
+}
 ----
 
-IMPORTANT: This annotation is part of the xref:/Technical Documentation/Public API/Overview.adoc[Payara Platform Public API]
+IMPORTANT: This annotation is part of the xref:Technical Documentation/Public API/Overview.adoc[Payara Platform Public API]
 
 If you only want to set the name of the cache but don't want to depend on the `@NamedCache`, you can use the `@CacheDefaults` annotation on the bean class instead:
 

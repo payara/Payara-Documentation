@@ -37,14 +37,14 @@ For more information about the `jdb` debugger, see the following official Java S
 * Java Platform Debugger Architecture: `https://docs.oracle.com/en/java/javase/11/docs/specs/jpda/jpda.html`
 * Java SE `jdb` command: `https://docs.oracle.com/en/java/javase/11/tools/jdb.html`
 
-Payara Server debugging is based on JPDA. For more information, see xref:Technical Documentation/application-development-guide:debugging-apps.adoc#jpda-options[JPDA Options].
+Payara Server debugging is based on JPDA. For more information, see xref:#jpda-options[JPDA Options].
 
 You can attach any JPDA compliant debugger to Payara Server, including that of all major Java IDE environments like IntelliJ, Apache Netbeans, Eclipse and Visual Studio Code.
 
 You can enable debugging even when Payara Server is started without the `--debug` option. This is useful in development environments where you want to make sure that debugging is always turned on.
 
 [[to-set-the-server-to-automatically-start-up-in-debug-mode]]
-===== To Set the Server to Automatically Start Up in Debug Mode
+==== To Set the Server to Automatically Start Up in Debug Mode
 
 . Use the Administration Console. Select the _JVM Settings_ component under the relevant configuration.
 . Check the _Debug Enabled_ box.
@@ -72,9 +72,9 @@ You can include any additional options if needed.
 [[generating-a-stack-trace-for-debugging]]
 === Generating a Stack Trace for Debugging
 
-To generate a Java stack trace for debugging purposes, use the `asadmin generate-jvm-report --type=thread` command. The generated stack trace goes to the `${domain-dir}/logs/server.log` file and also appears on the command prompt screen.
+To generate a Java stack trace for debugging purposes, use the `asadmin generate-jvm-report --type=thread` command. The generated stack trace goes to the `domain-dir/logs/server.log` file and also appears on the command prompt screen.
 
-For more information about the `asadmin generate-jvm-report` command, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/generate-jvm-report.adoc[generate-jvm-report].
+For more information about the `asadmin generate-jvm-report` command, see xref:Technical Documentation/Payara Server Documentation/Command Reference/generate-jvm-report.adoc[`generate-jvm-report`].
 
 [[application-client-debugging]]
 === Application Client Debugging
@@ -88,11 +88,9 @@ VMARGS=-agentlib:transport=dt_socket,server=y,suspend=y,address=8118
 
 IMPORTANT: For debugging an application client, you must set the suspend option to `y` so you can connect the debugger to the client before any code has actually executed. Otherwise, the client may start running and execute past the point you want to examine.
 
-You should use different ports for the server and client if you are debugging both concurrently. For details about setting the port, see
-xref:Technical Documentation/application-development-guide:debugging-apps.adoc#jpda-options[JPDA Options].
+You should use different ports for the server and client if you are debugging both concurrently. For details about setting the port, see xref:#jpda-options[JPDA Options].
 
-You can also include JVM options in the `appclient` script directly. For information about the `appclient` script, see the
-xref:Technical Documentation/Payara Server Documentation/Command Reference/appclient.adoc[appclient].
+You can also include JVM options in the `appclient` script directly. For information about the `appclient` script, see xref:Technical Documentation/Payara Server Documentation/Command Reference/appclient.adoc[`appclient`].
 
 NOTE: The Application Client Container is supported only in the Full Profile, not in the Web Profile. See xref:Technical Documentation/application-development-guide:java-clients.adoc#developing-java-clients[Developing Java Clients].
 
@@ -108,8 +106,7 @@ NOTE: JMS resources are supported only in the Full Profile, not in the Web Profi
 [[enabling-verbose-mode]]
 === Enabling Verbose Mode
 
-To have the server logs and messages printed to `System.out` on your command prompt screen, you can start the server in *verbose mode*.
-This makes it easy to do simple debugging using print statements, without having to check the `server.log` file every time.
+To have the server logs and messages printed to `System.out` on your command prompt screen, you can start the server in *verbose mode*. This makes it easy to do simple debugging using print statements, without having to check the `server.log` file every time.
 
 To start the domain in verbose mode, use the `--verbose` option as follows:
 
@@ -140,12 +137,12 @@ asadmin create-jvm-options -XX\:+LogVMOutput
 asadmin create-jvm-options -XX\:LogFile=${com.sun.aas.instanceRoot}/logs/jvm.log
 ----
 
-To send Payara Server messages to the standard console instead of `stderr`, start the domain in verbose mode as described in xref:Technical Documentation/application-development-guide:debugging-apps.adoc#enabling-verbose-mode[Enabling Verbose Mode].
+To send Payara Server messages to the standard console instead of `stderr`, start the domain in verbose mode as described in xref:#enabling-verbose-mode[Enabling Verbose Mode].
 
 [[debugging-in-payara-micro]]
 == Debugging in Payara Micro
 
-As Payara Micro' server instance is a standalone Java process that runs without an administration interface, debugging applications that run in it is as simple as configuring the debugging options when launching a new server instance from the command line:
+As Payara Micro server instance is a standalone Java process that runs without an administration interface, debugging applications that run in it is as simple as configuring the debugging options when launching a new server instance from the command line:
 
 [source, shell]
 ----

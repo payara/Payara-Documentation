@@ -8,8 +8,7 @@ This chapter also tells how to set the default persistence provider in Payara Se
 [[eclipselink-overview]]
 == EclipseLink Overview
 
-EclipseLink is the default persistence provider in the Payara Platform.
-It is a comprehensive standards-based object-persistence and object-transformation framework that provides APIs, schemas, and run-time services for the persistence layer of an application.
+EclipseLink is the default persistence provider in the Payara Platform. It is a comprehensive standards-based object-persistence and object-transformation framework that provides APIs, schemas, and run-time services for the persistence layer of an application.
 
 EclipseLink implements the following specifications, plus value-added extensions:
 
@@ -48,9 +47,9 @@ To run EclipseLink JPA applications in Payara Server, you must configure the ser
 
 . Create the application. For guidance in writing your application, see "https://eclipse-ee4j.github.io/jakartaee-tutorial/#persistence[Persistence]" in The Jakarta EE Tutorial.
 
-. Create the `persistence.xml` file. See xref:jpa.adoc#specifying-the-database-for-an-application[Specifying the Database for an Application] for considerations specific to Payara Server.
+. Create the `persistence.xml` file. See xref:#specifying-the-database-for-an-application[Specifying the Database for an Application] for considerations specific to Payara Server.
 +
-If you are using the Jakarta Persistence API by calling `Persistence.createEMF()`, see xref:jpa.adoc#specifying-the-persistence-provider-for-an-application[Specifying the Persistence Provider for an Application].
+If you are using the Jakarta Persistence API by calling `Persistence.createEMF()`, see xref:#specifying-the-persistence-provider-for-an-application[Specifying the Persistence Provider for an Application].
 
 . If the security manager is enabled, and you are using the Jakarta Persistence API by calling `Persistence.createEMF()`, see xref:Technical Documentation/application-development-guide:securing-apps.adoc#enabling-and-disabling-the-security-manager[Enabling and Disabling the Security Manager].
 
@@ -157,10 +156,9 @@ If you are using the Jakarta Persistence API by calling `Persistence.createEMF()
 
 You can specify a non-default persistence provider for an application in the manner described in the Jakarta Persistence API Specification:
 
-. Install the provider. Copy the provider JAR files to the `${domain-dir}/lib` directory, and restart the Payara Server domain.
+. Install the provider. Copy the provider JAR files to the `domain-dir/lib` directory, and restart the Payara Server domain.
 +
-The new persistence provider is now available to all modules and applications
-deployed on servers that share the same configuration.
+The new persistence provider is now available to all modules and applications deployed on servers that share the same configuration.
 +
 NOTE: EclipseLink will remain as the default persistence provider.
 
@@ -169,14 +167,14 @@ NOTE: EclipseLink will remain as the default persistence provider.
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
-    <persistence xmlns="http://java.sun.com/xml/ns/persistence">
-        <persistence-unit name ="em3">
-            <provider>com.company.persistence.PersistenceProviderImpl</provider>
-            <properties>
-                <property name="company.database.name" value="MyDB"/>
-            </properties>
-        </persistence-unit>
-    </persistence>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence">
+    <persistence-unit name ="em3">
+        <provider>com.company.persistence.PersistenceProviderImpl</provider>
+        <properties>
+            <property name="company.database.name" value="MyDB"/>
+        </properties>
+    </persistence-unit>
+</persistence>
 ----
 
 [[primary-key-generation-defaults]]
@@ -188,10 +186,12 @@ In the descriptions of the `@GeneratedValue`, `@SequenceGenerator`, and `@TableG
 
 * Using `strategy=AUTO` (or no `strategy`) creates a `@TableGenerator` named `SEQ_GEN` with default settings. Specifying a `generator` has no effect.
 * Using `strategy=TABLE` without specifying a `generator` creates a `@TableGenerator` named `SEQ_GEN_TABLE` with default settings.
++
 Specifying a `generator` but no `@TableGenerator` creates and names a `@TableGenerator` with default settings.
 
 * Using `strategy=IDENTITY` or `strategy=SEQUENCE` produces the same results, which are database-specific.
 ** For Oracle databases, not specifying a `generator` creates a `@SequenceGenerator` named `SEQ_GEN_SEQUENCE` with default settings.
++
 Specifying a `generator` but no `@SequenceGenerator` creates and names a `@SequenceGenerator` with default settings.
 ** For PostgreSQL databases, a `SERIAL` column named entity-table`_`pk-column`_SEQ` is created.
 ** For MySQL databases, an `AUTO_INCREMENT` column is created.
@@ -215,10 +215,8 @@ This insulates developers from many of the database related aspects of developme
 
 The resulting schema is usable as-is or can be given to a database administrator for tuning with respect to performance, security, and so on.
 
-IMPORTANT: Automatic schema generation is supported on an all-or-none basis: it expects that no tables exist in the database before it is executed. It
-is not intended to be used as a tool to generate extra tables or constraints. +
-Deployment won't fail if all tables are not created, and un-deployment won't fail if not all tables are dropped. Instead, an error is written to the server log. This is done to allow you to investigate the problem
-and fix it manually. You should not rely on the partially created database schema to be correct for running the application.
+IMPORTANT: Automatic schema generation is supported on an all-or-none basis: it expects that no tables exist in the database before it is executed. It is not intended to be used as a tool to generate extra tables or constraints. +
+Deployment won't fail if all tables are not created, and un-deployment won't fail if not all tables are dropped. Instead, an error is written to the server log. This is done to allow you to investigate the problem and fix it manually. You should not rely on the partially created database schema to be correct for running the application.
 
 [[annotations]]
 === Annotations
@@ -271,8 +269,8 @@ Schema generation properties or `asadmin` command line options can control autom
 * Dropping and creating tables during redeployment
 * Generating the DDL files
 
-Optional schema generation properties control the automatic creation of database tables. You can specify them in the `persistence.xml` file. For
-more information, see https://www.eclipse.org/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#CHDFDDBF[EclipseLink JPA Extensions for Schema Generation].
+//TODO - Find an updated link to EclipseLink documentation
+Optional schema generation properties control the automatic creation of database tables. You can specify them in the `persistence.xml` file. For more information, see https://www.eclipse.org/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#CHDFDDBF[EclipseLink JPA Extensions for Schema Generation].
 
 The following options of the `asadmin deploy` or `asadmin deploydir` command control the automatic creation of database tables at deployment.
 
@@ -281,8 +279,7 @@ The following options of the `asadmin deploy` or `asadmin deploydir` command con
 |===
 |Option |Default |Description
 
-|`--createtables` |none |If `true`, causes database tables to be created
-for entities that need them. No unique constraints are created. If `false`, does not create tables. If not specified, the value of the `eclipselink.ddl-generation` property in `persistence.xml` is used.
+|`--createtables` |none |If `true`, causes database tables to be created for entities that need them. No unique constraints are created. If `false`, does not create tables. If not specified, the value of the `eclipselink.ddl-generation` property in `persistence.xml` is used.
 
 |`--dropandcreatetables` |none| If `true`, and if tables were automatically created when this  application was last deployed, tables from the earlier deployment are dropped and fresh ones are created.
 
@@ -359,9 +356,9 @@ If column names are not explicitly specified on a field, unique constraints and 
 [source,java]
 ----
 @Table(name="Department",
-        uniqueConstraints= {
-            @UniqueConstraint(columnNames= "DEPTNAME")
-        })
+    uniqueConstraints= {
+        @UniqueConstraint(columnNames= "DEPTNAME")
+})
 ----
 
 The other way to handle this is by specifying explicit column names for each field with the required case. For example:
@@ -423,8 +420,7 @@ If a finder method with an input greater than 255 characters is executed and the
 
 [source, text]
 ----
-com.sybase.jdbc2.jdbc.SybSQLException: Implicit conversion from datatype 
-'TEXT' to 'VARCHAR' is not allowed. Use the CONVERT function to run this query.
+com.sybase.jdbc2.jdbc.SybSQLException: Implicit conversion from datatype 'TEXT' to 'VARCHAR' is not allowed. Use the CONVERT function to run this query.
 ----
 
 To avoid this error, make sure the finder method input is less than 255 characters.
