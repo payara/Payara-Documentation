@@ -8,20 +8,23 @@ Creates a domain.
 
 [source,shell]
 ----
-asadmin [asadmin-options] create-domain [--help] 
+asadmin [asadmin-options] create-domain [--help]
 [--adminport adminport]
-[--instanceport instanceport] 
-[--portbase portbase] 
-[--profile profile-name] 
-[--template template-name] 
-[--domaindir domaindir] 
-[--savemasterpassword={false|true}] 
+[--instanceport instanceport]
+[--portbase portbase]
+[--profile profile-name]
+[--template template-name]
+[--domaindir domaindir]
+[--savemasterpassword={false|true}]
 [--usemasterpassword={false|true}]
-[--domainproperties (name=value)[:name=value]*] 
-[--keytooloptions (name=value)[:name=value]*] 
-[--savelogin={false|true}] 
-[--checkports={true|false}] 
-[--nopassword={false|true}] 
+[--domainproperties (name=value)[:name=value]*]
+[--keytooloptions (name=value)[:name=value]*]
+[--savelogin={false|true}]
+[--checkports={true|false}]
+[--nopassword={false|true}]
+[--hazelcastdasport hazelcastdasport]
+[--hazelcaststartport hazelcaststartport]
+[--hazelcastautoincrement hazelcastautoincrement]
 domain-name
 ----
 
@@ -162,29 +165,62 @@ asadmin-options::
     https://felix.apache.org/documentation/subprojects/apache-felix-remote-shell.html[Apache  Felix Remote Shell].
     This shell uses the Felix shell service to interact with the OSGi module management subsystem.
     Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
+  `hazelcast.das.port`;;
+    This property specifies the port number of the port the DAS use to run the Data Grid (Hazelcast) on. The `hazelcast.das.port` property is overridden by the `--hazelcastdasport` option.
+  `hazelcast.start.port`;;
+    This property specifies the port number of the port the other Payara Server instances use to run the Data Grid (Hazelcast) on. The `hazelcast.start.port` property is overridden by the `--hazelcaststartport` option.
+  `hazelcast.auto.increment`;;
+    This property specifies whether to use the next unoccupied port that is available starting with the start port. When auto-increment is turned off an occupied start port results in a startup failure instead. The `hazelcast.auto.increment` property is overridden by the `--hazelcastautoincrement` option.
 `--keytooloptions`::
-  Specifies an optional list of name-value pairs of keytool options for a self-signed server certificate. The certificate is generated during
-  the creation of the domain. Each pair in the list must be separated by the colon (:) character. +
-  Allowed options are as follows: +
-  `CN`;;
-    Specifies the common name of the host that is to be used for the self-signed certificate. This option name is case insensitive. +
-    By default, the name is the fully-qualified name of the host where the `create-domain` subcommand is run.
+  Specifies an optional list of name-value pairs of keytool options for a self-signed server certificate. The certificate is generated during the creation of the domain. Each pair in the list must be separated by the colon (:) character.
++
+Allowed options are as follows:
++
+`CN`;;
+Specifies the common name of the host that is to be used for the self-signed certificate. This option name is case insensitive.
++
+By default, the name is the fully-qualified name of the host where the `create-domain` subcommand is run.
 `--savelogin`::
   If set to true, this option saves the administration user name and password. Default value is false. The username and password are stored in the `.asadminpass` file in user's home directory.
   A domain can only be created locally. Therefore, when using the `--savelogin` option, the host name saved in `.asadminpass` is always `localhost`.
   If the user has specified default administration port while creating the domain, there is no need to specify `--user`, `--passwordfile`,
   `--host`, or `--port` on any of the subsequent `asadmin` remote commands. These values will be obtained automatically. +
 
-NOTE: When the same user creates multiple domains that have the same administration port number on the same or different host (where the
-home directory is NFS mounted), the subcommand does not ask if the password should be overwritten. The password will always be overwritten.
+NOTE: When the same user creates multiple domains that have the same administration port number on the same or different host (where the home directory is NFS mounted), the subcommand does not ask if the password should be overwritten. The password will always be overwritten.
 
 `--checkports`::
-  Specifies whether to check for the availability of the administration, HTTP, JMS, JMX, and IIOP ports. The default value is true.
+  Specifies whether to check for the availability of the administration, HTTP, JMS, JMX, and IIOP ports. The default value is `true`.
 `--nopassword`::
-  Specifies whether the administrative user will have a password. If false (the default), the password is specified by the
-  `AS_ADMIN_PASSWORD` entry in the `asadmin` password file (set by using the `--passwordfile` option). If false and the `AS_ADMIN_PASSWORD` is not set, you are prompted for the password. +
-  If true, the administrative user is created without a password.
-  If a user name for the domain is not specified by using the `--user` option, and the `--nopassword` option is set to true, the default user name, `admin`, is used.
+Specifies whether the administrative user will have a password. If false (the default), the password is specified by the
+  `AS_ADMIN_PASSWORD` entry in the `asadmin` password file (set by using the `--passwordfile` option). If false and the `AS_ADMIN_PASSWORD` is not set, you are prompted for the password.
++
+If `true`, the administrative user is created without a password.
++
+WARNING: If a username for the domain is not specified by using the `--user` option, and the `--nopassword` option is set to `true`, the default username, `admin`, is used.
+
+`--hazelcastdasport`::
+The port to run the Data Grid (Hazelcast) on for the DAS. If this port is busy and auto-increment option is enabled, the port specified will be incremented until a valid port is found.
++
+The `--hazelcastdasport` option cannot be used with the `--portbase` option.
++
+The `--hazelcastdasport` option overrides the `hazelcast.das.port` property of the `--domainproperties` option. The default value is `4900`.
+
+`--hazelcaststartport`::
+The port the other Payara Server instances use to run the Data Grid (Hazelcast) on.
++
+If this port is busy and the `--hazelcastautoincrement`  option is enabled, the port specified will be incremented until a valid port is found. The `--hazelcaststartport` option cannot be used with the `--portbase`  option. The `--hazelcaststartport` option overrides the `hazelcast.start.port` property of the `--domainproperties` option.
++
+The default value is `5900`.
++
+NOTE: If the port base options are used, the values for the ports of the Hazelcast DAS start port and the Hazelcast start Port are calculated as follows: +
+Hazelcast DAS start port = `portbase + 49` and Hazelcast Instance start port= `portbase + 59`.
+
+`--hazelcastautoincrement`::
+By default, the Data Grid (Hazelcast) uses the next unoccupied port that is available starting with the start port.
++
+When auto-increment is turned off an occupied start port results in a startup failure instead. The `--hazelcastautoincrement` option overrides the `hazelcast.auto.inrement` property of the `--domainproperties` option.
++
+The default value is `5900`.
 
 [[operands]]
 == Operands
@@ -202,7 +238,7 @@ This example creates a domain named `domain4`.
 
 [source,shell]
 ----
-asadmin>create-domain --adminport 4848 domain4
+asadmin> create-domain --adminport 4848 domain4
 Enter admin user name [Enter to accept default "admin" / no password]>
 Using port 4848 for Admin.
 Using default port 8080 for HTTP Instance.
@@ -228,7 +264,7 @@ This example creates a domain named `sampleDomain` in the `/home/someuser/domain
 
 [source,shell]
 ----
-asadmin> create-domain --domaindir /home/someuser/domains --adminport 7070 
+asadmin> create-domain --domaindir /home/someuser/domains --adminport 7070
 --instanceport 7071 sampleDomain
 Enter admin user name [Enter to accept default "admin" / no password]>
 Using port 7070 for Admin.
@@ -306,6 +342,35 @@ No domain initializers found, bypassing customization step
 Domain domain5 created.
 Domain domain5 admin port is 9898.
 Domain domain5 allows admin login as user "admin" with no password.
+Command create-domain executed successfully.
+----
+
+*Example 5 Creating a Domain with Hazelcast specific domain properties*
+
+This example creates a domain named `testDomain` with the port to run Hazelcast on for the DAS set to 7900 and the port the other Payara Server instances use to run Hazelcast set to 8900.
+
+[source,shell]
+----
+asadmin> asadmin create-domain --hazelcastdasport 7900 --hazelcaststartport 8900 testDomain
+Using default port 4848 for Admin.
+Using default port 8080 for HTTP Instance.
+Using default port 7676 for JMS.
+Using default port 3700 for IIOP.
+Using default port 8181 for HTTP_SSL.
+Using default port 3820 for IIOP_SSL.
+Using default port 3920 for IIOP_MUTUALAUTH.
+Using default port 8686 for JMX_ADMIN.
+Using default port 6666 for OSGI_SHELL.
+Using default port 9009 for JAVA_DEBUGGER.
+Using port 7900 for Hazelcast DAS.
+Using port 8900 for Hazelcast Start.
+Distinguished Name of the self-signed X.509 Server Certificate is:
+[CN=dev,OU=Payara,O=Payara Foundation,L=Great Malvern,ST=Worcestershire,C=UK]
+Distinguished Name of the self-signed X.509 Server Certificate is:
+[CN=dev-instance,OU=Payara,O=Payara Foundation,L=Great Malvern,ST=Worcestershire,C=UK]
+Domain testDomain created.
+Domain testDomain admin port is 4848.
+Domain testDomain allows admin login as user "admin" with no password.
 Command create-domain executed successfully.
 ----
 
