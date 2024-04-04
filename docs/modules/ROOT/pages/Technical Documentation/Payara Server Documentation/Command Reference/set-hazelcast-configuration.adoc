@@ -1,7 +1,7 @@
 [[set-hazelcast-configuration]]
 = set-hazelcast-configuration
 
-Configures the underlying Hazelcast instance.
+Configures the underlying Data Grid (Hazelcast) instance.
 
 [[synopsis]]
 == Synopsis
@@ -26,29 +26,29 @@ asadmin [asadmin-options] set-hazelcast-configuration
 [--multicastgroup multicastgroup]
 [--multicastport multicastport]
 [--clustername clustername]
-[--jndiname jndiname]
-[--cachemanagerjndiname cachemanagerjndiname]
-[--cachingproviderjndiname cachingproviderjndiname]
+[--jndiname name]
+[--cachemanagerjndiname name]
+[--cachingproviderjndiname name]
 [--executorpoolsize executorpoolsize]
 [--executorqueuecapacity executorqueuecapacity]
-[--scheduledexecutorpoolsize scheduledexecutorpoolsize]
-[--scheduledexecutorqueuecapacity scheduledexecutorqueuecapacity]
+[--scheduledexecutorpoolsize scheduledExecutorPoolsize]
+[--scheduledexecutorqueuecapacity scheduledexecutorQueueCapacity]
 [--licensekey=licensekey]
 [--lite={true|false}]
-[--hostawarepartitioning={true|false}]
+[--hostawarePartitioning={true|false}]
 [--membername membername]
 [--membergroup membergroup]
-[--kubernetesnamespace kubernetesnamespace]
-[--kubernetesservicename kubernetesservicename]
-[--autoincrementport={true|false}]
-[--configspecificdatagridstartport configspecificdatagridstartport]
-[--encryptdatagrid={true|false}]
+[--kubernetesNamespace namespace]
+[--kubernetesServicename serviceName]
+[--autoIncrementport={true|false}]
+[--configSpecificDatagridStartport startPort]
+[--encryptDatagrid={true|false}]
 ----
 
 [[description]]
 == Description
 
-This command can be used to configure the settings of the underlying Hazelcast instance.
+This command can be used to configure the settings of the underlying Data Grid (Hazelcast) instance.
 
 [[options]]
 == Options
@@ -59,93 +59,139 @@ Options for the `asadmin` utility. For information about these options, see the 
 `-?`::
 Displays the help text for the subcommand.
 `--target`::
-This option helps specify the target on which you are configuring the monitoring service. Valid values are: +
+This option helps specify the target on which you are executing this operation. Valid values are: +
 `server`;;
 Applies to the default server instance. This is the default value.
 instance_name;;
 Applies to a specified server instance.
 `--enabled`::
-Enables Hazelcast. If no `target` is specified, this will enable Hazelcast on the domain configuration _(server-config)_. If no arguments are specified, defaults to _true_. If other options are specified, asadmin will interactively prompt for `--enabled`. The default value is `true`.
+Enables the Data Grid (Hazelcast).
++
+If no `target` is specified, this will enable Hazelcast on the domain configuration `server-config`.
++
+If no arguments are specified, defaults to `true`. If other options are specified, asadmin will interactively prompt for `--enabled`.
++
+The default value is `true`.
 `--dynamic`::
 Enable or disable dynamic stopping and starting of the embedded Hazelcast member. The default value is `false`.
 `--hazelcastconfigurationfile`::
 `-f`::
-The Hazelcast configuration file to use. This path is relative to the domain config directory, `<Payara Installation Directory>/glassfish/domains/<Domain Name>/config/`. The default value is `hazelcast-config.xml`.
+The Hazelcast configuration file to use.
++
+This path is relative to the domain config directory, `domain-dir/config/`.
++
+The default value is `hazelcast-config.xml`.
 `--startport`::
-The port to run Hazelcast on for Payara Server Instances. If this port is busy, the port specified will be incremented until a valid port is found. The default value is `5900`.
+The port to run the Data Grid (Hazelcast) on for Payara Server Instances.
++
+If this port is busy, the port specified will be incremented until a valid port is found.
++
+The default value is `5900`.
 `--publicaddress`::
-The Public Address to use for this Data Grid Node. Used when the node is behind a NAT.
+The Public Address to use for this Data Grid Node.
++
+Used when the node is behind a NAT.
 `--daspublicaddress`::
 This is the public IP Address that the DAS should use if the DAS is behind a NAT firewall and other Payara Server Instances need to connect via the public NAT address rather than the internal IP Address.
 `--dasbindaddress`::
-Explicitly specifies the IP Address the DAS should bind the Hazelcast instance to. By default, Hazelcast will try to choose the correct bind address from the IP addresses available on the host. If you find the DAS is binding to an incorrect IP Address the correct address can be specified here.
+Explicitly specifies the IP Address the DAS should bind the Hazelcast instance to.
++
+By default, Hazelcast will try to choose the correct bind address from the IP addresses available on the host.
++
+If you find the DAS is binding to an incorrect IP Address the correct address can be specified here.
 `--dasport`::
-The port to run Hazelcast on for the DAS. If this port is busy, the port specified will be incremented until a valid port is found. The default value is `4900`.
+The port to run Hazelcast on for the DAS.
++
+If this port is busy, the port specified will be incremented until a valid port is found.
++
+The default value is `4900`.
 `--clustermode`::
-Can be one of `domain`, `tcpip` or `multicast`. See xref:Technical Documentation/Payara Server Documentation/High Availability/domain-data-grid.adoc#domain-discovery-mode[Discovery Modes] for a detailed description of each mode.
+Sets the Data Grid cluster discovery mode.
++
+Can be one of `domain`, `tcpip`, `multicast` or `kubernetes`.
++
+See xref:Technical Documentation/Payara Server Documentation/High Availability/domain-data-grid.adoc#domain-discovery-mode[Discovery Modes] for a detailed description of each mode.
 `--tcpipmembers`::
 Comma separated list of `IP-Address:port` used to discover cluster members if `tcpip` is selected as the cluster mode.
 `--dnsmembers`::
 Sets the list of DNS names and ports of all Data Grid members when xref:Technical Documentation/Payara Server Documentation/High Availability/domain-data-grid.adoc#dns[DNS Discovery Mode] is used.
 `--interfaces`::
-Similar to DAS Bind address by default Hazelcast will choose the correct IP Address to bind to. If you find Hazelcast is binding to the incorrect address a comma separated list of IP Addresses can be specified here.
+Similar to DAS Bind address by default Hazelcast will choose the correct IP Address to bind to.
++
+If you find Hazelcast is binding to the incorrect address a comma separated list of IP Addresses can be specified here.
 `--multicastgroup`::
 `-g`::
 The multicast group for communications in the Hazelcast instance if `multicast` is selected as cluster mode. The default value is `224.2.2.3`.
 `--multicastport`::
 The multicast port for communications in the Hazelcast instance if `multicast` is selected as cluster mode. The default value is `54327`.
 `--clustername`::
-Specifies the Hazelcast group name, to be optionally used to help divide clusters into logical, segregated groups (i.e. _dev-group_, _prod_group_).
+Specifies the Hazelcast group name, to be optionally used to help divide clusters into logical, segregated groups (i.e. `dev-group`, `prod_group`).
 `--jndiname`::
 `-j`::
 Specifies the JNDI name to bind the Hazelcast instance to.
-`--cachemanagerjndiname`::
+`--cacheManagerJndiname`::
 Specified the JNDI name to bind the JCache Caching provider.
-`--cachingproviderjndiname`::
+`--cachingProviderJndiname`::
 The JNDI name to bind the JCache Caching Provider to.
 `--executorpoolsize`::
 The thread pool’s size for the Hazelcast Executor service.
 `--executorqueuecapacity`::
-Queue Capacity of the Data Grid Executor Service. Executions are queued until a thread is available.
+Queue Capacity of the Data Grid Executor Service.
++
+Executions are queued until a thread is available.
 `--scheduledexecutorpoolsize`::
 The thread pool’s size for the Hazelcast Scheduled Executor service.
 `--scheduledexecutorqueuecapacity`::
 Queue Capacity of the Data Grid Scheduled Executor Service. Executions are queued until a thread is available.
 `--licensekey`::
 `-lk`::
-https://hazelcast.com/products/enterprise/[Hazelcast Enterprise] features.
+Used to set the license key to start Hazelcast using an equivalent https://hazelcast.com/products/enterprise/[Hazelcast Enterprise] edition compatible build.
++
+IMPORTANT: Hazelcast Enterprise binaries have to be properly patched in the server installation for the Data Grid to be started correctly.
 `--lite`::
 Sets the cluster to lite mode, where it will cluster but *not* store any cluster data. The default value is `false`.
-`--hostawarepartitioning`::
-Whether or not to enable http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#grouping-types[host-aware partitioning] for the cluster. Host aware partitioning *must be* enabled on all members of the cluster (including Payara Micro instances) for this feature to work correctly. The default value is `false`.
+`--hostawarePartitioning`::
+Whether to enable http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#grouping-types[host-aware partitioning] for the cluster.
++
+Host aware partitioning *must be* enabled on all members of the cluster (including Payara Micro instances) for this feature to work correctly. The default value is `false`.
 `--membername`::
 Member name. The default value is `instance name`.
 `--membergroup`::
 Instance group name for all Server Instances using the configuration. Future functionality may use this name. The default value is `config name`.
-`--kubernetesnamespace`::
+`--kubernetesNamespace`::
 Sets the Kubernetes namespace when xref:Technical Documentation/Payara Server Documentation/High Availability/domain-data-grid.adoc#kubernetes[Kubernetes Discovery Mode] is used.
++
+NOTE: If a namespace is not specified, Payara Server will use the `default` namespace.
 
-NOTE: If a namespace is not specified, Payara Server will use the "default" namespace.
-
-`--kubernetesservicename`::
+`--kubernetesServicename`::
 Sets the Kubernetes service name when xref:Technical Documentation/Payara Server Documentation/High Availability/domain-data-grid.adoc#kubernetes[Kubernetes Discovery Mode] is used.
 `--autoincrementport`::
-By default the Data Grid uses the next unoccupied port that is available starting with the start port. When auto-increment is turned off an occupied start port results in a startup failure instead. The default value is `false`.
+By default, the Data Grid uses the next unoccupied port that is available starting with the start port.
++
+When auto-increment is turned off an occupied start port results in a startup failure instead.
++
+The default value is `false`.
 `--configSpecificDataGridStartPort`::
-Sets the cluster to lite mode, where it will cluster but *not* store any cluster data. The default value is `false`.
+Sets a specific Data Grid start port to the instance.
++
+NOTE: This argument is only applicable when targeting standalone instances.
++
+If set to `0` the Domain wide start port will be used instead.
 `--encryptdatagrid`::
-Enables or disables encryption of data stored in the xref:Technical Documentation/Payara Server Documentation/High Availability/domain-data-grid.adoc[Domain Data Grid] store using a key created using the xref:Technical Documentation/Payara Server Documentation/Command Reference/generate-encryption-key.adoc[`generate-encryption-key`] command. The default value is `false`.
+Enables or disables encryption of data stored in the xref:Technical Documentation/Payara Server Documentation/High Availability/domain-data-grid.adoc[Domain Data Grid] store using a key created using the xref:Technical Documentation/Payara Server Documentation/Command Reference/generate-encryption-key.adoc[`generate-encryption-key`] command.
++
+The default value is `false`.
 
 [[examples]]
 == Examples
 
-*Example 1 Configuring underlying Hazelcast instance*
+*Example 1 Basic configuration of the Data Grid settings*
 
-This example demonstrates configuring the underlying Hazelcast instance setting on a cluster called cluster1.
+This example demonstrates configuring the Data Grid settings for a Hazelcast cluster called `cluster1`.
 
 [source, shell]
 ----
-asadmin> set-hazelcast-configuration --enabled=true --target=cluster1 --dynamic=true -f hazelcast-config.xml --startport=5902 -g 224.2.2.3 --multicastport=6666 --clustermode multicast --hostawarepartitioning=true -j payara/Hazelcast
+asadmin> set-hazelcast-configuration --enabled=true --target=cluster1 --dynamic=true -f hazelcast-config.xml --startPort=5902 -g 224.2.2.3 --multicastPort=6666 --clustermode multicast --hostawarePartitioning=true -j payara/Hazelcast
 Command set-hazelcast-configuration executed successfully.
 ----
 

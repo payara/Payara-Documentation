@@ -49,7 +49,7 @@ The Domain Data Grid allows multiple Payara Server or Payara Micro instances to 
 [[light-weight-domain-messaging]]
 === Light-Weight Domain Messaging
 
-Typically you normally need a ‘system’ between the sender and receiver to transport data from one domain to another and possibly hold that data until receiver is able to process it. The Domain Data Grid is a light weight messaging transport system so you don’t need any additional resources and installation of components to send messages within the domain.
+Typically, you normally need a ‘system’ between the sender and receiver to transport data from one domain to another and possibly hold that data until receiver is able to process it. The Domain Data Grid is a lightweight messaging transport system, so you don’t need any additional resources and installation of components to send messages within the domain.
 
 [[little-to-no-configuration-needed]]
 === Little to No Configuration Needed
@@ -70,12 +70,14 @@ NOTE: As the `domain.xml` is used to discover other members of the Data Grid no 
 
 [[tcp-ip]]
 === TCP-IP Discovery Mode
+
 The TCP-IP discovery mode is an alternative discovery mode. In this mode the user specifies a comma separated list of IP addresses and ports that a Payara Server instance should try to find members of the data grid at upon boot.
 
 TIP: This discovery mode can be used to build a topology based on single instances of the DAS joining together to create the Data Grid. This is common in container based topologies with no central domain administration server.
 
 [[multicast]]
 === Multicast Discovery Mode
+
 The Multicast discovery mode is an alternative discovery mode. In this mode the user specifies the multicast group and multicast port used to find other members of the Data Grid. When a Payara Server instance configured with multicast discovery starts it broadcasts a message on the multicast group and port to discover other members of the data grid.
 
 TIP: This discovery mode can be used to also build a topology based on single instances of the DAS joining together to create the data grid. In this mode multicast must be supported on the network.
@@ -87,14 +89,15 @@ CAUTION: Also change the Data Grid group name and password to prevent other inst
 [[dns]]
 === DNS Discovery Mode
 
-The DNS discovery mode is an alternative discovery mode, closely related to the TCPIP discovery mode. In this mode the user specifies a comma separated list of DNS names and ports that a Payara Server should try to find members of the data grid at upon boot.
+The DNS discovery mode is an alternative discovery mode, closely related to the TCP-IP discovery mode. In this mode the user specifies a comma separated list of DNS names and ports that a Payara Server should try to find members of the data grid at upon boot.
 
 [[kubernetes]]
 === Kubernetes Discovery Mode
 
 The Kubernetes discovery mode is an alternative discovery mode intended for use when running in a Kubernetes environment. In this mode, the user specifies the Kubernetes service name and namespace that Payara Server should look to find other data grid members in - Payara Server will then contact the Kubernetes master upon boot to obtain the list of IP addresses of any other running instances under the specified namespace and service name.
 
-NOTE: This clustering is done using the Hazelcast Kubernetes plugin, and so you will need to grant Hazelcast permission to query the Kubernetes master node. As per the plugin documentation, you will need to apply the permissions outlined below using `kubectl apply`. The original documentation on configuring these permissions can be found https://github.com/hazelcast/hazelcast-kubernetes#grating-permissions-to-use-kubernetes-api[here], as well as extra documentation on how to restrict these permissions further https://github.com/helm/charts/tree/master/stable/hazelcast#configuration[here].
+NOTE: This clustering is done using the Hazelcast Kubernetes plugin, and so you will need to grant Hazelcast permission to query the Kubernetes master node. As per the plugin documentation, you will need to apply the permissions outlined below using `kubectl apply`. +
+The original documentation on configuring these permissions can be found https://github.com/hazelcast/hazelcast-kubernetes#grating-permissions-to-use-kubernetes-api[here], as well as extra documentation on how to restrict these permissions further link:https://github.com/helm/charts/tree/master/stable/hazelcast#configuration[here].
 
 [source, yaml]
 ----
@@ -125,9 +128,9 @@ image:domain-datagrid/discovery-mode.png[Domain Discovery Mode]
 The discovery mode can be set via the asadmin CLI, depending on the specific mode to be selected, by running the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-hazelcast-configuration.adoc[`set-hazelcast-configuration`] commands.
 
 [[set-tcpip-mode]]
-==== Set TCPIP Mode
+==== Set TCP-IP Mode
 
-When setting TCPIP mode the list of IP addresses and ports of all Data Grid members must be specified:
+When setting TCP-IP mode the list of IP addresses and ports of all Data Grid members must be specified:
 
 [source, shell]
 ----
@@ -181,7 +184,8 @@ asadmin> set-hazelcast-configuration --clustermode kubernetes --kubernetesServic
 
 The data grid is enabled by default in Payara Server. It can be disabled and re-enabled either through the Admin Console, or by using a command line asadmin command.
 
-WARNING: If you are using MacOS and have screen sharing enabled, Payara Server will fail to start due to screen sharing using port `5900`, the same as the default Hazelcast port. You can disable MacOS screen sharing in Preferences -> Sharing, Disable "Screen Sharing"`, or xref:configuring-config-specific-data-grid-start-port[change the Hazelcast start port].
+WARNING: If you are using macOS and have screen sharing enabled, Payara Server will fail to start due to screen sharing using port `5900`, the same as the default Hazelcast port. +
+You can disable macOS screen sharing in Preferences -> Sharing, Disable "Screen Sharing"`, or xref:configuring-config-specific-data-grid-start-port[change the Hazelcast start port].
 
 [[enabling-hazelcast-admin-console]]
 === Disabling the Data Grid via the Admin Console
@@ -196,12 +200,15 @@ image::hazelcast/hazelcast-admin-console-select-instance-config.png[Admin Consol
 +
 image::hazelcast/hazelcast-admin-console-enable-hazelcast.png[Admin Console Data Grid Enabling]
 
-CAUTION: Disabling the Data Grid in a configuration object will disable the Data Grid for all instances using that same configuration. If this change is applied dynamically and multiple instances are restarted, there is big risk in incurring on data loss. If this is a problem, ensure not to select the dynamic option and restart each affected instance manually in turn.
+CAUTION: Disabling the Data Grid in a configuration object will disable the Data Grid for all instances using that same configuration. If this change is applied dynamically and multiple instances are restarted, there is big risk in incurring on data loss. +
+If this is a problem, ensure not to select the dynamic option and restart each affected instance manually in turn.
 
 [[enabling-hazelcast-asadmin]]
 === Disabling DataGrid using Asadmin CLI
 
-The xref:Technical Documentation/Payara Server Documentation/Command Reference/set-hazelcast-configuration.adoc[`set-hazelcast-configuration`] asadmin command can be used to enable or disable Hazelcast and therefore the Data Grid. This command is also used to configure other aspects of Hazelcast, which is covered in this same section. The command requires the Admin Server to be running, and will expect it to be listening on port **4848** unless specified differently with the asadmin utility `--port` option.
+The xref:Technical Documentation/Payara Server Documentation/Command Reference/set-hazelcast-configuration.adoc[`set-hazelcast-configuration`] asadmin command can be used to enable or disable Hazelcast and therefore the Data Grid.
+
+This command is also used to configure other aspects of Hazelcast, which is covered in this same section. The command requires the Admin Server to be running, and will expect it to be listening on port **4848** unless specified differently with the asadmin utility `--port` option.
 
 [source, shell]
 ----
@@ -235,7 +242,8 @@ Using a Hazelcast configuration file will cause the settings set via the Admin C
 
 IMPORTANT: The https://github.com/hazelcast/hazelcast/blob/master/hazelcast/src/main/resources/hazelcast-default.xml[Hazelcast defaults settings] are not necessarily the same as the Payara Server's Hazelcast default settings).
 
-NOTE: Payara Server uses its https://github.com/payara/Payara/blob/master/nucleus/payara-modules/hazelcast-bootstrap/src/main/java/fish/payara/nucleus/hazelcast/PayaraHazelcastSerializer.java[own serializer] instead of the default Hazelcast one. Setting a global serializer will not override it. This is by design, implemented to avoid a https://github.com/payara/Payara/issues/759[bug] that causes `ClassNotFoundException` issues.
+NOTE: The Payara Platform uses its https://github.com/payara/Payara/blob/master/nucleus/payara-modules/hazelcast-bootstrap/src/main/java/fish/payara/nucleus/hazelcast/PayaraHazelcastSerializer.java[own serializer] instead of the default Hazelcast one. Setting a global serializer will not override it. +
+This is by design, implemented to avoid a https://github.com/payara/Payara/issues/759[bug] that causes `ClassNotFoundException` issues.
 
 *The following topics are addressed here:*
 
@@ -288,7 +296,7 @@ The following configuration options are available here:
 |DAS Bind Address|Explicitly specifies the IP Address the DAS should bind the Hazelcast instance to.
 By default, Hazelcast will try to choose the correct bind address from the IP addresses available on the host. If you find the DAS is binding to an incorrect IP Address the correct address can be specified here.
 |DAS Public Address|This is the public IP Address that the DAS should use if the DAS is behind a NAT firewall and other Payara Server Instances need to connect via the public NAT address rather than the internal IP Address
-|Auto Increment Port| By default the cluster uses the next unoccupied port that is available starting with the start port. When auto-increment is turned off an occupied start port results in a startup failure instead.
+|Auto Increment Port| By default, the cluster uses the next unoccupied port that is available starting with the start port. When auto-increment is turned off an occupied start port results in a startup failure instead.
 |DAS Start Port | The port the DAS uses to run Hazelcast on. If this port is busy, the port specified will be incremented until a valid port is found.
 |Network Interfaces | Similar to DAS Bind address by default Hazelcast will choose the correct IP Address to bind to. If you find Hazelcast is binding to the incorrect address a comma separated list of IP Addresses can be specified here.
 
@@ -298,7 +306,7 @@ Using this option to point to a valid Hazelcast configuration file will cause al
 |Data Grid Group Name | Specifies the Hazelcast group name, to be optionally used to help divide clusters into logical, segregated groups (i.e. _dev-group_, _prod-group_).
 |Start Port|The port the other Payara Server instances use to run Hazelcast on. If this port is busy, the port specified will be incremented until a valid port is found.
 |License Key |Enables https://hazelcast.com/products/enterprise/[Hazelcast Enterprise] features.
-|Host Aware Partitioning |Whether or not to enable http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#grouping-types[host-aware partitioning] for the cluster. Host aware partitioning *must be* enabled on all members of the cluster (including Payara Micro instances) for this feature to work correctly. This is default in Payara Server 5.181 onwards for both Payara Server domains and Payara Micro instances.
+|Host Aware Partitioning |Whether to enable http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#grouping-types[host-aware partitioning] for the cluster. Host aware partitioning *must be* enabled on all members of the cluster (including Payara Micro instances) for this feature to work correctly. This is default in Payara Server 5.181 onwards for both Payara Server domains and Payara Micro instances.
 |Data Grid Discovery Mode | See xref:Technical Documentation/Payara Server Documentation/High Availability/domain-data-grid.adoc#domain-discovery-mode[Discovery Modes]
 |====
 
@@ -331,7 +339,7 @@ The following configuration options are available here:
 |Scheduled Executor Queue Capacity | Queue Capacity of the Data Grid Scheduled Executor Service. Executions are queued until a thread is available
 |====
 
-Enter your required values, and click _Save_. Restarting the domain or instance/cluster is not necessary for any changes made to take effect, provided that _"Dynamic"_ remains set to "_true_"
+Enter your required values, and click _Save_. Restarting the domain or instance/cluster is not necessary for any changes made to take effect, provided that _"Dynamic"_ remains set to `true`
 
 [[configuring-hazelcast-on-domain-creation]]
 === Configuring Hazelcast on Domain Creation
@@ -377,7 +385,6 @@ asadmin> set-hazelcast-configuration --dynamic=true --configSpecificDataGridStar
 
 [[viewing-data-grid-members]]
 == Viewing Data Grid Members
-
 
 This section details how to visualize the members of the Domain Data Grid in Payara Server.
 
@@ -482,7 +489,7 @@ That will generate a new file with the following contents:
 AS_ADMIN_MASTERPASSWORD=changeit
 ----
 
-NOTE: If you change the master password after generating your key, you’ll need to regenerate and propagate the new key to each of your instances since the original key was created using the old (and now incorrect) password. This should occur under the default `--sync normal`, but `--sync full` can be used to delete the local copy and resync.
+NOTE: If you change the master password after generating your key, you’ll need to regenerate and propagate the new key to each of your instances since the original key was created using the old (and now incorrect) password. This should occur under the default `--sync normal`, but `--sync full` can be used to delete the local copy and resynchronize it.
 
 [[enabling-encryption-in-hazelcast]]
 === Enabling Encryption in Hazelcast
@@ -496,7 +503,8 @@ asadmin> set-hazelcast-configuration --encryptdatagrid true
 
 This is a domain-wide setting, and thus means that hybrid setups where encryption is enabled only on specific clusters within a domain is not supported.
 
-IMPORTANT: Once you’ve generated your key and enabled encryption, you must restart all instances in the domain if they were still running; changes in encryption settings do not take effect until a server is restarted. It is *highly* recommended that you restart all of your running instances as quickly as possible, since those that haven't been restarted will be unable to decrypt the encrypted data placed in the data grid store by those that have been.
+IMPORTANT: Once you’ve generated your key and enabled encryption, you must restart all instances in the domain if they were still running; changes in encryption settings do not take effect until a server is restarted. +
+It is *highly* recommended that you restart all of your running instances as quickly as possible, since those that haven't been restarted will be unable to decrypt the encrypted data placed in the data grid store by those that have been.
 
 [[web-session-availability-configuration]]
 ==== Web Session Availability Configuration
@@ -529,7 +537,20 @@ No additional actions necessary.
 
 No additional actions necessary.
 
-*See also*
+[[hazelcast-phonehome]]
+== The Hazelcast PhoneHome Service
+
+In a similar manner to the server's xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#phone-home[Phone Home] service,  Hazelcast Community Edition also comes with an link:https://docs.hazelcast.com/hazelcast/5.3/phone-homes[internal service] that makes all instances that belong to the DataGrid send phone data regularly.
+
+As with the Platform's phone home service, if you want to disable Hazelcast Phone Home service, it can be done via either the `HZ_PHONE_HOME_ENABLED` environment variable (set it to `false`) or by using the `hazelcast.phone.home.enabled` system property:
+
+[source, shell]
+----
+asadmin create-jvm-options --target server-config "-Dhazelcast.phone.home.enabled=false"
+----
+
+[[see-also]]
+== See also
 
 * xref:Technical Documentation/Payara Server Documentation/High Availability/deployment-groups.adoc[Deployment Groups],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/create-domain.adoc[`create-domain`],

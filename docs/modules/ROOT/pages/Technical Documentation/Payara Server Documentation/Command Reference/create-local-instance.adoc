@@ -8,15 +8,15 @@ Creates a Payara Server instance on the host where the subcommand is run.
 
 [source,shell]
 ----
-asadmin [asadmin-options] create-local-instance [--help] 
-[--node node-name] [--nodedir node-dir] 
+asadmin [asadmin-options] create-local-instance [--help]
+[--node node-name] [--nodedir node-dir]
 [--config config-name | --cluster cluster-name]
 [--lbenabled={true|false}]
 [--portbase port-number] [--checkports={true|false}]
 [--savemasterpassword={false|true}]
 [--usemasterpassword={false|true}]
 [--systemproperties (name=value)[:name=value]* ]
-[--dataGridStartPort dataGridStartPort]
+[--dataGridStartPort startPort]
 instance-name
 ----
 
@@ -25,7 +25,9 @@ instance-name
 
 The `create-local-instance` subcommand creates a Payara Server instance on the node that represents the host where the subcommand is run. This subcommand does not require the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to be configured.
 
-You must run this subcommand from the host that is represented by the node where the instance is to reside. To contact the domain administration server (DAS), this subcommand requires the name of the host where the DAS is running. If a nondefault port is used for administration, this subcommand also requires the port number. If you are adding the first instance to a node, you must provide this information through the `--host` option and the `--port` option of the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] utility. For the second and later instances, this information is obtained from the DAS properties of the node.
+You must run this subcommand from the host that is represented by the node where the instance is to reside. To contact the domain administration server (DAS), this subcommand requires the name of the host where the DAS is running.
+
+If a non-default port is used for administration, this subcommand also requires the port number. If you are adding the first instance to a node, you must provide this information through the `--host` option and the `--port` option of the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] utility. For the second and later instances, this information is obtained from the DAS properties of the node.
 
 A Payara Server instance is a single Virtual Machine for the Java platform (Java Virtual Machine or JVM machine) on a single node in which Payara Server is running. A node defines the host where the Payara Server instance resides. The JVM machine must be compatible with the Java Platform, Enterprise Edition (Jakarta EE).
 
@@ -40,17 +42,21 @@ A Payara Server instance requires a reference to the following items:
 Each Payara Server instance is one of the following types of instance:
 
 Standalone instance::
-  A standalone instance does not share its configuration with any other instances or clusters. A standalone instance is created if either of the following conditions is met: +
-  * No configuration or cluster is specified in the command to create the instance.
-  * A configuration that is not referenced by any other instances or clusters is specified in the command to create the instance. +
-  When no configuration or cluster is specified, a copy of the `default-config` configuration is created for the instance. The name of this configuration is instance-name`-config`, where instance-name represents the name of an unclustered server instance.
+A standalone instance does not share its configuration with any other instances or clusters. A standalone instance is created if either of the following conditions is met: +
+* No configuration or cluster is specified in the command to create the instance.
+* A configuration that is not referenced by any other instances or clusters is specified in the command to create the instance.
++
+When no configuration or cluster is specified, a copy of the `default-config` configuration is created for the instance. The name of this configuration is instance-name`-config`, where instance-name represents the name of an unclustered server instance.
 Shared instance::
-  A shared instance shares its configuration with other instances or clusters. A shared instance is created if a configuration that is referenced by other instances or clusters is specified in the command to create the instance.
+A shared instance shares its configuration with other instances or clusters. A shared instance is created if a configuration that is referenced by other instances or clusters is specified in the command to create the instance.
 Clustered instance::
-  A clustered instance inherits its configuration from the cluster to which the instance belongs and shares its configuration with other instances in the cluster. A clustered instance is created if a cluster is specified in the command to create the instance. +
-  Any instance that is not part of a cluster is considered an unclustered server instance. Therefore, standalone instances and shared instances are unclustered server instances.
+A clustered instance inherits its configuration from the cluster to which the instance belongs and shares its configuration with other instances in the cluster. A clustered instance is created if a cluster is specified in the command to create the instance.
++
+Any instance that is not part of a cluster is considered an unclustered server instance. Therefore, standalone instances and shared instances are unclustered server instances.
 
-By default, this subcommand attempts to resolve possible port conflicts for the instance that is being created. The subcommand also assigns ports that are currently not in use and not already assigned to other instances on the same node. The subcommand assigns these ports on the basis of an algorithm that is internal to the subcommand. Use the `--systemproperties` option to resolve port conflicts for additional instances on the same node. System properties of an instance can be manipulated by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-system-properties.adoc#create-system-properties[`create-system-properties`] subcommand and the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-system-property.adoc#delete-system-property[`delete-system-property`] subcommand.
+By default, this subcommand attempts to resolve possible port conflicts for the instance that is being created. The subcommand also assigns ports that are currently not in use and not already assigned to other instances on the same node.
+
+The subcommand assigns these ports on the basis of an algorithm that is internal to the subcommand. Use the `--systemproperties` option to resolve port conflicts for additional instances on the same node. System properties of an instance can be manipulated by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-system-properties.adoc#create-system-properties[`create-system-properties`] subcommand and the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-system-property.adoc#delete-system-property[`delete-system-property`] subcommand.
 
 When creating an instance, the subcommand retrieves the files that are required for secure synchronization with the domain administration server (DAS). The instance is synchronized with the DAS when the instance is started
 
@@ -58,18 +64,19 @@ When creating an instance, the subcommand retrieves the files that are required 
 == Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
 `--node`::
-  The name of the node that defines the host where the instance is to be created. The node must be specified only if more than one node exists in the directory where nodes are stored. Otherwise, the node may be omitted. If a node is specified, the node must exist. If no node is specified, the behavior of the subcommand depends on the number of existing nodes in the directory where nodes are stored: +
-  * If no nodes exist, the subcommand creates a node for the instance.
-  The name of the node is the name of the host on which the subcommand is run.
-  * If only one node exists, the subcommand creates a reference to the existing node for the instance.
-  * If two or more nodes exist, an error occurs.
+The name of the node that defines the host where the instance is to be created. The node must be specified only if more than one node exists in the directory where nodes are stored. Otherwise, the node may be omitted. If a node is specified, the node must exist. If no node is specified, the behavior of the subcommand depends on the number of existing nodes in the directory where nodes are stored:
++
+* If no nodes exist, the subcommand creates a node for the instance.
+The name of the node is the name of the host on which the subcommand is run.
+* If only one node exists, the subcommand creates a reference to the existing node for the instance.
+* If two or more nodes exist, an error occurs.
 `--nodedir`::
-  The path to the directory in which the files for instance's node is to be stored. The default is as-install`/nodes`.
+The path to the directory in which the files for instance's node is to be stored. The default is as-install`/nodes`.
 `--config`::
   Specifies the named configuration that the instance references. The configuration must exist and must not be named `default-config` or `server-config`. Specifying the `--config` option creates a shared instance. The `--config` option and the `--cluster` option are mutually exclusive. If both options are omitted, a standalone instance is created.
 `--cluster`::
@@ -81,18 +88,19 @@ asadmin-options::
   `false`;;
     The instance is disabled for load balancing. When an instance is disabled for load balancing, a load balancer does not send requests to the instance.
 `--portbase`::
-  Determines the number with which the port assignment should start. An instance uses a certain number of ports that are statically assigned. The portbase value determines where the assignment should start. The values for the ports are calculated as follows: +
-  * Administration port: portbase + 48
-  * HTTP listener port: portbase + 80
-  * HTTPS listener port: portbase + 81
-  * JMS port: portbase + 76
-  * IIOP listener port: portbase + 37
-  * Secure IIOP listener port: portbase + 38
-  * Secure IIOP with mutual authentication port: portbase + 39
-  * JMX port: portbase + 86
-  * JPA debugger port: portbase + 9
-  * Felix shell service port for OSGi module management: portbase + 66 +
-  When the `--portbase` option is specified, the output of this subcommand includes a complete list of used ports.
+Determines the number with which the port assignment should start. An instance uses a certain number of ports that are statically assigned. The `portbase` value determines where the assignment should start. The values for the ports are calculated as follows: +
+* Administration port: `portbase + 48`
+* HTTP listener port: `portbase + 80`
+* HTTPS listener port: `portbase + 81`
+* JMS port: `portbase + 76`
+* IIOP listener port: `portbase + 37`
+* Secure IIOP listener port: `portbase + 38`
+* Secure IIOP with mutual authentication port: `portbase + 39`
+* JMX port: `portbase + 86`
+* JPA debugger port: `portbase + 9`
+* Felix shell service port for OSGi module management: `portbase + 66`
++
+When the `--portbase` option is specified, the output of this subcommand includes a complete list of used ports.
 `--checkports`::
   Specifies whether to check for the availability of the administration, HTTP, JMS, JMX, and IIOP ports. The default value is `true`.
 `--savemasterpassword`::
@@ -134,25 +142,31 @@ asadmin-options::
   `OSGI_SHELL_TELNET_PORT`;;
     This property specifies the port number of the port that is used for connections to the Apache Felix Remote Shell (`http://felix.apache.org/site/apache-felix-remote-shell.html`). This shell uses the Felix shell service to interact with the OSGi module management subsystem. Valid values are 1-65535. On UNIX, creating sockets that listen on ports 1-1024 requires superuser privileges.
 `--dataGridStartPort`::
-Sets Data Grid Start Port to the instance. If set to 0 the Domain wide start port will be used instead. The default value is `0`.
+Sets Data Grid (Hazelcast) instance's starting port.
++
+If set to `0` the Domain wide start port will be used instead.
++
+The default value is `0`.
 
 [[operands]]
 == Operands
 
 instance-name::
-  The name of the instance that is being created. +
-  The name must meet the following requirements: +
-  * The name may contain only ASCII characters.
-  * The name must start with a letter, a number, or an underscore.
-  * The name may contain only the following characters:
-  ** Lowercase letters
-  ** Uppercase letters
-  ** Numbers
-  ** Hyphen
-  ** Period
-  ** Underscore
-  * The name must be unique in the domain and must not be the name of another Payara Server instance, a cluster, a named configuration, or a node.
-  * The name must not be `domain`, `server`, or any other keyword that is reserved by Payara Server.
+The name of the instance that is being created.
++
+The name must meet the following requirements:
++
+* The name may contain only ASCII characters.
+* The name must start with a letter, a number, or an underscore.
+* The name may contain only the following characters:
+** Lowercase letters
+** Uppercase letters
+** Numbers
+** Hyphen
+** Period
+** Underscore
+* The name must be unique in the domain and must not be the name of another Payara Server instance, a cluster, a named configuration, or a node.
+* The name must not be `domain`, `server`, or any other keyword that is reserved by Payara Server.
 
 [[examples]]
 == Examples
@@ -165,7 +179,7 @@ This example creates the standalone instance `il3` on the host where the command
 ----
 asadmin> create-local-instance il3
 Rendezvoused with DAS on localhost:4848.
-Port Assignments for server instance il3: 
+Port Assignments for server instance il3:
 JMX_SYSTEM_CONNECTOR_PORT=28686
 JMS_PROVIDER_PORT=27676
 HTTP_LISTENER_PORT=28080
@@ -190,7 +204,7 @@ node, the host on which the DAS is running is provided through the `--host` opti
 ----
 sj02# asadmin --host sr04 create-local-instance --cluster ymlclust --node sj02 ymli2
 Rendezvoused with DAS on sr04:4848.
-Port Assignments for server instance ymli2: 
+Port Assignments for server instance ymli2:
 JMX_SYSTEM_CONNECTOR_PORT=28686
 JMS_PROVIDER_PORT=27676
 HTTP_LISTENER_PORT=28080
@@ -204,7 +218,7 @@ IIOP_SSL_MUTUALAUTH_PORT=23920
 Command create-local-instance executed successfully.
 ----
 
-*Example 3 Creating a Standalone Payara Instance with Specific Data Grid Start Port*
+*Example 3 Creating a Standalone Payara Server Instance with Specific Data Grid Start Port*
 
 This example creates a Standalone Payara instance `instance2` in the domain `domain1` on the local host. Setting the Data Grid Start Port when an instance is created to `2900`.
 
