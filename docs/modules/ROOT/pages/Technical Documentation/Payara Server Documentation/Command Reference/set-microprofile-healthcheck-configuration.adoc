@@ -1,0 +1,93 @@
+[[set-microprofile-healthcheck-configuration]]
+= set-microprofile-healthcheck-configuration
+
+Configures the settings of the MicroProfile HealthCheck service.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-microprofile-healthcheck-configuration [--help]
+[--enabled={true|false}]
+[--securityEnabled={true|false}]
+[--roles=<role-list>]
+[--endpoint=<context-root[default:health]>]
+[--target=<target[default:server]>]
+[--virtualservers=<virtualserver-list>]
+----
+
+[[description]]
+== Description
+
+The `set-microprofile-healthcheck-configuration` enables or disables the MicroProfile healthcheck service and configures the endpoint where all registered health checks are exposed.
+
+IMPORTANT: Changes made with this command will only be applied when the server or instance is restarted.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--enabled`::
+Defaults to true. Enables or disables the service.
+
+`--securityenabled`::
+Defaults to false. Whether to secure access to the health-check endpoint is enabled.
+
+`--roles`::
+Defaults to `microprofile`. If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.
+
+`--endpoint`::
+Defaults to health. The context root used to expose the health checks endpoint.
+
+`--target`::
+Specifies the target of this command. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
+
+`--virtualservers`::
+If defined, the `/health`` endpoint will be assigned to the list of virtual servers specified as a comma-separated list of names.
++
+Otherwise, the endpoint will be assigned to all virtual servers available.
+
+[[examples]]
+== Example
+
+*Example 1 Configure the MicroProfile HealthCheck service*
+
+This example configures MicroProfile Health Check with security enabled, specifies the roles allowed to access the endpoint, sets a custom endpoint context root, and associates it with the specified virtual servers:
+
+[source,shell]
+----
+asadmin set-microprofile-healthcheck-configuration \
+    --enabled=true \
+    --securityEnabled=true \
+    --roles=ADMIN \
+    --endpoint=myhealth \
+    --target=server \
+    --virtualservers=myapp
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-microprofile-healthcheck-configuration.adoc#get-microprofile-healthcheck-configuration[`get-microprofile-healthcheck-configuration`]

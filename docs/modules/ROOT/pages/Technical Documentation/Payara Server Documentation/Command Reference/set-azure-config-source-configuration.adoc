@@ -1,0 +1,92 @@
+[[set-azure-config-source-configuration]]
+= set-azure-config-source-configuration
+
+Sets the configuration for an Azure Secrets configuration source.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-azure-config-source-configuration [--help]
+[--tenant-id=tenant-id]
+[--client-id=client-id]
+[--key-vault-name=key-vault-name]
+[--private-key-file=private-key-file]
+[--thumbprint=thumbprint]
+[--target=server]
+[--dynamic=false]
+[--enabled={true|false}]
+----
+
+[[description]]
+== Description
+
+The `set-azure-config-source-configuration` provides configuration options for the config source which fetches secrets from Azure Key Vault.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
+
+`--key-vault-name`::
+Name of the Azure Key Vault to fetch secrets from.
+
+`--tenant-id`::
+Tenant ID of your Azure Active Directory application.
+
+`--client-id`::
+The Client (Application) ID of your Azure Active Directory application.
+
+`--thumbprint`::
+The thumbprint of the certificate(certificate hash) that is tied to your Azure Active Directory application.
+
+`--private-key-file`::
+The path to the Private key file which will be used for certificate-based authentication to request access token. This file will be copied to the config/ directory.
+
+`--dynamic`::
+Configure the config source dynamically, which will not require a restart.
+
+`--enabled`::
+Enables or disables the config source, which fetches data from Azure Key Vault.
+
+[[examples]]
+== Example
+
+*Example 1 Setting the configuration of the Azure secrets*
+
+This example configures the Azure Secrets Config Source.
+
+[source,shell]
+----
+asadmin set-azure-config-source-configuration --dynamic true --enabled true --keyVaultName demo-secret-key-vault --tenantID 22b3bb26-e046-42df-9c96-65dbd72c1c81 --clientID 22b3bb26-e046-42df-9c96-65dbd72c1c81 --thumbprint 84E05C1D98BCE3A5421D225B140B36E86A3D5534 --privateKeyPath path/to/privatekey.pem
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-azure-config-source-configuration.adoc#get-azure-config-source-configuration[`get-azure-config-source-configuration`]
+

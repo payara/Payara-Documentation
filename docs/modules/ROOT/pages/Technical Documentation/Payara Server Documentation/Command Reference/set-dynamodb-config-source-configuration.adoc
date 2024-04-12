@@ -1,0 +1,95 @@
+[[set-dynamodb-config-source-configuration]]
+= set-dynamodb-config-source-configuration
+
+Sets the configuration for the DynamoDB Config Source.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-dynamodb-config-source-configuration [--help]
+[--region-name=region-name]
+[--table-name=table-name]
+[--key-column-name=key-column-name]
+[--value-column-name=value-column-name]
+[--limit=100]
+[--target=server]
+[--dynamic={false|true}]
+[--enabled={true|false}]
+----
+
+[[description]]
+== Description
+
+The `set-dynamodb-config-source-configuration` provides configuration options to set the properties required by DynamoDB config source to retrieves data from the configured DynamoDB database table.
+
+TIP: Make sure that the password aliases `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are created first.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
+
+`--region-name`::
+The regional location of your DynamoDB service.
+
+`--table-name`::
+Name of the table in the database.
+
+`--key-column-name`::
+Name of the column containing the key.
+
+`--value-column-name`::
+Name of the column containing the value.
+
+`--limit`::
+The maximum number of items to retrieves from the database table. The default value is 100.
+
+`--dynamic`::
+Configure the config source dynamically, which will not require a restart.
+
+`--enabled`::
+Enables or disables the config source.
+
+[[examples]]
+== Example
+
+*Example 1 Setting the configuration of the DynamoDB Config Source*
+
+This example configures the DynamoDB Config Source.
+
+[source,shell]
+----
+asadmin> set-dynamodb-config-source-configuration --enabled true --dynamic true --region-name eu-west-2 --table-name Books --key-column-name ISBN --value-column-name Title --limit 10
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-dynamodb-config-source-configuration.adoc#get-dynamodb-config-source-configuration[`get-dynamodb-config-source-configuration`]
+

@@ -1,0 +1,94 @@
+[[set-openapi-configuration]]
+= set-openapi-configuration
+
+Configures the settings of the MicroProfile OpenAPI service.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-openapi-configuration [--help]
+[--enabled={true|false}]
+[--corsHeaders={true|false}]
+[--securityEnabled={true|false}]
+[--roles=<role-list>]
+[--endpoint=<context-root[default:openapi]>]
+[--target=<target[default:server]>]
+[--virtualservers=<virtualserver-list>]
+----
+
+[[description]]
+== Description
+
+This command enables or disables the OpenAPI service.
+
+NOTE: When the OpenAPI service is disabled, the `/openapi` endpoint will always return a `403` error and any applications deployed during this period will *not* have an OpenAPI document built. +
+Enabling the service again will not cause a documents to be built for any currently deployed applications.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--enabled`::
+Whether the service should be enabled/disabled. Defaults to `true`.
+
+`--corsHeaders`::
+Defaults to `false`. Whether CORS protection headers (e.g. `Access-Control-Allow-Origin=*`) should be added to OpenAPI endpoint responses.
+
+`--securityEnabled`::
+Defaults to `false`. Whether to secure access to the OpenAPI endpoint is enabled.
+
+`--roles`::
+Defaults to `microprofile`.
++
+If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.
+
+`--endpoint`::
+Defaults to `openapi`. The context root used to expose the OpenAPI endpoint.
+
+`--target`::
+Specifies the target of this command. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
+
+`--virtualservers`::
+If defined, the `/openapi` endpoint will be assigned to the list of virtual servers specified as a comma-separated list of names.
++
+Otherwise, the endpoint will be assigned to all virtual servers available.
+
+[[examples]]
+== Examples
+
+*Example 1 Configures OpenAPI service*
+
+This example configures OpenAPI service with CORS headers enabled, security enabled, a custom endpoint context root, and association with the specified virtual servers.
+
+[source, shell]
+----
+asadmin set-openapi-configuration --enabled=true --corsHeaders=true --securityEnabled=true --roles=ADMIN --endpoint=myapi --target=server --virtualservers=myapp
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-openapi-configuration.adoc#get-openapi-configuration[`get-openapi-configuration`]

@@ -1,0 +1,90 @@
+[[set-hashicorp-config-source-configuration]]
+= set-hashicorp-config-source-configuration
+
+Sets the configuration for the HashiCorp secrets Config Source.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-hashicorp-config-source-configuration [--help]
+[--api-version=2]
+[--secrets-engine-path=secrets-engine-path]
+[--secrets-path=secrets-path]
+[--vault-address=vault-address]
+[--target=server]
+[--dynamic={false|true}]
+[--enabled={true|false}]
+----
+
+[[description]]
+== Description
+
+The `set-hashicorp-config-source-configuration` provides configuration options for the Hashicorp configuration source which fetches secrets from HashiCorp Vault. Hashicorp config source only supports the Vault KV secrets engine.
+
+Make sure that the password aliases `HASHICORP_VAULT_TOKEN` is registered.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+
+`--api-version`::
+KV Secrets Engine API version.
+
+`--secrets-engine-path`::
+The path where the KV secrets engine is enabled.
+
+`--secrets-path`::
+The path where your secrets are stored.
+
+`--vault-address`::
+Vault's address represented as URL and port. For example, "http://127.0.0.1:8200".
+
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
+
+`--dynamic`::
+Configure the config source dynamically, which will not require a restart.
+
+`--enabled`::
+Enables or disables the config source.
+
+[[examples]]
+== Example
+
+*Example 1 Setting the configuration of the HashiCorp Config Source*
+
+This example configures the HashiCorp Config Source.
+
+[source,shell]
+----
+asadmin set-hashicorp-config-source-configuration --enabled true --dynamic true --api-version 2 --vault-address https://127.0.0.1:8200 --secrets-engine-path secret --secrets-path my-secret
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-hashicorp-config-source-configuration.adoc#get-hashicorp-config-source-configuration[`get-hashicorp-config-source-configuration`]

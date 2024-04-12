@@ -1,6 +1,6 @@
 = Eclipse MicroProfile Fault Tolerance API
 
-Payara Server {page-version} provides MicroProfile Fault Tolerance {mpFaultToleranceVersion}
+The Payara Platform {page-version} provides MicroProfile Fault Tolerance {mpFaultToleranceVersion}
 
 == Background
 
@@ -12,17 +12,22 @@ Breaking changes introduced in MicroProfile Fault Tolerance {mpFaultToleranceVer
 
 [[additions-to-spec]]
 == Additions to the Fault Tolerance Spec
-In addition to the functionality https://github.com/eclipse/microprofile-fault-tolerance/blob/master/spec/src/main/asciidoc/microprofile-fault-tolerance-spec.asciidoc[detailed in the spec], the following is also implemented in Payara Server and Payara Micro:
+
+In addition to the functionality https://github.com/eclipse/microprofile-fault-tolerance/blob/master/spec/src/main/asciidoc/microprofile-fault-tolerance-spec.asciidoc[detailed in the specification document], Payara Platform has implemented additional features like:
 
 [[configurable-executor-services]]
 === Configurable Executor Services
-The managed and scheduled managed executor pool can be configured via the _set-fault-tolerance-configuration_ asadmin command.
 
-The executor service is used to execute methods annotated with `@Asynchronous`, whereas the scheduled executor service is used by the CircuitBreaker and Timeout interceptors for their timeout operations (scheduling the circuit breaker to be set to half open, and just timing out respectively).
+On Payara Server, the managed and scheduled managed executor pool used to generate threads for the service can be configured via the `set-fault-tolerance-configuration` Asadmin command.
+
+The executor service is used to execute methods annotated with `@Asynchronous`, whereas the scheduled executor service is used by the `CircuitBreaker` and `Timeout` interceptors for their timeout operations (scheduling the circuit breaker to be set to half open, and just timing out respectively).
 
 [[alternative-asynchronous]]
 === Alternative @Asynchronous Annotations
-The Payara specific configuration property `MP_Fault_Tolerance_Alternative_Asynchronous_Annotations` can be used to specify a comma separated list of fully qualified class names of those annotations that should have the same effect as FT's `@Asynchronous`. These annotations do not have to be interceptor bindings.
+
+The Payara Platform configuration property `MP_Fault_Tolerance_Alternative_Asynchronous_Annotations` can be used to specify a comma separated list of fully qualified class names of those annotations that should have the same effect as the `@Asynchronous` defined in the Fault Tolerance specification.
+
+These annotations do not have to be interceptor bindings.
 
 For example:
 
@@ -30,27 +35,17 @@ For example:
 MP_Fault_Tolerance_Alternative_Asynchronous_Annotations=jakarta.ejb.Asynchronous
 ----
 
+[[annotation-priority]]
 === Annotation Priority
-Prior to release 5.192 the order that the fault tolerance annotations are invoked is as follows:
 
-* Fallback (_SPECIAL CASE - you'll ONLY get here if there is an exception kicking off the asynchronous thread_)
-* Asynchronous
-* Fallback
-* Retry
-* Bulkhead
-* CircuitBreaker
-* Timeout
+As per the Fault Tolerance specification, interactions between annotations are handled effectively nesting computation in the following way (skipping handling for annotations not present):
 
-Since the asynchronous annotation is invoked first, if it's combined with any other fault tolerance annotations they will be processed on the asynchronous thread.
-
-Since release 5.192 interactions between annotations are handled as described by the 2.0 specification effectively nesting computation in the following way (skipping handling for annotations not present):
-
-. Asynchronous
-. Fallback
-. Retry
-. Circuit Breaker
-. Timeout
-. Bulkhead
+. `Asynchronous`
+. `Fallback`
+. `Retry`
+. `CircuitBreaker`
+. `Timeout`
+. `Bulkhead`
 . (calling annotated method; might be wrapped by other interceptors)
 
 As specified the interceptor priority can be changed using the property `mp.fault.tolerance.interceptor.priority` affecting all annotations including alternative ones.
@@ -58,111 +53,32 @@ As specified the interceptor priority can be changed using the property `mp.faul
 [[fault-tolerance-configuration]]
 == Fault Tolerance Configuration
 
-Fault Tolerance can be configured by using Admin Console or Asadmin commands.
+On Payara Server the Fault Tolerance service can be configured by using the Admin Console or Asadmin CLI commands.
 
 [[using-the-admin-console]]
 === Using the Admin Console
 
-To configure the Fault Tolerance in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → Fault Tolerance:
+To configure the Fault Tolerance in the Admin Console, go to Configuration -> [instance-configuration (like `server-config`)] -> MicroProfile -> Fault Tolerance:
 
 image:microprofile/fault-tolerance.png[Set Fault Tolerance Configuration]
 
 [[using-asadmin-commands]]
 === Using Asadmin Commands
 
-[[set-fault-tolerance-configuration]]
-==== `set-fault-tolerance-configuration`
+Use the following commands to modify the configuration settings of the MicroProfile Fault Tolerance service:
 
-*Usage*::
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-fault-tolerance-configuration.adoc#set-fault-tolerance-configuration[`set-fault-tolerance-configuration`]
 
-[source, shell]
-----
-asadmin> set-fault-tolerance-configuration
-  [--managedexecutorservicename=managedexecutorservicename]
-  [--managedscheduledexecutorservicename=managedscheduledexecutorservicename]
-  [--target=server-config]
-----
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-fault-tolerance-configuration.adoc#get-fault-tolerance-configuration[`get-fault-tolerance-configuration`]
 
-*Aim*::
-Provides a way to set the configuration of the fault tolerance service of the targeted config.
-
-[[set-fault-tolerance-configuration-options]]
-===== Command Options
-
-NOTE: The options `asyncmaxpoolsize` and `delaymaxpoolsize` have been removed as they are no longer applicable due to the configurable managed executor pools being used.
-
-[cols="4,6,4,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`managedexecutorservicename`
-|The Logical JNDI name of the Managed Executor Service to look up. Changes to this configuration require a restart of the server to take effect.
-|`java:comp/DefaultManagedExecutorService`
-|no
-
-|`managedscheduledexecutorservicename`
-|The Logical JNDI name of the Managed Scheduled Executor Service to look up. Changes to this configuration require a restart of the server to take effect.
-|`java:comp/DefaultManagedScheduledExecutorService`
-|no
-
-|`target`
-|The target configuration object to apply the change to
-|`server`
-|no
-
-|===
-
-
-[[set-fault-tolerance-configuration-example]]
-===== Example
-
-[source,Shell]
-----
-asadmin> set-fault-tolerance-configuration --managedexecutorservicename=java:comp/DefaultManagedExecutorService --target instance1
-----
-
-[[get-fault-tolerance-configuration]]
-==== `get-fault-tolerance-configuration`
-
-*Usage*::
-`asadmin> get-fault-tolerance-configuration [--target=server-config]`
-*Aim*::
-Returns the current configuration options for the Fault Tolerance service on the targeted config.
-
-[[get-fault-tolerance-configuration-options]]
-===== Command Options
-
-[cols="2,6,2,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`target`
-|The config to get the fault tolerance configuration for.
-|server-config
-|no
-|===
-
-
-===== Example
-
-[source,Shell]
-----
-asadmin> get-fault-tolerance-configuration --target=instance1
-----
-
-[[microprofile-4-upgrade]]
-== Upgrading from MicroProfile 3.x to 4.x
+[[microprofile-upgrade]]
+== Upgrading from Eclipse MicroProfile 3.x to 4.x
 
 MicroProfile 4.0 brings with it a number of changes to MicroProfile Fault Tolerance. There are two incompatible changes with the previous version of MicroProfile Fault Tolerance.
 
 [[names-and-scopes-changed]]
 === Metric Names and Scopes Changed
+
 The metrics added automatically by MicroProfile Fault Tolerance have been updated to take advantage of support for metric tags which were added to MicroProfile Metrics in version 2.0. As a result, some information which was previously contained in the metric name is now instead included in tags.
 
 In addition, metrics have moved from the `application` scope to the `base` scope for consistency with other MicroProfile specifications. Note that this means:

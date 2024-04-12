@@ -1,0 +1,76 @@
+[[set-config-ordinal]]
+= set-config-ordinal
+
+Provides a way to set the ordinal value of a configuration source.
+
+[[synopsis]]
+== Synopsis
+
+[source, shell]
+----
+asadmin [asadmin-options] set-config-ordinal [--help]
+[--target target]
+[--ordinalvalue]
+[--source={domain|config|server|application|module|cluster}]
+----
+
+[[description]]
+== Description
+
+The `set-config-ordinal` sets the ordinal value for the given config source. Where multiple configuration properties exist, the property from a source with a higher ordinal number is preferred.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+
+`--ordinal`::
+The value of the ordinal to set. This must be a number greater than `1`.
++
+A lower number ordinal means lower order of precedence.
+`--source`::
+The value of the source to change. Must be one of:
+* `domain`
+* `config`
+* `server`
+* `application`
+* `module`
+* `cluster`.
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+
+[[examples]]
+== Example
+
+*Example 1 Setting the ordinal value*
+
+This example sets the ordinal value of the application configuration source to `600`.
+
+[source,shell]
+----
+asadmin set-config-ordinal --ordinal=600 --source=application
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-ordinal.adoc#get-config-ordinal[`get-config-ordinal`]

@@ -1,115 +1,55 @@
 = Directory Config Source
 
+This page details how to configure and use the *Directory* configuration source in the Payara Platform.
+
+[[configuration]]
 == Configuration
 
 Config Directory can be configured by using Admin Console or Asadmin commands.
 
+[[use-admin-console]]
 === Using the Admin Console
 
 To configure the Config Directory in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → Config → Directory:
 
 image:microprofile/config-property.png[Set Config Property]
 
+[[using-asadmin-commands]]
 === Using Asadmin Commands
 
-==== `set-config-dir`
+Use the following commands to configure and get the current settings of this configuration source:
 
-*Usage*::
-`asadmin> set-config-dir --directory=<full.path.to.dir> --target=<target[default:server]>`
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-dir.adoc#set-config-dir[`set-config-dir`]
 
-*Aim*::
-Sets the directory to be used for the directory config source.
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-dir.adoc#get-config-dir[`get-config-dir`]
 
-* *Leaf directory cannot start with a dot*, rendering `/home/payara/.secret` an invalid path ("." means hidden on a POSIX filesystem).
-* If relative, will lookup beneath server instance location (usually to be found at `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/`)
-* Defaults to `secrets`, targeting `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/secrets/`
-
-NOTE: After setting via `asadmin`, you will need to restart the application server to reinitialize the config source!
-
-===== Command Options
-
-[cols="2,10,1,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`directory`
-|Full path to the directory containing configuration files.
- Leaf directory name cannot start with a dot.
-|`secrets`
-|yes
-
-|`target`
-|The target configuration where the command should be run
-|server-config
-|no
-|===
-
-
-===== Example
-
-[source, shell]
-----
-asadmin> set-config-dir
-    --directory=/home/payara/secrets
-    --target=myAppCluster
-----
-
-==== `get-config-dir`
-
-*Usage*::
-`asadmin> get-config-dir --target=<target[default:server]>`
-*Aim*::
-Gets the value of the directory to be used for the directory config source.
-
-
-===== Command Options
-
-[cols="2,10,1,1", options="header"]
-|===
-|Option
-|Description
-|Default
-|Mandatory
-
-|`target`
-|The target configuration where the command should be run
-|server-config
-|no
-|===
-
-
-===== Example
-
-[source, shell]
-----
-asadmin> get-config-dir --target=myAppCluster
-----
-
-=== Using Preboot or Postboot Scripts
+[[using-boot-scripts]]
+=== Using Pre-boot and/or Postboot Scripts
 
 When running a Payara Platform distribution in a container, there is no way to restart a running instance after configuring via an `asadmin` command without losing the changes to the domain configuration.
 
-Thus you should add the corresponding command to a boot script as described at xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Asadmin Commands/Pre and Post Boot Commands.adoc[Pre- and Postboot scripts].
+Thus, you should add the corresponding command to a boot script as described at xref:Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Asadmin Commands/Pre and Post Boot Commands.adoc[Pre- and Postboot scripts].
 
-See xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Docker Host Support/Docker Instances.adoc#environment_variables[Payara Server Docker Image environment variables] for details how to use this within non-micro containers.
+See xref:Technical Documentation/Payara Server Documentation/Payara Server Docker Image.adoc#using-environment-variables[Payara Server Docker Image environment variables] for details how to use this within non-micro containers.
 
+[[usage]]
 == Usage
 
 Usually this config source is used to map secrets mounted by Kubernetes or Docker to a directory inside a running container.
 
 Once you configured a directory to read a config (secrets) from, you need to make sure file names correspond to properties in your codebase.
 
+[[map-properties-flat-file-hierarchy]]
 === Map property names to flat file hierarchy
 
 . Say you have two properties `property1` and `foo.bar.property2`.
 . Payara is configured with secret directory `/home/payara/secrets`
 . Secrets mounted as files to `/home/payara/secrets/property1` and `/home/payara/secrets/foo.bar.property2` will be read.
 
-IMPORTANT: Remember that the files may only contain the secret or other configuration values. Plaintext files only, no file extensions allowed.
+IMPORTANT: Remember that the files may only contain the secret or other configuration values. +
+Plaintext files only, no file extensions allowed.
 
+[[map-properties-subdir-structure]]
 === Map property names to a subdirectory structure
 
 . Say you have two properties `property1` and `foo.bar.property2`.
@@ -120,6 +60,7 @@ Restrictions on the files content are the same as with the flat hierarchy.
 
 Updates to files and subdirectories are picked up at runtime. Retrieving the config property again will use the updated values. This allows for clearing a value by removing the file, too.
 
+[[dots-usage-directories]]
 ==== Dots usage and depicting directories and file name
 
 Dots in property names are used to reflect scopes, for example to distinguish different applications, modules, etc.
@@ -133,6 +74,7 @@ You cannot use directories or files whose names start with a dot. They will be i
 
 Symbolic links will be followed, so you can expose files from such hidden areas, allowing for all types of mangling with names etc. Don't link to directories, as the file monitors rely on real directories.
 
+[[kubernetes-example]]
 ==== Kubernetes Example
 
 You want to retrieve a (secret) value via property `foo.bar.property1`:
@@ -152,7 +94,7 @@ metadata:
   name: foobar
 type: Opaque
 stringData:
-  property1: my-super-secret-value
+  property1: "my-super-secret-value"
 ----
 
 And your pod mounts it at `/home/payara/secrets/foo/bar` (only showing the relevant parts from the `Deployment` K8s YAML):
