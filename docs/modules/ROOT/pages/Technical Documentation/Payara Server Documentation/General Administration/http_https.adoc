@@ -1,42 +1,31 @@
-[[administering-internet-connectivity]]
-= Administering Internet Connectivity
+[[administering-http-connectivity]]
+= Administering HTTP Connectivity
 
-This chapter provides procedures for performing internet connectivity tasks in the Payara Server environment by using the `asadmin` command-line utility.
+This chapter provides procedures for performing HTTP connectivity tasks in the Payara Server environment by using the `asadmin` command-line utility.
 
 Instructions for accomplishing the tasks in this chapter by using the Administration Console are contained in the Administration Console online help.
 
 [[about-internet-connectivity]]
 == About Internet Connectivity
 
-The HTTP service provides functionality for deploying web applications and for making deployed web applications accessible by Internet clients,
-either in a single application server instance or in a cluster of multiple server instances. HTTP services are provided by two kinds of
-related objects: listeners and virtual servers.
+The HTTP service provides functionality for deploying web applications and for making deployed web applications accessible by Internet clients, either in a single application server instance or in a cluster of multiple server instances. HTTP services are provided by two kinds of related objects: listeners and virtual servers.
 
-For more information about clusters, see the xref:ROOT:Technical Documentation/Payara Server Documentation/High Availability/overview.adoc[Payara Server High Availability section].
+For more information about clusters, see the xref:Technical Documentation/Payara Server Documentation/High Availability/overview.adoc[Payara Server High Availability section].
 
 [[about-http-network-listeners]]
 === About HTTP Network Listeners
 
-An HTTP listener, also known as a network listener, is a listen socket that has an Internet Protocol (IP) address, a port number, a server
-name, and a default virtual server. Each virtual server provides connections between the server and clients through one or more
-listeners. Each listener must have a unique combination of port number and IP address. For example, an HTTP listener can listen for a host on
-all configured IP addresses on a given port by specifying the IP address `0.0.0.0`. A listener can listen on a specific port on all network interfaces
-by using the IP `0.0.0.0`, and a configured port. Alternatively, the listener can specify a unique IP address for each listener while using the same port.
+An HTTP listener, also known as a network listener, is a listen socket that has an Internet Protocol (IP) address, a port number, a server name, and a default virtual server. Each virtual server provides connections between the server and clients through one or more listeners. Each listener must have a unique combination of port number and IP address. For example, an HTTP listener can listen for a host on all configured IP addresses on a given port by specifying the IP address `0.0.0.0`.
 
-A virtual server will then be used to select a combination of network listeners to use for an application.
-For example, Payara Server has two default network listeners for user deployed applications: an insecure listener on port 8080 (http-listener-1),
-and a secure listener on port 8181 (http-listener-2).
+A listener can listen on a specific port on all network interfaces by using the IP `0.0.0.0`, and a configured port. Alternatively, the listener can specify a unique IP address for each listener while using the same port.
 
-Because an HTTP listener is a combination of IP address and port number, you can have multiple HTTP listeners with the same IP address and
-different port numbers, or with different IP addresses and the same port number (if your host was configured to respond to these addresses).
-However, if an HTTP listener uses the `0.0.0.0` IP address, which listens on all IP addresses on a port, you cannot create HTTP listeners for
-additional IP addresses that listen on the same port for a specific IP address. For example, if an HTTP listener uses 0.0.0.0:8080 (all IP
-addresses on port 8080), another HTTP listener cannot use 1.2.3.4:8080. The host running the Payara Server typically has access to only one
-IP address. HTTP listeners typically use the `0.0.0.0` IP address and different port numbers, with each port number serving a different
-purpose. However, if the host does have access to more than one IP address, each address can serve a different purpose.
+A virtual server will then be used to select a combination of network listeners to use for an application. For example, Payara Server has two default network listeners for user deployed applications: an insecure listener on port 8080 (`http-listener-1`), and a secure listener on port 8181 (`http-listener-2`).
 
-To access a web application deployed on Payara Server, use the URL `http://localhost:8080/` (or `https://localhost:8081/` for a secure
-application), along with the context root specified for the web application.
+Because an HTTP listener is a combination of IP address and port number, you can have multiple HTTP listeners with the same IP address and different port numbers, or with different IP addresses and the same port number (if your host was configured to respond to these addresses). However, if an HTTP listener uses the `0.0.0.0` IP address, which listens on all IP addresses on a port, you cannot create HTTP listeners for additional IP addresses that listen on the same port for a specific IP address. For example, if an HTTP listener uses `0.0.0.0:8080` (all IP addresses on port 8080), another HTTP listener cannot use `1.2.3.4:8080`.
+
+The host running the Payara Server typically has access to only one IP address. HTTP listeners typically use the `0.0.0.0` IP address and different port numbers, with each port number serving a different purpose. However, if the host does have access to more than one IP address, each address can serve a different purpose.
+
+To access a web application deployed on Payara Server, use the URL `http://localhost:8080/` (or `https://localhost:8081/` for a secure application), along with the context root specified for the web application.
 
 To access the Administration Console, use the URL `https://localhost:4848/` or `http://localhost:4848/asadmin/` (console default context root).
 
@@ -44,14 +33,12 @@ To access the Administration Console, use the URL `https://localhost:4848/` or `
 === About Virtual Servers
 
 A virtual server, sometimes called a virtual host, is an object that allows the same physical server to host multiple Internet domain names.
-All virtual servers hosted on the same physical server share the IP address of that physical server. A virtual server associates a domain
-name for a server (such as `www.aaa.com`) with the particular server on which Payara Server is running. Each virtual server must be
-registered with the DNS server for your network.
+
+All virtual servers hosted on the same physical server share the IP address of that physical server. A virtual server associates a domain name for a server (such as `www.aaa.com`) with the particular server on which Payara Server is running. Each virtual server must be registered with the DNS server for your network.
 
 NOTE: Do not confuse an Internet domain with the administrative domain of Payara Server.
 
-For example, assume that you want to host the following domains on your physical server: `www.aaa.com`, `www.bbb.com`, and `www.ccc.com`. Assume
-that these domains are respectively associated with web modules `web1`, `web2`, and `web3`. This means that the following URLs are handled by your physical server:
+For example, assume that you want to host the following domains on your physical server: `www.aaa.com`, `www.bbb.com`, and `www.ccc.com`. Assume that these domains are respectively associated with web modules `web1`, `web2`, and `web3`. This means that the following URLs are handled by your physical server:
 
 [source,text]
 ----
@@ -60,10 +47,7 @@ http://www.bbb.com:8080/web2
 http://www.ccc.com:8080/web3
 ----
 
-The first URL is mapped to virtual server `www.aaa.com`, the second URL is mapped to virtual server `www.bbb.com`, and the third is mapped to
-virtual server `www.ccc.com`. For this mapping to work, `www.aaa.com`, `www.bbb.com`, and `www.ccc.com` must all resolve to your physical
-server's IP address and each virtual server must be registered with the DNS server for your network. In addition, on a UNIX system, add these
-domains to your `/etc/hosts` file (if the setting for `hosts` in your `/etc/nsswitch.conf` file includes `files`).
+The first URL is mapped to virtual server `www.aaa.com`, the second URL is mapped to virtual server `www.bbb.com`, and the third is mapped to virtual server `www.ccc.com`. For this mapping to work, `www.aaa.com`, `www.bbb.com`, and `www.ccc.com` must all resolve to your physical server's IP address and each virtual server must be registered with the DNS server for your network. In addition, on a UNIX system, add these domains to your `/etc/hosts` file (if the setting for `hosts` in your `/etc/nsswitch.conf` file includes `files`).
 
 [[administering-http-network-listeners]]
 == Administering HTTP Network Listeners
@@ -85,65 +69,674 @@ The following table describes the Payara Server default ports for the listeners 
 [width="100%",cols="18%,13%,69%",options="header",]
 |=======================================================================
 |Listener |Default Port |Description
-|Administrative server |4848 |A domain's administrative server is
-accessed by the Administration Console and the `asadmin` utility. For
-the Administration Console, specify the port number in the URL of the
-browser. When running an `asadmin` subcommand remotely, specify the port
-number by using the `--port` option.
+|Administrative server |`4848` |A domain's administrative server is accessed by the Administration Console and the `asadmin` utility.
 
-|HTTP |8080 |The web server listens for HTTP requests on a port. To
-access deployed web applications and services, clients connect to this
-port.
+For the Administration Console, specify the port number in the URL of the browser. When running an `asadmin` subcommand remotely, specify the port number by using the `--port` option.
 
-|HTTPS |8181 |Web applications configured for secure communications
-listen on a separate port.
+|HTTP |`8080` |The web server listens for HTTP requests on a port.
+To access deployed web applications and services, clients connect to this port.
+
+|HTTPS |`8181` |Web applications configured for secure communications listen on a separate port.
 
 |=======================================================================
 
+[[network-listeners-configuration]]
+=== Network Listeners Configuration
+
+NOTE: When configuring network listeners from the admin console, there are some visible configuration options that transparently configure the protocol being used. +
+If a configuration property isn't shown here but is visible in the admin console, see xref:#protocol-configuration[Protocols].
+
+Existing network listeners can be configured from the admin console or with asadmin commands. The network listener configurations can be found in the admin console under *Configurations* -> *your-config* -> *Network Config* -> *Network Listeners*.
+
+image::http/network-listener-config.png[Configuration Page Location]
+
+The following fields can be configured for network listeners:
+
+.Network Listeners Configuration
+[header, cols="2,6,8"]
+|===
+| configuration settings  | Description | Asadmin Command
+
+| Name
+| The unique name of the network listener. This cannot be edited from the admin console.
+| `set configs.config.server-config.network-config.network-listeners.network-listener.$+{network-listener-name}+.name=value`
+
+| Protocol
+| The protocol used by the network listener. This cannot be edited from the admin console.
+| `set configs.config.server-config.network-config.network-listeners.network-listener.$+{network-listener-name}+.protocol=$+{protocol-name}+`
+
+| Status
+| The status of the network listener. This determines whether the listener will be actively listening for requests.
+| `set configs.config.server-config.network-config.network-listeners.network-listener.$+{network-listener-name}+.status=[true/false]`
+
+| JK Enabled
+| Whether mod_jk support should be enabled for this listener. Should only be enabled if mod_jk is being explicitly configured on an Apache Web Server in conjunction with Payara Server.
+| `set configs.config.server-config.network-config.network-listeners.network-listener.$+{network-listener-name}+.jk-enabled=[true/false]`
+
+| JK Configuration File
+| The location of the mod_jk configuration file. Defaults to ${com.sun.aas.instanceRoot}/config/glassfish-jk.properties.
+| `set configs.config.server-config.network-config.network-listeners.network-listener.$+{network-listener-name}+.jk-configuration-file=/location/to/file`
+
+| Port
+| The port used by the network listener. The selected port will be used to listen for requests.
+| `set configs.config.server-config.network-config.network-listeners.network-listener.$+{network-listener-name}+.port=value`
+
+| Address
+| The address used by the network listener. 0.0.0.0 corresponds to all addresses.
+| `set configs.config.server-config.network-config.network-listeners.network-listener.$+{network-listener-name}+.address=value`
+
+| Transport
+| The transport used by the network listener. This cannot be edited from the admin console. Defaults to tcp.
+| `set configs.config.server-config.network-config.network-listeners.network-listener.$+{network-listener-name}+.transport=$+{transport-name}+`
+
+| Thread Pool
+| The thread pool used by the network listener. This determines the pool of threads used to service requests.
+| `set configs.config.server-config.network-config.network-listeners.network-listener.$+{network-listener-name}+.thread-pool=$+{thread-pool-name}+`
+
+|===
 
 [[to-create-an-internet-connection]]
 === To Create an Internet Connection
 
-Use the subcommands in this procedure to create an internet connection with the full range of listener options. A network listener is created
-behind the scenes. For the shortcut version of this process , see xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-http-network-listener[To Create an HTTP Network Listener].
+Use the subcommands in this procedure to create an internet connection with the full range of listener options. A network listener is created behind the scenes. For the shortcut version of this process , see xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-http-network-listener[To Create an HTTP Network Listener].
 
-. Ensure that the server is running. +
+. Ensure that the server is running.
++
 Remote subcommands require a running server.
-. Create an HTTP or HTTPS protocol by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-protocol.adoc[`create-protocol`] subcommand with the
-`--securityenabled` option. +
+. Create an HTTP or HTTPS protocol by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-protocol.adoc[`create-protocol`] subcommand with the
+`--securityenabled` option.
++
 To use the built-in `http-listener-1` HTTP protocol, or `http-listener-2` HTTPS protocol, skip this step.
-. Create an HTTP configuration by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-http.adoc[`create-http`] subcommand. +
+. Create an HTTP configuration by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-http.adoc[`create-http`] subcommand.
++
 To use a built-in protocol, skip this step.
-. Create a transport by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-transport.adoc[`create-transport`] subcommand. +
+. Create a transport by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-transport.adoc[`create-transport`] subcommand.
++
 To use the built-in `tcp` transport, skip this step.
-. Create a thread pool by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-threadpool.adoc[`create-threadpool`] subcommand. +
-To avoid using a thread pool, or to use the built-in `http-thread-pool` thread pool, skip this step. +
+. Create a thread pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-threadpool.adoc[`create-threadpool`] subcommand.
++
+To avoid using a thread pool, or to use the built-in `http-thread-pool` thread pool, skip this step.
++
 For additional thread pool information, see xref:Technical Documentation/Payara Server Documentation/General Administration/threadpools.adoc#administering-thread-pools[Administering Thread Pools].
-. Create an HTTP listener by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-network-listener.adoc[`create-network-listener`] subcommand. +
+. Create an HTTP listener by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-network-listener.adoc[`create-network-listener`] subcommand.
++
 Specify a protocol and transport, optionally a thread pool.
-. To apply your changes, restart Payara Server. +
+. To apply your changes, restart Payara Server.
++
 See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
 
-You can also view the full syntax and options of the subcommand by typing a command such as `asadmin help create-http-listener` at the command line.
+[[to-create-an-http-network-listener]]
+=== To Create an HTTP Network Listener
+
+Use the `create-http-listener` subcommand or the `create-network-listener` subcommand in remote mode to create a listener. These subcommands provide backward compatibility and also provide a shortcut for creating network listeners that use the HTTP protocol.
+
+Behind the scenes, a network listener is created as well as its associated protocol, transport, and HTTP configuration. This method is a convenient shortcut, but it gives access to only a limited number of options. If you want to specify the full range of listener options, follow the instructions in xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-internet-connection[To Create an Internet Connection].
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. Create an HTTP network listener by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-network-listener.adoc[`create-network-listener`] subcommand or the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-http-listener.adoc[`create-http-listener`] subcommand.
+. If needed, restart the server. If you edit the special HTTP network listener named `admin-listener`, you must restart the server for changes to take effect.
++
+See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+[[exampleto-create-an-http-network-listener]]
+==== Example - Creating an HTTP Listener
+
+This example creates an HTTP listener named `sampleListener` that uses a non-default number of acceptor threads. Security is not enabled at runtime.
+
+[source,shell]
+----
+asadmin create-http-listener --listeneraddress `0.0.0.0` --listenerport 7272 --defaultvs server --servername host1.sun.com --acceptorthreads 100 --securityenabled=false --enabled=false sampleListener
+Command create-http-listener executed successfully.
+----
+
+[[example-to-create-an-http-network-listener-2]]
+==== Example - Creating a Network Listener
+
+This example a network listener named `sampleListener` that is not enabled at runtime:
+
+[source,shell]
+----
+asadmin create-network-listener --listenerport 7272 protocol http-1 --enabled=false sampleListener
+Command create-network-listener executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-http-listener` or `asadmin help create-network-listener` at the command line.
+
+[[to-list-http-network-listeners]]
+=== *To List HTTP Network Listeners*
+
+Use the `list-http-listeners` subcommand or the `list-network-listeners` subcommand in remote mode to list the existing HTTP listeners.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. List HTTP listeners by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-http-listeners.adoc[`list-http-listeners`] or xref:Technical Documentation/Payara Server Documentation/Command Reference/list-network-listeners.adoc[`list-network-listeners`] subcommand.
+
+[[example-to-list-http-network-listeners]]
+==== Example - Listing HTTP Listeners*
+
+This example lists the HTTP listeners. The same output is given if you use the `list-network-listeners` subcommand.
+
+[source,shell]
+----
+asadmin list-http-listeners
+admin-listener
+http-listener-2
+http-listener-1
+Command list-http-listeners executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-http-listeners` or `asadmin help list-network-listeners` at the command line.
+
+[[to-update-an-http-network-listener]]
+=== *To Update an HTTP Network Listener*
+
+. List HTTP listeners by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-http-listeners.adoc[`list-http-listeners`] or xref:Technical Documentation/Payara Server Documentation/Command Reference/list-network-listeners.adoc[`list-network-listeners`] subcommand.
+. Modify the values for the specified listener by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand.
++
+The listener is identified by its dotted name.
+
+[[example-to-update-an-http-network-listener]]
+==== Example - Updating an HTTP Network Listener
+
+This example changes `security-enabled` to `false` on `http-listener-2`.
+
+[source,shell]
+----
+asadmin set server.network-config.protocols.protocol.http-listener-2.security-enabled=false
+Command set executed successfully.
+----
+
+[[to-restart-an-http-network-listener]]
+=== *To Restart an HTTP Network Listener*
+
+The `restart-http-listeners` commands restarts all HTTP listeners but the `admin-listener` of the targeted instance(s). It is either used with the `--all` flag to target all instances or with a particular target instance, deployment group or cluster following the `--target` parameter.
+
+When `target` and `all` parameters are both omitted the default target is the DAS.
+
+NOTE: This command only restarts all HTTP listeners except the `admin-listener`. IIOP listeners are not affected and may require a server restart to make changes take effect.
+
+[[example-to-restart-an-http-network-listener]]
+==== Example - Restarting an HTTP Network Listener
+
+This example restarts the instance named `FlyingFish`:
+
+[source,shell]
+----
+asadmin restart-http-listeners --target FlyingFish
+Command restart-http-listeners executed successfully.
+----
+
+[[to-delete-an-http-network-listener]]
+=== *To Delete an HTTP Network Listener*
+
+Use the `delete-http-listener` subcommand or the `delete-network-listener` subcommand in remote mode to delete an existing HTTP listener. This disables secure communications for the listener.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. List HTTP listeners by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-http-listeners.adoc[`list-http-listeners`] subcommand.
+. Delete an HTTP listener by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-http-listener.adoc[`delete-http-listener`] or xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-network-listener.adoc[`delete-network-listener`] subcommand.
+. To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+
+[[example-to-delete-an-http-network-listener]]
+==== Example - Deleting an HTTP Listener
+
+This example deletes the HTTP listener named `sampleListener`:
+
+[source,shell]
+----
+asadmin delete-http-listener sampleListener
+Command delete-http-listener executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help delete-http-listener` or `asadmin help delete-network-listener` at the command line.
+
+[[configure-an-http-listener-for-ssl]]
+=== *Configure an HTTP Listener for SSL*
+
+Use the `create-ssl` subcommand in remote mode to create and configure an SSL element in the specified listener. This enables secure communication for the listener.
+
+. Ensure that the server is running.
++
+Remote subcommands require a running server.
+. Configure an HTTP listener by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-ssl.adoc[`create-ssl`] subcommand.
+. To apply your changes, restart Payara Server.
++
+See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+[[example-to-configure-an-http-listener-for-ssl]]
+==== Example - Configuring an HTTP Listener for SSL
+
+This example enables the HTTP listener named `http-listener-1` for SSL:
+
+[source,shell]
+----
+asadmin create-ssl --type http-listener --certname sampleCert http-listener-1
+Command create-ssl executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-ssl` at the command line.
+
+[[configure-sni-for-http-listeners]]
+=== *Configure SNI for HTTP Listeners*
+
+Server Name Indication, SNI for short, allows you to use multiple SSL certificates with the same IP address. When enabled, the server will look for a certificate in the configured keystore using a nickname that matches the host name requested.
+
+SNI can be enabled by configuring a network listener. Existing network listeners can be configured from the admin console or with asadmin commands. The network listener configurations can be found in the admin console under *Configurations -> <your-config> -> Network Config -> Network Listeners*.
+
+From here, click on the SSL tab, and make sure that the *SNI Support* checkbox is ticked.
+
+IMPORTANT: For SNI to take effect, the network listener must have security enabled by providing a default keypair and certificate, and by checking the *Security* box on the *HTTP* tab.
+
+[[configure-optional-client-authentication-for-ssl]]
+=== *Configure Optional Client Authentication for SSL*
+
+In Payara Server, you can configure the SSL protocol of an HTTP listener such that it requests a certificate before permitting a client connection, but does not refuse a connection if the client does not provide one. To enable this feature, set the `client-auth` property of the SSL protocol to the value `want`. For example:
+
+[source,shell]
+----
+asadmin set configs.config.config-name.network-config.protocols.protocol.listener-name.ssl.client-auth=want
+----
+
+[[configure-a-custom-ssl-implementation]]
+=== *Configure a Custom SSL Implementation*
+
+In Payara Server, you can configure the SSL protocol an HTTP listener such that it uses a custom implementation of SSL. To enable this feature, set the `classname` property of the SSL protocol to the name of a class that implements the `com.sun.grizzly.util.net.SSLImplementation` interface. For example:
+
+[source,shell]
+----
+asadmin> set configs.config.config-name.network-config.protocols.protocol.listener-name.ssl.classname=SSLImplementation-class-name
+----
+
+By default, Payara Server uses the implementation `com.sun.enterprise.security.ssl.GlassfishSSLImpl` for the SSL protocol.
+
+[[delete-ssl-from-an-http-listener]]
+=== *Delete SSL From an HTTP Listener*
+
+Use the `delete-ssl` subcommand in remote mode to delete the SSL element in the specified listener. This disables secure communications for the listener.
+
+. Ensure that the server is running.
++
+Remote subcommands require a running server.
+. Delete SSL from an HTTP listener by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-ssl[`delete-ssl`] subcommand.
+. To apply your changes, restart Payara Server.
++
+See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+[[example-to-delete-ssl-from-an-http-listener]]
+==== Example - Deleting SSL From an HTTP Listener
+
+This example disables SSL for the HTTP listener named `http-listener-1`:
+
+[source,shell]
+----
+asadmin delete-ssl --type http-listener http-listener-1
+Command delete-ssl executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help delete-ssl` at the command line.
+
+[[assign-a-default-virtual-server-to-an-http-listener]]
+=== *Assign a Default Virtual Server to an HTTP Listener*
+
+. In the Administration Console, open the HTTP Service component under the relevant configuration.
+. Open the HTTP Listeners component under the HTTP Service component.
+. Select or create a new HTTP listener.
+. Select from the Default Virtual Server drop-down list. For more information, see:
++
+xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-assign-a-default-web-module-to-a-virtual-server[To Assign a Default Web Module to a Virtual Server].
+
+For details, click the Help button in the Administration Console from the HTTP Listeners page.
 
 [[administering-http-protocols]]
-=== Administering HTTP Protocols
+== Administering HTTP Protocols
 
-Each HTTP listener has an HTTP protocol, which is created either by using the `create-protocol` subcommand or by using the built-in
-protocols that are applied when you follow the instructions in xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-http-network-listener[To Create an HTTP Network Listener].
+A protocol is used by a network listener to determine the nature of the communication expected by the listener. For example, a protocol determines the timeout of a request, as well as whether HTTPS should be used. The reason the protocol is separate to the listener is so that the same protocol configuration can be used to listen on multiple ports.
 
-[[to-create-a-protocol]]
-==== *To Create a Protocol*
+Existing protocols can be configured from the admin console or with asadmin commands. The protocol configurations can be found in the Admin Console under *Configurations* -> *your-config* -> *Network Config* -> *Protocols*.
+
+Each HTTP listener has an HTTP protocol, which is created either by using the `create-protocol` subcommand or by using the built-in protocols that are applied when you follow the instructions in xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-http-network-listener[To Create an HTTP Network Listener].
+
+[[protocol-configuration]]
+=== Protocol Configurations
+
+.Security
+[header, cols="2,6,8"]
+|===
+| configuration settings  | Description | Asadmin Command
+
+| Security
+| Whether security is enabled for the protocol. When disabled, all the SSL/TLS options are ignored.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.security-enabled=[true\|false]`
+
+|===
+
+.HTTP Settings
+[header, cols="2,6,8"]
+|===
+| configuration settings  | Description | Asadmin Command
+
+| Server Name
+| The name of the server. This will be sent as the `Server` header in responses.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.server-name-enabled=value`
+
+| Default Virtual Server
+| The default virtual server used for the protocol. Establishes the request priority when multiple virtual servers are configured.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.default-virtual-server=value`
+
+| Redirect Port
+| The port used for SSL transport redirection.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.redirect-port=value`
+
+| Max Connections
+| The maximum number of requests per connection to keep in keep-alive mode.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.max-connections=value`
+
+| Timeout
+| The amount of time in seconds before a connection is deemed as idle. After this, the connection will no longer be in keep-alive state.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.timeout-seconds=value`
+
+| Upload Timeout Enabled
+| Enables closing a connection that is reading bytes slowly after the `configuration-http-upload-timeout-millis` setting is reached.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.upload-timeout-enabled=value`
+
+| Connection Upload Timeout
+a| The timeout, in milliseconds, for uploads.
+[TIP]
+====
+To disable this timeout, set the value to `-1`.
+====
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.connection-upload-timeout-millis=value`
+
+| Request Timeout
+a| The timeout, in seconds, for requests.
+[TIP]
+====
+To disable this timeout, set the value to `-1`.
+====
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.request-timeout-seconds=value`
+
+| Send Buffer Size
+| The size, in bytes, of the send buffer.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.send-buffer-size-bytes=value`
+
+| Header Buffer Length
+| The size, in bytes, of the buffer used to read the request data.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.header-buffer-length-bytes=value`
+
+| Max Post Size
+| The maximum size, in bytes, of POST actions.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.max-post-size-bytes=value`
+
+| Max Form Post Size
+| The maximum size, in bytes, of a POST form.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.max-form-post-size-bytes=value`
+
+| Max Save Post Size
+| The maximum size, in bytes, of a POST request that will be saved during authentication.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.max-save-post-size-bytes=value`
+
+| URI Encoding
+| The character set used to decode the request URIs received.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.uri-encoding=value`
+
+| Compression
+| Whether to enable HTTP/1.1 GZIP compression to save server bandwidth. Will be ignored when HTTP/2 is used.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.compression=[off/on/force]`
+
+| Compression Level
+a| The level of compression to be used:
+
+*  `-1` corresponds to the default level
+* `0` is no compression
+* `1` is the best speed
+* `9` is the best compression
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.compression-level=[-1-9]`
+
+| Compression Strategy
+| Sets the strategy to be used during HTTP compression.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.compression-strategy=[Default/Filtered/Huffman Only]`
+
+| Compressible Mime Types
+| Comma separated list of MIME types for which HTTP compression is used.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.compressable-mime-type=value`
+
+| Compression Minimum Size
+| The minimum size of a file that determines whether compression is applied.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.compression-min-size-bytes=value`
+
+| No-Compression User Agents
+| Comma separated list of regular expressions matching user agents for which compression should not be used.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.no-compression-user-agents=value`
+
+| Restricted User Agents
+| List of restricted user agents for which HTTP compression is applied.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.restricted-user-agents=value`
+
+| Default Response Type
+| The default response type if none are matched. Specified as a semicolon delimited string consisting of content type, encoding, language, charset.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.default-response-type=value`
+
+| Adapter
+| The class name of the static resources adapter.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.adapter=value`
+
+| Comet Support
+| Whether comet support is enabled or not.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.comet-support-enabled=[true\|false]`
+
+| DNS Lookup
+| Enables Domain Name System lookups.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.dns-lookup-enabled=[true\|false]`
+
+| Trace Enabled
+a| Enables the TRACE operation
+
+TIP: Setting this to false helps prevent cross-site scripting attacks.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.trace-enabled=[true\|false]`
+
+| Auth Pass Through
+| Enable this if the network listener receives traffic from an SSL terminating proxy server.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.auth-pass-through-enabled=[`true`\|`false`]`
+
+| Chunking Enabled
+| Enables HTTP response chunking.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.chunking-enabled=[true\|false]`
+
+| XPoweredBy
+| Used to overwrite the default `X-Powered-By` header string.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.xpowered-by=value`
+
+| XFrame Options
+| When enabled, the `X-Frame-Options` header will be set to `SAMEORIGIN`. This can still be overridden by a deployed application.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.xframe-options=[true\|false]`
+
+| Encoded Slash
+| Allow encoded slashes (e.g. `%2F`) in URIs.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.encoded-slash-enabled=[true\|false]`
+
+| Websockets Support Enabled
+| Allows Websockets to be used.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.websockets-support-enabled=[true\|false]`
+
+| Scheme Mapping
+| HTTP header name used for identifying the originating protocol of an HTTP request.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.scheme-mapping=value`
+
+| Remote User Mapping
+| HTTP header name used for identifying the originating user of an HTTP request.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.remote-user-mapping=value`
+
+| Enable Cookie SameSite
+| Enabling to set all cookies to use the SameSite value.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.cookie-same-site-enabled=[true\|false]`
+
+| Cookie SameSite Value
+a| The values to be used:
+
+* `Lax`: Cookies are not sent on normal cross-site sub-requests
+* `Strict`: Cookies will only be sent in a first-party context
+* `None`: Cookies will be sent in all contexts
+
+Users can set up the SameSite Cookie attribute at the *application level* by using the `payara-web.xml` deployment descriptor.
+
+Set this attribute by using the `cookie-properties` tag with a child property named `cookieSameSite`:
+[source,xml,indent=0]
+----
+<payara-web-app>
+    <cookie-properties>
+        <property name="cookieSameSite" value="Strict" />
+    </cookie-properties>
+</payara-web-app>
+----
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.cookie-same-site-value=[`Lax`\|`Strict`\|`None`]`
+
+|===
+
+.HTTP/2 Settings
+[header, cols="2,6,8"]
+|===
+| configuration settings  | Description | Asadmin Command
+
+| HTTP/2 Enabled
+a| Whether to enable HTTP/2 support.
+
+IMPORTANT: HTTP/2 support can only be enabled on a secure network listener
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-enabled=[true\|false]`
+
+| Disable HTTP/2 Cipher Check
+| Whether TLS connections can be established using insecure cipher suites.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-disable-cipher-check=[true\|false]`
+
+| HTTP/2 Max Concurrent Streams
+| The number of maximum concurrent streams allowed per HTTP/2 connection.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-max-concurrent-streams=value`
+
+| HTTP/2 Initial Window Size
+| The initial window size in bytes.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-initial-window-size-in-bytes=value`
+
+| HTTP/2 Max Frame Payload Size
+| The maximum size of the HTTP/2 frame payload to be accepted.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-max-frame-payload-size-in-bytes=value`
+
+| HTTP/2 Max Header List Size
+| The maximum size, in bytes, of the header list.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-max-header-list-size-in-bytes=value`
+
+| Streams High Watermark
+| The maximum number of streams that are allowed. Excess streams will be cleaned out periodically in proportion to the maximum number of streams.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-streams-high-water-mark=value`
+
+| Streams Clean Percentage
+a| The number of streams to process when the high watermark is exceeded.
+
+NOTE: Only closed streams will be removed.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-clean-percentage=value`
+
+| Streams Clean Frequency Check
+| The number of streams that must be closed before checking if the number of streams exceeds the high watermark.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-clean-frequency-check=value`
+
+| HTTP/2 Push
+| Enables server push. This is enabled by default.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.http.http2-push-enabled=[true\|false]`
+
+|===
+
+.HTTP/2 Settings
+[header, cols="2,6,8"]
+|===
+| configuration settings  | Description | Asadmin Command
+
+| TLS V1.2 Enabled
+| Whether to enable TLS V1.2 or not. Will be ignored if TLS is disabled.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.tls12-enabled=[true\|false]`
+
+| TLS V1.3 Enabled
+a| Whether to enable TLS V1.3 or not. Will be ignored if TLS is disabled.
+
+NOTE: Support for TLS 1.3 is available with JDK 8 versions after JDK 1.8.0u261, unless you’re using Zulu JDK 1.8.0u222 - 1.8.0u252, in which case you’ll also need to use the Java option -XX:+UseOpenJSSE. This option makes OpenJSSE default TLS provider. +
+OpenJSEE is a JSEE provider created by Azul to support TLS 1.3 on JDK 8. See TLS 1.3 Support in Zulu 8 with OpenJSSE for more information. Also note that this flag can cause problems with the HTTP/2 support. If you’re using a lower version than 1.8.0u222, checkbox to enable TLS 1.3 will not be visible on the web administration console.
+
+IMPORTANT: You will need to add the following Java Option: -Dfish.payara.clientHttpsProtocol=TLSv1.3 to the asadmin script for TLS 1.3 to work with asadmin CLI. This sets the TLS version to 1.3 which will be used by the asadmin client.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.tls13-enabled=[true\|false]`
+
+| Client Authentication
+| When enabled, clients will be required to authenticate themselves to the server.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.client-auth-enabled=[true\|false]`
+
+| Certificate Nickname
+| The alias of the certificate to be supplied on secure requests. The certificate should be present in the server keystore.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.cert-nickname=value`
+
+| Key Store
+| The name of the keystore file used to secure communication handled by this network listener.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.key-store=value`
+
+| Trust Store
+| The name of the trust store file where trusted certificates are stored.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.trust-store=value`
+
+| Trust Algorithm
+| The name of the trust management algorithm (e.g. PKIX) to use for certification path validation.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.trust-algorithm=value`
+
+| Max Certificate Length
+| Maximum number of non self-issued intermediate certificates that can exist in a certification path. Only used if the trust algorithm is set to PKIX.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.trust-max-cert-length=value`
+
+| Enabled Ciphers
+| A list of the server enabled ciphers. This string is stores as a comma separated list of the enabled ciphers with a `+` or a `-` at the start of each, depending on whether the cipher is enabled or disabled. E.g. `+TLS_RSA_WITH_AES_256_CBC_SHA,+SSL_RSA_WITH_3DES_EDE_CBC_SHA`.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.ssl3-tls-ciphers=value`
+
+| Handshake Timeout
+| The timeout, in milliseconds, for a handshake. After this timeout the handshake will be aborted.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.handshake-timeout-millis=value`
+
+| TLS Rollback
+| Whether TLS rollback is enabled or not.
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.tls-rollback-enabled=[true\|false]`
+
+| HSTS Enabled
+a| Whether HSTS is enabled. When enabled, the server will respond to requests with the `Strict-Transport-Security` header. While these requests often return a 301 directing the client to the secure site, this header instructs the requester to make all connections to this site secure for the next year.
+
+The header takes the following form:
+
+----
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+----
+
+The last 2 attributes are added based on the other HSTS configuration options.
+
+NOTE: HSTS can be enabled on any HTTP listener. However, it's meant to be enabled on a secure HTTP listener if an insecure HTTP listener redirects to the secure listener. When browsers receive the `Strict-Transport-Security` header over HTTPS, they will use HTTPS immediately for all future connections requested over plain HTTP. +
+If the header is retrieved over HTTP, it is ignored by browsers due to security reasons. More information in https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security[MDN Docs].
+a| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.hsts-enabled=[true\|false]`
+
+NOTE: When the configuration value is set to true, the HSTS header is added with a max-age property value of 31536000. The max-age property is not configurable.
+
+| HSTS Subdomains
+| When enabled in combination with HSTS, `Strict-Transport-Security` headers will include the includeSubDomains attribute. When this is configured, the client will also assume subdomains of the targeted resource require secure connections. The subdomains property is not enabled by default and has to be enabled with the following command:
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.hsts-sub-domains=[true\|false]`
+
+| HSTS Preload
+| When enabled in combination with HSTS, `Strict-Transport-Security` headers will include the `preload` attribute. When this is configured, the domain of the target resource will be added to the browser `preload` list, meaning that initial requests to this resource in future won’t be insecure. The `preload` property is not enabled by default and has to be enabled with the following command:
+| `set configs.config.server-config.network-config.protocols.protocol.$+{protocol-name}+.ssl.hsts-preload=[true\|false]`
+
+|===
+
+[[create-a-protocol]]
+=== *Create a Protocol*
 
 Use the `create-protocol` subcommand in remote mode to create a protocol.
 
-. Ensure that the server is running. +
+. Ensure that the server is running.
++
 Remote subcommands require a running server.
-. Create a protocol by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-protocol.adoc[`create-protocol`] +
+. Create a protocol by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-protocol.adoc[`create-protocol`]
++
 Information about options and properties for the subcommand are included in this help page.
 
 [[example-to-create-a-protocol]]
-=== Example 13-1 Creating an HTTP Protocol
+==== Example - Creating an HTTP Protocol
 
 This example creates a protocol named `http-1` with security enabled.
 
@@ -153,26 +746,24 @@ asadmin> create-protocol --securityenabled=true http-1
 Command create-protocol executed successfully.
 ----
 
-You can also view the full syntax and options of the subcommand by
-typing `asadmin help create-protocol` at the command line.
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-protocol` at the command line.
 
-[[to-list-protocols]]
-==== *To List Protocols*
+[[list-protocols]]
+=== *List Protocols*
 
-Use the `list-protocols` subcommand in remote mode to list the existing
-HTTP protocols.
+Use the `list-protocols` subcommand in remote mode to list the existing HTTP protocols.
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. List the existing protocols by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-protocols.adoc[`list-protocols`] subcommand.
+. List the existing protocols by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-protocols.adoc[`list-protocols`] subcommand.
 
 [[example-to-list-protocols]]
-Example 13-2 Listing the Protocols
+==== Example - Listing the Protocols
 
 This example lists the existing protocols.
 
 [source,shell]
 ----
-asadmin> list-protocols
+asadmin list-protocols
 admin-listener
 http-1
 http-listener-1
@@ -182,122 +773,121 @@ Command list-protocols executed successfully.
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help list-protocols` at the command line.
 
-[[to-delete-a-protocol]]
-==== *To Delete a Protocol*
+[[delete-a-protocol]]
+=== *Delete a Protocol*
 
-Use the `delete-protocol` subcommand in remote mode to remove a
-protocol.
+Use the `delete-protocol` subcommand in remote mode to remove a protocol.
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. Delete a protocol by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-protocol.adoc[`delete-protocol`] subcommand
+. Delete a protocol by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-protocol.adoc[`delete-protocol`] subcommand
 
 [[example-to-delete-a-protocol]]
-==== Example 13-3 Deleting a Protocol
+==== Example - Deleting a Protocol
 
 This example deletes the protocol named `http-1`.
 
 [source,shell]
 ----
-asadmin> delete-protocol http-1
+asadmin delete-protocol http-1
 Command delete-protocol executed successfully.
 ----
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help delete-protocol` at the command line.
 
 [[administering-http-configurations]]
-=== Administering HTTP Configurations
+== Administering HTTP Configurations
 
-Each HTTP listener has an HTTP configuration, which is created either by using the `create-http` subcommand or by using the built-in
-configurations that are applied when you follow the instructions in xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-http-network-listener[To Create an HTTP Network Listener].
+Each HTTP listener has an HTTP configuration, which is created either by using the `create-http` subcommand or by using the built-in configurations that are applied when you follow the instructions in xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-http-network-listener[To Create an HTTP Network Listener].
 
-[[to-create-an-http-configuration]]
-==== *To Create an HTTP Configuration*
+[[create-an-http-configuration]]
+=== *Create an HTTP Configuration*
 
-Use the `create-http` subcommand in remote mode to create a set of HTTP parameters for a protocol. This set of parameters configures one or more
-network listeners,
+Use the `create-http` subcommand in remote mode to create a set of HTTP parameters for a protocol. This set of parameters configures one or more network listeners,
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. Create an HTTP configuration by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-http.adoc[`create-http`] subcommand. +
+. Create an HTTP configuration by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-http.adoc[`create-http`] subcommand.
++
 Information about options and properties for the subcommand are included in this help page.
 
 [[example-to-create-an-http-configuration]]
-==== Example 13-4 Creating an HTTP Configuration
+==== Example - Creating an HTTP Configuration
 
 This example creates an HTTP parameter set for the protocol named `http-1`.
 
 [source,shell]
 ----
-asadmin> create-http --timeout-seconds 60 --default-virtual-server server http-1
+asadmin create-http --timeout-seconds 60 --default-virtual-server server http-1
 Command create-http executed successfully.
 ----
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help create-http` at the command line.
 
-[[to-delete-an-http-configuration]]
-==== *To Delete an HTTP Configuration*
+[[delete-an-http-configuration]]
+=== *Delete an HTTP Configuration*
 
 Use the `delete-http` subcommand in remote mode to remove HTTP parameters from a protocol.
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. Delete the HTTP parameters from a protocol by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-http.adoc[`delete-http`] subcommand.
+. Delete the HTTP parameters from a protocol by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-http.adoc[`delete-http`] subcommand.
 
 [[example-to-delete-an-http-configuration]]
-==== Example 13-5 Deleting an HTTP Configuration
+==== Example - Deleting an HTTP Configuration
 
 This example deletes the HTTP parameter set from a protocol named `http-1`.
 
 [source,shell]
 ----
-asadmin> delete-http http-1
+asadmin delete-http http-1
 Command delete-http executed successfully.
 ----
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help delete-http` at the command line.
 
 [[administering-http-transports]]
-=== Administering HTTP Transports
+== Administering HTTP Transports
 
-Each HTTP listener has an HTTP transport, which is created either by using the `create-transport` subcommand or by using the built-in
-transports that are applied when you follow the instructions in xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-http-network-listener[To Create an HTTP Network Listener].
+Each HTTP listener has an HTTP transport, which is created either by using the `create-transport` subcommand or by using the built-in transports that are applied when you follow the instructions in xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-http-network-listener[To Create an HTTP Network Listener].
 
-[[to-create-a-transport]]
-==== *To Create a Transport*
+[[create-a-transport]]
+=== *Create a Transport*
 
 Use the `create-transport` subcommand in remote mode to create a transport for a network listener,
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. Create a transport by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-transport.adoc[`create-transport`]
-subcommand. Information about options and properties for the subcommand are includedin this help page.
+. Create a transport by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-transport.adoc[`create-transport`]
+subcommand.
++
+Information about options and properties for the subcommand are included in this help page.
 
 [[example-to-create-a-transport]]
-==== Example 13-6 Creating a Transport
+==== Example - Creating a Transport
 
 This example creates a transport named `http1-trans` that uses a non-default number of acceptor threads.
 
 [source,shell]
 ----
-asadmin> create-transport --acceptorthreads 100 http1-trans
+asadmin create-transport --acceptorthreads 100 http1-trans
 Command create-transport executed successfully.
 ----
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help create-transport` at the command line.
 
-[[to-list-transports]]
-==== *To List Transports*
+[[list-transports]]
+=== *List Transports*
 
 Use the `list-transports` subcommand in remote mode to list the existing HTTP transports.
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. List the existing transports by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-transports.adoc[`list-transports`] subcommand.
+. List the existing transports by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-transports.adoc[`list-transports`] subcommand.
 
 [[example-to-list-transports]]
-==== Example 13-7 Listing HTTP Transports
+==== Example - Listing HTTP Transports
 
 This example lists the existing transports.
 
 [source,shell]
 ----
-asadmin> list-transports
+asadmin list-transports
 Enter the value for the target operand> server
 http1-trans
 tcp
@@ -318,284 +908,225 @@ instance-name;;
 Lists the transports for the specified server instance.
 You can also view the full syntax and options of the subcommand by typing `asadmin help list-transports` at the command line.
 
-[[to-delete-a-transport]]
-==== *To Delete a Transport*
+[[delete-a-transport]]
+=== *Delete a Transport*
 
 Use the `delete-transport` subcommand in remote mode to remove a transport.
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. Delete a transport by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-transport.adoc[`delete-transport`] subcommand.
+. Delete a transport by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-transport.adoc[`delete-transport`] subcommand.
 
 [[example-to-delete-a-transport]]
-==== Example 13-8D eleting a Transport
+==== Example - Deleting a Transport
 
-This example deletes he transport named `http1-trans`.
+This example deletes the transport named `http1-trans`.
 
 [source,shell]
 ----
-asadmin> delete-transport http1-trans
-Command delete-transport executed successfully. 
+asadmin delete-transport http1-trans
+Command delete-transport executed successfully.
 ----
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help delete-transport` at the command line.
-
-[[administering-http-network-listeners-1]]
-== Administering HTTP Network Listeners
-
-[[to-create-an-http-network-listener]]
-=== To Create an HTTP Network Listener
-
-Use the `create-http-listener` subcommand or the `create-network-listener` subcommand in remote mode to create a
-listener. These subcommands provide backward compatibility and also provide a shortcut for creating network listeners that use the HTTP
-protocol. Behind the scenes, a network listener is created as well as its associated protocol, transport, and HTTP configuration. This method
-is a convenient shortcut, but it gives access to only a limited number of options. If you want to specify the full range of listener options,
-follow the instructions in xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-create-an-internet-connection[To Create an Internet Connection].
-
-. Ensure that the server is running. Remote subcommands require a running server.
-. Create an HTTP network listener by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-network-listener.adoc[`create-network-listener`] subcommand or the
-xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-http-listener.adoc[`create-http-listener`] subcommand.
-. If needed, restart the server. If you edit the special HTTP network listener named `admin-listener`, you must restart the server for changes to take effect. See
-xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
-
-[[exampleto-create-an-http-network-listener]]
-==== Example 13-9 Creating an HTTP Listener
-
-This example creates an HTTP listener named `sampleListener` that uses a non-default number of acceptor threads. Security is not enabled at runtime.
-
-[source,shell]
-----
-asadmin> create-http-listener --listeneraddress `0.0.0.0`
---listenerport 7272 --defaultvs server --servername host1.sun.com 
---acceptorthreads 100 --securityenabled=false 
---enabled=false sampleListener
-Command create-http-listener executed successfully.
-----
-
-[[exampleto-create-an-http-network-listener-2]]
-==== Example 13-10 Creating a Network Listener
-
-This example a network listener named `sampleListener` that is not enabled at runtime:
-
-[source,shell]
-----
-asadmin> create-network-listener --listenerport 7272 protocol http-1
---enabled=false sampleListener
-Command create-network-listener executed successfully.
-----
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help create-http-listener` or `asadmin help create-network-listener` at the command line.
-
-[[to-list-http-network-listeners]]
-==== *To List HTTP Network Listeners*
-
-Use the `list-http-listeners` subcommand or the `list-network-listeners` subcommand in remote mode to list the existing HTTP listeners.
-
-. Ensure that the server is running. Remote subcommands require a running server.
-. List HTTP listeners by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-http-listeners.adoc[`list-http-listeners`] or
-xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-network-listeners.adoc[`list-network-listeners`] subcommand.
-
-[[example-to-list-http-network-listeners]]
-==== Example 13-11 Listing HTTP Listeners*
-
-This example lists the HTTP listeners. The same output is given if you use the `list-network-listeners` subcommand.
-
-[source,shell]
-----
-asadmin> list-http-listeners
-admin-listener
-http-listener-2
-http-listener-1
-Command list-http-listeners executed successfully.
-----
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help list-http-listeners` or `asadmin help list-network-listeners` at the command line.
-
-[[to-update-an-http-network-listener]]
-==== *To Update an HTTP Network Listener*
-
-. List HTTP listeners by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-http-listeners.adoc[`list-http-listeners`] or
-xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-network-listeners.adoc[`list-network-listeners`] subcommand.
-. Modify the values for the specified listener by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand. +
-The listener is identified by its dotted name.
-
-[[example-to-update-an-http-network-listener]]
-==== Example 13-12 Updating an HTTP Network Listener
-
-This example changes `security-enabled` to `false` on `http-listener-2`.
-
-[source,shell]
-----
-asadmin> set server.network-config.protocols.protocol.http-listener-2.security-enabled=false
-Command set executed successfully.
-----
-
-[[to-delete-an-http-network-listener]]
-==== *To Delete an HTTP Network Listener*
-
-Use the `delete-http-listener` subcommand or the `delete-network-listener` subcommand in remote mode to delete an
-existing HTTP listener. This disables secure communications for the listener.
-
-. Ensure that the server is running. Remote subcommands require a running server.
-. List HTTP listeners by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-http-listeners.adoc[`list-http-listeners`] subcommand.
-. Delete an HTTP listener by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-http-listener.adoc[`delete-http-listener`] or
-xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-network-listener.adoc[`delete-network-listener`] subcommand.
-. To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
-
-[[example-to-delete-an-http-network-listener]]
-==== Example 13-13 Deleting an HTTP Listener
-
-This example deletes the HTTP listener named `sampleListener`:
-
-[source,shell]
-----
-asadmin> delete-http-listener sampleListener
-Command delete-http-listener executed successfully.
-----
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help delete-http-listener` or
-`asadmin help delete-network-listener` at the command line.
-
-[[to-configure-an-http-listener-for-ssl]]
-==== *To Configure an HTTP Listener for SSL*
-
-Use the `create-ssl` subcommand in remote mode to create and configure an SSL element in the specified listener. This enables secure
-communication for the listener.
-
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. Configure an HTTP listener by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-ssl.adoc[`create-ssl`] subcommand.
-. To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
-
-[[example-to-configure-an-http-listener-for-ssl]]
-==== Example 13-14 Configuring an HTTP Listener for SSL
-
-This example enables the HTTP listener named `http-listener-1` for SSL:
-
-[source,shell]
-----
-asadmin> create-ssl --type http-listener --certname sampleCert http-listener-1
-Command create-ssl executed successfully.
-----
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help create-ssl` at the command line.
-
-[[to-configure-optional-client-authentication-for-ssl]]
-==== *To Configure Optional Client Authentication for SSL*
-
-In Payara Server, you can configure the SSL protocol of an HTTP listener such that it requests a certificate before permitting a client
-connection, but does not refuse a connection if the client does not provide one. To enable this feature, set the `client-auth` property of
-the SSL protocol to the value `want`. For example:
-
-[source,shell]
-----
-asadmin> set configs.config.config-name.network-config.protocols.\
-protocol.listener-name.ssl.client-auth=want
-----
-
-[[to-configure-a-custom-ssl-implementation]]
-==== *To Configure a Custom SSL Implementation*
-
-In Payara Server, you can configure the SSL protocol an HTTP listener such that it uses a custom implementation of SSL. To enable this
-feature, set the `classname` property of the SSL protocol to the name of a class that implements the `com.sun.grizzly.util.net.SSLImplementation` interface. For example:
-
-[source,shell]
-----
-asadmin> set configs.config.config-name.network-config.protocols.\
-protocol.listener-name.ssl.classname=SSLImplementation-class-name
-----
-
-By default, Payara Server uses the implementation `com.sun.enterprise.security.ssl.GlassfishSSLImpl` for the SSL protocol.
-
-[[to-delete-ssl-from-an-http-listener]]
-==== *To Delete SSL From an HTTP Listener*
-
-Use the `delete-ssl` subcommand in remote mode to delete the SSL element in the specified listener. This disables secure communications for the listener.
-
-. Ensure that the server is running. +
-Remote subcommands require a running server.
-. Delete SSL from an HTTP listener by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-ssl[`delete-ssl`] subcommand.
-. To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
-
-[[example-to-delete-ssl-from-an-http-listener]]
-==== Example 13-15 Deleting SSL From an HTTP Listener
-
-This example disables SSL for the HTTP listener named `http-listener-1`:
-
-[source,shell]
-----
-asadmin> delete-ssl --type http-listener http-listener-1
-Command delete-http-listener executed successfully.
-----
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help delete-ssl` at the command line.
-
-[[to-assign-a-default-virtual-server-to-an-http-listener]]
-==== *To Assign a Default Virtual Server to an HTTP Listener*
-
-. In the Administration Console, open the HTTP Service component under
-the relevant configuration.
-. Open the HTTP Listeners component under the HTTP Service component.
-. Select or create a new HTTP listener.
-. Select from the Default Virtual Server drop-down list. For more information, see: +
-xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-assign-a-default-web-module-to-a-virtual-server[To Assign a Default Web Module to a Virtual Server].
-
-For details, click the Help button in the Administration Console from the HTTP Listeners page.
 
 [[administering-virtual-servers]]
 == Administering Virtual Servers
 
 A virtual server is a virtual web server that serves content targeted for a specific URL. Multiple virtual servers can serve content using the same or different host names, port numbers, or IP addresses. The HTTP service directs incoming web requests to different virtual servers based on the URL.
 
+Just as multiple network cards in a single PC make the network see them as separate hosts, virtual servers allow one physical server instance to appear as many, enabling multiple domain names to be associated with the same server.
+
 When you first install Payara Server, a default virtual server is created. You can assign a default virtual server to each new HTTP listener you create.
 
-Web applications and Jakarta EE applications containing web components (web modules) can be assigned to virtual servers during deployment. A web module can be assigned to more than one virtual server, and a virtual server can have more than one web module assigned to it. If you deploy a web application and don't specify any assigned virtual servers, the web application is assigned to all currently defined virtual servers. If you then create additional virtual servers and want to assign existing web applications to them, you must redeploy the web applications. For more information about deployment, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Application Deployment/overview.adoc[Payara Server Application Deployment section].
+Web applications and Jakarta EE applications containing web components (web modules) can be assigned to virtual servers during deployment. A web module can be assigned to more than one virtual server, and a virtual server can have more than one web module assigned to it. If you deploy a web application and don't specify any assigned virtual servers, the web application is assigned to all currently defined virtual servers.
+
+If you then create additional virtual servers and want to assign existing web applications to them, you must redeploy the web applications. For more information about deployment, see the xref:Technical Documentation/Payara Server Documentation/Application Deployment/overview.adoc[Payara Server Application Deployment section].
 
 You can define virtual server properties using the `asadmin set` command. For example:
 
 [source,shell]
 ----
-asadmin> set server-config.http-service.virtual-server.MyVS.property.sso-enabled="true"
+asadmin set server-config.http-service.virtual-server.MyVS.property.sso-enabled="true"
 ----
 
-Some virtual server properties can be set for a specific web application. For details, see "xref:ROOT:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc[payara-web-app]" in
-Payara Server Application Deployment section.
+Some virtual server properties can be set for a specific web application. For details, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc[payara-web-app]" in the Payara Server Application Deployment section.
 
-[[to-create-a-virtual-server]]
-=== To Create a Virtual Server
+[[virtual-server-configuration]]
+=== Virtual Server Configuration
+
+Existing virtual servers can be configured from the admin console or with `set` asadmin commands. The virtual server configurations can be found in the admin console under *Configurations* -> *your-config* -> *Virtual Servers*.
+
+image::http/virtual-server-config.png[Configuration Page Location]
+
+The following fields can be configured:
+
+.Virtual Server Configuration
+[header, cols="2,6,8"]
+|===
+| configuration settings  | Description | Asadmin Command
+
+| ID
+| The unique ID for the virtual server. The only field which cannot be altered from the admin console. The ID cannot begin with a number.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.id=value`
+
+| Hosts
+| A comma separated list of values allowed in the host request header to select this virtual server. Each virtual server with the same connection group must have a unique host for that group.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.hosts=value,value2`
+
+| State
+a| The enabled state of the virtual server. There are 3 options for this property:
+
+- *On* -> This means that the virtual server is active and will be ready to serve requests.
+- *Off* -> This means that the virtual server is inactive, and will return a 404 error for all requests made through it. This will look from the outside as if no applications are deployed to this server.
+- *Disabled* -> This means that the virtual server is inactive, and will return a 403 error for all requests made through it. This will look from the outside as if the server is intentionally down for maintenance.
+
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.state=on/off/disabled`
+
+| SSO
+a| Allows multiple web applications deployed to the same virtual server to share the user authentication state. This would mean that signing in to one application would implicitly sign you into all others.
+
+There are 3 options for this property:
+
+- *True* (enabled) -> This enables SSO for applications on the same virtual server.
+- *False* (disabled) -> This disables SSO for applications on the same virtual server.
+- *Inherit* (controlled by HTTP service) -> This will inherit from the value specified in the *HTTP Service*.
+
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.sso-enabled=true/false/inherit`
+
+| SSO Cookie Http Only
+| Determines whether to add the `HttpOnly` flag to the `JSESSIONIDSSO` cookie. In practice, this will disallow JavaScript access to the cookie in the browser.
+
+This prevents malicious XSS attacks hijacking a Java session. It is enabled by default.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.sso-cookie-http-only=true/false`
+
+| Network Listeners
+| Comma separated list of network listeners which applications deployed to this virtual server are available on.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.network-listeners=listener-1,listener-2`
+
+| Default Web Module
+| This defines which application deployed to this virtual server will be requested if no modules are resolved in the request. For example if `app1` and `app2` have context roots of `/app1` and `/app2` respectively, `app1` will be returned when the user requests `/`.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.default-web-module=app1`
+
+| Log File
+| This defines a file where log messages coming from this virtual server are redirected to. This allows you to separate application logs from server logs.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.log-file=/dir/to/logs/file.log`
+
+| Docroot
+| This defines the directory used as the document root for this virtual server. A document root is a directory where static files can be placed and served from.
+
+For example, if you have a web application deployed to `http://localhost:8080/app1` and the corresponding virtual server has a docroot value of `/opt/server/docs`, then requesting `http://localhost:8080/app1/img.jpg` will fetch the file at `/opt/server/docs/img.jpg`.
+
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.docroot=/dir/to/docs/`
+
+| Access Logging
+a| Enables access logging for this virtual server. Access logging logs all requests made to that virtual server.
+
+There are 3 options for this property:
+
+- *True* (enabled) -> This enables access logging for applications on the same
+virtual server.
+- *False* (disabled) -> This disables access logging for applications on the
+same virtual server.
+- *Inherit* (controlled by HTTP service) -> This will inherit from the value
+specified in the *HTTP Service*.
+
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.access-logging=true/false/inherit`
+
+| Access Log Directory
+| Defines the directory used for access logs.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.access-log=/dir/to/logs`
+|===
+
+[[additional-properties]]
+=== Additional properties
+
+Defines additional properties for the configuration of a virtual server.
+
+[cols="20,70,10",options="header",]
+|===
+| Key                         | Description | Default Value
+| *sso-max-inactive-seconds*  | The number of seconds of no activity after which a user's SSO record becomes eligible for purging.
+| `300`
+| *sso-reap-interval-seconds* | The number of seconds between purges of SSO records. | `60`
+| *setCacheControl*           | Comma separated list of Cache-Control response directives (See section 14.9 of: https://www.ietf.org/rfc/rfc2616.txt). | none
+| *allowLinking*             a| If set to `true`, resources that are symbolic links will be served for all applications deployed to this virtual server.
+
+Can be overridden for an individual application in the `glassfish-web.xml`/`payara-web.xml` deployment descriptor with:
+
+[source, xml]
+----
+<glassfish-web-app>
+  <property name="allowLinking" value="false" />
+</glassfish-web-app>
+----
+
+NOTE: Setting this property to `true` on Windows systems exposes JSP source code.
+| false
+| *accessLogWriteInterval*    | The number of seconds between each time the log is written to disk. The access log is written when the buffer is full or when the interval expires. If the value is 0, the buffer is always written even if it's not full. | 300
+| *accessLogBufferSize*       | The size, in bytes, of the buffer where access log calls are stored. | 32768
+| *allowRemoteAddress*        | Comma separated list of regular expression patterns to which the remote client's IP address is compared. The IP must match one of the patterns to be accepted. | none
+| *denyRemoteAddress*         | Comma separated list of regular expression patterns to which the remote client's IP address is compared. The IP must not match any of the patterns to be accepted. | none
+| *allowRemoteHost*           | Comma separated list of regular expression patterns to which the remote client's host name is compared. The host name must match one of the patterns to be accepted. | none
+| *denyRemoteHost*            | Comma separated list of regular expression patterns to which the remote client's host name is compared. The host name must not match any of the patterns to be accepted. | none
+| *authRealm*                 | Specifies the name attribute of a security realm, which overrides the server's default realm for standalone web applications deployed to this virtual server. Can be overridden for an individual application with a realm defined in the web.xml. | none
+| *securePagesWithPragma*     | Set this property to `false` to ensure that for all web applications on this server file downloads using SSL work properly in Internet Explorer. | true
+| *contextXmlDefault*         | Sets the directory of the `context.xml` used for this virtual server, if one is used. | none
+| *alternatedocroot_n*        | Specifies an alternate document root, where n is a positive integer that allows specification of more than one. | none
+| *send-error_n*             a| Specifies custom error page mappings for the virtual server, which are inherited by all web applications deployed on the virtual server, unless overridden in the web.xml. The value is a string, composed of three values:
+
+- code -> The HTTP response status code for the custom error page.
+- path -> The path of the file to be returned, relative to the `/config` directory.
+- reason (optional) -> The text of the reason string.
+
+E.g. `send-error_1="code=404 path=/dir/of/file/error.html reason=UNAUTHORIZED"`.
+
+| none
+| *redirect_n*               a| Specifies a redirect from an old url to a new one. The value is a string, composed of two values:
+
+- `from` -> The prefix of the requested URI to match.
+- `url-prefix` -> The prefix of the new URI to return to the client. The *from* prefix is replaced by this value.
+
+E.g. `redirect_1="from=/fake url-prefix=http://another"`.
+| none
+| *listener_n*                | Specifies the fully qualified class name of a custom Catalina listener, where n is a positive integer that allows the specification of more than one. The listener class must implement the *`org.apache.catalina.ContainerListener`* or *`org.apache.catalina.LifecycleListener`* interface. | none
+
+| *errorReportValve*          | Specifies the fully qualified class name of a custom valve that produces default error pages for applications on this virtual server. Specify an empty string to disable the default error page mechanism for this virtual server. | *`org.apache.catalina.valves.ErrorReportValve`*
+|===
+
+[[create-a-virtual-server]]
+=== Create a Virtual Server
 
 By default, when Payara Server starts, the following virtual servers are started automatically:
 
-* A virtual server named `server`, which hosts all user-defined web modules. For development, testing, and deployment of web services in a
-non-production environment, `server` is often the only virtual server required.
-* A virtual server named `__asadmin`, which hosts all administration-related web modules (specifically, the Administration
-Console). This server is restricted, which means that you cannot deploy web modules to this virtual server.
+* A virtual server named `server`, which hosts all user-defined web modules. For development, testing, and deployment of web services in a  non-production environment, `server` is often the only virtual server required.
+* A virtual server named `__asadmin`, which hosts all administration-related web modules (specifically, the Administration Console). This server is restricted, which means that you cannot deploy web modules to this virtual server.
 
-In a production environment, additional virtual servers provide hosting facilities for users and customers so that each appears to have its own
-web server, even though there is only one physical server.
+In a production environment, additional virtual servers provide hosting facilities for users and customers so that each appears to have its own web server, even though there is only one physical server.
 
 Use the `create-virtual-server` subcommand in remote mode to create the named virtual server.
 
 *Before You Begin*
 
-A virtual server must specify an existing HTTP listener. Because the virtual server cannot specify an HTTP listener that is already being
-used by another virtual server, create at least one HTTP listener before creating a new virtual server.
+A virtual server must specify an existing HTTP listener. Because the virtual server cannot specify an HTTP listener that is already being used by another virtual server, create at least one HTTP listener before creating a new virtual server.
 
-. Ensure that the server is running. +
+. Ensure that the server is running.
++
 Remote subcommands require a running server.
-. Create a virtual server by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-virtual-server.adoc[`create-virtual-server`] subcommand. +
+. Create a virtual server by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-virtual-server.adoc[`create-virtual-server`] subcommand.
++
 Information about properties for this subcommand is included in this help page.
-. To apply your changes, restart Payara Server. +
+. To apply your changes, restart Payara Server.
++
 See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-to-create-a-virtual-server]]
-==== Example 13-16 Creating a Virtual Server
+==== Example - Creating a Virtual Server
 
 This example creates a virtual server named `sampleServer` on `localhost`.
 
 [source,shell]
 ----
-asadmin> create-virtual-server --hosts pigeon,localhost
---property authRealm=ldap sampleServer
+asadmin create-virtual-server --hosts pigeon,localhost --property authRealm=ldap sampleServer
 Command create-virtual-server executed successfully.
 ----
 
@@ -607,16 +1138,17 @@ You can also view the full syntax and options of the subcommand by typing `asadm
 Use the `list-virtual-servers` subcommand in remote mode to list the existing virtual servers.
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. List virtual servers by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-virtual-servers.adoc[`list-virtual-servers`] subcommand.
+. List virtual servers by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-virtual-servers.adoc[`list-virtual-servers`] subcommand.
 
 [[example-to-list-virtual-servers]]
-==== Example 13-17 Listing Virtual Servers
+==== Example - Listing Virtual Servers
 
 This example lists the virtual servers for `localhost`.
 
 [source,shell]
 ----
-asadmin> list-virtual-servers
+asadmin list-virtual-servers
+
 sampleListener
 admin-listener
 http-listener-2
@@ -626,26 +1158,27 @@ Command list-http-listeners executed successfully.
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help list-virutal-servers` at the command line.
 
-[[to-update-a-virtual-server]]
-=== To Update a Virtual Server
+[[update-a-virtual-server]]
+=== Update a Virtual Server
 
-. List virtual servers by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-virtual-servers.adoc[`list-virtual-servers`] subcommand.
-. Modify the values for the specified virtual server by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set[`set`] subcommand. +
+. List virtual servers by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-virtual-servers.adoc[`list-virtual-servers`] subcommand.
+. Modify the values for the specified virtual server by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand.
++
 The virtual server is identified by its dotted name.
 
-[[to-delete-a-virtual-server]]
-=== To Delete a Virtual Server
+[[delete-a-virtual-server]]
+=== Delete a Virtual Server
 
 Use the `delete-virtual-server` subcommand in remote mode to delete an existing virtual server.
 
 . Ensure that the server is running. Remote subcommands require a running server.
-. List virtual servers by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-virtual-servers.adoc[`list-virtual-servers`] subcommand.
+. List virtual servers by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-virtual-servers.adoc[`list-virtual-servers`] subcommand.
 . If necessary, notify users that the virtual server is being deleted.
-. Delete a virtual server by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-virtual-server.adoc[`delete-virtual-server`] subcommand.
+. Delete a virtual server by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-virtual-server.adoc[`delete-virtual-server`] subcommand.
 . To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-to-delete-a-virtual-server]]
-==== Example 13-18 Deleting a Virtual Server
+==== Example - Deleting a Virtual Server
 
 This example deletes the virtual server named `sampleServer` from `localhost`.
 
@@ -660,17 +1193,18 @@ You can also view the full syntax and options of the subcommand by typing `asadm
 [[to-assign-a-default-web-module-to-a-virtual-server]]
 === To Assign a Default Web Module to a Virtual Server
 
-A default web module can be assigned to the default virtual server and to each new virtual server. To access the default web module for a
-virtual server, point the browser to the URL for the virtual server, but do not supply a context root. For example:
+A default web module can be assigned to the default virtual server and to each new virtual server. To access the default web module for a virtual server, point the browser to the URL for the virtual server, but do not supply a context root.
+
+For example:
 
 [source,text]
 ----
 http://myvserver:3184/
 ----
 
-A virtual server with no default web module assigned serves HTML or JavaServer Pages ( JSP) content from its document root, which is usually
-`domain-dir/docroot`. To access this HTML or JSP content, point your browser to the URL for the virtual server, do not supply a context root,
-but specify the target file.
+A virtual server with no default web module assigned serves HTML or JavaServer Pages ( JSP) content from its document root, which is usually `domain-dir/docroot`.
+
+To access this HTML or JSP content, point your browser to the URL for the virtual server, do not supply a context root, but specify the target file.
 
 For example:
 
@@ -679,8 +1213,8 @@ For example:
 http://myvserver:3184/hellothere.jsp
 ----
 
-[[to-assign-a-virtual-server-to-an-application-or-module]]
-=== To Assign a Virtual Server to an Application or Module
+[[assign-a-virtual-server-to-an-application-or-module]]
+=== Assign a Virtual Server to an Application or Module
 
 You can assign a virtual server to a deployed application or web module.
 
@@ -696,21 +1230,19 @@ The application or module must already be deployed.
 [[to-set-jsessionidsso-cookie-attributes]]
 === To Set `JSESSIONIDSSO` Cookie Attributes
 
-Use the `sso-cookie-http-only` and `sso-cookie-secure` virtual server attributes to set the `HttpOnly` and `Secure` attributes of any
-`JSESSIONIDSSO` cookies associated with web applications deployed to the virtual server.
+Use the `sso-cookie-http-only` and `sso-cookie-secure` virtual server attributes to set the `HttpOnly` and `Secure` attributes of any `JSESSIONIDSSO` cookies associated with web applications deployed to the virtual server.
 
-Use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand to set the value of the
-`sso-cookie-http-only` and `sso-cookie-secure` virtual server attributes.
+Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand to set the value of the `sso-cookie-http-only` and `sso-cookie-secure` virtual server attributes.
 
 The values supported for these attributes are as follows:
 
 `sso-cookie-http-only`::
-  A boolean value that specifies whether the `HttpOnly` attribute is included in `JSESSIONIDSSO` cookies. When set to `true`, which is the
-  default, the `HttpOnly` attribute is included. When set to `false`, the `HttpOnly` attribute is not included.
+A boolean value that specifies whether the `HttpOnly` attribute is included in `JSESSIONIDSSO` cookies.
++
+When set to `true`, which is the  default, the `HttpOnly` attribute is included. When set to `false`, the `HttpOnly` attribute is not included.
 `sso-cookie-secure`::
-  A string value that specifies whether the `Secure` attribute is included in `JSESSIONIDSSO` cookies. Allowed values are as follows: +
-  * `true` — The `Secure` attribute is included.
-  * `false` — The `Secure` attribute is not included.
-  * `dynamic` — The `Secure` attribute setting is inherited from the Table 1 Default Ports for Listeners first session participating in SSO. This is the default value.
-
-
+A string value that specifies whether the `Secure` attribute is included in `JSESSIONIDSSO` cookies. Allowed values are as follows:
++
+* `true` — The `Secure` attribute is included.
+* `false` — The `Secure` attribute is not included.
+* `dynamic` — The `Secure` attribute setting is inherited from the default ports table for all HTTP listeners first session participating in SSO. This is the default value.
