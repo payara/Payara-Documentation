@@ -1,14 +1,16 @@
 [[set-config-dir]]
 = set-config-dir
 
-Provides a way to configure the Config Directory.
+Provides a way to configure the *Directory* configuration source.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin> set-config-dir --directory=<full.path.to.dir> --target=<target[default:server]>`
+asadmin [asadmin-options] set-config-dir [--help]
+[--directory=<full.path.to.dir>]
+[--target=<target[default:server]>]
 ----
 
 [[description]]
@@ -17,8 +19,8 @@ asadmin> set-config-dir --directory=<full.path.to.dir> --target=<target[default:
 The `set-config-dir` sets the directory to be used for the directory config source.
 
 * *Leaf directory cannot start with a dot*, rendering `/home/payara/.secret` an invalid path ("." means hidden on a POSIX filesystem).
-* If relative, will lookup beneath server instance location (usually to be found at `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/`)
-* Defaults to `secrets`, targeting `<PAYARA-HOME>/glassfish/domains/<DOMAIN>/secrets/`
+* If relative, will look beneath server instance location (usually to be found at `domain-dir/`)
+* Defaults to `secrets`, targeting `domain-dir/secrets/`
 
 [[options]]
 == Options
@@ -30,9 +32,21 @@ asadmin-options::
   Displays the help text for the subcommand.
 
 `--directory`::
-Full path to the directory containing configuration files. Leaf directory name cannot start with a dot. Defaults to `secrets`.
+Full path to the directory containing configuration files.
++
+Leaf directory name cannot start with a dot. Defaults to `secrets`.
+
 `--target`::
-Defaults to `server-config`. The target configuration where the command should be run
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
 
 [[examples]]
 == Example
@@ -43,9 +57,7 @@ This example sets the directory to be used for the directory config source.
 
 [source,shell]
 ----
-asadmin> set-config-dir
-    --directory=/home/payara/secrets
-    --target=myAppCluster
+asadmin set-config-dir --directory=/home/payara/secrets --target=myAppCluster
 ----
 
 [[exit-status]]

@@ -1,20 +1,29 @@
 [[get-config-property]]
 = get-config-property
 
-Provides a way to get a configuration property value for a particular configuration source.
+Provides a way to get the value of a MicroProfile configuration property stored in a specific configuration source.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin> get-config-property --propertyName=<property.name> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>
+asadmin [asadmin-options] get-config-property [--help]
+[--propertyName=<property.name>]
+[--source={domain|config|server|application|module|cluster}]
+[--sourceName=<source.name>]
+[--moduleName=<module.name>]
+[--target=<target[default:server]>]
 ----
 
 [[description]]
 == Description
 
-The `get-config-property` gets the value for the given property name in one of the built-in config sources. The source is specified with --source and, where there is ambiguity, the --sourceName and --moduleName options can be used. For example, where the source is server, the --sourceName can be used to specify the name of the server where the config property is to be stored.
+The `get-config-property` gets the value for the given Eclipse MicroProfile configuration property name in one of the built-in configuration sources.
+
+The source is specified with `--source` and, where there is ambiguity, the `--sourceName` and `--moduleName` options can be used.
+
+For example, where the source is `server`, the `--sourceName` can be used to specify the name of the server where the property is to be stored.
 
 [[options]]
 == Options
@@ -28,30 +37,35 @@ asadmin-options::
 `--propertyName`::
 The name of the configuration property to get.
 `--source`::
-The ConfigSource where the property is stored.
+The configuration source where the property is stored.
 `--sourceName`::
-The name of the ConfigSource when there may be ambiguity, for example a ConfigSource of type application must specify the name of the application. This property is required for sources of type: config, server, application or module
+The name of the source when there may be ambiguity, for example a source of type `application` must specify the name of the application.
++
+This property is required for sources of type: `config`, `server`, `application` or `module`
 `--moduleName`::
-The name of the module when the ConfigSource is of type module. When this is specified, the sourceName parameter must be provided and must have the name of the application where the module is deployed.
+The name of the module when the source is of type `module`. When this is specified, the `sourceName` parameter must be provided and must have the name of the application where the module is deployed.
 `--target`::
-Defaults to server (the DAS). The target configuration where the command should be run
-
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
 
 [[examples]]
 == Example
 
 *Example 1 Getting the configuration property value*
 
-This example gets the JMSBrokerURL property value within the configuration source named myApplication, belonging to the module myModule, and targeting the myAppCluster cluster.
+This example gets the `JMSBrokerURL` property value within the configuration source named `myApplication`, belonging to the module `myModule`, and targeting the `myAppCluster` cluster.
 
 [source,shell]
 ----
-asadmin> get-config-property
-    --propertyName=JMSBrokerURL
-    --source=module
-    --sourceName=myApplication
-    --moduleName=myModule
-    --target=myAppCluster
+asadmin get-config-property --propertyName=JMSBrokerURL --source=module --sourceName=myApplication --moduleName=myModule --target=myAppCluster
 ----
 
 [[exit-status]]

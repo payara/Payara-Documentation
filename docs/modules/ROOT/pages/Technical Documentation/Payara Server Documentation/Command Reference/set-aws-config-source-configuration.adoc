@@ -1,22 +1,25 @@
 [[set-aws-config-source-configuration]]
 = set-aws-config-source-configuration
 
-Sets the configuration for the AWS Secrets Config Source.
+Sets the configuration for the AWS Secrets configuration source.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin> set-aws-config-source-configuration [--regionname=reg
-     ionname] [--secretname=secretname] [--target=server] [--dyna
-     mic=false] --enabled=true|false
+asadmin [asadmin-options] set-aws-config-source-configuration [--help]
+[--regionname=regionname]
+[--secretname=secretname]
+[--target=server]
+[--dynamic={false|true}]
+[--enabled={true|false}]
 ----
 
 [[description]]
 == Description
 
-The `set-aws-config-source-configuration` provides configuration options for the config source which fetches data from AWS Secrets Manager. Make sure that the password aliases AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY exist.
+The `set-aws-config-source-configuration` provides configuration options for the config source which fetches data from AWS Secrets Manager. Make sure that the password aliases `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are registered first.
 
 [[options]]
 == Options
@@ -34,11 +37,19 @@ The region name of the AWS Secrets service.
 The name of the secret to fetch as a map of properties.
 
 `--target`::
-Specifies the target server/instance configuration. Defaults to server.
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
 
 `--dynamic`::
 Configure the config source dynamically, which will not require a restart.
-
 `--enabled`::
 Enables or disables the config source, which fetches data from AWS Secrets Manager
 
@@ -51,7 +62,7 @@ This example configures the AWS Secrets Cloud Config Source.
 
 [source,shell]
 ----
-asadmin> set-aws-config-source-configuration --dynamic true --enabled true --secretName payara/test/key --regionName eu-west-2
+asadmin set-aws-config-source-configuration --dynamic true --enabled true --secretName payara/test/key --regionName eu-west-2
 ----
 
 [[exit-status]]

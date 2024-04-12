@@ -10,7 +10,7 @@ The Metrics specification {mpMetricsSpecUrl}#scopes[defines four _Scopes_], **Ba
 **Base**::
 Base metrics are a set of optional metrics that a compliant server may provide. A server that provides this kind of metric can implement all, some of them or none of them. A reason to choose a different set of metrics is that the metrics libraries they are using in their implementation come with metrics with a similar purpose to the {mpMetricsSpecUrl}#base-metrics[spec-described] base metrics.
 +
-These metrics can be accessed under `/metrics?scope=base`. 
+These metrics can be accessed under `/metrics?scope=base`.
 +
 These metrics must be tagged with `mp_scope=base`.
 
@@ -38,9 +38,12 @@ These metrics must be tagged with `mp_scope=scope_name`.
 For example:
 [source, java]
 ----
-@Gauge(name = "gaugeMethod", unit = MetricUnits.NONE, scope = "mygauge")
-public long getGauge() {
-    log.info("Private Gauge:"+getPrivateGauge());
-    return gauge;
+@RequestScoped
+public class Component{
+    @Gauge(name = "gaugeMethod", unit = MetricUnits.NONE, scope = "mygauge")
+    public long getGauge() {
+        log.info("Private Gauge:"+getPrivateGauge());
+        return gauge;
+    }
 }
 ----

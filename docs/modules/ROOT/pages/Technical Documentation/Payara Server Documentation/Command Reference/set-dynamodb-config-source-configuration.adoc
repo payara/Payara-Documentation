@@ -8,17 +8,23 @@ Sets the configuration for the DynamoDB Config Source.
 
 [source,shell]
 ----
-asadmin> set-dynamodb-config-source-configuration [--region-na
-     me=region-name] [--table-name=table-name] [--key-column-name
-     =key-column-name] [--value-column-name=value-column-name] [-
-     -limit=100] [--target=server] [--dynamic=false] --enabled=tr
-     ue|false
+asadmin [asadmin-options] set-dynamodb-config-source-configuration [--help]
+[--region-name=region-name]
+[--table-name=table-name]
+[--key-column-name=key-column-name]
+[--value-column-name=value-column-name]
+[--limit=100]
+[--target=server]
+[--dynamic={false|true}]
+[--enabled={true|false}]
 ----
 
 [[description]]
 == Description
 
-The `set-dynamodb-config-source-configuration` provides configuration options to set the properties required by DynamoDB config source to retrieves data from the configured DynamoDB database table. Make sure that the password aliases AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY exist.
+The `set-dynamodb-config-source-configuration` provides configuration options to set the properties required by DynamoDB config source to retrieves data from the configured DynamoDB database table.
+
+TIP: Make sure that the password aliases `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are created first.
 
 [[options]]
 == Options
@@ -28,6 +34,18 @@ asadmin-options::
 `--help`::
 `-?`::
   Displays the help text for the subcommand.
+
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
 
 `--region-name`::
 The regional location of your DynamoDB service.
@@ -43,9 +61,6 @@ Name of the column containing the value.
 
 `--limit`::
 The maximum number of items to retrieves from the database table. The default value is 100.
-
-`--target`::
-Specifies the target server/instance configuration.
 
 `--dynamic`::
 Configure the config source dynamically, which will not require a restart.

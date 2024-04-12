@@ -1,16 +1,19 @@
 [[set-gcp-config-source-configuration]]
 = set-gcp-config-source-configuration
 
-Sets the configuration for the GCP secrets Config Source.
+Sets the configuration for the GCP secrets configuration source.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin> set-gcp-config-source-configuration [--projectname=pr
-     ojectname] [--jsonkeyfile=jsonkeyfile] [--target=server] [--
-     dynamic=false] --enabled=true|false
+asadmin [asadmin-options] set-gcp-config-source-configuration [--help]
+[--projectname=projectname]
+[--jsonkeyfile=jsonkeyfile]
+[--target=server]
+[--dynamic={false|true}]
+[--enabled={true|false}]
 ----
 
 [[description]]
@@ -34,7 +37,16 @@ The name of the GCP project to fetch secrets from.
 The path to the JSON key file which a service account uses to authenticate with GCP Secrets. This file will be copied to the config/ directory.
 
 `--target`::
-Specifies the target server/instance configuration.
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
 
 `--dynamic`::
 Configure the config source dynamically, which will not require a restart.
@@ -51,7 +63,7 @@ This example configures the GCP Config Source.
 
 [source,shell]
 ----
-asadmin> set-gcp-config-source-configuration --dynamic true --enabled true --jsonKeyFile /path/to/token/file.json --projectName project-name
+asadmin set-gcp-config-source-configuration --dynamic true --enabled true --jsonKeyFile /path/to/token/file.json --projectName project-name
 ----
 
 [[exit-status]]
@@ -66,4 +78,3 @@ asadmin> set-gcp-config-source-configuration --dynamic true --enabled true --jso
 
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/get-gcp-config-source-configuration.adoc#get-gcp-config-source-configuration[`get-gcp-config-source-configuration`]
-

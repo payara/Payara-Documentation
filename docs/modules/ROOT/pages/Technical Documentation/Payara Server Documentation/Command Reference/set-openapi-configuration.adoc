@@ -1,29 +1,30 @@
 [[set-openapi-configuration]]
 = set-openapi-configuration
 
-Configures the OpenAPI service.
+Configures the settings of the MicroProfile OpenAPI service.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin> set-openapi-configuration
-        [--enabled=true|false]
-        [--corsheaders=true|false]
-        [--securityenabled=true|false]
-        [--roles=<role-list>]
-        [--endpoint=<context-root[default:openapi]>]
-        [--target=<target[default:server]>]
-        [--virtualservers=<virtualserver-list>]
+asadmin [asadmin-options] set-openapi-configuration [--help]
+[--enabled={true|false}]
+[--corsHeaders={true|false}]
+[--securityEnabled={true|false}]
+[--roles=<role-list>]
+[--endpoint=<context-root[default:openapi]>]
+[--target=<target[default:server]>]
+[--virtualservers=<virtualserver-list>]
 ----
 
 [[description]]
 == Description
 
 This command enables or disables the OpenAPI service.
-[[configuration-note]]
-NOTE: When the OpenAPI service is disabled, the `/openapi` endpoint will always return a `403` error and any applications deployed during this period will *not* have an OpenAPI document built. Enabling the service again will not cause a documents to be built for any currently deployed applications.
+
+NOTE: When the OpenAPI service is disabled, the `/openapi` endpoint will always return a `403` error and any applications deployed during this period will *not* have an OpenAPI document built. +
+Enabling the service again will not cause a documents to be built for any currently deployed applications.
 
 [[options]]
 == Options
@@ -34,26 +35,38 @@ Options for the `asadmin` utility. For information about these options, see the 
 `-?`::
 Displays the help text for the subcommand.
 `--enabled`::
-Whether the service should be enabled/disabled. Defaults to true.
+Whether the service should be enabled/disabled. Defaults to `true`.
 
-`--corsheaders`::
-Defaults to false. Whether or not CORS headers (e.g. `Access-Control-Allow-Origin=*`) should be added to OpenAPI endpoint responses.
+`--corsHeaders`::
+Defaults to `false`. Whether CORS protection headers (e.g. `Access-Control-Allow-Origin=*`) should be added to OpenAPI endpoint responses.
 
-`--securityenabled`::
-Defaults to false. Whether or not secure access to the OpenAPI endpoint is enabled.
+`--securityEnabled`::
+Defaults to `false`. Whether to secure access to the OpenAPI endpoint is enabled.
 
 `--roles`::
-Defaults to `microprofile`. If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.
+Defaults to `microprofile`.
++
+If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.
 
 `--endpoint`::
 Defaults to `openapi`. The context root used to expose the OpenAPI endpoint.
 
 `--target`::
-Defaults to server-config. The target Payara config to apply the change to.
+Specifies the target of this command. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
 
 `--virtualservers`::
-If defined, the `/openapi` endpoint will be assigned to the list of virtual servers specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available.
-
+If defined, the `/openapi` endpoint will be assigned to the list of virtual servers specified as a comma-separated list of names.
++
+Otherwise, the endpoint will be assigned to all virtual servers available.
 
 [[examples]]
 == Examples
@@ -64,14 +77,7 @@ This example configures OpenAPI service with CORS headers enabled, security enab
 
 [source, shell]
 ----
-asadmin> set-openapi-configuration
-    --enabled=true
-    --corsheaders=true
-    --securityenabled=true
-    --roles=ADMIN
-    --endpoint=myapi
-    --target=server
-    --virtualservers=myapp
+asadmin set-openapi-configuration --enabled=true --corsHeaders=true --securityEnabled=true --roles=ADMIN --endpoint=myapi --target=server --virtualservers=myapp
 ----
 
 [[exit-status]]

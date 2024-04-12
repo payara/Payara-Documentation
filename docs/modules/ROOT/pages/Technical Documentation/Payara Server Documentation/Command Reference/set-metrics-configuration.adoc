@@ -1,21 +1,21 @@
 [[set-metrics-configuration]]
 = set-metrics-configuration
 
-Sets the configuration of the metrics service.
+Modifies the configuration settings of the MicroProfile Metrics service.
 
 [[synopsis]]
 == Synopsis
 
 [source,shell]
 ----
-asadmin> set-metrics-configuration
-        [--enabled=true|false]
-        [--securityenabled=true|false]
-        [--roles=<role-list>]
-        [--dynamic=true|false]
-        [--endpoint=<context-root[default:metrics]>]
-        [--target=<instance-name[default:server]>]
-        [--virtualservers=<virtualserver-list>]
+asadmin [asadmin-options] set-metrics-configuration [--help]
+[--enabled={true|false}]
+[--securityEnabled={true|false}]
+[--roles=<role-list>]
+[--dynamic={true|false}]
+[--endpoint=<context-root[default:metrics]>]
+[--target=<instance-name[default:server]>]
+[--virtualservers=<virtualserver-list>]
 ----
 
 [[description]]
@@ -32,36 +32,49 @@ asadmin-options::
 `-?`::
   Displays the help text for the subcommand.
 `--enabled`::
-Defaults to `true`. Enables or disables the metrics service.
+Defaults to `true`. Enables or disables the Metrics service.
 
-`--securityenabled`::
+`--securityEnabled`::
 Defaults to `false`. Specifies whether secure access to the metrics endpoint is enabled or disabled.
 
 `--roles`::
 Defaults to `microprofile`. If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.
 
 `--dynamic`::
-Defaults to `true`. If set to true, applies the changes instantly without a restart. Otherwise a restart is required.
+Defaults to `true`. If set to `true`, applies the changes instantly without a restart.
++
+Otherwise, a restart is required.
 
 `--endpoint`::
 Defaults to `metrics`. Specifies the context root used to expose the metrics endpoint.
 
 `--target`::
-Defaults to `server-config`. Specifies the target server/instance configuration.
+Specifies the target for its respective configuration. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
 
 `--virtualservers`::
-If defined, the endpoint will be assigned to a list of virtual servers specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available.
+If defined, the endpoint will be assigned to a list of virtual servers specified as a comma-separated list of names.
++
+Otherwise, the endpoint will be assigned to all virtual servers available.
 
 [[examples]]
 == Example
 
-*Example 1 Setting the configuration of the metrics service*
+*Example 1 Setting the configuration of the Metrics service*
 
-This example sets the metrics service configuration for the specified target  instance1.
+This example sets the metrics service configuration for the specified target  `instance1`.
 
 [source,shell]
 ----
-asadmin> set-metrics-configuration --enabled=true --securityenabled=true --dynamic=true --target instance1
+asadmin set-metrics-configuration --enabled=true --securityEnabled=true --dynamic=true --target instance1
 
 ----
 

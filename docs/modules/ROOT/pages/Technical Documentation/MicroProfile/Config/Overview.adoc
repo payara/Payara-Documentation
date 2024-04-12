@@ -1,8 +1,10 @@
 = Eclipse MicroProfile Config API
 
-Payara Server {page-version} provides MicroProfile Config {mpConfigVersion}
+The Payara Platform {page-version} provides MicroProfile Configuration {mpConfigVersion}
 
+[[background]]
 == Background
+
 The Config API was created to allow for the modification of application configuration from outside the application without needing the application to be repackaged.
 
 {mpConfigSpecUrl}[The complete specification] can be found on the Eclipse MicroProfile website.
@@ -24,7 +26,9 @@ NOTE: Where multiple configuration properties exist, the property from a source 
 
 |`directory`
 |90
-|Reads configuration properties from files in a specified directory. Each file name is the configuration property name and the contents of the file are the config property value. This config source can be used to read https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod[Kubernetes secrets files]. You can find out more about directory config sources here: xref:/Technical Documentation/MicroProfile/Config/Directory.adoc[Directory Config Sources]
+|Reads configuration properties from files in a specified directory. Each file name is the configuration property name and the contents of the file are the config property value. This config source can be used to read https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod[Kubernetes secrets files].
++
+You can find out more about directory config sources here: xref:Technical Documentation/MicroProfile/Config/Directory.adoc[Directory Config Sources]
 
 |`password`
 |105
@@ -60,28 +64,39 @@ Property values will only apply on the named server instance
 |160
 |Retrieves and stores config values in the *Hazelcast* cluster as name value pairs. These will be available for all server instances that are members of the cluster.
 
-|`payara expression`
+|`payara-expression`
 |170
-|Reads configuration properties from a `payara-expression-config.properties` file. This should be stored in the same location as your `microprofile-config.properties` file This file can be used to reference properties containing variables which will be translated to their actual values upon retrieval. The property values should be in the format referenced here: xref:/Technical Documentation/Payara Server Documentation/Server Configuration And Management/Configuration Options/Variable Substitution/Types of Variables.adoc[Types of Variables]
+|Reads configuration properties from a `payara-expression-config.properties` file. This should be stored in the same location as your `microprofile-config.properties` file This file can be used to reference properties containing variables which will be translated to their actual values upon retrieval.
++
+The property values should be in the format referenced here: xref:Technical Documentation/Payara Server Documentation/Server Configuration And Management/Configuration Options/Variable Substitution/Types of Variables.adoc[Types of Variables]
 
 |`cloud`
 |180
-|Reads configuration properties from various Cloud provider secret stores. You can find out more about our supported cloud config sources here: xref:/Technical Documentation/MicroProfile/Config/Cloud/Overview.adoc[Cloud Config Sources]
+|Reads configuration properties from various Cloud provider secret stores.
++
+You can find out more about our supported cloud config sources here: xref:Technical Documentation/MicroProfile/Config/Cloud/Overview.adoc[Cloud Config Sources]
 
 |`jdbc`
 |190
-|Reads configuration properties from a specified database table. You can find out more about JDBC config sources here: xref:/Technical Documentation/MicroProfile/Config/JDBC.adoc[JDBC Config Sources]
+|Reads configuration properties from a specified database table.
++
+You can find out more about JDBC config sources here: xref:Technical Documentation/MicroProfile/Config/JDBC.adoc[JDBC Config Sources]
 
 |`ldap`
 |200
-|Reads configuration properties from a specified LDAP directory. You can find out more about LDAP config sources here: xref:/Technical Documentation/MicroProfile/Config/LDAP.adoc[LDAP Config Sources]
-
+|Reads configuration properties from a specified LDAP directory.
++
+You can find out more about LDAP config sources here: xref:Technical Documentation/MicroProfile/Config/LDAP.adoc[LDAP Config Sources]
 |===
 
+[[converters]]
 == Converters
 
-In addition to the standard converters specified by the API, Payara Platform's implementation includes out-of-the-box converters for URL and `InetAddress`. These have `@Priority` of `1`, the same as the default converters.
+In addition to the standard converters specified by the API, Payara Platform's implementation includes out-of-the-box converters for URL and `InetAddress`.
 
+These have `@Priority` of `1`, the same as the default converters.
+
+[[platform-config-properties]]
 == Payara Platform Configuration Properties
 
 In addition to the standard configuration properties, Payara Server and Micro provide a number of out-of-the-box config properties you can use in your application to find information about the runtime environment.
@@ -138,8 +153,9 @@ In addition to the standard configuration properties, Payara Server and Micro pr
 
 |`payara.instance.https.enabled`
 |Whether the https listener is enabled
-
 |===
+
+Payara Server offers additional facilities to configure specific settings of the MicroProfile Configuration API, described next.
 
 [[config-ordinal-configuration]]
 == Config Ordinal Configuration
@@ -149,7 +165,7 @@ Configuration variables ordinal values can be configured by using Admin Console 
 [[using-the-admin-console]]
 === Using the Admin Console
 
-To configure the ordinal value in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → Config → Ordinal:
+To configure the ordinal value in the Admin Console, go to Configuration → [instance-configuration (like server-config)] -> MicroProfile -> Config -> Ordinal:
 
 image:microprofile/config-ordinal.png[Set Config Ordinal]
 
@@ -158,73 +174,41 @@ image:microprofile/config-ordinal.png[Set Config Ordinal]
 
 IMPORTANT: A `--source` value of `jndi` is not supported for these asadmin commands yet. The JNDI `ConfigSource` does exist and is usable from the Config API, though.
 
-==== `set-config-ordinal`
+The following Asadmin commands can be used to manipulate configuration sources ordinal values:
 
-*Usage*::
-`asadmin> set-config-ordinal --ordinal=<integer.value> --source=domain|config|server|application|module|cluster`
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-ordinal.adoc#set-config-ordinal[`set-config-ordinal`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-ordinal.adoc#get-config-ordinal[`get-config-ordinal`]
 
-Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-ordinal.adoc#set-config-ordinal[`set-config-ordinal`]
- for more information.
-
-==== `get-config-ordinal`
-
-*Usage*::
-`asadmin> get-config-ordinal --source=domain|config|server|application|module|cluster`
-
-Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-ordinal.adoc#get-config-ordinal[`get-config-ordinal`]
-for more information.
-
-[[config-property-configuration]]
-== Config Property Configuration
+[[config-property-manipulation]]
+== Configuration Property Manipulation
 
 Configuration properties can be configured by using Admin Console or Asadmin commands.
 
 [[using-the-admin-console-get]]
 === Using the Admin Console
 
-To configure the property in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → Config → Property:
+To configure the property in the Admin Console, go to Configuration → [instance-configuration (like server-config)] -> MicroProfile -> Config -> Property:
 
 image:microprofile/config-property.png[Set Config Property]
 
 [[using-asadmin-commands-get]]
 === Using Asadmin Commands
 
-==== `set-config-property`
+The following Asadmin commands can be used to directly configure MicroProfile configuration properties:
 
-*Usage*::
-`asadmin> set-config-property --propertyName=<property.name> --propertyValue= <property.val> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-property.adoc#set-config-property[`set-config-property`]
 
-Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-property.adoc#set-config-property[`set-config-property`] for more information.
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-property.adoc#get-config-property[`get-config-property`]
 
-==== `delete-config-property`
-
-*Usage*::
-`asadmin> delete-config-property --propertyName=<property.name> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
-
-Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-config-property.adoc#delete-config-property[`delete-config-property`] for more information.
-
-
-==== `get-config-property`
-
-*Usage*::
-`asadmin> get-config-property --propertyName=<property.name> --source=domain|config|server|application|module|cluster --sourceName=<source.name> --moduleName=<module.name> --target=<target[default:server]>`
-
-Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-property.adoc#get-config-property[`get-config-property`] for more information.
-
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-config-property.adoc#delete-config-property[`delete-config-property`]
 
 [[config-cache-duration-configuration]]
-== Config Cache Duration
+== Cache Duration Configuration
 
-The cache duration can be configured by using Asadmin commands. By default properties have a TTL (time to live) of 60 seconds.
-That means each individual property does not change for 60 seconds since it has been resolved before. Therefore it can take up to 60 seconds for changes made visible by a config source to become effective.
+The cache duration of the values of a configuration property can be configured by using Asadmin commands. By default, the cached value of properties have a TTL (time to live) of `60` seconds.
 
-If properties were not resolved recently, the change can become visible faster than the cache duration or even immediately because some time already passed since they had been last resolved and cached.
+That means each individual property does not change for `60` seconds since it has been resolved before. Therefore, it can take up to `60` seconds for changes made visible by a source to become effective.
 
-=== Using Asadmin Commands
+TIP: If properties were not resolved recently, the change can become visible faster than the cache duration or even immediately because some time already passed since they had been last resolved and cached.
 
-==== `set-config-cache`
-
-*Usage*::
-`asadmin> set-config-cache --duration=<duration.in.second> --target=<target[default:server]>`
-
-Refer xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-cache.adoc#set-config-cache[`set-config-cache`] for more information.
+Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-config-cache.adoc#set-config-cache[`set-config-cache`] to modify this setting.
