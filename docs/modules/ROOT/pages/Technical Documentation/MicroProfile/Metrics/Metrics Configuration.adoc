@@ -1,129 +1,28 @@
 [[metrics-configuration]]
-= Metrics Configuration
+= Metrics Configuration in Payara Platform
 
-Metrics can be configured by using Admin Console or Asadmin commands. 
+On Payara Server, the MicroProfile Metrics service can be configured by using Admin Console or Asadmin commands.
+
+Payara Micro doesn't have a convenient solution for its MicroProfile Metrics service configuration yet.
 
 [[using-the-admin-console]]
 == Using the Admin Console
 
-To configure the Metrics in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → Metrics:
+To configure the Metrics in the Admin Console, go to Configuration -> [instance-configuration (like `server-config`)] -> MicroProfile -> Metrics:
 
 image:microprofile/metrics.png[Set Metrics Configuration]
 
 [[using-asadmin-commands]]
 == Using Asadmin Commands
 
-=== `set-metrics-configuration`
+Use the following commands to manipulate the configuration settings of the service:
 
-*Usage*::
-----
-asadmin> set-metrics-configuration
-        [--enabled=true|false]
-        [--securityenabled=true|false]
-        [--roles=<role-list>] 
-        [--dynamic=true|false]
-        [--endpoint=<context-root[default:metrics]>]
-        [--target=<instance-name[default:server]>]
-        [--virtualservers=<virtualserver-list>]
-----
-*Aim*::
-Provides a way to set the configuration of the metrics service of the targeted config.
-
-==== Command Options
-
-[cols=",,,,", options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`enabled`
-|Boolean
-|Enables or disables the metrics service.
-|true
-|No
-
-|`securityenabled`
-|Boolean
-|Whether or not secure access to the metrics endpoint is enabled.
-|false
-|No
-
-|`roles`
-|String
-|If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.
-|`microprofile`
-|No
-
-|`endpoint`
-|String
-|The context root used to expose the metrics endpoint.
-|`metrics`
-|No
-
-|`dynamic`
-|Boolean
-|If set to `true`, applies the changes instantly without a restart. Otherwise a restart is required.
-|true
-|No
-
-|`target`
-|String
-|The target server/instance configuration.
-|`server-config`
-|No
-
-|`virtualservers`
-|String
-|If defined, the endpoint will be assigned to a list of *virtual servers* specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available. 
-|-
-|No
-|===
-
-==== Example
-
-[source,Shell]
-----
-asadmin> set-metrics-configuration --enabled=true --securityenabled=true --dynamic=true --target instance1
-----
-
-=== `get-metrics-configuration`
-
-*Usage*::
-----
-asadmin> get-metrics-configuration [--target <instance-name>]
-----
-*Aim*::
-Returns the current configuration options for the metrics service on the targeted configuration.
-
-==== Command Options
-
-[cols=",,,,", options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`target`
-|String
-|The target server/instance configuration.
-|`server-config`
-|No
-|===
-
-==== Example
-
-[source,Shell]
-----
-asadmin> get-metrics-configuration --target cluster1
-----
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-metrics-configuration.adoc#set-metrics-configuration[`set-metrics-configuration`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-metrics-configuration.adoc#get-metrics-configuration[`get-metrics-configuration`]
 
 [[security-configuration]]
-=== Security Configuration
-By default, the OpenAPI endpoint binds to the root context application which is the `__default-web-module` (also known as *docroot*) system application and the `__default-web-module` application, which is secured under the default realm (`file`) of the server. 
+== Security Configuration Considerations
 
-If a user application is deployed in the empty context-root, then the security configuration of this application will be shared by the OpenAPI endpoint, so exert extreme caution when making these changes.
+By default, the MicroProfile Metrics endpoint binds to the root context application which is the `__default-web-module` (also known as *docroot*) system application and the `__default-web-module` application, which is secured under the default realm (`file`) of the server domain.
+
+If a user application is deployed in the empty *context-root*, then the security configuration of this application will be shared by the MicroProfile Metrics endpoint, so _exert extreme caution_ when making these changes.

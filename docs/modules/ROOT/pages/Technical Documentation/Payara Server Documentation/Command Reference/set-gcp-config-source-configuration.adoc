@@ -1,0 +1,80 @@
+[[set-gcp-config-source-configuration]]
+= set-gcp-config-source-configuration
+
+Sets the configuration for the GCP secrets configuration source.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-gcp-config-source-configuration [--help]
+[--projectname=projectname]
+[--jsonkeyfile=jsonkeyfile]
+[--target=server]
+[--dynamic={false|true}]
+[--enabled={true|false}]
+----
+
+[[description]]
+== Description
+
+The `set-gcp-config-source-configuration` provides configuration options for the config source which fetches data from GCP Secrets Manager.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+
+`--projectname`::
+The name of the GCP project to fetch secrets from.
+
+`--jsonkeyfile`::
+The path to the JSON key file which a service account uses to authenticate with GCP Secrets. This file will be copied to the config/ directory.
+
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
+
+`--dynamic`::
+Configure the config source dynamically, which will not require a restart.
+
+`--enabled`::
+Enables or disables the config source.
+
+[[examples]]
+== Example
+
+*Example 1 Setting the configuration of the GCP Config Source*
+
+This example configures the GCP Config Source.
+
+[source,shell]
+----
+asadmin set-gcp-config-source-configuration --dynamic true --enabled true --jsonKeyFile /path/to/token/file.json --projectName project-name
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-gcp-config-source-configuration.adoc#get-gcp-config-source-configuration[`get-gcp-config-source-configuration`]

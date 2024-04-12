@@ -1,0 +1,80 @@
+[[set-aws-config-source-configuration]]
+= set-aws-config-source-configuration
+
+Sets the configuration for the AWS Secrets configuration source.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-aws-config-source-configuration [--help]
+[--regionname=regionname]
+[--secretname=secretname]
+[--target=server]
+[--dynamic={false|true}]
+[--enabled={true|false}]
+----
+
+[[description]]
+== Description
+
+The `set-aws-config-source-configuration` provides configuration options for the config source which fetches data from AWS Secrets Manager. Make sure that the password aliases `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are registered first.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+
+`--regionname`::
+The region name of the AWS Secrets service.
+
+`--secretname`::
+The name of the secret to fetch as a map of properties.
+
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
+
+`--dynamic`::
+Configure the config source dynamically, which will not require a restart.
+`--enabled`::
+Enables or disables the config source, which fetches data from AWS Secrets Manager
+
+[[examples]]
+== Example
+
+*Example 1 Setting the configuration of the AWS secrets*
+
+This example configures the AWS Secrets Cloud Config Source.
+
+[source,shell]
+----
+asadmin set-aws-config-source-configuration --dynamic true --enabled true --secretName payara/test/key --regionName eu-west-2
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-aws-config-source-configuration.adoc#get-aws-config-source-configuration[`get-aws-config-source-configuration`]
+

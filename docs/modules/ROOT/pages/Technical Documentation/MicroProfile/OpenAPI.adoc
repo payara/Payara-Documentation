@@ -1,11 +1,11 @@
 = Eclipse MicroProfile OpenAPI API
 
-Payara Server {page-version} provides MicroProfile OpenAPI {mpOpenAPIVersion}
+The Payara Platform {page-version} provides MicroProfile OpenAPI {mpOpenAPIVersion}
 
 [[background]]
 == Background
 
-The OpenAPI API was designed to provide a standard interface for documenting and exposing RESTful APIs. The MicroProfile OpenAPI API provides a set of interfaces and annotations to allow application developers to produce an OpenAPI document from their JAX-RS applications. The OpenAPI API is somewhat similar to the Swagger API, so many concepts in the API will be familiar.
+OpenAPI was designed to provide a standard interface for documenting and exposing RESTful APIs. The MicroProfile OpenAPI API provides a set of interfaces and annotations to allow application developers to produce an OpenAPI document from their JAX-RS applications. OpenAPI is somewhat similar to the Swagger API, so many concepts in the API will be familiar.
 
 {mpOpenAPISpecUrl}[The complete specification] can be found on the Eclipse MicroProfile website.
 
@@ -16,9 +16,13 @@ IMPORTANT: Version {mpOpenAPIVersion} of the OpenAPI specification does not defi
 [[endpoint]]
 == REST Endpoint
 
-MicroProfile OpenAPI specifies that an OpenAPI document should be published at the endpoint `/openapi` documenting a deployed application. For both Payara Server and Payara Micro, this means that the endpoint can be found on any HTTP port (e.g. `8080`) after deploying an application. The OpenAPI document displayed will always be for the most recently deployed application, except in the special case of disabling the service (see <<configuration-note, configuration>>).
+MicroProfile OpenAPI specifies that an OpenAPI document should be published at the endpoint `/openapi` documenting a deployed application. For both Payara Server and Payara Micro, this means that the endpoint can be found on any HTTP port (e.g. `8080`) after deploying an application.
 
-By default the OpenAPI document is displayed in YAML format, although this can be changed to JSON by changing the `Accept` header of the request. Alternatively if using a browser, this can also be done by specifying a `format` query parameter. For example, `http://localhost:8080/openapi?format=json`. The valid values are `json` and `yaml`.
+WARNING: The OpenAPI document displayed will always be for the most recently deployed application, except in the special case of disabling the service.
+
+By default, the OpenAPI document is displayed in YAML format, although this can be changed to JSON by changing the `Accept` header of the request. Alternatively if using a browser, this can also be done by specifying a `format` query parameter.
+
+For example, `http://localhost:8080/openapi?format=json`. The valid values are `json` and `yaml`.
 
 [[sources]]
 == OpenAPI Configuration Sources
@@ -68,7 +72,7 @@ When a `name` key is provided with a string value, the schema will be added to t
 
 For example, in the case where an application wishes to represent a Java `Date` object in epoch-style milliseconds, the following configuration can be used (line escapes and indentation added for readability):
 
-[source, json]
+[source, properties]
 ----
 mp.openapi.schema.java.util.Date = { \
   "name": "EpochMillis", \
@@ -139,12 +143,15 @@ The following code could be used to give the corresponding operation an ID of "h
 [source, java]
 ----
 import org.eclipse.microprofile.openapi.annotations.Operation;
-...
+
+@Path("/app")
+public class AppResource{
     @GET
     @Operation(operationId = "hello world")
     public String helloWorld() {
         return "Hello World!";
     }
+}
 ----
 
 Here's an example of how the OpenAPI document of a sample application would look like::
@@ -257,122 +264,27 @@ components: {}
 [[openApi-configuration]]
 == OpenAPI Configuration
 
-OpenAPI can be configured by using Admin Console or Asadmin commands.
+On Payara Server, MicroProfile OpenAPI settings can be configured by using the Admin Console or Asadmin CLI commands.
 
 [[using-the-admin-console]]
 === Using the Admin Console
 
-To configure the OpenAPI in the Admin Console, go to Configuration → [instance-configuration (like server-config)] → MicroProfile → OpenAPI:
+To configure the OpenAPI in the Admin Console, go to Configuration -> [instance-configuration (like `server-config`)] -> MicroProfile -> OpenAPI:
 
 image:microprofile/openapi.png[Set OpenAPI Configuration]
 
 [[using-asadmin-commands]]
 === Using Asadmin Commands
 
-[[set-openapi-configuration]]
-==== `set-openapi-configuration`
+Use the following commands to configure the settings of the MicroProfile OpenAPI service:
 
-*Usage*::
-----
-asadmin> set-openapi-configuration
-        [--enabled=true|false]
-        [--corsheaders=true|false]
-        [--securityenabled=true|false]
-        [--roles=<role-list>]
-        [--endpoint=<context-root[default:openapi]>]
-        [--target=<target[default:server]>]
-        [--virtualservers=<virtualserver-list>]
-----
-*Aim*::
-Enables or disables the OpenAPI service.
-
-[[configuration-note]]
-NOTE: When the OpenAPI service is disabled, the `/openapi` endpoint will always return a `403` error and any applications deployed during this period will *not* have an OpenAPI document built. Enabling the service again will not cause a documents to be built for any currently deployed applications.
-
-===== Command Options
-
-[cols="1,1,10,1,1", options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`enabled`
-|Boolean
-|Whether the service should be enabled/disabled.
-|true
-|No
-
-|`corsheaders`
-|Boolean
-|Whether or not CORS headers (e.g. `Access-Control-Allow-Origin=*`) should be added to OpenAPI endpoint responses.
-|false
-|No
-
-|`securityenabled`
-|Boolean
-|Whether or not secure access to the OpenAPI endpoint is enabled.
-|false
-|No
-
-|`roles`
-|String
-|If defined, the endpoint will be assigned to a list of the role specified as a comma-separated.
-|`microprofile`
-|No
-
-|`endpoint`
-|String
-|The context root used to expose the OpenAPI endpoint.
-|`openapi`
-|No
-
-|`target`
-|String
-|The target Payara config to apply the change to.
-|server-config
-|No
-
-|`virtualservers`
-|String
-|If defined, the `/openapi` endpoint will be assigned to the list of virtual servers specified as a comma-separated list of names. Otherwise, the endpoint will be assigned to all virtual servers available.
-|-
-|No
-|===
-
-[[get-openapi-configuration]]
-==== `get-openapi-configuration`
-
-*Usage*::
-----
-asadmin> get-openapi-configuration
-    [--target=<target>]
-----
-*Aim*::
-Gets the status of the OpenAPI service.
-
-===== Command Options
-
-[cols="1,1,10,1,1", options="header"]
-|===
-|Option
-|Type
-|Description
-|Default
-|Mandatory
-
-|`target`
-|String
-|The target Payara config to apply the change to.
-|server-config
-|false
-|===
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-openapi-configuration.adoc#set-openapi-configuration[`set-openapi-configuration`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-openapi-configuration.adoc#get-openapi-configuration[`get-openapi-configuration`]
 
 [[security-configuration]]
 === Security Configuration
-By default, the OpenAPI endpoint binds to the root context application which is the `__default-web-module` (also known as `docroot`) system application and the `__default-web-module` application, which is secured under the default realm (`file`) of the server. 
+
+By default, the OpenAPI endpoint binds to the root context application which is the `__default-web-module` (also known as `docroot`) system application and the `__default-web-module` application, which is secured under the default realm (`file`) of the server.
 
 If a user application is deployed in the empty context-root, then the security configuration of this application will be shared by the OpenAPI endpoint, so exert extreme caution when making these changes.
 

@@ -1,0 +1,74 @@
+[[set-config-dir]]
+= set-config-dir
+
+Provides a way to configure the *Directory* configuration source.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-config-dir [--help]
+[--directory=<full.path.to.dir>]
+[--target=<target[default:server]>]
+----
+
+[[description]]
+== Description
+
+The `set-config-dir` sets the directory to be used for the directory config source.
+
+* *Leaf directory cannot start with a dot*, rendering `/home/payara/.secret` an invalid path ("." means hidden on a POSIX filesystem).
+* If relative, will look beneath server instance location (usually to be found at `domain-dir/`)
+* Defaults to `secrets`, targeting `domain-dir/secrets/`
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+
+`--directory`::
+Full path to the directory containing configuration files.
++
+Leaf directory name cannot start with a dot. Defaults to `secrets`.
+
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
+
+[[examples]]
+== Example
+
+*Example 1 Setting the Config Directory.*
+
+This example sets the directory to be used for the directory config source.
+
+[source,shell]
+----
+asadmin set-config-dir --directory=/home/payara/secrets --target=myAppCluster
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-dir.adoc#get-config-dir[`get-config-dir`]

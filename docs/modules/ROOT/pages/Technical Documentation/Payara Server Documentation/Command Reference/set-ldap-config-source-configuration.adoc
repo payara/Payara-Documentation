@@ -1,0 +1,112 @@
+[[set-ldap-config-source-configuration]]
+= set-ldap-config-source-configuration
+
+Sets the LDAP Config Source
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-ldap-config-source-configuration [--help]
+[--enabled={true|false}]
+[--dynamic={true|false}]
+[--url=<ldap-server-url>]
+[--authType={simple|none}]
+[--startTLSEnabled={true|false}]
+[--bindDN=<user-distinguished-name>]
+[--bindDNPassword=<user-credential>]
+[--searchBase={subtree|onelevel|object}]
+[--searchFilter=<search-filter>]
+[--searchScope=<search-scope>]
+[--connectionTimeout=<integer-value-in-milliseconds>]
+[--readTimeout=<integer-value-in-milliseconds>]
+[--target=<target[default:server]>]
+----
+
+[[description]]
+== Description
+
+The `set-ldap-config-source-configuration` provides a way to configure the MicroProfile LDAP configuration source.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+`--enabled`::
+Defaults to `false`. Enables or disables the config source
+`--dynamic`::
+Defaults to `false`. If set to true, applies the changes instantly without a restart. Otherwise, a restart is required.
+
+`--url`::
+URL where the LDAP server can be reached
+
+`--authType`::
+Defaults to `none`. Type of the Authentication method used during the connection with the LDAP server.
++
+The MicroProfile LDAP config source supports simple and none auth type. If simple auth type is selected then Bind DN and Bind DN Password are mandatory. If none auth type is selected then *Search Base* and *Search Filter* are mandatory otherwise optional.
++
+If *Search Base* and *Search Filter* are not defined then data fetched from direct binding.
+
+`--startTLSEnabled`::
+Defaults to `false`. Secure the LDAP server connection using LDAP over TLS (STARTTLS) protocol
+
+`--bindDN`::
+Distinguished name for the application that will be used to access the LDAP server
+
+`--bindDNPassword`::
+Password for the application defined by the Bind DN member. In place of the password, you can enter an alias which corresponds to the password in the form: ${ALIAS=<password-alias-name>}
+
+`--searchBase`::
+Overrides 'Base DN' and causing the search to be used instead of direct binding
+
+`--searchFilter`::
+Search filter to find values starting from the 'Search Base DN' with the scope specified by 'Search Scope'.
+
+`--searchScope`::
+Search scope determines the depth of the search in the LDAP tree
+
+`--connectionTimeout`::
+The timeout for connecting to the LDAP server in milliseconds. The value should be greater than zero. If this value is not specified or less than one, then wait for the response until it is received.
+
+`--readTimeout`::
+The timeout for fetching the results from the LDAP server in milliseconds. The value should be greater than zero. If this value is not specified or less than one, then wait for the response until it is received.
+
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+
+[[examples]]
+== Example
+
+*Example 1 Setting the LDAP configuration*
+
+This example enables and configures LDAP authentication on the Payara Server instance, specifying the LDAP server's URL, authentication type, binding credentials and other settings.
+
+[source,shell]
+----
+asadmin set-ldap-config-source-configuration --enabled=true --dynamic=true --url=ldap://ldap.forumsys.com:389 --authType=simple --bindDnPassword=password --bindDn=cn=read-only-admin,dc=example,dc=com
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-ldap-config-source-configuration.adoc#get-ldap-config-source-configuration[`get-ldap-config-source-configuration`]

@@ -1,0 +1,82 @@
+[[set-config-property]]
+= set-config-property
+
+Provides a way to set the value of a MicroProfile Configuration property in a specific configuration source.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] set-config-property [--help]
+[--propertyName=<property.name>]
+[--propertyValue=<property.val>]
+[--source={domain|config|server|application|module|cluster}]
+[--sourceName=<source.name>]
+[--moduleName=<module.name>]
+[--target=<target[default:server]>]
+----
+
+[[description]]
+== Description
+
+The `set-config-property` sets the value of a MicroProfile Configuration property in one of the built-in config sources. The source is specified with `--source` and, where there is ambiguity, the `--sourceName` and `--moduleName` options can be used.
+
+For example, where the source is server, the `--sourceName` can be used to specify the name of the server where the config property is to be stored.
+
+[[options]]
+== Options
+
+asadmin-options::
+  Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+  Displays the help text for the subcommand.
+
+`--propertyName`::
+The name of the configuration property to set.
+`--propertyValue`::
+The value of the configuration property to set.
+`--source`::
+The ConfigSource where the property is to be stored.
+`--sourceName`::
+The name of the ConfigSource when there may be ambiguity, for example a ConfigSource of type application must specify the name of the application. This property is required for sources of type: config, server, application or module
+`--moduleName`::
+The name of the module when the ConfigSource is of type module. When this is specified, the sourceName parameter must be provided and must have the name of the application where the module is deployed.
+`--target`::
+Specifies the target where the configuration source resides. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
+
+[[examples]]
+== Example
+
+*Example 1 Setting the configuration property value*
+
+This example sets the `JMSBrokerURL` property to `my.jms.hostname` within the configuration source named `myApplication`, belonging to the module `myModule`, and targeting the `myAppCluster` cluster.
+
+[source,shell]
+----
+asadmin set-config-property --propertyName=JMSBrokerURL --propertyValue=my.jms.hostname --source=module --sourceName=myApplication --moduleName=myModule --target=myAppCluster
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+  subcommand executed successfully
+1::
+  error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-config-property.adoc#delete-config-property[`delete-config-property`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-config-property.adoc#get-config-property[`get-config-property`]
