@@ -1,0 +1,88 @@
+[[renew-self-signed-certificates]]
+= renew-self-signed-certificates
+
+Renews all self-signed certificates in the specified server's keystore.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin renew-self-signed-certificates [--help]
+[--reload={false|true}]
+[--domainName=name]
+[--domainDir=directory]
+[--node=nodeName]
+[--nodeDir=directory]
+[--listener=listenername]
+[--target=instanceName]
+----
+
+[[description]]
+== Description
+
+The `renew-self-signed-certificates` subcommand renews all self-signed certificates in a keystore using the old distinguished name and alias.
+
+These certificates are then placed in the key and trust stores of the target instance or listener, replacing the old ones.
+
+[[options]]
+== Options
+
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are renewing its self-signed certificates. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified sever instance.
+`--reload`::
+Whether the HTTP listeners should be reloaded. Defaults to `false`
+`--listener`::
+The name of the HTTP or IIOP listener to add the certificate to.
+`--domainname`::
+The name of the domain where the target instance exists.
++
+Defaults to `domain1` or the existing domain if only one exists.
+`--domainDir`::
+The path to the directory containing the target domain.
++
+Defaults to
+`as-install/glassfish/domains`
+`--node`::
+The name of the node where the target instance exists.
++
+Defaults to `localhost-$domainname`
+`--nodeDir`::
+The path to the directory containing the target node.
++
+Defaults to `as-install/glassfish/nodes`
+
+[[examples]]
+== Examples
+
+*Example 1 Renews all self-signed certificates on the default domain*
+
+[source, shell]
+----
+asadmin renew-self-signed-certificates
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Security Guide/SSL Certificate Management.adoc[SSL Certificate Management],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/generate-csr.adoc[`generate-csr`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/generate-self-signed-certificate.adoc[`generate-self-signed-certificate`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/add-to-keystore.adoc[`add-to-keystore`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/add-to-truststore.adoc[`add-to-truststore`]

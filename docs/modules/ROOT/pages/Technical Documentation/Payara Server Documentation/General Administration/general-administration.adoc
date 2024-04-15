@@ -392,9 +392,9 @@ This example runs the `configure-managed-jobs` subcommand in multimode to set th
 
 For the full syntax and options of the subcommands in the preceding examples, see the following help pages:
 
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/attach.adoc[`attach`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/configure-managed-jobs.adoc[`configure-managed-jobs`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-jobs.adoc[`list-jobs`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/attach.adoc[`attach`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/configure-managed-jobs.adoc[`configure-managed-jobs`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-jobs.adoc[`list-jobs`]
 
 [[administering-system-properties]]
 == Administering System Properties
@@ -456,6 +456,133 @@ asadmin> delete-system-property http-listener-port
 Command delete-system-property executed successfully.
 ----
 This example deletes a system property named `http-listener-port` from `localhost`.
+
+[[list-of-system-properties]]
+=== System Properties Inventory
+
+The following properties are used exclusively by Payara Server to configure specific settings across multiple features:
+
+`fish.payara.clientHttpsProtocol`::
+Sets the TLS version to be used by the asadmin client.
++
+This is separate from the TLS version set for HTTPS communication on a listener.
++
+Valid values are:
+
+* `TLSv1.2`,
+* `TLSv1.3`
+* `TLSv1.3` (default)
+
+`fish.payara.classloading.delegate`::
+When set to `false`, libraries from applications, and `domain-dir/lib` will override the library in the `as-install/glassfish/modules` directory
++
+Defaults to `true`.
+
+`fish.payara.admin.command.jline.log.disable`::
+When set to `true`, JLine logging entries for invalid key bindings and other unwanted errors will be prevented
++
+NOTE: This is a property used exclusively by the Asadmin CLI
++
+Defaults to `false`
+
+`fish.payara.deployment.transform.namespace`::
+When set to `true`, namespace transformation (`javax.\*` to `jakarta.\*` package refactoring) is always performed.
++
+If the value is `undefined` then auto transformation is performed on the absence of `jakarta.\*` classes in the deployment archive otherwise transformation task is disabled.
++
+Defaults to `null` (undefined)
+
+`fish.payara.permittedFormBasedAuthHttpMethods` ::
+A comma separated list of HTTP methods that are permitted to use for FORM based authentication (`j_security_check`).
++
+If not set all HTTP methods are permitted.
++
+Valid values are:
+
+* `GET`
+* `HEAD`
+* `POST`
+* `PUT`
+* `DELETE`
+* `CONNECT`
+* `OPTIONS`
+* `TRACE`
+* `PATCH`
++
+Defaults to `null` (undefined)
+
+`fish.payara.shutdowngrace`::
+After server shutdown is initiated the server waits this period of time (in seconds) to finish ongoing requests before terminating.
++
+New requests are still accepted during this grace period. Accepts values between `0` - `Integer.MAX` and defaults to `0`.
+
+`fish.payara.SO_KEEPALIVE`::
+Enables keep alive (`SO_KEEPALIVE`) on the sockets created by an IIOP listener. Can be set as a global system property, or as a property on a specific listener (with the latter taking precedence over the global setting if both are set).
++
+NOTE: Replaces deprecated property `fish.payara.SOKeepAlive`.
++
+Defaults to `false`
+
+`org.glassfish.grizzly.DEFAULT_MEMORY_MANAGER`::
+If option (defined as JVM Option with `-D` or as System Property value) `org.glassfish.grizzly.DEFAULT_MEMORY_MANAGER` is not present in the server/instance configuration, the server will override the Grizzly default and use the `HeapMemoryManager` class.
++
+To override this behaviour (so to use a different memory manager), you must specify this JVM option in the server/instance config with your desired setting.
++
+Valid values are:
+
+* `org.glassfish.grizzly.memory.HeapMemoryManager` (default)
+* `org.glassfish.grizzly.memory.PooledMemoryManager`
+* `org.glassfish.grizzly.memory.ByteBufferManager`
+
+`deployment.resource.validation`::
+This option (defined as JVM Option with `-D` or as System Property value) defines if the resources are validated during deployment of the application.
++
+When active, the default value, all JNDI references are verified but those references can be provided by the application itself and thus not yet available at deployment time (for example the `java:module/env/` based ones).
++
+By setting this option to `false`, validation is not performed and deployment will succeed.
++
+However, issues will occur at runtime of the application in case of errors in the references.
++
+Defaults to `true`
+
+`fish.payara.javax.servlet.jsp.disable-static-field-references`::
+This option brings back the behaviour of evaluating EL in JSP pages from previous iterations.
++
+When enabled, a static field reference won't be evaluated.
++
+Defaults to `false`
+
+`fish.payara.node.ssh.timeout`::
+This option sets the SSH timeout in milliseconds for running commands on SSH nodes.
++
+This is a separate timeout to the Asadmin CLI communication or any command specific timeout, this is specifically for the SSH connection used for running certain commands that operate on the remote node itself (e.g. `setup-ssh` and `start-instance`).
++
+If set to an invalid value a warning will be logged and the default will be used.
++
+Accepts values from `1` - `Integer.MAX`. Defaults to `120000ms`
+
+`fish.payara.tenantcontrol.blocking.disable`::
+This option determines if a server instance should skip its standard checks for if it is available for a Hazelcast `Tenantable` object.
++
+Defaults to `true`.
+
+//Conditional block, only rendered for the Community Edition
+ifeval::["{page-site-edition}" == "community"]
+`fish.payara.autoscale.maxscale`::
+This option sets the default maximum boundary for the number of instances to scale up or down by when using auto-scale groups.
++
+Accepts values from `1` - `Integer.MAX`. Defaults to `100` instances.
+endif::[]
+
+//Conditional block, only rendered for the Enterprise Edition
+ifeval::["{page-site-edition}" == "enterprise"]
+`fish.payara.upgrade.repo.url`::
+This option defines the Maven repository URL used by the `upgrade-server` command.
++
+Accepts a URL pointing to the Payara Enterprise Nexus repository to download from (expected to point to the `fish/payara/distributions` directory of the repository).
++
+Defaults to `https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/distributions/`
+endif::[]
 
 //TODO - Not sure what this feature is for and how it works or it is properly supported.
 

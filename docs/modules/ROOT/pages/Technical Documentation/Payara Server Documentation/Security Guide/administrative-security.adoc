@@ -75,8 +75,7 @@ The username and password used for a login attempt must match the username and p
 
 The secure admin feature enforces security via the following authentication methods:
 
-* The DAS and instances authenticate to each other via mutual (two-way) SSL/TLS certificate authentication. The DAS authenticates to clients via
-one-way SSL/TLS certificate authentication.
+* The DAS and instances authenticate to each other via mutual (two-way) SSL/TLS certificate authentication. The DAS authenticates to clients via one-way SSL/TLS certificate authentication.
 +
 NOTE: The domain creation process creates a default keystore and truststore, plus a default private key for the DAS. Secure admin uses this initial configuration to set up the default truststore so that the DAS and instances always trust each other.
 
@@ -84,7 +83,7 @@ NOTE: The domain creation process creates a default keystore and truststore, plu
 
 * A locally-running Asadmin CLI (that is, connecting to an instance on the same host) authenticates and authorizes to the co-located instance using a locally-provisioned password.
 
-* Credentials or other sensitive information sent over the network are always encrypted if secure admin is enabled. No credentials are sent in the clear if secure admin is enabled. (If secure admin is disabled, credentials are sent in the clear.)
+* Credentials or other sensitive information sent over the network are always encrypted if secure admin is enabled. No credentials are sent in the clear if secure admin is enabled. (If secure admin is disabled, credentials are sent in clear text.)
 +
 Messages between administration clients and the DAS, between the DAS and remote instances, and between local administration clients and instances are encrypted using SSL/TLS. This is true even if you explicitly set the `asadmin` `-—secure` option to `false`.
 
@@ -162,7 +161,7 @@ The self-signed certificates that Payara Server uses will not be trusted by clie
 
 If you enable secure admin and then contact the DAS using an administration client, that client will detect whether the certificate is automatically trusted. Most modern web browsers will deny access to the web  interface of the Admin console and reject any communication until the user explicitly creates an exception to continue. And example is shown in the following figure:
 
-image:accept-certificate.png["This screen shot shows how a Mozilla Firefox responds to an untrusted certificate."]
+image:security/accept-certificate.png["This screen shot shows how a Mozilla Firefox responds to an untrusted certificate."]
 
 Similarly, the first time the Asadmin CLI receives an untrusted certificate, it displays the certificate and lets you accept it or reject it, as follows:
 
@@ -242,6 +241,7 @@ If you decide to use the `s1as` and `glassfish-instance` aliases with your own c
 You can also use the `--changealias` or`--delete` option of `keytool` to accomplish this. After that import your own certificates.
 
 IMPORTANT: When renewing an expired certificate (since most CA-issued certificates would have a lifetime of a year in general), you must first disable secure admin, replace the certificates in the keystore and truststore with the renewed certificates and then re-enable secure admin to correctly re-established secure administration to the domain and its instances.
+
 
 [[an-alternate-approach-using-distinguished-names-to-specify-certificates]]
 === An Alternate Approach: Using Distinguished Names to Specify Certificates
@@ -444,7 +444,7 @@ This generally means that you must:
 +
 [source,shell]
 ----
-asadmin> create-file-user --authrealmname admin-realm --groups 
+asadmin> create-file-user --authrealmname admin-realm --groups
 asadmin newAdminUsername
 ----
 
@@ -462,8 +462,7 @@ The following example allows secure admin to use a username and password alias f
 asadmin> enable-secure-admin-internal-user --passwordalias passwordAliasName newAdminUsername
 ----
 
-If Payara Server finds at least one secure admin internal user, then if secure admin is enabled Payara Server processes will not use SSL
-authentication and authorization with each other and will instead use basic authentication through username and password credentials.
+If Payara Server finds at least one secure admin internal user, then if secure admin is enabled Payara Server processes will not use SSL authentication and authorization with each other and will instead use basic authentication through username and password credentials.
 
 Most users who use this subcommand will need to set up only one secure admin internal user. If you set up more than one secure admin internal user, you should not make any assumptions about which username and password pair Payara Server will choose to use for any given admin request.
 
