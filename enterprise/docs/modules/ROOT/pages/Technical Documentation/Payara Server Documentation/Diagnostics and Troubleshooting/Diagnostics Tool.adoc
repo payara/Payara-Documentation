@@ -9,11 +9,11 @@ A tool that collects the following information from the specified target.
 * Heap Dump
 * JVM Report
 
-Collection can be targeted towards specific a specific Instance, Deployment Group or Cluster. By default, everything is collect from the DAS, each Instance, Deployment Group and Cluster.
+Collection can be targeted towards specific a specific Instance, Deployment Group or Cluster. By default, everything is collected from the DAS, each Instance, Deployment Group and Cluster.
 
-If the target is offline, only the Domain.xml and Server Log will be collected.
+If the target is offline, only the domain.xml configuration file and Server Log will be collected.
 
-NOTE: If you are not using the default _domain1_, you must specify that domain to collect diagnostics from.
+NOTE: If you are not using the default _domain1_, you must specify the domain to collect diagnostics from.
 
 [[instance-collection]]
 == Instance Collection
@@ -121,4 +121,38 @@ The items collected are stored in a zip file in your user home directory, the ou
 [source, shell]
 ----
 asadmin> collect-diagnostics --target deploymentGroup1 mydomain
+
+Directory selected C:\Users\Payara\payara-diagnostics-mydomain-2024-04-15T11-42-36Z
+Collecting domain.xml from instance2
+Attempting to create missing path at C:\Users\Payara\payara-diagnostics-mydomain-2024-04-15T11-42-36Z\deploymentGroup1\instance2
+Collecting logs from instance2
+Collecting jvm report from instance2
+Collecting thread dump from instance2
+Collecting Heap Dump from instance2
+This version of Payara does not support heap dump generation.
+Collecting domain.xml from instance1
+Attempting to create missing path at C:\Users\Payara\payara-diagnostics-mydomain-2024-04-15T11-42-36Z\deploymentGroup1\instance1
+Collecting logs from instance1
+Collecting jvm report from instance1
+Collecting thread dump from instance1
+Collecting Heap Dump from instance1
+This version of Payara does not support heap dump generation.
+Command collect-diagnostics executed successfully.
+----
+
+==== Resultant Zip Structure
+[source, shell]
+----
+
+deploymentGroup1
+├── instance1
+│   ├── instance1-domain.xml
+│   ├── instance1-jvm-report.txt
+│   ├── instance1-server.log
+│   └── instance1-thread-dump.txt
+└── instance2
+    ├── instance2-domain.xml
+    ├── instance2-jvm-report.txt
+    ├── instance2-server.log
+    └── instance2-thread-dump.txt
 ----
