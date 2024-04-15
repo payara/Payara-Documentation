@@ -1,0 +1,98 @@
+[[add-to-truststore]]
+= add-to-truststore
+
+Adds the specified certificate to a target domain truststore.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin add-to-truststore [--help]
+[--reload={false|true}]
+[--domainName=name]
+[--domainDir=directory]
+[--node=nodeName]
+[--nodeDir=directory]
+[--listener=listenername]
+[--target=instanceName]
+[--file=<file-path>]
+[alias]
+----
+
+[[description]]
+== Description
+
+This command adds a certificate (e.g. `.cer`/`.pem` file) to the target instance or listener's trust store or listener's trust store using the provided alias.
+
+If the instance or listener is configured to use the default trust store, the command will instead synchronize the instance with the DAS (under the assumption the certificate has been added to the default trust store of the DAS), since any certificates added to the instance stores would be lost upon next synchronisation.
+
+IMPORTANT: This will overwrite an entry already present with the same alias.
+
+[[options]]
+== Options
+
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are adding the certificate. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified sever instance.
+`--reload`::
+Whether the HTTP listeners should be reloaded. Defaults to `false`
+`--listener`::
+The name of the HTTP or IIOP listener to add the certificate to.
+`--domainname`::
+The name of the domain where the target instance exists.
++
+Defaults to `domain1` or the existing domain if only one exists.
+`--domainDir`::
+The path to the directory containing the target domain.
++
+Defaults to
+`as-install/glassfish/domains`
+`--node`::
+The name of the node where the target instance exists.
++
+Defaults to `localhost-$domainname`
+`--nodeDir`::
+The path to the directory containing the target node.
++
+Defaults to `as-install/glassfish/nodes`
+
+`--file`::
+The certificate file to add to the target truststore.
+
+[[operands]]
+== Operands
+
+alias::
+The alias name to store the certificate in the truststore under.
+
+[[examples]]
+== Examples
+
+*Example 1 Add the specified certificate under the `mycert` alias*
+
+[source, shell]
+----
+asadmin add-to-truststore --file mycert.pem mycert
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Security Guide/SSL Certificate Management.adoc[SSL Certificate Management],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/add-to-keystore.adoc[`add-to-keystore`]

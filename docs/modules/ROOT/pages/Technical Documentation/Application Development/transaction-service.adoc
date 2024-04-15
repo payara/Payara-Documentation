@@ -1,11 +1,9 @@
 [[using-the-transaction-service]]
 = Using the Transaction Service
 
-The Jakarta EE platform provides several abstractions that simplify development of dependable transaction processing for applications.
-This chapter discusses Jakarta EE transactions and transaction support in the Payara Platform.
+The Jakarta EE platform provides several abstractions that simplify development of dependable transaction processing for applications. This chapter discusses Jakarta EE transactions and transaction support in the Payara Platform.
 
-For more information about the Jakarta Transactions API (JTA) and Java Transaction Service (JTS), see "xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#administering-transactions[Administering Transactions]" in
-Payara Server General Administration section and in the https://jakarta.ee/specifications/transactions[Jakarta Transactions specification].
+For more information about the Jakarta Transactions API (JTA) and Java Transaction Service (JTS), see "xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#administering-transactions[Administering Transactions]" in Payara Server General Administration section and in the https://jakarta.ee/specifications/transactions[Jakarta Transactions specification].
 
 You might also want to read "https://eclipse-ee4j.github.io/jakartaee-tutorial/#transactions[Transactions]" in The Jakarta EE Tutorial.
 
@@ -23,11 +21,8 @@ Not all database vendors support all transaction isolation levels available in t
 |Transaction Isolation Level |`getTransactionIsolation` Return Value |Description
 
 |`read-uncommitted` |`1` |Dirty reads, non-repeatable reads, and phantom reads can occur.
-
 |`read-committed` |`2` |Dirty reads are prevented; non-repeatable reads and phantom reads can occur.
-
 |`repeatable-read` |`4` |Dirty reads and non-repeatable reads are prevented; phantom reads can occur.
-
 |`serializable` |`8` |Dirty reads, non-repeatable reads and phantom reads are prevented.
 |===
 
@@ -106,7 +101,7 @@ Typically, a connection is enlisted in the context of the transaction in which a
 
 The main advantage of using non-transactional connections is that the overhead incurred in enlisting and de-listing connections in transaction contexts is avoided.
 
-CAUTION: Use such connections carefully.
+CAUTION: Use these connections carefully.
 
 For example, if a non-transactional connection is used to query the database while a transaction is in progress that modifies the database, the query retrieves the unmodified data in the database.
 
@@ -133,7 +128,7 @@ Flat transactions are the most prevalent model and are supported by most commerc
 
 Both local and global transactions are demarcated using the `jakarta.transaction.UserTransaction` interface, which the client must use. Local transactions bypass the XA commit protocol and are faster.
 
-For more information, see xref:transaction-service.adoc#the-transaction-manager-the-transaction-synchronization-registry-and-usertransaction[The Transaction Manager, the Transaction Synchronization Registry, and `UserTransaction`].
+For more information, see xref:#the-transaction-manager-the-transaction-synchronization-registry-and-usertransaction[The Transaction Manager, the Transaction Synchronization Registry, and `UserTransaction`].
 
 [[commit-options]]
 === Commit Options
@@ -186,7 +181,7 @@ IMPORTANT: This timeout value is not used if the bean joins a client transaction
 [[transactions-and-non-persistent-messages]]
 === Transactions and Non-Persistent Messages
 
-During transaction recovery, non-persistent messages might be lost. If the broker fails between the transaction manager's prepare and commit operations, any non-persistent message in the transaction is lost and cannot be delivered.
+During transaction recovery, non-persistent messages might be lost. If the broker fails between the transaction manager `prepare` and `commit` operations, any non-persistent message in the transaction is lost and cannot be delivered.
 
 A message that is not saved to a persistent store is not available for transaction recovery.
 
@@ -208,7 +203,7 @@ To access a `UserTransaction` instance, you can either look it up using the `jav
 
 Accessing a `DataSource` using the `Synchronization.beforeCompletion()` method requires setting the _Allow Non-Component Callers_ option of its corresponding JDBC Connection Pool to `true`.
 
-The default setting is `false`. For more information about non-component callers, see xref:Technical Documentation/application-development-guide:jdbc.adoc#allowing-non-component-callers[Allowing Non-Component Callers].
+The default setting is `false`. For more information about non-component callers, see xref:Technical Documentation/Application Development/jdbc.adoc#allowing-non-component-callers[Allowing Non-Component Callers].
 
 If possible, you should use the `jakarta.transaction.TransactionSynchronizationRegistry` interface instead of `jakarta.transaction.TransactionManager` , for portability. You can look up the implementation of this interface by using the JNDI name `java:comp/TransactionSynchronizationRegistry`.
 

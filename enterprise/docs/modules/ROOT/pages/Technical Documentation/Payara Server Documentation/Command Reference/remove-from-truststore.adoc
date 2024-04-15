@@ -1,0 +1,93 @@
+[[remove-from-truststore]]
+= remove-from-truststore
+
+Removes a certificate entry from the specified server truststore.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin remove-from-truststore [--help]
+[--reload={false|true}]
+[--domainName=name]
+[--domainDir=directory]
+[--node=nodeName]
+[--nodeDir=directory]
+[--listener=listenername]
+[--target=instanceName]
+[alias]
+----
+
+[[description]]
+== Description
+
+This command removes a certificate from the target instance or listener's truststore matching the provided alias.
+
+If the instance or listener is configured to use the default trust store, the command will instead synchronize the instance with the DAS (under the assumption the certificate has been removed from the default trust store of the DAS), since any certificates removed from the instance stores would be lost upon its next synchronisation.
+
+[[options]]
+== Options
+
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are removing from its truststore. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified sever instance.
+`--reload`::
+Whether the HTTP listeners should be reloaded. Defaults to `false`
+`--listener`::
+The name of the HTTP or IIOP listener to add the certificate to.
+`--domainname`::
+The name of the domain where the target instance exists.
++
+Defaults to `domain1` or the existing domain if only one exists.
+`--domainDir`::
+The path to the directory containing the target domain.
++
+Defaults to
+`as-install/glassfish/domains`
+`--node`::
+The name of the node where the target instance exists.
++
+Defaults to `localhost-$domainname`
+`--nodeDir`::
+The path to the directory containing the target node.
++
+Defaults to `as-install/glassfish/nodes`
+
+[[operands]]
+== Operands
+
+alias::
+The alias name of the certificate entry to remove.
+
+[[examples]]
+== Examples
+
+*Example 1 Remove the `mycert` entry from the `production` domain's truststore*
+
+[source, shell]
+----
+asadmin remove-from-truststore --domainName production --listener http-listener-2 mycert
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Security Guide/SSL Certificate Management.adoc[SSL Certificate Management],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/remove-expired-certificates.adoc[`remove-expired-certificates`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/remove-from-keystore.adoc[`remove-from-keystore`]

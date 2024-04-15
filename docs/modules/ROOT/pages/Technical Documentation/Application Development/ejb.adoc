@@ -67,7 +67,6 @@ The Payara Platform provides a number of value additions that relate to EJB deve
 Another feature that Payara Server provides is the read-only bean, an EJB 2.1 entity bean that is never modified by an EJB client. Read-only beans avoid database updates completely.
 
 IMPORTANT: Read-only beans are specific to the Payara Platform and are not part of the Enterprise JavaBeans Specification, v2.1. Use of this feature for an EJB 2.1 bean results in a non-portable application. +
-
 To make an EJB 3.0 entity read-only, use `@Column` annotations to mark its columns `insertable=false` and `updatable=false`.
 
 A read-only bean can be used to cache a database entry that is frequently accessed but rarely updated (externally by other beans).
@@ -87,6 +86,7 @@ NOTE: Read-only beans are best suited for situations where the underlying data n
 === The `pass-by-reference` Element
 
 The `pass-by-reference` element in the `glassfish-ejb-jar.xml` file allows you to specify the parameter passing semantics for co-located remote EJB invocations. This is an opportunity to improve performance.
+
 However, use of this feature results in non-portable applications. See "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#pass-by-reference[pass-by-reference]" in the Payara Server Application Deployment section.
 
 [[pooling-and-caching]]
@@ -168,8 +168,7 @@ http://localhost:8080/ejb-timer-service-app/timer
 To change the database used by the EJB Timer Service, set the EJB Timer Service's Timer DataSource setting to a valid JDBC resource.
 If the EJB Timer Service has already been started in a server instance, you must also create the timer database table. DDL files to create these tables are located in `as-install/lib/install/databases`.
 
-Using the EJB Timer Service is equivalent to interacting with a single JDBC resource manager.
-If an EJB component or application accesses a database either directly through JDBC or indirectly (for example, through an entity bean's persistence mechanism), and also interacts with the EJB Timer Service, its data source must be configured with an XA-compatible JDBC driver.
+Using the EJB Timer Service is equivalent to interacting with a single JDBC resource manager. If an EJB component or application accesses a database either directly through JDBC or indirectly (for example, through an entity bean's persistence mechanism), and also interacts with the EJB Timer Service, its data source must be configured with an XA-compatible JDBC driver.
 
 You can change the following EJB Timer Service settings. You must restart the server for these changes to take effect.
 

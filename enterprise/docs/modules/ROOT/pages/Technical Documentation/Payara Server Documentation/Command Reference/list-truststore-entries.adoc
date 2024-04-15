@@ -1,0 +1,93 @@
+[[list-truststore-entries]]
+= list-truststore-entries
+
+Displays entries in the specified domain trust store
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin list-truststore-entries [--help]
+[--verbose={false|true}]
+[--domainName=name]
+[--domainDir=directory]
+[--node=nodeName]
+[--nodeDir=directory]
+[--listener=listenername]
+[--target=instanceName]
+[alias]
+----
+
+[[description]]
+== Description
+
+This command displays either all or a specific store entry from the target instance or listener's trust store.
+
+[[options]]
+== Options
+
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are listing its truststore entries. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified sever instance.
+`--verbose`::
+Whether to print the full entry details. Defaults to `false`
+`--listener`::
+The name of the HTTP or IIOP listener to add the certificate to.
+`--domainname`::
+The name of the domain where the target instance exists.
++
+Defaults to `domain1` or the existing domain if only one exists.
+`--domainDir`::
+The path to the directory containing the target domain.
++
+Defaults to
+`as-install/glassfish/domains`
+`--node`::
+The name of the node where the target instance exists.
++
+Defaults to `localhost-$domainname`
+`--nodeDir`::
+The path to the directory containing the target node.
++
+Defaults to `as-install/glassfish/nodes`
+
+[[operands]]
+== Operands
+
+alias::
+The alias name of the entry to list. If not provided then all entries in the truststore are listed.
+
+[[examples]]
+== Examples
+
+*Example 1 List all entries in the `production` domain's truststore*
+
+[source, shell]
+----
+asadmin list-keystore-entries --domainName production
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Security Guide/SSL Certificate Management.adoc[SSL Certificate Management],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/generate-csr.adoc[`generate-csr`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/renew-self-signed-certificates.adoc[`renew-self-signed-certificates`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/add-to-keystore.adoc[`add-to-keystore`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/add-to-truststore.adoc[`add-to-truststore`]

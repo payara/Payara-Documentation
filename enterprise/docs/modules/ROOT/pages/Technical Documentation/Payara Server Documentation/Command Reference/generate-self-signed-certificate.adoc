@@ -1,0 +1,108 @@
+[[generate-self-signed-certificate]]
+= generate-self-signed-certificate
+
+Generates a new self-signed certificate in the specified server configuration.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin generate-self-signed-certificate [--help]
+[--reload={false|true}]
+[--domainName=name]
+[--domainDir=directory]
+[--node=nodeName]
+[--nodeDir=directory]
+[--listener=listenername]
+[--target=instanceName]
+[--distinguishedName=name]
+[--alternativeNames=<"ALT1;ALT2;ALT3">]
+[alias]
+----
+
+[[description]]
+== Description
+
+This command can generate a self-signed certificate for an instance, placing the resultant key pair in the target instance or listener's keystore and truststores.
+
+If the instance or listener is configured to use the default keystore and truststore, the command will instead synchronize the instance with the DAS (under the assumption the certificate has been added to the default key and trust store of the DAS), since any certificates added to the instance stores would be lost upon next synchronisation.
+
+NOTE: This command will not overwrite an entry already present in the keystore with the same alias. In this scenario no certificate is generated and the command exits. +
+In the case however where there is not an entry with the same alias in the key store but there is in the trust store, a certificate will be generated and the entry in the trust store will be overwritten.
+
+[[options]]
+== Options
+
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+This option helps specify the target on which you are generating the certificate. Valid values are: +
+`server`;;
+Applies to the default server instance. This is the default value.
+cluster_name;;
+Applies to every server instance in the cluster.
+instance_name;;
+Applies to a specified sever instance.
+`--reload`::
+Whether the HTTP listeners should be reloaded. Defaults to `false`
+`--listener`::
+The name of the HTTP or IIOP listener to add the certificate to.
+`--domainname`::
+The name of the domain where the target instance exists.
++
+Defaults to `domain1` or the existing domain if only one exists.
+`--domainDir`::
+The path to the directory containing the target domain.
++
+Defaults to
+`as-install/glassfish/domains`
+`--node`::
+The name of the node where the target instance exists.
++
+Defaults to `localhost-$domainname`
+`--nodeDir`::
+The path to the directory containing the target node.
++
+Defaults to `as-install/glassfish/nodes`
+
+`--distinguishedName`::
+`--dn`::
+The distinguished name (DN) to use when generating the certificate.
+
+`--alternativeNames`::
+`--altnames`::
+The semicolon (`;`) separated list of additional Subject Alternative Names to add to the generated certificate.
+
+[[operands]]
+== Operands
+
+alias::
+The alias name to use when generating the certificate and storing it in the keystore and truststores.
+
+[[examples]]
+== Examples
+
+*Example 1 Generate a new self-signed certificate under the `test-cert` alias*
+
+[source, shell]
+----
+asadmin generate-self-signed-certificate --dn "CN=test.payara.fish,IP=192.168.1.1" --listener http-listener-2 --alternativenames "test2.payara.fish;DNS:test3.payara.fish,IP:127.0.0.1,EMAIL:anon@payara.fish" --target Instance1 test_cert
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Security Guide/SSL Certificate Management.adoc[SSL Certificate Management],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/generate-csr.adoc[`generate-csr`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/renew-self-signed-certificates.adoc[`renew-self-signed-certificates`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/add-to-keystore.adoc[`add-to-keystore`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/add-to-truststore.adoc[`add-to-truststore`]
