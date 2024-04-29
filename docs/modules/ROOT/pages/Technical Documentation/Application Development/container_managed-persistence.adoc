@@ -15,7 +15,7 @@ Payara Server support for EJB 2.1 CMP beans includes:
 
 * Full support for the J2EE v1.4 specification's CMP model. This includes the following:
 
-** Support for commit options `B` and `C` for transactions. See xref:Technical Documentation/application-development-guide:transaction-service.adoc#commit-options[Commit Options].
+** Support for commit options `B` and `C` for transactions. See xref:Technical Documentation/Application Development/transaction-service.adoc#commit-options[Commit Options].
 ** The primary key class must be a subclass of `java.lang.Object`. This ensures portability, and is noted because some vendors allow primitive types
 (such as `int`) to be used as the primary key class.
 
@@ -25,7 +25,7 @@ Payara Server support for EJB 2.1 CMP beans includes:
 ** Support for compound (multi-column) primary keys.
 ** Support for sophisticated custom finder methods.
 ** Standards-based query language (EJB QL).
-** CMP runtime support. See xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource].
+** CMP runtime support. See xref:configuring-the-cmp-resource[Configuring the CMP Resource].
 
 * Payara Server performance-related features, including the following:
 
@@ -33,7 +33,7 @@ Payara Server support for EJB 2.1 CMP beans includes:
 ** Relationship prefetching
 ** Read-Only Beans
 
-For details, see xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#performance-related-features[Performance-Related Features].
+For details, see xref:performance-related-features[Performance-Related Features].
 
 [[cmp-mapping]]
 == CMP Mapping
@@ -64,7 +64,7 @@ Each module with CMP beans must have the following files:
 * `glassfish-ejb-jar.xml` - Payara Server's proprietary deployment descriptor for assembling enterprise beans. For a detailed description, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in Payara Server Application Deployment section.
 * `sun-cmp-mappings.xml` - The mapping deployment descriptor file, which describes the mapping of CMP beans to tables in a database. For a detailed description, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-files.adoc#the-sun-cmp-mappings.xml-file[The sun-cmp-mappings.xml File]" in Payara Server Application Deployment section.
 
-The `sun-cmp-mappings.xml` file can be automatically generated and does not have to exist prior to deployment. For details, see xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#generation-options-for-cmp[Generation Options for CMP].
+The `sun-cmp-mappings.xml` file can be automatically generated and does not have to exist prior to deployment. For details, see xref:generation-options-for-cmp[Generation Options for CMP].
 
 The `sun-cmp-mappings.xml` file maps CMP fields and CMR fields (relationships) to the database. A primary table must be selected for each CMP bean, and optionally, multiple secondary tables. CMP fields are mapped to columns in either the primary or secondary table(s). CMR fields are mapped to pairs of column lists (normally, column lists are the lists of columns associated with primary and foreign keys).
 
@@ -76,14 +76,14 @@ NOTE: Payara Server creates the mappings in the `sun-cmp-mappings.xml` file auto
 
 To map the fields and relationships of your entity beans manually, edit the `sun-cmp-mappings.xml` deployment descriptor.
 
-The mapping information is developed in conjunction with the database schema (`.dbschema`) file, which can be automatically captured when you deploy the bean (see xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#automatic-database-schema-capture[Automatic Database Schema Capture]).
+The mapping information is developed in conjunction with the database schema (`.dbschema`) file, which can be automatically captured when you deploy the bean (see xref:automatic-database-schema-capture[Automatic Database Schema Capture]).
 
-You can manually generate the schema using the `capture-schema` utility (xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#using-the-capture-schema-utility[Using the `capture-schema` Utility]).
+You can manually generate the schema using the `capture-schema` utility (xref:using-the-capture-schema-utility[Using the `capture-schema` Utility]).
 
 [[mapping-considerations]]
 === Mapping Considerations
 
-The data types used in automatic schema generation are also suggested for manual mapping. These data types are described in xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#supported-data-types-for-cmp[Supported Data Types for CMP].
+The data types used in automatic schema generation are also suggested for manual mapping. These data types are described in xref:supported-data-types-for-cmp[Supported Data Types for CMP].
 
 [[join-tables-and-relationships]]
 ==== Join Tables and Relationships
@@ -112,7 +112,7 @@ Use this feature with schemas that cannot be changed, such as a schema inherited
 A managed field is a CMP or CMR field that is mapped to the same database column as another CMP or CMR field. CMP fields mapped to the same column and CMR fields mapped to exactly the same column lists always have the same value in memory. For CMR fields that share only a subset of their mapped columns, changes to the columns affect the relationship fields in memory differently. Basically, Payara Server always tries to keep the state of the objects in memory synchronized with the database.
 
 A managed field can have any `fetched-with` sub-element. If the `fetched-with` sub-element is `<default/>`, the `-DAllowManagedFieldsInDefaultFetchGroup` flag must be set to
-`true`. See xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#default-fetch-group-flags[Default Fetch Group Flags] and "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#fetched-with[fetched-with]" in the Payara Server Application Deployment section.
+`true`. See xref:default-fetch-group-flags[Default Fetch Group Flags] and "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#fetched-with[fetched-with]" in the Payara Server Application Deployment section.
 
 [[blob-support]]
 ==== BLOB Support
@@ -412,12 +412,12 @@ Deployment descriptor elements or `asadmin` command line options can control aut
 * Specifying that table names are unique
 * Specifying type mappings for individual CMP fields
 
-NOTE: Before using these options, make sure you have a properly configured CMP resource. See xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource]. +
-For a read-only bean, do not create the database schema during deployment. Instead, work with your database administrator to populate the data into the tables.See xref:Technical Documentation/application-development-guide:ejb.adoc#using-read-only-beans[Using Read-Only Beans]. +
-Automatic schema generation is not supported for beans with version column consistency checking. Instead, work with your database administrator to create the schema and add the required triggers. See xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#version-column-consistency-checking[Version Column Consistency Checking].
+NOTE: Before using these options, make sure you have a properly configured CMP resource. See xref:configuring-the-cmp-resource[Configuring the CMP Resource]. +
+For a read-only bean, do not create the database schema during deployment. Instead, work with your database administrator to populate the data into the tables.See xref:Technical Documentation/Application Development/ejb.adoc#using-read-only-beans[Using Read-Only Beans]. +
+Automatic schema generation is not supported for beans with version column consistency checking. Instead, work with your database administrator to create the schema and add the required triggers. See xref:version-column-consistency-checking[Version Column Consistency Checking].
 
 The following optional data sub-elements of the `cmp-resource` element in the `glassfish-ejb-jar.xml` file control the automatic creation of database
-tables at deployment. For more information about the `cmp-resource` element, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#cmp-resource[cmp-resource]" in the Payara Server Application Deployment section and xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource].
+tables at deployment. For more information about the `cmp-resource` element, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/dd-elements.adoc#cmp-resource[cmp-resource]" in the Payara Server Application Deployment section and xref:configuring-the-cmp-resource[Configuring the CMP Resource].
 
 [width="172%", cols="30%,15%,55% a",options="header",]
 |===
@@ -518,7 +518,7 @@ When command line and `glassfish-ejb-jar.xml` options are both specified, the `a
 
 You can configure a CMP bean in Payara Server to automatically capture the database metadata and save it in a `.dbschema` file during deployment. If the `sun-cmp-mappings.xml` file contains an empty `<schema/>` entry, the `cmp-resource` entry in the `glassfish-ejb-jar.xml` file is used to get a connection to the database, and automatic generation of the schema is performed.
 
-WARNING: Before capturing the database schema automatically, make sure you have a properly configured CMP resource. See xref:Technical Documentation/application-development-guide:container_managed-persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource].
+WARNING: Before capturing the database schema automatically, make sure you have a properly configured CMP resource. See xref:configuring-the-cmp-resource[Configuring the CMP Resource].
 
 [[using-the-capture-schema-utility]]
 === Using the `capture-schema` Utility
@@ -611,7 +611,7 @@ Payara Server provides a number of ways by which a read-only bean's state can be
 
 Access to CMR fields of read-only beans is not supported. Deployment will succeed, but an exception will be thrown at runtime if a get or set method is invoked.
 
-Read-only beans are best suited for situations where the underlying data never changes, or changes infrequently. For further information and usage guidelines, see xref:Technical Documentation/application-development-guide:ejb.adoc#using-read-only-beans[Using Read-Only Beans].
+Read-only beans are best suited for situations where the underlying data never changes, or changes infrequently. For further information and usage guidelines, see xref:Technical Documentation/Application Development/ejb.adoc#using-read-only-beans[Using Read-Only Beans].
 
 [[default-fetch-group-flags]]
 == Default Fetch Group Flags
