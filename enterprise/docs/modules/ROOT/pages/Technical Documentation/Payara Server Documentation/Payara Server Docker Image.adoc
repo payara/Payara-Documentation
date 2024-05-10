@@ -1,5 +1,6 @@
 [[docker-image-overview]]
 = Payara Server Docker Image Overview
+:ordinal: 10
 
 Overview of the usage and details of the official Payara Server Enterprise Docker image.
 
@@ -15,8 +16,8 @@ docker run -p 8080:8080 nexus.payara.fish:5000/payara/server-full
 
 Keep in mind the following:
 
-* The container starts the `production` domain in the foreground so the server's DAS becomes the main process. 
-* The _tini_ utility is used to guarantee that the server runs seamlessly as the single child process. 
+* The container starts the `production` domain in the foreground so the server's DAS becomes the main process.
+* The _tini_ utility is used to guarantee that the server runs seamlessly as the single child process.
 * The server's JVM process runs under the `payara` user.
 
 IMPORTANT: It is recommended to specify the tag of the correct Payara Enterprise version that will be used on your production environment for guaranteed long-term stability
@@ -77,7 +78,7 @@ CAUTION: Make sure to update the administrator credentials after the domain has 
 [[installation-details]]
 == Installation Details
 
-The Payara Server installation is located in the `/opt/payara/appserver` directory (identified by the `PAYARA_DIR` environment variable). The `/opt/payara/` parent directory is the default working directory of the docker image. 
+The Payara Server installation is located in the `/opt/payara/appserver` directory (identified by the `PAYARA_DIR` environment variable). The `/opt/payara/` parent directory is the default working directory of the docker image.
 
 NOTE: The directory name is deliberately free of any versioning so that any scripts written to work with one version can be seamlessly migrated to the latest docker image.
 
@@ -91,7 +92,7 @@ The default entrypoint will scan the `$DEPLOY_DIR` directory (which defaults to 
 
 NOTE: Any RAR files artefacts found in the directory will always be deployed first
 
-To deploy your applications, you can mount this directory as a Docker volume mapped to a local directory that hosts your application artefacts. 
+To deploy your applications, you can mount this directory as a Docker volume mapped to a local directory that hosts your application artefacts.
 
 The following sample command will launch a new Payara Server container and deploy all applications located in the `~/payara/apps` directory:
 
@@ -147,10 +148,10 @@ The following is a list of variables used by the Docker image to configure the P
 [width="100%",cols="29%,50%,21%",options="header",]
 |===
 |Name| Description| Value
-|`HOME_DIR`| The home directory for the `payara` user| `/opt/payara` 
+|`HOME_DIR`| The home directory for the `payara` user| `/opt/payara`
 |`PAYARA_DIR`| The root directory of the Payara installation| `/opt/payara/appserver`
-|`SCRIPT_DIR`| The directory where the `generate_deploy_commands.sh` and `startInForeground.sh` scripts can be found| `/opt/payara/scripts` 
-|`CONFIG_DIR`| The directory where the post and pre boot files are generated to by default| `/opt/payara/config` 
+|`SCRIPT_DIR`| The directory where the `generate_deploy_commands.sh` and `startInForeground.sh` scripts can be found| `/opt/payara/scripts`
+|`CONFIG_DIR`| The directory where the post and pre boot files are generated to by default| `/opt/payara/config`
 |`DEPLOY_DIR`| The directory where applications are searched for in `generate_deploy_commands.sh` script| `/opt/payara/deployments`
 |`ADMIN_USER`| The default username credential for the default administrator user| `admin`
 |`ADMIN_PASSWORD`| The default password credential for the default administrator user. Can only be set when the basic image is created| `admin`
@@ -182,7 +183,7 @@ COPY post-boot-commands.asadmin $POSTBOOT_COMMANDS
 [[executing-custom-scripts-before-domain-startup]]
 === Executing Custom Scripts before Domain Startup
 
-If preboot command files are not enough, you can add your customized shell scripts to the `${SCRIPT_DIR}/init.d` directory. This will allow you to modify the environment before the Payara Server domain starts. 
+If preboot command files are not enough, you can add your customized shell scripts to the `${SCRIPT_DIR}/init.d` directory. This will allow you to modify the environment before the Payara Server domain starts.
 
 Scripts added to this folder should be link:https://www.gnu.org/software/bash/[Bash] scripts and they should end with the `.sh` suffix.
 
