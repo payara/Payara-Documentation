@@ -1,5 +1,6 @@
 [[administering-payara-server-clusters]]
 = Administering Payara Server Clusters
+:ordinal: 3
 
 IMPORTANT: Clusters have been deprecated and officially replaced with Deployment Groups. +
 We do not recommend setting up highly-available architectures using traditional clusters.
@@ -11,7 +12,7 @@ A cluster is a collection of Payara Server instances that work together as one l
 
 A cluster is a named collection of Payara Server instances that share the same applications, resources, and configuration information.
 
-For information about Payara Server instances, see xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#administering-payara-server-instances[Administering Payara Server Instances].
+For information about Payara Server instances, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#administering-payara-server-instances[Administering Payara Server Instances].
 
 Payara Server enables you to administer all the instances in a cluster as a single unit from a single host, regardless of whether the instances reside on the same host or different hosts. You can perform the same operations on a cluster that you can perform on an un-clustered instance, for example, deploying applications and creating resources.
 
@@ -48,7 +49,7 @@ To this effect, most of the configuration settings listed in the next section ma
 
 Payara Server has the following types of GMS settings:
 
-* GMS cluster settings — These are determined during cluster creation. For more information about these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#to-create-a-cluster[To Create a Cluster].
+* GMS cluster settings — These are determined during cluster creation. For more information about these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-create-a-cluster[To Create a Cluster].
 * GMS configuration settings — These are determined during configuration creation and are explained here.
 
 The following GMS configuration settings are used in GMS for group discovery and failure detection:
@@ -84,7 +85,7 @@ The default value is `10000`.
 
 The heartbeat frequency, maximum missed heartbeats, peer-to-peer connection-based failure detection, and the verify timeouts are all needed to ensure that failure detection is robust and reliable in Payara Server.
 
-For the dotted names for each of these GMS configuration settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#dotted-names-for-gms-settings[Dotted Names for GMS Settings]. For the steps to specify these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings].
+For the dotted names for each of these GMS configuration settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#dotted-names-for-gms-settings[Dotted Names for GMS Settings]. For the steps to specify these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings].
 
 [[dotted-names-for-gms-settings]]
 === Dotted Names for GMS Settings
@@ -120,7 +121,7 @@ clusters.cluster.mycluster.property.GMS_TCPENDPORT=9200
 
 The last `get` subcommand displays only the properties that have been explicitly set.
 
-For the steps to specify these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings] and xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#to-change-gms-settings-after-cluster-creation[To Change GMS Settings After Cluster Creation].
+For the steps to specify these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings] and xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-change-gms-settings-after-cluster-creation[To Change GMS Settings After Cluster Creation].
 
 [[to-preconfigure-nondefault-gms-configuration-settings]]
 === To Preconfigure Nondefault GMS Configuration Settings
@@ -133,7 +134,7 @@ You can preconfigure GMS with values different than the defaults without requiri
 ----
 asadmin> copy-config default-config mycfg
 ----
-For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/named-configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
+For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
 . Set the values for the new configuration's GMS configuration settings. For example:
 +
 [source,shell]
@@ -141,14 +142,14 @@ For more information, see xref:Technical Documentation/Payara Server Documentati
 asadmin> set configs.config.mycfg.group-management-service.group-discovery-timeout-in-millis=8000
 asadmin> set configs.config.mycfg.group-management-service.failure-detection.max-missed-heartbeats=5
 ----
-For a complete list of the dotted names for these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#dotted-names-for-gms-settings[Dotted Names for GMS Settings].
+For a complete list of the dotted names for these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#dotted-names-for-gms-settings[Dotted Names for GMS Settings].
 . Create the cluster so it uses the previously created configuration. For example:
 +
 [source,shell]
 ----
 asadmin> create-cluster --config mycfg mycluster
 ----
-You can also set GMS cluster settings during this step. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#to-create-a-cluster[To Create a Cluster].
+You can also set GMS cluster settings during this step. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-create-a-cluster[To Create a Cluster].
 . Create server instances for the cluster. For example:
 +
 [source,shell]
@@ -168,9 +169,9 @@ You can also view the full syntax and options of a subcommand by typing `asadmin
 [[to-change-gms-settings-after-cluster-creation]]
 === To Change GMS Settings After Cluster Creation
 
-To avoid the need to restart the DAS and the cluster, configure GMS configuration settings before cluster creation as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings].
+To avoid the need to restart the DAS and the cluster, configure GMS configuration settings before cluster creation as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings].
 
-To avoid the need to restart the DAS and the cluster, configure the GMS cluster settings during cluster creation as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#to-create-a-cluster[To Create a Cluster].
+To avoid the need to restart the DAS and the cluster, configure the GMS cluster settings during cluster creation as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-create-a-cluster[To Create a Cluster].
 
 Changing any GMS settings using the `set` subcommand after cluster creation requires a domain administration server (DAS) and cluster restart as explained here.
 
@@ -187,7 +188,7 @@ configs.config.mycfg.group-management-service.failure-detection.verify-failure-c
 configs.config.mycfg.group-management-service.failure-detection.verify-failure-waittime-in-millis=1500
 configs.config.mycfg.group-management-service.group-discovery-timeout-in-millis=5000
 ----
-For a complete list of the dotted names for these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#dotted-names-for-gms-settings[Dotted Names for GMS Settings].
+For a complete list of the dotted names for these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#dotted-names-for-gms-settings[Dotted Names for GMS Settings].
 . Use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand to change the settings. For example:
 +
 [source,shell]
@@ -304,15 +305,15 @@ If you change GMS settings for an existing cluster, the DAS and the cluster must
 
 When you create a cluster, Payara Server automatically creates a Message Queue cluster for the Payara Server cluster.
 
-For more information about Message Queue clusters, see xref:Technical Documentation/Payara Server Documentation/High Availability/jms.adoc#using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server].
+For more information about Message Queue clusters, see xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring JMS High Availability.adoc#using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server].
 
 *Before You Begin*
 
-If the cluster is to reference an existing named configuration, ensure that the configuration exists. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/named-configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
+If the cluster is to reference an existing named configuration, ensure that the configuration exists. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
 
 If you are using a named configuration to preconfigure GMS settings, ensure that these settings have the required values in the named configuration.
 
-For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings].
+For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings].
 
 If you are configuring the cluster's GMS settings when you create the cluster, ensure that you have the following information:
 
@@ -388,14 +389,14 @@ Command create-cluster executed successfully.
 
 After creating a cluster, you can add Payara Server instances to the cluster as explained in the following sections:
 
-* xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
 
 *See Also*
 
-* xref:Technical Documentation/Payara Server Documentation/High Availability/named-configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/jms.adoc#using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring JMS High Availability.adoc#using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server]
 * xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-cluster.adoc[`create-cluster`]
 * xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-system-properties.adoc[`create-system-properties`]
 
@@ -453,10 +454,10 @@ If the cluster's named configuration was created automatically for the cluster a
 
 Ensure that following prerequisites are met:
 
-* The cluster that you are deleting is stopped. For information about how to stop a cluster, see xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-stop-a-cluster[To Stop a Cluster].
+* The cluster that you are deleting is stopped. For information about how to stop a cluster, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-stop-a-cluster[To Stop a Cluster].
 * The cluster that you are deleting contains no Payara Server instances. For information about how to remove instances from a cluster, see the following sections:
-** xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
-** xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+** xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
+** xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
 
 Follow these steps:
 
@@ -502,9 +503,9 @@ Command delete-cluster executed successfully.
 
 *See Also*
 
-* xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-stop-a-cluster[To Stop a Cluster]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-stop-a-cluster[To Stop a Cluster]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
 * xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-cluster.adoc[`delete-cluster`]
 * xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-clusters.adoc[`list-clusters`]
 * xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`]

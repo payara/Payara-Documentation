@@ -1,5 +1,6 @@
 [[configuring-high-availability-session-persistence-and-failover]]
 =  Configuring High Availability Session Persistence and Failover
+:ordinal: 9
 
 This chapter explains how to enable and configure high availability session persistence.
 
@@ -22,7 +23,7 @@ A distributed session can run in multiple Payara Server instances, if:
 Payara Server supports in-memory session replication on standalone server instances (and as part of a deployment group) through the use of the Data Grid.
 +
 In-memory session replication is enabled by default for Payara Server traditional clusters if the *Group Management Service* is enabled. For more information about GMS, see
-xref:Technical Documentation/Payara Server Documentation/High Availability/clusters.adoc#group-management-service[Group Management Service].
+xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#group-management-service[Group Management Service].
 +
 If server instances in a cluster are located on different hosts, ensure that the following prerequisites are met:
 
@@ -46,7 +47,7 @@ When configuring session persistence and failover, note the following restrictio
 These features are for development, not production environments, so you must disable them before enabling the session persistence service.
 +
 For information about how to disable these features, see the xref:Technical Documentation/Payara Server Documentation/Application Deployment/Overview.adoc[Payara Server Application Deployment section].
-* Payara Server does not support High Availability Database (HA-DB) configurations. Instead, use in-memory replication, as described in xref:Technical Documentation/Payara Server Documentation/High Availability/overview.adoc#high-availability-session-persistence[High Availability Session Persistence].
+* Payara Server does not support High Availability Database (HA-DB) configurations. Instead, use in-memory replication, as described in xref:Technical Documentation/Payara Server Documentation/High Availability/Overview.adoc#high-availability-session-persistence[High Availability Session Persistence].
 * You can only bind certain objects to distributed sessions that support failover. Contrary to the Jakarta Servlet specification, Payara Server does not throw an `IllegalArgumentException` if an object type not supported for failover is bound into a distributed session.
 +
 You can bind the following objects into a distributed session that supports failover:
@@ -107,7 +108,7 @@ This procedure explains how to enable high availability for a cluster as a whole
 . Create a Payara Server cluster or a new deployment group.
 . Set up load balancing for the cluster/deployment group.
 +
-For instructions, see xref:Technical Documentation/Payara Server Documentation/High Availability/http-load-balancing.adoc#setting-up-http-load-balancing[Setting Up HTTP Load Balancing].
+For instructions, see xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring HTTP Load Balancing.adoc#setting-up-http-load-balancing[Setting Up HTTP Load Balancing].
 . Verify that all instances within the cluster/deployment group for which you want to enable availability are running.
 +
 These steps are also necessary when enabling availability for a Web, EJB, or JMS container.
@@ -176,7 +177,7 @@ asadmin> set <instance-name>-config.availability-service.availability-enabled=tr
 +
 Select methods for which checkpointing the session state is necessary.
 +
-For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/session-persistence-and-failover.adoc#configuring-availability-for-an-individual-bean[Configuring Availability for an Individual Bean].
+For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring HA Session Persistence and Failover.adoc#configuring-availability-for-an-individual-bean[Configuring Availability for an Individual Bean].
 
 . Make each web module distributable if you want it to be highly
 available.
@@ -189,8 +190,8 @@ See the links below for instructions.
 
 See Also
 
-* xref:Technical Documentation/Payara Server Documentation/High Availability/session-persistence-and-failover.adoc#configuring-availability-for-individual-web-applications[Configuring Availability for Individual Web Applications]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/session-persistence-and-failover.adoc#using-single-sign-on-with-session-failover[Using Single Sign-on with Session Failover]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring HA Session Persistence and Failover.adoc#configuring-availability-for-individual-web-applications[Configuring Availability for Individual Web Applications]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring HA Session Persistence and Failover.adoc#using-single-sign-on-with-session-failover[Using Single Sign-on with Session Failover]
 
 [[configuring-availability-for-individual-web-applications]]
 === Configuring Availability for Individual Web Applications
@@ -308,7 +309,7 @@ However, if an SFSB participates in a bean-managed transaction, the transaction 
 
 In this case, the EJB container checkpoints the bean's state at the end of the corresponding method, provided the bean is not in the scope of another transaction when that method ends. If a bean-managed transaction spans across multiple methods, checkpointing is delayed until there is no active transaction at the end of a subsequent method.
 
-The state of an SFSB is not necessarily transactional and might be significantly modified as a result of non-transactional business methods. If this is the case for an SFSB, you can specify a list of checkpointed methods, as described in xref:Technical Documentation/Payara Server Documentation/High Availability/session-persistence-and-failover.adoc#specifying-methods-to-be-checkpointed[Specifying Methods to Be Checkpointed]
+The state of an SFSB is not necessarily transactional and might be significantly modified as a result of non-transactional business methods. If this is the case for an SFSB, you can specify a list of checkpointed methods, as described in xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring HA Session Persistence and Failover.adoc#specifying-methods-to-be-checkpointed[Specifying Methods to Be Checkpointed]
 
 If a distributable web application references an SFSB, and the web application's session fails over, the EJB reference is also failed over.
 

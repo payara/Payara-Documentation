@@ -119,7 +119,7 @@ This example redirects `from` `dummy` to `etude`:
 The Apache Tomcat Connector `mod_jk` can be used to connect the web container with web servers such as Apache HTTP Server. By using `mod_jk`, which comes with Payara Server, you can front Payara Server with Apache HTTP Server.
 
 You can also use `mod_jk` directly at the JSP/servlet engine for load balancing. For more information about configuring `mod_jk` and Apache HTTP Server for load
-balancing with Payara Server refer to xref:docs:ROOT:Technical Documentation/Payara Server Documentation/High Availability/http-load-balancing.adoc#configuring-http-load-balancing[Configuring HTTP Load Balancing] in the Payara Server High Availability section.
+balancing with Payara Server refer to xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring HTTP Load Balancing.adoc#configuring-http-load-balancing[Configuring HTTP Load Balancing] in the Payara Server High Availability section.
 
 [[to-enable-mod_jk]]
 === To Enable `mod_jk`
@@ -235,18 +235,18 @@ This example shows an `httpd.conf` file that is set for load balancing.
 ----
 LoadModule jk_module /usr/lib/httpd/modules/mod_jk.so
 JkWorkersFile /etc/httpd/conf/worker.properties
-# Where to put jk logs 
+# Where to put jk logs
 JkLogFile /var/log/httpd/mod_jk.log
-# Set the jk log level [debug/error/info] 
-JkLogLevel debug 
-# Select the log format 
-JkLogStampFormat "[%a %b %d %H:%M:%S %Y] " 
-# JkOptions indicate to send SSL KEY SIZE, 
-JkOptions +ForwardKeySize +ForwardURICompat -ForwardDirectories 
-# JkRequestLogFormat set the request format 
-JkRequestLogFormat "%w %V %T" 
+# Set the jk log level [debug/error/info]
+JkLogLevel debug
+# Select the log format
+JkLogStampFormat "[%a %b %d %H:%M:%S %Y] "
+# JkOptions indicate to send SSL KEY SIZE,
+JkOptions +ForwardKeySize +ForwardURICompat -ForwardDirectories
+# JkRequestLogFormat set the request format
+JkRequestLogFormat "%w %V %T"
 # Send all jsp requests to Payara Server
-JkMount /*.jsp worker1 
+JkMount /*.jsp worker1
 # Send all glassfish-test requests to Payara Server
 JkMount /glassfish-test/* loadbalancer
 ----
@@ -294,7 +294,7 @@ where `file1:file2:` and so on represents the random compressed files.
 +
 [source,shell]
 ----
-openssl rsa -in server.key -out server.pem 
+openssl rsa -in server.key -out server.pem
 ----
 
 . Generate the CSR is as follows:
@@ -319,7 +319,7 @@ This temporary certificate is good for 60 days.
 # Send all jsp requests to GlassFish
 JkMount /*.jsp worker1
 # Send all glassfish-test requests to GlassFish
-JkMount /glassfish-test/* loadbalancer 
+JkMount /glassfish-test/* loadbalancer
 ----
 
 [[example-6-8]]
@@ -392,20 +392,20 @@ while having requests for dynamic resources, such as servlets and JavaServer Pag
 ----
 LoadModule proxy_module /usr/lib/httpd/modules/mod_proxy.so
 LoadModule proxy_ajp_module /usr/lib/httpd/modules/mod_proxy_ajp.so
- 
+
 Listen 1979
 NameVirtualHost *:1979
 <VirtualHost *:1979>
    ServerName localhost
    ErrorLog /var/log/apache2/ajp.error.log
    CustomLog /var/log/apache2/ajp.log combined
- 
+
    <Proxy *>
      AddDefaultCharset Off
      Order deny,allow
      Allow from all
    </Proxy>
- 
+
    ProxyPass / ajp://localhost:8009/
    ProxyPassReverse / ajp://localhost:8009/
 </VirtualHost>
@@ -450,18 +450,18 @@ In order to support stickiness, the `mod_proxy_balancer` load balancer relies on
 LoadModule proxy_module /usr/lib/httpd/modules/mod_proxy.so
 LoadModule proxy_ajp_module /usr/lib/httpd/modules/mod_proxy_ajp.so
 LoadModule proxy_balancer_module /usr/lib/httpd/modules/mod_proxy_balancer.so
- 
+
 # Forward proxy needs to be turned off
 ProxyRequests Off
 # Keep the original Host Header
 ProxyPreserveHost On
- 
+
    <Proxy *>
       Order deny,allow
       Deny from all
       Allow from localhost
    </Proxy>
- 
+
 # Each BalancerMember corresponds to an instance in the Payara Server
 # cluster. The port specified for each instance must match the ajp port
 # specified for that instance.
@@ -513,7 +513,7 @@ AJP_INSTANCE_NAME=instance3
 ----
 In this example, `instance1`, `instance2` and `instance3` are the names of the Payara Server instances in the cluster.
 
-. To apply your changes, restart Payara Server. 
+. To apply your changes, restart Payara Server.
 See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 

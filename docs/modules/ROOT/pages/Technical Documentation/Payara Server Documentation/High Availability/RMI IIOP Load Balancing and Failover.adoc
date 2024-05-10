@@ -1,5 +1,6 @@
 [[rmi-iiop-load-balancing-and-failover]]
 = RMI-IIOP Load Balancing and Failover
+:ordinal: 11
 
 This chapter describes using high-availability features for remote EJB references and JNDI objects over RMI-IIOP in Payara Server.
 
@@ -23,7 +24,7 @@ Payara Server provides high availability of remote EJB references and `NameServi
 
 Payara Server supports load balancing for Jakarta  applications executing in the Application Client Container (ACC).
 
-See xref:Technical Documentation/Payara Server Documentation/High Availability/rmi-iiop.adoc#enabling-rmi-iiop-hardware-load-balancing-and-failover[Enabling RMI-IIOP Hardware Load Balancing and Failover].
+See xref:Technical Documentation/Payara Server Documentation/High Availability/RMI IIOP Load Balancing and Failover.adoc#enabling-rmi-iiop-hardware-load-balancing-and-failover[Enabling RMI-IIOP Hardware Load Balancing and Failover].
 
 CAUTION: Payara Server does not support RMI-IIOP load balancing and failover over secure sockets layer (SSL).
 
@@ -32,12 +33,12 @@ CAUTION: Payara Server does not support RMI-IIOP load balancing and failover ove
 
 Payara Server supports two general models for load balancing:
 
-xref:Technical Documentation/Payara Server Documentation/High Availability/rmi-iiop.adoc#initialcontext-load-balancing[`InitialContext` Load Balancing]::
+xref:Technical Documentation/Payara Server Documentation/High Availability/RMI IIOP Load Balancing and Failover.adoc#initialcontext-load-balancing[`InitialContext` Load Balancing]::
 When a client performs a JNDI lookup for an object, the Naming Service creates a `InitialContext` (IC) object associated with a particular server instance.
 +
 From then on, all lookup requests made using that IC object are sent to the same server instance. `InitialContext` load balancing can be configured automatically across an entire cluster.
 
-xref:Technical Documentation/Payara Server Documentation/High Availability/rmi-iiop.adoc#per-request-load-balancing-prlb[Per-Request Load Balancing (PRLB)]::
+xref:Technical Documentation/Payara Server Documentation/High Availability/RMI IIOP Load Balancing and Failover.adoc#per-request-load-balancing-prlb[Per-Request Load Balancing (PRLB)]::
 Per Request Load Balancing (PRLB) is a method for load balancing stateless EJBs that enables load-balancing for each request to an EJB instance.
 +
 NOTE: PRLB chooses the first node in a cluster to use on each request. PRLB is configured on a per-EJB basis.
@@ -113,7 +114,7 @@ For a list of the path variables to update, see xref:ROOT:Technical Documentatio
 For example, on UNIX use `chmod 700`.
 . [[find-the-iiop-listener-port-number-for-at-least-two-instances-in-the-cluster]]Find the IIOP listener port number for at least two instances in the cluster.
 +
-You specify the IIOP listeners as endpoints in xref:Technical Documentation/Payara Server Documentation/High Availability/rmi-iiop.adoc#add-at-least-two-target-server-elements-in-the-sun-acc.xml-file[Add at least two `target-server` elements in the `sun-acc.xml` file.].
+You specify the IIOP listeners as endpoints in xref:Technical Documentation/Payara Server Documentation/High Availability/RMI IIOP Load Balancing and Failover.adoc#add-at-least-two-target-server-elements-in-the-sun-acc.xml-file[Add at least two `target-server` elements in the `sun-acc.xml` file.].
 +
 For each instance, obtain the IIOP listener ports as follows:
 +
@@ -141,7 +142,7 @@ asadmin> get servers.server.in1.system-property.*.value
 
 . [[add-at-least-two-target-server-elements-in-the-sun-acc.xml-file]] Add at least two `target-server` elements in the `sun-acc.xml` file.
 +
-Use the endpoints that you obtained in xref:Technical Documentation/Payara Server Documentation/High Availability/rmi-iiop.adoc#find-the-iiop-listener-port-number-for-at-least-two-instances-in-the-cluster[Find the IIOP listener port number for at least two instances in the cluster].
+Use the endpoints that you obtained in xref:Technical Documentation/Payara Server Documentation/High Availability/RMI IIOP Load Balancing and Failover.adoc#find-the-iiop-listener-port-number-for-at-least-two-instances-in-the-cluster[Find the IIOP listener port number for at least two instances in the cluster].
 +
 If the Payara Server instance on which the application client is deployed participates in a cluster, the ACC finds all currently active IIOP endpoints in the cluster automatically. However, a client should have at least two endpoints specified for bootstrapping purposes, in case one of the endpoints has failed.
 +
@@ -210,7 +211,7 @@ To test load balancing, use multiple clients and see how the load gets distribut
 
 *See Also*
 
-See xref:Technical Documentation/Payara Server Documentation/High Availability/session-persistence-and-failover.adoc#enabling-the-high-availability-session-persistence-service[Enabling the High Availability Session Persistence Service] for instructions on enabling the session availability service for a cluster or for a Web, EJB, or JMS container running in a cluster.
+See xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring HA Session Persistence and Failover.adoc#enabling-the-high-availability-session-persistence-service[Enabling the High Availability Session Persistence Service] for instructions on enabling the session availability service for a cluster or for a Web, EJB, or JMS container running in a cluster.
 
 [[per-request-load-balancing-prlb]]
 == Per-Request Load Balancing (PRLB)
@@ -296,4 +297,4 @@ public class EJBClient {
 [[see-also]]
 == See Also
 
-See xref:Technical Documentation/Payara Server Documentation/High Availability/session-persistence-and-failover.adoc#enabling-the-high-availability-session-persistence-service[Enabling the High Availability Session Persistence Service] for instructions on enabling the session availability service for a cluster or for a Web, EJB, or JMS container running in a cluster.
+See xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring HA Session Persistence and Failover.adoc#enabling-the-high-availability-session-persistence-service[Enabling the High Availability Session Persistence Service] for instructions on enabling the session availability service for a cluster or for a Web, EJB, or JMS container running in a cluster.
