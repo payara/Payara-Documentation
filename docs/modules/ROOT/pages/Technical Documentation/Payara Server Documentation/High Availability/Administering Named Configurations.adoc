@@ -1,0 +1,446 @@
+[[administering-named-configurations]]
+= Administering Named Configurations
+:ordinal: 7
+
+A named configuration is a set of configuration information for Payara Server instances and clusters. A configuration sets port numbers for listeners that an instance or a cluster uses and defines settings for items such as the EJB container, security, logging, and monitoring. Applications and resources are not defined in named configurations.
+
+Payara Server enables you to create configurations for use by clusters and instances. Payara Server creates configurations automatically for clusters and instances that do not reference an existing configuration. You can modify any existing named configuration regardless of how the configuration was created.
+
+[[about-named-configurations]]
+== About Named Configurations
+
+Configurations exist in a domain. Multiple Payara Server instances or clusters in the domain can reference the same configuration, or they can have separate configurations.
+To ensure that the environment in a cluster's instances is homogenous, all instances in the cluster inherit the cluster's configuration.
+
+[[types-of-named-configurations]]
+=== Types of Named Configurations
+
+Each named configuration is one of the following types of configuration:
+
+Standalone configuration::
+A standalone configuration is referenced by only one instance or cluster and is not shared with any other instances or clusters.
++
+NOTE: A configuration that is referenced by only one cluster is a standalone configuration, even if the cluster contains multiple instances.
+
+Shared configuration::
+  A shared configuration is referenced by multiple instances (even if they live on a deployment group) or clusters.
+
+The type of un-clustered instances is determined by the type of the configuration that the instance references.
+
+For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#types-of-payara-server-instances[Types of Payara Server Instances].
+
+[[the-default-config-configuration]]
+=== The `default-config` Configuration
+
+The `default-config` configuration is a special configuration that acts as a template for creating new named configurations. Clusters and instances cannot refer to the `default-config` configuration. The `default-config` configuration can only be copied to create configurations.
+
+[[automatically-created-configurations]]
+=== Automatically Created Configurations
+
+When you create a cluster or an instance, you can choose whether to specify an existing configuration that the new cluster or instance will reference. If you choose to create a cluster or an instance without specifying an existing configuration, Payara Server automatically creates a configuration for the cluster or instance.
+
+For more information, see the following sections:
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-create-a-cluster[To Create a Cluster]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
+
+Payara Server automatically creates a configuration by copying the `default-config` configuration. If you require an instance or cluster to reference a copy of a different configuration, copy the configuration and specify the copy when you create the instance or cluster.
+
+For information about how to copy a configuration, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
+
+Payara Server assigns the name `<cluster-or-instance>-config` to an automatically created configuration. `<cluster-or-instance>` is the name of the cluster or instance for which the configuration is created.
+
+The `server-config` configuration is automatically created for the domain administration server (DAS) when the domain is created.
+
+[[directory-for-configuration-synchronization]]
+=== Directory for Configuration Synchronization
+
+When a named configuration is created, Payara Server creates a configuration directory on the domain administration server (DAS) at `domain-dir/config/config-name`.
+
+domain-dir::
+  The directory in which the domain's configuration is stored.
+config-name::
+  The name that was assigned to the configuration when the configuration was created.
+
+This contents of this directory are synchronized to all instances that inherit or reference the configuration.
+
+[[creating-listing-and-deleting-named-configurations]]
+== Creating, Listing, and Deleting Named Configurations
+
+Payara Server enables you to create configurations for use by clusters and instances, obtain information about configurations, and delete configurations that are no longer required.
+
+[[to-create-a-named-configuration]]
+=== To Create a Named Configuration
+
+Use the `copy-config` subcommand in remote mode to create a named configuration by copying an existing configuration. Payara Server requires you to create a configuration by copying a configuration because a configuration contains many required settings.
+
+The newly created configuration is identical to the configuration that you copy until you change its configuration settings.
+
+TIP: Create a named configuration only if you plan to share the configuration among multiple un-clustered instances or clusters.
+
+Otherwise, create clusters and instances without specifying an existing configuration.
+If no configuration is specified, Payara Server creates a copy of the default configuration for the cluster or instance.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the `copy-config` subcommand.
++
+NOTE: Only the options that are required to complete this task are provided in this step.
+For information about all the options for configuring the named configuration, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/copy-config.adoc#copy-config[`copy-config`] help page.
++
+[source,shell]
+----
+asadmin> copy-config source-config-name destination-config-name
+----
++
+source-config-name::
+  The name of the configuration that you are copying. You must specify a configuration to copy even if you are copying the default configuration. The configuration must already exist.
+destination-config-name::
+  Your choice of name for the configuration that you are creating by copying the source configuration.
+
+The following example creates the named configuration `cluster-presets-config` by copying the default configuration.
+
+[source,shell]
+----
+asadmin> copy-config default-config cluster-presets-config
+Command copy-config executed successfully.
+----
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-create-a-cluster[To Create a Cluster]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/copy-config.adoc#copy-config[`copy-config`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help copy-config` at the command line.
+
+[[to-list-the-named-configurations-in-a-domain]]
+=== To List the Named Configurations in a Domain
+
+Use the `list-configs` subcommand in remote mode to list existing named configurations in a domain.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-configs.adoc[`list-configs`] subcommand.
++
+[source,shell]
+----
+asadmin> list-configs
+----
+
+The following example lists all named configurations in the current domain.
+
+[source,shell]
+----
+asadmin> list-configs
+server-config
+default-config
+cluster-presets-config
+Command list-configs executed successfully.
+----
+
+*See Also*
+
+xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-configs.adoc[`list-configs`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-configs` at the command line.
+
+[[to-list-the-targets-of-a-named-configuration]]
+=== To List the Targets of a Named Configuration
+
+Use the `list-clusters` subcommand and the `list-instances` subcommand in remote mode to list the targets of a named configuration.
+
+The targets of a named configuration are the clusters and Payara Server instances that reference the configuration.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. List the clusters that refer to the configuration.
++
+[source,shell]
+----
+asadmin> list-clusters config-name
+----
++
+config-name::
+  The name of the configuration whose targets you are listing.
+. List the instances that refer to the configuration.
++
+[source,shell]
+----
+asadmin> list-instances config-name
+----
++
+config-name::
+  The name of the configuration whose targets you are listing.
+
+The following example shows that the cluster `ymlcluster` and the instances `yml-i1` and `yml-i2` reference the named configuration `ymlcluster-config`.
+
+[source,shell]
+----
+asadmin> list-clusters ymlcluster-config
+
+ymlcluster partially running
+Command list-clusters executed successfully.
+asadmin> list-instances ymlcluster-config
+yml-i1   running
+yml-i2   not running
+Command list-instances executed successfully.
+----
+
+*See Also*
+
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-clusters.adoc[`list-clusters`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help list-clusters`
+* `asadmin help list-instances`
+
+[[to-delete-a-named-configuration]]
+=== To Delete a Named Configuration
+
+Use the `delete-config` subcommand in remote mode to delete an existing named configuration from the configuration of the DAS.
+
+You cannot delete the `default-config` configuration.
+
+NOTE: A standalone configuration that was created automatically for a cluster or a Payara Server instance is deleted when the cluster or instance is deleted.
+
+*Before You Begin*
+
+Ensure that no clusters or instances refer to the configuration. If a cluster or instance refers to the configuration and is no longer required, delete the cluster or instance.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Confirm that no clusters refer to the configuration that you are deleting.
++
+[source,shell]
+----
+asadmin> list-clusters config-name
+----
++
+config-name::
+  The name of the configuration that you are deleting.
+
+. Confirm that no instances refer to the configuration that you are deleting.
++
+[source,shell]
+----
+asadmin> list-instances config-name
+----
++
+config-name::
+  The name of the configuration that you are deleting.
+
+. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-config.adoc[`delete-config`] subcommand.
++
+[source,shell]
+----
+asadmin> delete-config config-name
+----
+config-name::
+  The name of the configuration that you are deleting.
+
+The following example confirms that no clusters or instances refer to the configuration `cluster-presets-config` and then deletes the configuration.
+
+[source,shell]
+----
+asadmin> list-clusters cluster-presets-config
+Nothing to list
+Command list-clusters executed successfully.
+
+asadmin> list-instances cluster-presets-config
+Nothing to list.
+Command list-instances executed successfully.
+
+asadmin> delete-config cluster-presets-config
+Command delete-config executed successfully.
+----
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-delete-a-cluster[To Delete a Cluster]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-config.adoc#delete-config[`delete-config`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-clusters.adoc#list-clusters[`list-clusters`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc#list-instances[`list-instances`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help delete-config`
+* `asadmin help list-clusters`
+* `asadmin help list-instances`
+
+[[modifying-properties-for-named-configurations-and-instances]]
+== Modifying Properties for Named Configurations and Instances
+
+The properties in a named configuration define port numbers for un-clustered instances that reference the configuration or clustered instances that inherit the configuration. An instance initially obtains port numbers from the configuration that the instance references or inherits.
+
+CAUTION: To avoid port conflicts, edit the properties of named configurations and instances.
+
+[[properties-for-port-numbers-in-a-named-configuration]]
+=== Properties for Port Numbers in a Named Configuration
+
+The default configuration `default-config` contains properties that define the initial values of port numbers in a configuration that is copied from `default-config`. When an instance or a cluster that references the configuration is created, these properties are set for the instance.
+
+You can create additional system properties for a configuration either by specifying the `--systemproperties` option of the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/copy-config.adoc[`copy-config`] subcommand or by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-system-properties.adoc[`create-system-properties`] subcommand.
+
+To reference a system property from the configuration, use the `$\{property-name\}` notation, where prop-name is the name of the system property.
+
+For example, if a configuration defines additional HTTP listeners, use system properties to define the ports for those listeners. However, these properties are not set automatically when an instance or a cluster that references the configuration is created.
+
+NOTE: You must set these properties explicitly when you create the instance or cluster.
+
+//TODO - Add any additional ports created for Payara Server
+
+The properties in a named configuration that define port numbers are as follows:
+
+`ASADMIN_LISTENER_PORT`::
+  This property specifies the port number of the HTTP port or HTTPS port through which the DAS connects to the instance to manage the instance.
+`HTTP_LISTENER_PORT`::
+  This property specifies the port number of the port that is used to listen for HTTP requests.
+`HTTP_SSL_LISTENER_PORT`::
+  This property specifies the port number of the port that is used to listen for HTTPS requests.
+`IIOP_LISTENER_PORT`::
+  This property specifies the port number of the port that is used for IIOP connections.
+`IIOP_SSL_LISTENER_PORT`::
+  This property specifies the port number of the port that is used for secure IIOP connections.
+`IIOP_SSL_MUTUALAUTH_PORT`::
+  This property specifies the port number of the port that is used for secure IIOP connections with client authentication.
+`JAVA_DEBUGGER_PORT`::
+  This property specifies the port number of the port that is used for connections to the http://java.sun.com/javase/technologies/core/toolsapis/jpda/[Java Platform Debugger Architecture (JPDA)] debugger.
+`JMS_PROVIDER_PORT`::
+  This property specifies the port number for the Jakarta Message Service provider.
+`JMX_SYSTEM_CONNECTOR_PORT`::
+  This property specifies the port number on which the JMX connector listens.
+`OSGI_SHELL_TELNET_PORT`::
+This property specifies the port number of the port that is used for connections to the http://felix.apache.org/site/apache-felix-remote-shell.html[Apache Felix Remote Shell].
++
+This shell uses the Felix shell service to interact with the OSGi module management subsystem.
+
+TIP: Valid port values are `1-65535`.
+
+WARNING: On UNIX operating systems, creating sockets that listen on ports `1-1024` requires superuser privileges.
+
+[[to-modify-a-named-configurations-properties]]
+=== To Modify a Named Configuration's Properties
+
+Use the `get` subcommand and the `set` subcommand in remote mode to modify a named configuration's properties.
+
+You might copy a configuration for use by instances that reside on the same host as instances that refer to the original configuration. In this situation, edit the properties of one of the configurations to ensure that instances that will refer to the configuration have the correct initial settings.
+
+If you change the port number in a configuration, the port number is changed for any instance that references or inherits the configuration.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. For each property that you are modifying, determine the current value and set the new value.
+. Determine the current value of the property.
++
+[source,shell]
+----
+asadmin> get configs.config.config-name.system-property.property-name.value
+----
++
+config-name::
+  The name of the configuration whose properties you are modifying.
+property-name::
+  The name of the property that you are modifying. For a list of available properties, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#properties-for-port-numbers-in-a-named-configuration[Properties for Port Numbers in a Named Configuration].
+
+. Set the property to its new value.
++
+[source,shell]
+----
+asadmin> set configs.config.config-name.system-property.property-name.value=new-value
+----
+config-name::
+  The name of the configuration whose properties you are modifying.
+property-name::
+  The name of the property that you are modifying. For a list of available properties, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#properties-for-port-numbers-in-a-named-configuration[Properties for Port Numbers in a Named Configuration].
+new-value::
+  The value to which you are setting the property.
+
+The following example changes the value of the `JMS_PROVIDER_PORT` property in the `cluster-presets-config` configuration from `27676` to `27678`.
+
+[source,shell]
+----
+asadmin> get configs.config.cluster-presets-config.system-property.JMS_PROVIDER_PORT.value
+
+configs.config.cluster-presets-config.system-property.JMS_PROVIDER_PORT.value=27676
+Command get executed successfully.
+
+asadmin> set configs.config.cluster-presets-config.system-property.JMS_PROVIDER_PORT.value=27678
+
+Command set executed successfully.
+----
+
+*See Also*
+
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/get.adoc[`get` command]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set` command]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help get`
+* `asadmin help set`
+
+[[to-modify-port-numbers-of-an-instance]]
+=== To Modify Port Numbers of an Instance
+
+Use the `get` subcommand and the `set` subcommand in remote mode to modify the port numbers of an instance.
+
+The port numbers of an instance are initially set in the configuration that the instance references or inherits from its parent cluster. Multiple instances that reside on the same host must each listen on a unique port number.
+
+Therefore, if multiple instances that reference or inherit the same configuration reside on the same host, a port conflict prevents all except one of the instances from starting. To avoid port conflicts, modify the port numbers on which individual instances listen.
+
+If you modify an instance's port number and later modify the port number in the instance's configuration, the instance's port number remains unchanged.
+
+The port numbers of an instance are stored as Java system properties. When Payara Server is started, it treats these properties in the same way as properties that are passed through the `-D` option of the Java application launcher.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. For each port number that you are modifying, determine the current value and set the new value.
+.  Determine the current value of the port number.
++
+[source,shell]
+----
+asadmin> get
+servers.server.instance-name.system-property.port-property.value
+----
+instance-name::
+  The name of the instance whose port numbers you are modifying.
+port-property::
+  The name of the property that corresponds to the port number that you are modifying. For a list of available properties, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#properties-for-port-numbers-in-a-named-configuration[Properties for Port Numbers in a Named Configuration].
+. Set the port number to its new value.
++
+[source,shell]
+----
+asadmin> get
+servers.server.instance-name.system-property.port-property.value=new-value
+----
+instance-name::
+  The name of the instance whose port numbers you are modifying.
+port-property::
+  The name of the property that corresponds to the port number that you are modifying. For a list of available properties, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#properties-for-port-numbers-in-a-named-configuration[Properties for Port Numbers in a Named Configuration].
+new-value::
+  The value to which you are setting the port number.
+
+The following example changes the port number of the HTTP port or the HTTPS port for administration of the `pmdsainst` instance from `24849` to `24859`.
+
+[source,shell]
+----
+asadmin> get servers.server.pmdsainst.system-property.ASADMIN_LISTENER_PORT.value
+
+servers.server.pmdsainst.system-property.ASADMIN_LISTENER_PORT.value=24849
+
+Command get executed successfully.
+asadmin> set servers.server.pmdsainst.system-property.ASADMIN_LISTENER_PORT.value=24859
+
+Command set executed successfully.
+----
+
+*See Also*
+
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/get.adoc[`get` command]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set` command]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help get`
+* `asadmin help set`

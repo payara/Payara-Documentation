@@ -1,0 +1,979 @@
+[[extended-notification-service-details]]
+= Extended Notification Service Details
+:ordinal: 11
+
+Payara Enterprise has additional notifiers built in and ready for use with your server environment that do not require further installation. These additional notifiers are pre-installed as *extensions* in the server module layout.
+
+TIP: If needed, notifiers can be removed from the server's environment to reduce overhead.
+
+[[summary]]
+== Notifier Extension Structure
+
+Each notifier extension is composed of 2 parts:
+
+[[core-module]]
+=== The Core Module
+
+The core module contains all the code necessary to receive notifications from the notification service and propagate them to their proposed channel. When installing this module, you'll get the admin commands to configure the notifier, as well as the ability to select that notifier in the notification sources such as Request Tracing commands and admin console pages.
+
+[[admin-console-plugin]]
+=== The Admin Console Plugin
+
+The admin console plugin contains all the code necessary to configure the notifier in the admin console. This is exclusively the tab in the notification service page. This module is not required for the notifier to function, but makes administrating the notifier easier.
+
+[[installation]]
+== Installing a Notifier
+
+To install a notifier extension: download the artifacts listed on the notifier documentation page and drop them into the `as-install/modules` directory of your Payara Server installation.
+
+You can then restart the server to see your extension activated.
+
+[[creating-custom-notifiers]]
+== Creating Customer Notifiers
+
+To create a new custom notifier, you'll have to create a new extension module that follows the structure outlined previously.
+
+Read the xref:Technical Documentation/Payara Server Documentation/Extensions/Custom Notifiers.adoc[custom notifiers section] to find detailed instructions and guidelines on how to create a custom notifier implementation.
+
+[[removing-notifiers]]
+== Removing Notifiers
+
+All Payara  Server notifiers are included in Payara Enterprise by default, however they are fully pluggable and can be removed from your Payara Server installation.
+
+To remove a notifier from Payara Enterprise edition, first find the relevant modules to the notifier you want to remove in `as-install/modules`. To fully remove the notifier, you should delete both the core module and the admin console plugin module files, then restart the domain.
+
+If you change your mind in the future, you can just drop both the module files back into the `as-install/modules` directory and restart the domain for the notifier to be re-installed.
+
+[[additional-notifiers]]
+== Additional Notifiers
+
+The following notifiers are available in Payara Server Enterprise:
+
+[[email-notifier]]
+=== Email Notifier
+
+Payara Server is able to direct notifications to a single given email address. The notifier modules are available in these locations:
+
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/email-notifier-core/2.0-enterprise/email-notifier-core-2.0-enterprise.jar[Email Notifier Core 2.0-enterprise]
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/email-notifier-console-plugin/2.0-enterprise/email-notifier-console-plugin-2.0-enterprise.jar[Email Notifier Console Plugin 2.0-enterprise]
+
+To use this notifier the following requirements have to be met:
+
+* A valid, configured `JavaMail` session.
+
+[[email-notifier-configuration]]
+==== Configuration
+
+At a high level, the steps to configure the email notifier are:
+
+. Create a `JavaMail` Session
+. Create the notifier using the `asadmin` command or through the Admin Console
+
+[[email-notifier-admin-console]]
+===== Using the admin console
+
+You will need a `JavaMail` session to send the notifications; instructions on setting up a `JavaMail` session can be found xref:docs::Technical Documentation/Payara Server Documentation/General Administration/Administering the Jakarta Mail Service.adoc[in this section].
+
+The email notifier is configured in the **Email** tab of the Notification Section of the server's instance configuration.
+
+On the Email tab there are four fields:
+
+`Enabled`::
+Determines whether the notifier should be activated.
+`Dynamic`::
+Sets whether the notifier will be enabled without a restart, `true`
+enables it immediately, while `false` requires a restart.
+`JavaMail JNDI Name`::
+Sets the name of the Java Naming and Directory Interface (JNDI) of the
+configured `JavaMail` session. The parameter name is `--jndiName` in the asadmin command.
+`Target Address`::
+Sets the email address which will receive the email notifications. Currently
+only one address can be specified. The parameter name is `--recipient` in the asadmin command.
+
+image:docs::notification-service/email/email-admin-console-configuration.png[Email Notifier on Admin Console]
+
+[[email-notifier-asadmin]]
+===== Using the Asadmin CLI
+
+The same configuration can be set using an `asadmin` command, as shown below:
+
+[source, shell]
+----
+asadmin set-email-notifier-configuration --jndiName=mail/exampleEmailNotifier --recipient=notifications@example.com --enabled=true --dynamic=true
+----
+
+To check the currently applied configuration, you can run the following `asadmin`
+command:
+
+[source, shell]
+----
+asadmin get-email-notifier-configuration
+----
+
+It will return the current configuration of the email notifier in full detail;
+including whether it is enabled, the recipient address, and the JNDI name of
+the current JavaMail session in use.
+
+Here is an example output:
+
+[source, shell]
+----
+Enabled  JNDI Name                  Recipient
+true     mail/exampleEmailNotifier  example@example.com
+----
+
+[[snmp-notifier]]
+=== SNMP Notifier
+
+The **S**imple **N**etwork **M**anagement **P**rotocol is a standard Internet Protocol that was designed to collect and organize information about all managed devices and services that belong to the same network. *SNMP* is supported by a huge variety of devices, including network devices like routers, modems and switches, servers and in the latter years extended to cover IoT devices and specialized equipment connected to the cloud.
+
+The notifier modules are available in these locations:
+
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/snmp-notifier-core/2.0-enterprise/snmp-notifier-core-2.0-enterprise.jar[SNMP Notifier Core 2.0-enterprise]
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/snmp-notifier-console-plugin/2.0-enterprise/snmp-notifier-console-plugin-2.0-enterprise.jar[SNMP Notifier Console Plugin 2.0-enterprise]
+* link:https://nexus.payara.fish/repository/payara-artifacts/fish/payara/server/core/packager/snmp4j-repackaged/3.7.5/snmp4j-repackaged-3.7.5.jar[Dependency: SNMP4J 3.7.5]
+
+IMPORTANT: Use the version of SNMP4J 3.7.5 provided above as it has a modified manifest to be compatible with Payara Enterprise.
+
+[[snmp-concepts]]
+==== SNMP Concepts
+
+The basic elements in every SNMP communication are the following:
+
+*Managed Component*::
+This is the device or service that is managed and monitored by SNMP, in this specific case, Payara Server.
+*SNMP Agent*::
+A specialized software that gathers data on the overall status of the managed component and exposes specific instructions over interfaces for its management. In our case, the SNMP Notifier acts as an SNMP agent.
+*SNMP Manager*::
+A server machine that runs a network management system, which is configured to monitor and manage all devices and services in a network by _"talking"_ to the agents and gathering all relevant information.
+
+The SNMP protocol works using _PDUs (Protocol Data Units)_ to allow managers and agents to work with a defined set of instructions.
+
+NOTE: The notifier currently operates using the *TRAP* PDU to handle notification events.
+
+[[snmp-traps]]
+==== SNMP Traps
+
+Payara Server notifies network management systems using SNMP traps. An SNMP trap is a special PDU that is used to generate an asynchronous notification from an _agent_ to a _manager_. An important point to stress with traps is that they are asynchronous events that can occur at any time, which means that a _manager_ expects to receive updates in a *PASSIVE* manner, thus saving resources.
+
+In order to correctly configure Payara Server to send traps to a manager, the following information must be reviewed in tandem with the configuration of the _manager_:
+
+*Hostname*:: This is the hostname of the server where the manager software resides.
+*Port*:: This is the UDP port where the manager software is receiving SNMP traps. By default, the protocol usually uses port *162*.
+*Version*:: The version used by the SNMP trap.
+*Community*:: This is the community string used to "secure" the communication to the manager
+*OID*:: The object identifier used by the trap in order to allow the manager to correctly interpret the status of the server.
+
+[[version]]
+===== Version
+
+Currently, the SNMP protocol is supported on three versions: *v1*, *v2c* and *v3*. Version 1 is extremely unsecure since authentication is managed only with the community string. Version 2c is an enhanced version of v1 in that improves the message formats and the protocol operations, using stronger authentication guards using the simplistic community string mechanism.
+
+Finally, Version 3 improves security and remote management discarding the use of community strings.
+
+Currently, the notifier configuration only supports *v1* and *v2c*, hence the need to correctly configure a community string as well. By default, all traps are configured to use *v2c*, since it's guaranteed to be supported by almost all network manager systems.
+
+[[community]]
+===== Community
+
+The community string is used to establish trust between managers and agents. The community names are essentially passwords; most vendors ship their equipment with default community strings: `public` for a read-only community (allows reading data values, but doesn't allow modification) and `private` for the read-write community (allowed to read and modify data values). It's important to change these defaults on production environments.
+
+The notifier configures all traps with the `public` community string by default.
+
+[[oid]]
+===== OID - Object Identifier
+
+Agents expose management data as variables composed in a structured hierarchy. SNMP does not define which variables are exposed by a managed component. Instead, SNMP uses an extensible design which allows applications and services to define their own hierarchies and other metadata (such as type and description of the variable), which are described in a *Management Information Base (MIB)*.
+
+MIBs describe the structure of the management data of a device subsystem using a hierarchical namespace composed of Object Identifiers (OID). Each OID uniquely identifies a variable sent in the SNMP trap by the agent.
+
+In order for a *network management system* to understand a trap sent to it by an agent, the management system must know what the OID defines. Therefore, it must have the MIB for that trap loaded in its configuration.
+
+The default value used by the notification service is `.1.3.6.1.2.1.1.8`. This OID represents a simple octet string that is used to hold the content of the notification event.
+
+NOTE: In most cases there is no need to change the default OID, since it's verified by most of the standard MIBs included on SNMP management systems and tools.
+
+[[snmp-notifier-configuration]]
+==== Configuration
+
+To set up the SNMP notifier on Payara Server you need to input the values mentioned earlier in the domain configuration. As usual, you can do this using the administration web console or from the command line.
+
+TIP: Keep in mind that the only required value to configure the notifier is the *hostname* of your network management system. All other values will assume the defaults discussed earlier if not configured explicitly.
+
+[[snmp-notifier-admin-console]]
+===== Using the Admin Console
+
+To configure the Notification Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_ and click on the *SNMP* tab:
+
+image:docs::notification-service/snmp/snmp-admin-console-configuration.png[Notification Service in Admin Console]
+
+[[snmp-notifier-asadmin]]
+===== Using the Asadmin CLI
+
+To configure the Notification Service from the command line, use the `set-snmp-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin set-snmp-notifier-configuration --enabled=true --dynamic=true --hostname=localhost --snmpport=162 --community=public --oid=".1.3.6.1.2.1.1.8" --version=v2c
+----
+
+You can use the `--enabled` and `--dynamic` options to enable or disable the SNMP notifier on demand.
+
+Also, you can retrieve the current configuration for the SNMP notifier using the `get-snmp-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin > get-snmp-notifier-configuration
+----
+
+This will return the details of the current SNMP configuration; see below for an example:
+
+[source, shell]
+----
+Enabled  Noisy  Community  OID                Version  Host       SNMP Port
+true     false  example    .1.3.6.1.2.1.1.8   v2c      127.0.0.1  162
+----
+
+[[snmp-troubleshooting]]
+==== Troubleshooting
+
+When you have correctly configured the SNMP notifier, it can be used to push notifications to your configured server. You can visualize the notification messages on your network management system of your choice.
+
+If you do not see any notification event messages, check the following:
+
+* Is the SNMP notifier enabled?
+* Is the Notification Service itself enabled?
+* Is there a service configured to use the notifier? (e.g. the HealthCheck service)
+* Is the service configured to send notifications frequently enough to observe?
+* Have you enabled the service after configuring it?
+* Does the SNMP network management supports SNMP traps?
+* Does the SNMP network management system support the configured protocol version?
+* Is the community string correctly supported by the SNMP network management system?
+* Are the SNMP management system's MIB correctly configured to verify traps sent with the configured OID?
+* Is there a firewall between Payara Server and the network management system that is correctly configured to allow sending SNMP traps in the respective port?
+
+Here's a sample of how the SNMP traps are visualized using http://www.mg-soft.com/tringer.html[MG-Soft Trap Ringer] software:
+
+image:docs::notification-service/snmp/trap-ringer-pro-output.png[SNMP Traps onTRinger]
+
+[[xmpp-notifier]]
+=== XMPP Notifier
+
+The **Ex**tensible **M**essaging and **P**resence **P**rotocol is a communication protocol based on *XML* notation, focused through the exchange of structured messages across services and devices on multiple network arrangements and targeted towards Message Oriented Middleware.
+
+Formerly known as *Jabber*, XMPP is an open standard, which means that anyone can implement toolsets used to send and receive messages across its implementations.
+
+The notifier modules are available in these locations:
+
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/xmpp-notifier-core/2.0-enterprise/xmpp-notifier-core-2.0-enterprise.jar[XMPP Notifier Core 2.0-enterprise]
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/xmpp-notifier-console-plugin/2.0-enterprise/xmpp-notifier-console-plugin-2.0-enterprise.jar[XMPP Notifier Console Plugin 2.0-enterprise]
+
+And these are the required dependencies for the core module to work correctly:
+
+* link:https://repo1.maven.org/maven2/org/igniterealtime/smack/smack-core/4.3.4/smack-core-4.3.4.jar[Dependency: smack-core 4.3.4]
+* link:https://repo.maven.apache.org/maven2/org/igniterealtime/smack/smack-java7/4.3.4/smack-java7-4.3.4.jar[Dependency: smack-java7 4.3.4]
+* link:https://repo.maven.apache.org/maven2/org/igniterealtime/smack/smack-tcp/4.3.4/smack-tcp-4.3.4.jar[Dependency: smack-tcp 4.3.4]
+* link:https://repo.maven.apache.org/maven2/org/igniterealtime/smack/smack-extensions/4.3.4/smack-extensions-4.3.4.jar[Dependency: smack-extensions 4.3.4]
+* link:https://repo.maven.apache.org/maven2/org/igniterealtime/smack/smack-im/4.3.4/smack-im-4.3.4.jar[Dependency: smack-im 4.1.9]
+* link:https://repo1.maven.org/maven2/org/apache/servicemix/bundles/org.apache.servicemix.bundles.xpp3/1.1.4c_7/org.apache.servicemix.bundles.xpp3-1.1.4c_7.jar[Dependency: XPP3 1.1.4c_7]
+* link:https://search.maven.org/remotecontent?filepath=org/jxmpp/jxmpp-jid/0.6.4/jxmpp-jid-0.6.4.jar[Dependency: jxmpp-jid 0.6.4]
+* link:https://search.maven.org/remotecontent?filepath=org/jxmpp/jxmpp-core/0.6.4/jxmpp-core-0.6.4.jar[Dependency: jxmpp-core 0.6.4]
+* link:https://search.maven.org/remotecontent?filepath=org/jxmpp/jxmpp-util-cache/0.6.4/jxmpp-util-cache-0.6.4.jar[Dependency: jxmpp-util-cache 0.6.4]
+* link:https://search.maven.org/remotecontent?filepath=org/minidns/minidns-core/0.3.4/minidns-core-0.3.4.jar[Dependency: minidns-core 0.3.4]
+
+[[xmpp-server-configuration]]
+==== XMPP Server Configuration
+
+XMPP works using a _client-server_ architecture, akin to other messaging solutions like MS Teams, Slack or IRC for example. Unlike those, XMPP is *decentralized*, which means that any person or organization can run its own server using a proprietary domain (which can be public or private depending on the user needs).
+
+There are multiple server implementations in the market, with both open source and commercial licensing models like the following:
+
+* https://mina.apache.org/vysper-project[Apache Vysper] (Open Source)
+* https://docs.oracle.com/en/industries/communications/instant-messaging-server/index.html[Oracle Communications Instant Messaging Server] (Commercial)
+* http://igniterealtime.org/projects/openfire/index.jsp[OpenFire] (Open Source)
+* https://www.communigate.com[CommuniGate Pro] (Commercial)
+* http://jabberd2.org/[Jabberd 2] (Open Source)
+
+No matter what XMPP server you or your organization is using, the XMPP Notifier will be able to communicate with it and push notifications to a specific chat room hosted on the server.
+
+The following are the requirements needed to be fulfilled by the XMPP
+server:
+
+. Configure the XMPP server with a valid domain name/FQDN
+. If considering secure communication, the XMPP server must have a valid SSL certificate configured for its FQDN
+. Configure the service for text-based conferencing (this service is usually named *conference* and is a subdomain of the server)
+. Create room that will be used to receive the notifications sent by Payara Server.
+. Create a user that is allowed to access the room created and push notification messages.
+
+We will use _OpenFire_ to illustrate how to correctly configure these requirements and the notifier. If you are using a different server, check its documentation and follow its instructions based on what's being done here.
+
+[[openfire-configuration]]
+===== OpenFire Configuration
+
+. Proceed to download and install the OpenFire server by following the instructions detailed http://download.igniterealtime.org/openfire/docs/latest/documentation/install-guide.html[here].
++
+Once the server is installed, start the OpenFire service and head to the server's admin console located at `http://{FQDN}:9090/`
+
+. Since the server was recently installed it will prepare a bootstrapping wizard.
++
+First, select the language that will be used by the administration interface:
++
+image:docs::notification-service/xmpp/openfire-install-1.png[OpenFire Language Select Screen]
+
+. Now, proceed to configure the domain name and _FQDN_ of your server. You can also alter the ports for the admin console and configure secure access using property encryption if necessary:
++
+image:docs::notification-service/xmpp/openfire-install-2.png[OpenFire Server Settings Screen]
+
+. To use OpenFire on production environments, it's recommended to install an external database used to store its configuration and data.
++
+For the sake of simplicity, we will use the embedded option instead:
++
+image:docs::notification-service/xmpp/openfire-install-3.png[OpenFire Database Select Screen]
+
+. Next, we have to configure the user data store that will back the server's authentication.
++
+Generally speaking, is not uncommon that an organization uses an **LDAP** directory to store profiles so that option is recommended on production environments.
++
+As with the previous configuration we will use the simpler option:
++
+image:docs::notification-service/xmpp/openfire-install-4.png[OpenFire Profile Screen]
+
+. Finally, configure the credentials for the *admin* user:
++
+image:docs::notification-service/xmpp/openfire-install-5.png[OpenFire Admin User Screen]
+
+. With the server installation complete, login to the admin console with the credentials of the administrator user:
++
+image:docs::notification-service/xmpp/openfire-login.png[OpenFire Login]
+
+. Now we need to create the user that will be used to push notifications on the service's room. Select the *User/Groups* option in the top menu:
++
+image:docs::notification-service/xmpp/openfire-users-1.png[OpenFire User Summary]
+
+. Click on the *Create New User* option in the sidebar. Input the information for this new user (*Username*, *Name* and *Password* are required):
++
+image:docs::notification-service/xmpp/openfire-users-2.png[OpenFire New User]
+
+. With the user created, we will proceed to create the room used to display notifications. Select the *Group Chat* option in the top menu:
++
+image:docs::notification-service/xmpp/openfire-create-room-1.png[OpenFire Room Summary]
+
+. Now, click on the *Create New Room* option in the sidebar. Be sure to input the room's *ID*, *Name* and *Description* as requested:
++
+image:docs::notification-service/xmpp/openfire-create-room-2.png[OpenFire New Room]
+
+. Check that the room was created successfully. Click on the room's link to enter its details. Take special note of the *Service Name*, which will be used to configure the notifier later:
++
+image:docs::notification-service/xmpp/openfire-room-details.png[OpenFire Room Details]
+
+. Finally, select the *Permissions* option in the sidebar and add the user we created earlier in the *Room Occupants* section. You can do this by searching using its username in the search box:
++
+image:docs::notification-service/xmpp/openfire-room-permissions.png[OpenFire Room Permissions]
+
+With this, the XMPP server configuration is completed.
+
+[[xmpp-notifier-configuration]]
+==== Notifier Configuration
+
+With the XMPP server properly configured, now it's time to set up the _Notification Service_ in the domain's configuration. As usual, you can do this using the administration web console or from the command line.
+
+The configuration settings required by the service are the following:
+
+_Server's Location_::
+_Hostname_ and _Port_ where the XMPP is listening for requests. The hostname is required, the port defaults to `5222` if not provided.
+_Service name_::
+Used by the XMPP server to manage group chat sessions, always required.
+_Room ID_::
+The ID of the room that will be used to host the notification events, always required.
+_Credentials_::
+The _Username_ and _Password_ of the user that will post notification events in the room.
+
+TIP: You can also configure an option whether to disable security transport (SSL) when establishing communication to the server. The default value for this setting is `false`. +
+It's not recommended to disable secure access on production environments, so use it with discretion.
+
+[[xmpp-notifier-admin-console]]
+===== Using the Administration Web Console
+
+To configure the Notification Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_ and click on the *XMPP* tab:
+
+image:docs::notification-service/xmpp/xmpp-admin-console-configuration.png[XMPP Notifier in Admin Console]
+
+Check the *Enabled* box (and the *Dynamic* box too if you don't want to restart the domain) and input the required information.
+
+Hit the *Save* button to preserve the changes.
+
+[[xmpp-notifier-asadmin]]
+===== Using the Asadmin CLI
+
+To configure the Notification Service from the command line, use the `set-xmpp-notifier-configuration` asadmin command, specifying the configuration options like this:
+
+[source, shell]
+----
+asadmin set-xmpp-notifier-configuration --enabled=true --dynamic=true --hostname="172.28.128.3" --xmppPort=5222 --username="payara_notifier" --password="******" --securityDisabled=false --roomId=server
+----
+
+You can use the `--enabled` and `--dynamic` options to enable or disable the XMPP notifier on demand.
+
+Also, you can retrieve the current configuration for the XMPP notifier using the `get-xmpp-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin get-xmpp-notifier-configuration
+
+Enabled  Noisy  Host          XMPP Port  Service Name            Username         Password  Security Disabled  Room ID
+true     false  172.28.128.3  5222       conference.payara.fish  payara_notifier  payara    true               server
+----
+
+[[xmpp-troubleshooting]]
+===== Troubleshooting
+
+When you have correctly configured the XMPP notifier, it can be used to push notifications to your configured server. You can visualize the messages in an XMPP client of your choice.
+
+If you do not see any notification event messages in the client, check the following:
+
+* Is the XMPP notifier enabled?
+* Is the Notification Service itself enabled?
+* Is there a service configured to use the notifier? (e.g. the HealthCheck service)
+* Is the service configured to send notifications frequently enough to observe?
+* Have you enabled the service after configuring it?
+* Is the XMPP server correctly configured?
+* Is there a firewall between both servers that is correctly configured to allow sending messages in the respective port?
+* Are the room permissions configured correctly?
+* If using secure transport, is the server configured with a valid SSL certificate for its _FQDN_?
+
+Here's a sample of how the notifications are visualized on a chat room using the https://www.igniterealtime.org/projects/spark/[Spark] XMPP client:
+
+image:docs::notification-service/xmpp/spark-chat.png[Spark Chat Room]
+
+[[newrelic-notifier]]
+=== New Relic Notifier
+
+https://newrelic.com/[New Relic] is an application performance monitoring (APM) tool that can be used to gather statistics and notify on key critical events generated by different type of applications.
+
+New Relic specializes on integrating Java application servers like GlassFish, JBoss WildFly, etc. and other application frameworks seamlessly.
+
+Payara Server includes a special notifier to send notifications from the xref:docs::Technical Documentation/Payara Server Documentation/General Administration/Administering the Notification Service.adoc[Notification service] to the New Relic **Insights service** using its remote API.
+
+Custom notification events generated from Payara Server's own monitoring systems like the Request Tracing and Healthcheck services can be automatically identified by this API and gathered correctly to identify performance issues on the application server.
+
+The notifier modules are available in these locations:
+
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/newrelic-notifier-core/2.0-enterprise/newrelic-notifier-core-2.0-enterprise.jar[New Relic Notifier Core 2.0-enterprise]
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/newrelic-notifier-console-plugin/2.0-enterprise/newrelic-notifier-console-plugin-2.0-enterprise.jar[New Relic Notifier Console Plugin 2.0-enterprise]
+
+[[newrelic-integration-configuration]]
+==== New Relic Configuration
+
+In order for the notifier to work correctly, you must complete the following requirements:
+
+. Create a New Relic user account. You can sign up for a new account https://newrelic.com/signup[here]
++
+NOTE: New Relic offers 14-days trial accounts that can be used to test the service for free.
+
+. Configure application performance monitoring (APM) for a Payara Server instance by installing a New Relic Java agent
+. Configure a New Relic Insights API key that will be used to set up the notifier.
+
+[[configure-apm]]
+==== Configure Application Performance Monitoring for Payara Server
+
+The first task is to set up the New Relic Java agent in Payara Server. To do that, follow these steps:
+
+. Login to New Relic with your account credentials, and if you haven't set up a monitoring agent yet, the following screen will be shown:
++
+image:docs::notification-service/newrelic/agent-setup-1.png[New Relic agent setup welcome screen]
+
+. Select the *Java* option and the agent installation procedure will be shown:
++
+image:docs::notification-service/newrelic/agent-setup-2.png[New Relic Java agent setup procedure]
++
+From the screen shown, copy the value of the _License Key_ (you need to press the *Reveal License Key* button first) since you will need it later.
+
+. Now, on the same screen press the *Download the Java Agent*. This will download the Java agent files to your station. Unzip the files and copy the resulting folder to the root folder of the Payara Server domain you want to monitor.
++
+In the following example we are copying it to the default domain `domain1`:
++
+[source, shell]
+----
+unzip newrelic-java-3.XX.X.zip
+mv newrelic as-install/domains/domain1
+----
+
+. Before proceeding to install the agent into the Payara Server domain, we need to configure the License Key we got earlier. To do this, modify the agent's configuration file that's located at `domain-dir/newrelic/newrelic.yml` by using the `license_key` property:
++
+[source, yaml, subs=attributes+]
+----
+  # ...
+  # This section is for settings common to all environments.
+  # Do not add anything above this next line.
+  common: &default_settings
+
+    # ============================== LICENSE KEY ===============================
+    # You must specify the license key associated with your New Relic
+    # account. ...
+    license_key: '073f5089681d0e96d5e0a9691251a626ea90286d'
+
+    # Agent Enabled
+    # Use this setting to disable the agent instead of removing it from the startup command.
+    # Default is true.
+    agent_enabled: true
+
+    # Set the name of your application as you'd like it to show up in New Relic.
+    # ...
+    app_name: Payara Server {page-version}
+
+    # ...
+----
++
+NOTE: We also recommend setting the name of the application under the `app_name` property to correctly identify this server's domain on the APM dashboard
+
+IMPORTANT: The License Key value must be inserted using single quotes (')
+
+. Now, proceed to install the agent by running the following command at the root of the domain folder:
++
+[source, shell]
+----
+java -jar newrelic/newrelic.jar install
+----
++
+If the installation was successful, the output of the agent's installer will show it like this:
++
+[source, log, subs=attributes+]
+----
+***** ( ( o))  New Relic Java Agent Installer
+***** Installing version 3.39.1 ...
+
+* Backed up start script to /opt/{page-version}/glassfish/domains/domain1/config/domain.xml.20170613_180108
+* Added agent switch to start script /opt/{page-version}/glassfish/domains/domain1/config/domain.xml
+
+* No need to create New Relic configuration file because:
+ A config file already exists: /opt/{page-version}/glassfish/domains/domain1/newrelic/newrelic.yml
+
+***** Install successful
+
+***** Next steps:
+You\'re almost done! To see performance data for your app:
+
+1) Restart your app server
+2) Exercise your app
+3) Log into http://rpm.newrelic.com
+
+Within two minutes, your app should show up, ready to monitor and troubleshoot.
+If app data doesn\'t appear, check newrelic/logs/newrelic_agent.log for errors.
+----
++
+The installer will modify the domain.xml configuration file of your server's domain and add the configuration of the Java agent as a JVM start argument:
++
+[source, xml]
+----
+<java-config classpath-suffix="" debug-options="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9009" system-classpath="">
+  <jvm-options>-javaagent:${com.sun.aas.instanceRoot}/newrelic/newrelic.jar</jvm-options>
+  <jvm-options>-server</jvm-options>
+  ...
+</java-config>
+----
++
+NOTE: The agent setup page has a different set of instructions for Windows and Linux environments, but they are so similar that the instructions mentioned here should be sufficient.
++
+TIP: If you are considering installing the New Relic Java agent on a Payara Server standalone instance or a cluster of multiple instances, you need to manually add the JVM (the installer won't work) option with the `javaagent` configuration to the instance/cluster referenced configuration. +
+Also, make sure that the directory where the _newrelic.jar_ resides also contains the `newrelic.yml` configuration file
+
+. Now that the agent has been installed, start the Payara Server domain. You will observe the following messages at the start of the domain's log
++
+[source, log, subs=attributes+]
+----
+INFO: New Relic Agent: Loading configuration file "/opt/{page-version}/glassfish/domains/domain1/newrelic/newrelic.yml"
+INFO: New Relic Agent: Writing to log file: /opt/{page-version}/glassfish/domains/domain1/newrelic/logs/newrelic_agent.log
+----
+
+. After some minutes with the server working, you can log in back to the New Relic portal and on the *APM* dashboard you can see a new entry for recently configured server:
++
+image:docs::notification-service/newrelic/apm-dashboard.png[New Relic APM Dashboard]
++
+You can also access the latest monitoring statistics:
++
+image:docs::notification-service/newrelic/apm-application-details.png[New Relic Application Details]
+
+[[retrieving-api-key]]
+===== Retrieving the API Key from New Relic Insights
+
+Now that the agent has been correctly installed, login back to your New Relic account portal and head to the *Insights* dashboard:
+
+image:docs::notification-service/newrelic/insights-dashboard.png[New Relic Insights Dashboard]
+
+Access the _Manage Data_ option on the side menu, you will be presented the following screen:
+
+image:docs::notification-service/newrelic/insights-api-keys-screen.png[New Relic Insights API Keys]
+
+Click on the `+` icon at the side of the *Insert Keys* header. Take note of the
+_Account ID_ and _API Key_ value on this screen. Also add a brief description to
+reference this key on the dashboard:
+
+image:docs::notification-service/newrelic/insights-insert-api-key.png[New Relic Insights Insert API Keys]
+
+[[newrelic-notifier-configuration]]
+==== Notifier Configuration
+
+With the New Relic Java agent and Insights API Key correctly configured, you can proceed to configure the New Relic notifier on the Payara Server domain. As usual, you can do this using the administration web console or from the command line.
+
+[[newrelic-notifier-admin-console]]
+===== Using the Administration Web Console
+
+To configure the Notification Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_ and click on the *New Relic* tab:
+
+image:docs::notification-service/newrelic/new-relic-admin-console-configuration.png[New Relic Configuration on Admin Console]
+
+Check the *Enabled* box (and the *Dynamic* box too if you don't want to restart the domain) and input the New Relic Account ID and the newly inserted
+Insights API Key. Hit the *Save* button to preserve the changes.
+
+[[newrelic-notifier-asadmin]]
+===== From the Command Line
+
+To configure the Notification Service from the command line, use the `set-newrelic-notifier-configuration` asadmin command, specifying the tokens like this:
+
+[source, shell]
+----
+asadmin set-newrelic-notifier-configuration --dynamic=true --enabled=true --accountId=1658989 --key=b5815wdxj6lF_tmMBljQa5y1603JTiLh
+----
+
+You can use the `--enabled` and `--dynamic` options to enable or disable the New Relic notifier on demand.
+
+Also, you can retrieve the current configuration for the New Relic notifier using the `get-newrelic-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin get-newrelic-notifier-configuration
+
+Enabled  Noisy  Key                               Account Id
+true     true   b5815wdxj6lF_tmMBljQa5y1603JTiLh  1658989
+----
+
+[[newrelic-troubleshooting]]
+==== Troubleshooting
+
+When you have correctly configured the New Relic notifier, it can be used observe notification events on the New Relic Insights service dashboard. If you do not see any notification event messages on the data explorer, check the following:
+
+* Is the New Relic notifier enabled?
+* Is the Notification Service itself enabled?
+* Is there a service configured to use the notifier? (e.g. the HealthCheck service)
+* Is the service configured to send notifications frequently enough to observe?
+* Have you enabled the service after configuring it?
+* Is the *Java Agent* for your Payara Server's domain correctly configured?
+* Have you created a valid API Key for the Insights service?
+* Does your account ID and the Insights API key match the ones configured on the Payara Server notifier?
+
+Here's a sample of how these notifications are visualized on the Data Explorer dashboard for the New Relic Insights service:
+
+image:docs::notification-service/newrelic/insights-data-explorer-results.png[New Relic Insights Data Explorer]
+
+You can observe that the events are correctly identified depending on the severity of the notification, and they are correctly grouped by their custom category (in the image only the *Healthcheck* events are shown).
+
+[[datadog-notifier]]
+=== Datadog Notifier
+
+https://www.datadoghq.com[Datadog] is a cloud metric aggregator that simplifies the gathering and visualization of multiple platform stacks and services that can be on premises or on the cloud. Datadog also eases browsing through of all this information by implementing combination graphs (multiple graphs that can be configured on a single view) of related metrics.
+
+Datadog supports gathering metrics from the following sources:
+
+* Cloud Providers (Amazon Web Services, Microsoft Azure, Google Cloud Platform)
+* Message Queues (Apache Kafka, ActiveMQ, RabbitMQ)
+* Code Repositories (GitHub, Bitbucket)
+* Clustering and DevOps Tools (Apache Mesos, Kubernetes, Docker)
+* Web Servers (Apache HTTP, Nginx, LightHTTP)
+* SQL and NoSQL Databases (MySQL, PostgreSQL, MongoDB, CouchBase)
+* Monitoring Solutions (New Relic, Nagios, Splunk, Amazon Cloud Trail)
+
+Payara Server includes a special notifier to send notifications from the xref:docs::Technical Documentation/Payara Server Documentation/General Administration/Administering the Notification Service.adoc[Notification service] to a Datadog account by means of an API key.
+
+IMPORTANT: Currently, the Payara Datadog notifier only supports the `US1 - East` region.
+
+The notifier modules are available in these locations:
+
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/datadog-notifier-core/2.0-enterprise/datadog-notifier-core-2.0-enterprise.jar[Datadog Notifier Core 2.0-enterprise]
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/datadog-notifier-console-plugin/2.0-enterprise/datadog-notifier-console-plugin-2.0-enterprise.jar[Datadog Notifier Console Plugin 2.0-enterprise]
+
+[[datadog-integration-configuration]]
+==== Datadog Account Integration
+
+When you create a Datadog account, the service will provide you a default API key that you can use to integrate Payara Server with your account.
+
+NOTE: You can sign up for a free trial account (14 days) if you want to test this integration without having to worry about a permanent subscription.
+
+Here are the instructions to retrieve the API keys:
+
+. First, access the Datadog administration panel located at https://app.datadoghq.com/. Then, in the side menu select your name in the bottom left _Organisation Settings_ -> _API Keys_ option:
++
+image:docs::notification-service/datadog/side-menu.png[Datadog Admin Panel Side Menu]
+
+. On the API Keys tab you will observe the default API Key available for integration:
++
+image:docs::notification-service/datadog/apikey-panel.png[Datadog API Key Panel]
++
+You can also create a new API key if you want to use it exclusively for your Payara Server installation.
+
+. Assign a name to the default API key or a newly created key, so you can identify which services or platform stacks are integrating with Datadog other than your Payara Server installation:
++
+image:docs::notification-service/datadog/apikey-name-dialog.png[Datadog API Key Name]
+
+[[datadog-notifier-configuration]]
+==== Notifier Configuration
+
+Having retrieved the API key from Datadog's administration panel, it's necessary to configure this key to the notification service on Payara Server. It's possible to do this either by using the administration web console or from the command line using administration commands.
+
+[[datadog-notifier-admin-console]]
+===== Using the Administration Web Console
+
+To configure the Notification Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_ and click on the *Datadog* tab:
+
+image:docs::notification-service/datadog/datadog-admin-console-configuration.png[Datadog Configuration on Admin Console]
+
+Check the *Enabled* box (and the *Dynamic* box too if you don't want to restart the domain) and input the three tokens highlighted in the previous section.
+
+Hit the *Save* button to preserve the changes.
+
+[[from-the-command-line]]
+===== From the Command Line
+
+To configure the Notification Service from the command line, use the `set-datadog-notifier-configuration` asadmin command, specifying the tokens like this:
+
+[source, shell]
+----
+asadmin set-datadog-notifier-configuration --dynamic=true --key=af510f122026bc9107f7c5f4f049e597 --enabled=true
+----
+
+You can use the `--enabled` and `--dynamic` options to enable or disable the Datadog notifier on demand.
+
+Also, you can retrieve the current configuration for the Datadog notifier using the `get-datadog-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin get-datadog-notifier-configuration
+
+Enabled  Noisy  Key
+true     false  af510f122026bc9107f7c5f4f049e597
+----
+
+[[datadog-troubleshooting]]
+==== Troubleshooting
+
+When you have correctly configured the Datadog notifier, Datadog can gather relevant monitoring events from your Payara Server installation. If you do not see any notification event messages on your Datadog account, check the following:
+
+* Is the Datadog notifier enabled?
+* Is the Notification Service itself enabled?
+* Is there a service configured to use the notifier? (e.g. the HealthCheck service)
+* Is the service configured to send notifications frequently enough to observe?
+* Have you enabled the service after configuring it?
+* Does the configured API key on Payara Server match one of the API keys configured on your Datadog account?
+* Is Datadog running in the US1 region?
+
+Here's a sample of how the notifications are visualized on the Datadog event notification panel (on the side menu select the _ServiceMgmt -> Events_ option):
+
+image:docs::notification-service/datadog/event-sample.png[Datadog Events Sample]
+
+[[teams-notifier]]
+=== MS Teams Notifier
+
+A notifier extension for publishing to a Microsoft Teams channel.
+
+The notifier modules are available in these locations:
+
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/teams-notifier-core/2.0-enterprise/teams-notifier-core-2.0-enterprise.jar[Teams Notifier Core 2.0-enterprise]
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/teams-notifier-console-plugin/2.0-enterprise/teams-notifier-console-plugin-2.0-enterprise.jar[Teams Notifier Console Plugin 2.0-enterprise]
+
+[[teams-notifier-configuration]]
+==== Notifier Configuration Configuration
+
+[[teams-notifier-admin-console]]
+===== Using the Administration Web Console
+
+To configure the Notification Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_ and click on the *Teams* tab:
+
+image:docs::notification-service/teams/teams-admin-console-configuration.png[Notification Service in Admin Console]
+
+[[teams-notifier-asadmin]]
+===== From the Command Line
+
+To configure the Notification Service from the command line, use the `set-teams-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin set-teams-notifier-configuration --enabled=true --dynamic=true https://outlook.office.com/webhook/xyz
+----
+
+You can use the `--enabled` and `--dynamic` options to enable or disable the Teams notifier on demand.
+
+You can retrieve the current configuration for the Teams notifier using the `get-teams-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin get-teams-notifier-configuration
+----
+
+This will return the details of the current Teams configuration; see below for an example:
+
+[source, shell]
+----
+Enabled  Noisy  Webhook URL
+true     false  https://outlook.office.com/webhook/xyz
+----
+
+[[slack-notifier]]
+=== Slack Notifier
+
+https://slack.com/[Slack] is a functional enterprise chat and team collaboration tool inspired by IRC. It allows an organisation to create specific *domains* and discuss work topics or subjects in separate *channels* that can either be public or private.
+
+This notifier sends notification events to an organisation's domain channel using Slack API integrations.
+
+The notifier modules are available in these locations:
+
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/slack-notifier-core/2.0-enterprise/slack-notifier-core-2.0-enterprise.jar[Slack Notifier Core 2.0-enterprise]
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/slack-notifier-console-plugin/2.0-enterprise/slack-notifier-console-plugin-2.0-enterprise.jar[Slack Notifier Console Plugin 2.0-enterprise]
+
+[[slack-integration-configuration]]
+==== Slack Integration Configuration
+
+In order to allow the notification service to log events on a Slack channel of your choice, you must fulfill the following requirements first:
+
+* Have created a Slack account within your organisation's domain (for example *payara.slack.com*)
+* Have a Slack account with granted permissions to create channels and configure API integrations.
+* Have created a Slack channel which will be used by the notification service to report notification events.
+
+Once you have completed these requirements, you can configure an link:https://api.slack.com/incoming-webhooks[Incoming Webhook integration] for the channel.
+
+An _Incoming Webhook_ is the simplest integration mechanism that Slack provides, in that they make use of normal HTTP requests with a _JSON_ payload that includes the message text and additional options to format incoming messages to the channel.
+
+[[configure-incoming-webhook]]
+===== Configure Incoming WebHook
+
+. First, access the developer portal's application directory located at https://payara.slack.com/apps.
++
+Then, in the search box type *Incoming Webhooks*. A suggestion will appear in the results display:
++
+image:docs::notification-service/slack/application-portal.png[Slack Application Portal]
+
+. Now, proceed to select the channel that the WebHook will use to direct the notification events to:
++
+image:docs::notification-service/slack/channel-selection.png[Incoming WebHook Channel Selection]
++
+NOTE: It's recommended to choose a _private_ channel, since it will keep these notifications events protected in case of unwanted disclosure, and it won't spam other users of your organisation with unwanted notifications
+
+. With this, the WebHook configuration is finished. Now, take special attention to the WebHook URL, which is usually follows this structure:
++
+----
+https://hooks.slack.com/services/{TOKEN1}/{TOKEN2}/{TOKEN3}
+----
++
+Like in the following sample:
++
+image:docs::notification-service/slack/webhook-url.png[WebHook URL Sample]
++
+We will use these 3 tokens when configuring the server's integration later.
++
+We recommend that you configure the following settings in the channel integration to give better visualization for your notifications:
++
+*Descriptive Label*:: Use a name that's easy to understand to identify this WebHook integration
+*Customize Name*:: Insert a name for the "agent" that will report the notification messages
+*Customize Icon*:: Insert a custom icon to identify the agent that will be visualized in the messages. We recommend using one of the Payara logos like in this sample:
++
+image:docs::notification-service/slack/webhook-additional-settings.png[WebHook Additional Settings]
+
+[[slack-notifier-configuration]]
+==== Notifier Configuration
+
+With the Incoming WebHook properly configured, now it's time to set up the Notification Service in the domain configuration. As usual, you can do this using the administration web console or from the command line.
+
+[[slack-notifier-admin-console]]
+===== Using the Administration Web Console
+
+To configure the Notification Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_ and click on the *Slack* tab:
+
+image:docs::notification-service/slack/slack-admin-console-configuration.png[Slack Configuration on Admin Console]
+
+Check the *Enabled* box (and the *Dynamic* box too if you don't want to restart the domain) and input the three tokens highlighted in the previous section. Hit the *Save* button to preserve the changes.
+
+[[slack-notifier-asadmin]]
+===== From the Command Line
+
+To configure the Notification Service from the command line, use the `set-slack-notifier-configuration` asadmin command, specifying the tokens like this:
+
+[source, shell]
+----
+asadmin set-slack-notifier-configuration --enabled=true --dynamic=true --token1=T43CHENUC --token2=B441EFQB1 --token3=Jas8P3jCZ4wK8Y2m88dCxGkn
+----
+
+You can use the `--enabled` and `--dynamic` options to enable or disable the Slack notifier on demand.
+
+Also, you can retrieve the current configuration for the Slack notifier using the `get-slack-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin get-slack-notifier-configuration
+
+Enabled  Noisy  Token 1    Token 2    Token 3
+true     false  T43CHENUC  B441EFQB1  Jas8P3jCZ4wK8Y2m88dCxGkn
+----
+
+[[slack-troubleshooting]]
+==== Troubleshooting
+
+When you have correctly configured the Slack notifier, it can be used to push notifications to your configured channel. If you do not see any notification event messages, check the following:
+
+* Is the Slack notifier enabled?
+* Is the Notification Service itself enabled?
+* Is there a service configured to use the notifier? (e.g. the HealthCheck service)
+* Is the service configured to send notifications frequently enough to observe?
+* Have you enabled the service after configuring it?
+* Is the *Incoming WebHook* correctly configured in the Slack API portal?
+* Check that you have not surpassed the current https://api.slack.com/docs/rate-limits[rate limit for the Slack API]
+
+Here's a sample of how the notifications are visualized on the Slack Desktop application:
+
+image:docs::notification-service/slack/notifications-sample.png[Slack Notifications Sample]
+
+[[discord-notifier]]
+=== Discord Notifier
+
+A notifier for publishing notifications to a Discord channel.
+
+The notifier modules are available in these locations:
+
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/discord-notifier-core/2.0-enterprise/discord-notifier-core-2.0-enterprise.jar[Discord Notifier Core 2.0-enterprise]
+* link:https://nexus.payara.fish/repository/payara-enterprise-downloadable-artifacts/fish/payara/extensions/notifiers/discord-notifier-console-plugin/2.0-enterprise/discord-notifier-console-plugin-2.0-enterprise.jar[Discord Notifier Console Plugin 2.0-enterprise]
+
+[[discord-notifier-configuration]]
+==== Notifier Configuration
+
+[[discord-notifier-admin-console]]
+===== Using the Administration Web Console
+
+To configure the Notification Service in the Administration Console, go to _Configuration -> [instance-configuration (like server-config)] -> Notification Service_ and click on the *Discord* tab:
+
+image:docs::notification-service/discord/discord-admin-console-configuration.png[Notification Service in Admin Console]
+
+[[discord-notifier-asadmin]]
+===== From the Command Line
+
+To configure the Notification Service from the command line, use the `set-discord-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin set-discord-notifier-configuration --enabled=true --dynamic=true --webhookId=xxx --webhookToken=yyy
+----
+
+Where the `xxx` and `yyy` are respectively the ID and token for the webhook you have configured within Discord.
+
+You can use the `--enabled` and `--dynamic` options to enable or disable the Discord notifier on demand.
+
+You can retrieve the current configuration for the Discord notifier using the `get-discord-notifier-configuration` asadmin command like this:
+
+[source, shell]
+----
+asadmin get-discord-notifier-configuration
+----
+
+This will return the details of the current Discord configuration; see below for an example:
+
+[source, shell]
+----
+Enabled  Noisy  Webhook ID  Webhook Token
+true     false  xxx         yyy
+----

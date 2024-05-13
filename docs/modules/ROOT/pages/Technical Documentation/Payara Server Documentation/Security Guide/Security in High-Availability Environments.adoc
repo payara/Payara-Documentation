@@ -1,0 +1,73 @@
+[[administering-security-in-ha-environment]]
+= Administering Security in a High-Availability Environment
+:ordinal: 4
+
+This chapter describes important information about administering security in a high availability environment (using traditional clusters or deployment groups).
+
+This chapter assumes that you are familiar with security features such as authentication, authorization, and certificates. If you are not, see xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#administering-system-security[Administering System Security].
+
+[[configuring-certificates-in-cluster-mode]]
+== Configuring Certificates in Cluster Mode
+
+The sections xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#certificates-and-secure-transport[Certificates and Secure Transport] and xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc[Administering JSSE Certificates] describe the relevant concepts and use of certificates in Payara Server.
+
+By default, Payara Server uses self-signed certificates. The self-signed certificates that Payara Server uses will not be trusted by clients by default because a certificate authority does not vouch for the authenticity of the certificate.
+
+You can instead use your own certificates, as described in xref:Technical Documentation/Payara Server Documentation/Security Guide/Managing Administrative Security.adoc[Using Your Own Certificates].
+
+[[dynamic-reconfiguration]]
+== Dynamic Reconfiguration
+
+Administrative commands that you execute on the domain administration server (DAS) must either be replicated on the affected server instances, or on all server instances that are part of a cluster or deployment group.
+
+Payara Server replicates the commands by sending the same administration command request that was sent to the DAS to the server instances. As a result of replicating the commands on the DAS and the individual instances, the DAS and the instances make the same changes to their respective copies of the domain's configuration.
+
+NOTE: It is recommended that you enable secure admin as described in xref:Technical Documentation/Payara Server Documentation/Security Guide/Managing Administrative Security.adoc#managing-administrative-security[Managing Administrative Security] so that Payara Server securely transfers these files on the network.
+
+Dynamic reconfiguration refers to using the `--target` operand to CLI subcommands to make a change to a server instance (if the user-specified target is a server instance), or all server instances that are part of a  cluster or deployment group (if the user-specified target is a cluster or deployment group).
+
+For example, in the following command:
+
+[source, shell]
+----
+asadmin create-jdbc-resource some-options --target some-target
+----
+
+The `--target` operand allows the following values:
+
+* `server` - Performs the command on the default server instance. This is the default value.
+* `configuration_name` - Performs the command in the specified configuration.
+* `cluster_name` - Performs the command on all server instances in the specified cluster.
+* `deployment_group_name` - Performs the command on all server instances in the specified deployment group.
+* `instance_name` - Performs the command on a specified server instance.
+
+If a command fails while targeting a cluster or deployment group, the status shows all server instances where dynamic reconfiguration failed, and suggests corrective measures to make progress.
+
+The command status also shows when a restart is required for each server instance.
+
+[[enabling-dynamic-configuration]]
+=== Enabling Dynamic Configuration
+
+Dynamic configuration is enabled by default and no additional action is required. Use the following command to enable dynamic configuration from the command line:
+
+[source, shell]
+----
+asadmin --user user --passwordfile password-file set <cluster-name-config>.dynamic-reconfiguration-enabled=true
+----
+
+To enable dynamic configuration from the Administration Console, perform the following steps:
+
+. Expand the _Configurations_ node.
+. Click the name of the cluster's configuration or a shared configuration object used by the instances of a deployment group.
+. On the _System Properties_ page, check the _Dynamic Reconfiguration_ Enabled box.
+. Save your changes.
+
+IMPORTANT: The dynamic reconfiguration feature applies only to server instances, not the DAS. Therefore, you cannot "disable" dynamic reconfiguration on the DAS. +
+Some commands and changes done in the DAS may be applied dynamically on the DAS, so consult the documentation on the command reference to find out if they support dynamic re-configuration on the DAS/
+
+[[understanding-synchronization]]
+== Understanding Synchronization
+
+As described in "xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#resynchronizing-payara-server-instances-and-the-das[Resynchronizing Payara Server Instances and the DAS]" in the High Availability section, configuration data for a Payara Server instance is stored in the repository of the DAS and in a cache on the host that is local to the instance.
+
+The configuration data in these locations must be synchronized. The cache is synchronized only when a user uses the administration tools to start or restart an instance.

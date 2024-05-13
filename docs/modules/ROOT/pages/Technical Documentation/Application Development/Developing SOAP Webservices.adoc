@@ -1,0 +1,139 @@
+[[developing-web-services]]
+= Developing SOAP Web Services
+:ordinal: 5
+
+This chapter describes Payara Server's support for SOAP-compatible web services. "https://eclipse-ee4j.github.io/jakartaee-tutorial/#building-web-services-with-jakarta-xml-web-services[Building with Jakarta XML Web Services]" in The Jakarta EE Tutorial shows more details on creating dedicated SOAP Web Services for any Jakarta EE runtime.
+
+For additional information about JAXB (Jakarta XML Binding), see https://jakarta.ee/specifications/xml-binding/[its corresponding specification] and xref:#the-databinding-provider[The Databinding Provider].
+
+For additional information about Jakarta XML Web Services,
+see https://jakarta.ee/specifications/xml-web-services/[its corresponding specification].
+
+For information about web services security, see xref:Technical Documentation/Application Development/Securing Applications.adoc#configuring-message-security-for-web-services[Configuring Message Security for Web Services].
+
+The Fast Infoset standard specifies a binary format based on the XML Information Set. This format is an efficient alternative to XML. For more information about using Fast Infoset, see the following links:
+
+* https://github.com/eclipse-ee4j/jaxb-fi[Fast Infoset Project]
+* https://www.w3.org/TR/xml-infoset/[XML Information Set]
+
+[[deploying-a-web-service]]
+== Deploying a Web Service
+
+You deploy a web service endpoint to Payara Server just as you would any servlet, stateless session bean (SLSB), or application.
+
+IMPORTANT: For complex services with dependent classes, user specified WSDL files, or other advanced features, auto-deployment of an annotated file is not sufficient.
+
+The Payara Server deployment descriptor files `glassfish-web.xml`/`payara-web.xml` and `glassfish-ejb-jar.xml` provide optional web service enhancements in the `webservice-endpoint` and `webservice-description` elements, including a `debugging-enabled` sub-element that enables the creation of a test page.
+
+The test page feature is enabled by default and described in xref:#the-web-service-uri-wsdl-file-and-test-page[The Web Service URI, WSDL File, and Test Page].
+
+[[the-web-service-uri-wsdl-file-and-test-page]]
+== The Web Service URI, WSDL File, and Test Page
+
+Clients can run a deployed web service by accessing its service endpoint address URI, which has the following format:
+
+[source,text]
+----
+http://${host}:${port}/${context-root}/${servlet-mapping-url-pattern}
+----
+
+The context-root is defined in the `application.xml` or `web.xml` file, and can be overridden in the `glassfish-application.xml` or
+`glassfish-web.xml`/`payara-web.xml` file. The servlet-mapping-url-pattern is defined in the `web.xml` file.
+
+In the following example, the context-root is `my-ws` and the servlet-mapping-url-pattern is `/simple` for local deployment in the default port:
+
+[source,text]
+----
+http://localhost:8080/my-ws/simple
+----
+
+You can view the WSDL file of the deployed service in a browser by adding `?WSDL` to the end of the URI. For example:
+
+[source,text]
+----
+http://localhost:8080/my-ws/simple?WSDL
+----
+
+For debugging, you can run a test page for the deployed service in a browser by adding `?Tester` to the end of the URL. For example:
+
+[source,text]
+----
+http://localhost:8080/my-ws/simple?Tester
+----
+
+This URL will show the SOAP Web Service Tester in the corresponding browser allowing users to quickly test their web services after deployment.
+
+You can also test a service using the Administration Console. Open the _Web Services_ component for the corresponding deployed application, select the web service in the listing on the _General_ tab, and select _Test_.
+
+WARNING: The tester webpage works only for WS-I compliant web services. This means that the tester servlet does not work for services with WSDL files that use RPC/encoded binding.
+
+The Web Service tester application is enabled by default. You can disable the test page for a web service by setting the value of the
+`debugging-enabled` element in the `glassfish-web.xml`/`payara-web.xml` and `glassfish-ejb-jar.xml` deployment descriptor to `false`.
+
+[[the-databinding-provider]]
+== The Databinding Provider
+
+To specify the Jakarta XML Binding provider implementation for the server runtime, set the `com.sun.xml.ws.spi.db.BindingContextFactory` JVM property to one of the following values:
+
+* `com.sun.xml.ws.db.glassfish.JAXBRIContextFactory`: Specifies the JAXB reference implementation in Payara Server (bundled within Metro). This is the default setting.
+* `org.eclipse.persistence.jaxb.JAXBContextFactory`: Specifies Eclipselink MOXy Jakarta XML bindings.
++
+For example:
++
+[source,shell]
+----
+asadmin create-jvm-options -Dcom.sun.xml.ws.spi.db.BindingContextFactory=org.eclipse.persistence.jaxb.JAXBContextFactory
+----
+
+To specify the Jakarta XML Binding provider for a *specific* web service endpoint, you have the following options:
+
+* Set the `com.oracle.webservices.api.databinding.DatabindingModeFeature` feature during `WebServiceFeature` initialization or using the `add` method.
++
+Allowed values are as follows:
++
+** `com.oracle.webservices.api.databinding.DatabindingModeFeature.GLASSFISH_JAXB`: Specifies the JAXB reference implementation (bundled within Metro). This is the default setting.
+** `org.eclipse.persistence.jaxb.JAXBContextFactory.ECLIPSELINK_JAXB`: Specifies Eclipselink MOXy JAXB binding.
++
+For example:
++
+[source,java]
+----
+import jakarta.xml.ws.WebServiceFeature;
+import com.oracle.webservices.api.databinding.DatabindingModeFeature;
+import org.eclipse.persistence.jaxb.JAXBContextFactory;
+
+WebServiceFeature[] features = {new DatabindingModeFeature(JAXBContextFactory.ECLIPSELINK_JAXB)};
+
+----
+
+* Set the `com.oracle.webservices.api.databinding.DatabindingModeFeature` feature using the `@DatabindingMode` annotation. For example:
++
+[source,java]
+----
+import jakarta.jws.WebService;
+import com.oracle.webservices.api.databinding.DatabindingMode;
+import org.eclipse.persistence.jaxb.JAXBContextFactory;
+
+@WebService
+@DatabindingMode(JAXBContextFactory.ECLIPSELINK_JAXB)
+public class MyWebService{
+}
+----
+
+IMPORTANT: To configure these features in your application at compile time you'll have to configure explicit dependencies to the Eclipse EE4J Metro and EclipseLink's projects.
+
+[[scanning-locations]]
+== Additional Scanning Locations
+
+Payara Server scans for specific JAX-WS files in locations further to those specified in the *JAX-WS* specification.
+
+Additional directories and sources are scanned are documented here.
+
+[[jax-ws-catalog]]
+=== `jax-ws-catalog.xml`
+
+The Jakarta XML Web Services specification states that the `jax-ws-catalog.xml` file should be searched for in the `META-INF` directory of a deployed `WAR` file relative to the classpath.
+
+Since the classpath of a WAR can be found in `/WEB-INF/classes/`, this means that this file is expected at `/WEB-INF/classes/META-INF/jax-ws-catalog.xml` (from the root of the `WAR` artifact).
+
+NOTE: Payara Server also searches for this file at `/WEB-INF/jax-ws-catalog.xml`.

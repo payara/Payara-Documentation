@@ -1,0 +1,316 @@
+[[running-in-a-secure-environment]]
+= Running in a Secure Environment
+:ordinal: 6
+
+This chapter describes important information about running Payara Server in a secure environment.
+
+This chapter assumes that you are familiar with security features such as authentication, authorization and certificates. If you are not, see xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#administering-system-security[Administering System Security] first.
+
+[[determining-your-security-needs]]
+== Determining Your Security Needs
+
+Before you deploy Payara Server and your Jakarta EE applications into a production environment, determine your security needs and make sure that you take the appropriate security measures.
+
+[[understand-your-environment]]
+=== Understand Your Environment
+
+To better understand your security needs, ask yourself the following questions:
+
+Which resources am I protecting?::
+
+Many resources in the production environment can be protected, including information in databases accessed by Payara Server and the availability, performance, applications, and the integrity of the website.
++
+Consider the resources you want to protect when deciding the level of security you must provide.
+
+From whom am I protecting the resources?::
+
+For most websites, resources must be protected from everyone on the Internet. But should the website be protected from the employees on an intranet in your enterprise infrastructure?
++
+Should your employees have access to all resources within the server environment?
++
+Should the system administrators have access to all Payara Server resources?
++
+Should the system administrators be able to access all data?
++
+You might consider giving access to highly confidential data or strategic resources to only a few well trusted system administrators. Perhaps it would be best to disallow system administrators access to the data or resources.
+
+What will happen if the protections on strategic resources fail?::
+
+In some cases, a fault in your security scheme is easily detected and considered nothing more than an inconvenience. In other cases, a fault might cause great damage to companies or individual clients that use the website.
++
+Understanding the security ramifications of each resource will help you protect it properly.
+
+[[installing-payara-server-in-a-secure-environment]]
+== Installing Payara Server in a Secure Environment
+
+This section describes recommendations for installing Payara Server in a secure environment.
+
+[[enable-the-secure-administration-feature]]
+=== Enable the Secure Administration Feature
+
+The secure administration feature allows an administrator to secure all administrative communication between the domain administration server (DAS), any remote instances, and administration clients such as the asadmin utility, the administration console, and REST clients.
+
+In addition, secure administration helps to prevent DAS-to-DAS and instance-to-instance traffic, and carefully restricts administration-client-to-instance traffic.
+
+When you install Payara Server or create a new domain, secure admin is disabled by default. Payara Server does not encrypt administrative communication among the system components and does not accept administrative connections from remote hosts.
+
+NOTE: Imposing a heightened level of security is optional.
+
+See xref:Technical Documentation/Payara Server Documentation/Security Guide/Managing Administrative Security.adoc#managing-administrative-security[Managing Administrative Security] for information on enabling the secure administration feature.
+
+[[run-on-the-web-profile-if-possible]]
+== Run on the Web Profile if Possible
+
+If your applications can run without issues on Payara Server's Web Profile, use that instead of the Full Profile. As the web profile is a subset of the full feature set of the Payara Platform, it has fewer features that require extra considerations for security (like ORB listeners, Web Services, Message Queue Brokers) which reduces the overall risks of the server's installation.
+
+[[securing-the-payara-server-host]]
+== Securing the Payara Server Host Machine
+
+A Payara Server production environment is only as secure as the security of the machine on which it is running. It is important that you secure the physical machine, the operating system, and all other software that is installed on the host machine.
+
+The following are basic recommendations for securing a Payara Server host in a production environment. Also check with the manufacturer of the machine and operating system for recommended security measures.
+
+IMPORTANT: The domain and server configuration files should be accessible only by the operating system users who configure or execute Payara Server processes.
+
+.Securing the Payara Server Host Machine
+
+[width="100%",cols="30%,70%a",options="header",]
+|=======================================================================
+|Security Action |Description
+|Physically secure the hardware.
+|Keep your hardware in a secured area to prevent unauthorized operating system users from tampering with the deployment machine or its network connections.
+
+|Log out of the Administration Console before navigating to a non-secure
+site.
+|If you are logged on to the Administration Console, be sure to
+log out completely before browsing to an unknown or non-secure website.
+
+|Secure networking services that the operating system provides.
+|Have a security professional review network services such as e-mail programs or directory services to ensure that a malicious attacker cannot access the operating system or system-level commands. These actions depend on the operating system used by the host machine.
+
+Sharing a file system with other machines in the enterprise network imposes risks of a remote attack on the file system. Be certain that the remote machines and the network are secure before sharing the file systems from the machine.
+
+|Use a file system that can prevent unauthorized access.
+|Make sure that the file system on each Payara Server host can prevent unauthorized access to protected resources.
+
+TIP: For example, on a Windows host, use only exFAT.
+
+|Set file access permissions for data stored on disk.
+|Set operating system file access permissions to restrict access to data
+stored on disk. This data includes, but is not limited to, the
+following:
+
+* The database files. Payara Server includes an integrated H2 database,however, you can use any JDBC-compliant database.
+
+* The directory and filename location of a private keystore, such as
+`keystore.p12`
+
+* The directory and filename location of a Root Certificate Authority (CA)
+truststore, such as `cacerts.p12`.
+
+*Nix operating systems provide utilities such as `umask` and `chmod`
+to set the file access permissions. At a minimum, consider using `umask
+066`, which denies read and write permission to the group owner and other users.
+
+|Set file access permission for the Payara Server installation.
+| The directory structure in which Payara Server is located, including all files, should be protected from access by unprivileged users.
+
+Taking this step helps ensure that unprivileged users cannot insert code that can potentially be executed by Payara Server.
+
+|Limit the number of user accounts on the host machine.
+| Avoid creating more user accounts than you need on host machines, and limit the file access privileges granted to each account.
+
+On operating systems that allow more than one system administrator user, the host machine should have two user accounts with system administrator privileges and one user with sufficient privileges to run Payara Server.
+
+Having two system administrator users provides a backup at all times. The Payara Server user should be a restricted user, not a system administrator user. One of the system administrator users can always create a new Payara Server user if needed.
+
+IMPORTANT: Domain and server configuration files should be accessible only by the operating system users who configure or execute Payara Server.
+
+CAUTION: Review active user accounts regularly and according to your organisation account management policies.
+
+Configuration data and some URL (Web) resources, including Java Server Pages (JSPs) and HTML pages, are stored in clear text on the file system. A sophisticated user or intruder with read access to files and directories might be able to defeat any security mechanisms you establish with authentication and authorization schemes.
+
+|For your system administrator user accounts, choose names that are not
+obvious.
+|For additional security, avoid choosing an obvious name such
+as "system," "admin," or "administrator" for your system administrator
+user accounts.
+
+|Safeguard passwords.
+|The passwords for user accounts on production machines should be robust, difficult to guess and should be guarded carefully.
+
+Set a policy to expire passwords periodically based on your organisation account management policies.
+
+WARNING: Never code passwords in client applications.
+
+|Safeguard password files
+|The `-passwordfile` option of the `asadmin` command specifies the name of a file that contains password entries in a specific format.
+
+These password entries are stored in clear text in the password file, and rely on file system mechanisms for protection. Therefore, any password file created for use with the `-passwordfile` option should be protected with file system permissions.
+
+Additionally, any password file being used for a transient purpose, such as setting up SSH among nodes, should be deleted after it has served its purpose.
+
+|Use password aliases
+|A password alias stores a password in encrypted form in the domain keystore, providing a clear-text alias name to use instead of the password.
+
+To provide additional security, use the `create-password-alias` subcommand to create an alias for the password. The password for which the alias is created is stored in an encrypted form.
+
+|Do not run Payara Server as root
+| Payara Server should run only as an unprivileged user, never as the `root` in *Nix systems or as an Administrator user in Windows systems.
+
+|Do not develop code on a production machine.
+|Develop your applications first on a development machine and then move code to the production machine when it is completed and tested.
+
+This process prevents bugs in the development environment from affecting the security of the production environment.
+
+|Do not install development or sample software on a production machine.
+|Do not install development tools on production machines. Keeping development tools off the production machine reduces the leverage intruders have should they get partial access to a production machine.
+
+|Enable security auditing.
+|If the operating system on which Payara Server runs supports security auditing of file and directory access, it is recommended using audit logging to track any denied directory or file access violations.
+
+NOTE: Administrators should ensure that sufficient disk space is available for the audit log.
+
+|Consider using additional software to secure your operating system.
+|Most operating systems can run additional software to secure a production environment. For example, an Intrusion Detection System (IDS) can detect attempts to modify the production environment.
+
+Refer to the vendor of your operating system for information about available software that can be used for this purpose.
+
+|Apply operating system patch sets and security patches. |Refer to the
+vendor of your operating system for a list of recommended patch sets and
+security-related patches.
+
+|Apply Java runtime security patches. |Refer to your official Java runtime version for a list of recommended security-related patches.
+
+NOTE: In general, whenever possible it is recommended to upgrade the Java runtime to its latest security patch on its corresponding major version.
+
+|=======================================================================
+
+[[securing-payara-server]]
+== Securing Payara Server
+
+Payara Server provides a powerful and flexible set of software tools for securing the subsystems and applications that run on a server instance. The following table provides a checklist of essential features recommended to secure your production environment.
+
+.Securing Payara Server
+
+[width="100%",cols="30%,70%a",options="header",]
+|=======================================================================
+|Security Action |Description
+
+|Enable Secure Admin.
+|The secure administration feature allows an administrator to secure all administrative communication between the domain administration server (DAS), any remote instances, and administration clients such as the `asadmin` utility, the administration console, and REST clients.
+
+In addition, secure administration helps to prevent DAS-to-DAS and instance-to-instance traffic, and carefully restricts administration-client-to-instance traffic.
+
+The secure administration feature provides a secure environment, in which you can be confident that rogue users or processes cannot intercept or corrupt administration traffic or impersonate legitimate Payara Server components.
+
+See xref:Technical Documentation/Payara Server Documentation/Security Guide/Managing Administrative Security.adoc#managing-administrative-security[Managing Administrative Security].
+
+|Protect the `.asadminpass` file
+|If you create a domain with the `--savelogin` option, `create-domain`
+ saves the administration username and password in the `.asadminpass` file in the user's home directory.
+
+Make sure that this file remains protected. Information stored in this file will be used by `asadmin` commands to manage the domain.
+
+|Safeguard password files
+|The `-passwordfile` option of the `asadmin` command specifies the name of a file that contains password entries in a specific format.
+
+These password entries are stored in clear text in the password file, and rely on file system mechanisms for protection. Therefore, any password file created for use with the `-passwordfile` option should be protected with file system permissions.
+
+Additionally, any password file being used for a transient purpose, such as setting up SSH among nodes, should be deleted after it has served its purpose.
+
+NOTE: To provide additional security, create a password alias.
+
+|Use SSL/TLS secured transport, but do not use the self-signed certificates in a production environment.
+|To prevent sensitive data from being compromised, secure data transfers
+by using HTTPS.
+
+By default, Payara Server uses self-signed certificates. The
+self-signed certificates that Payara Server uses will not be trusted
+by clients by default because a certificate authority does not vouch for
+their authenticity.
+
+You can instead use your own custom CA-issued certificates, as described in
+xref:Technical Documentation/Payara Server Documentation/Security Guide/Managing Administrative Security.adoc#using-your-own-certificates[Using Your Own Certificates].
+
+|Restrict the size and the time limit of requests on external channels
+to prevent *Denial of Service (DoS) attacks*.
+| To prevent some Denial of Service (DoS) attacks, restrict the size of a message as well as the maximum time it takes a message to arrive.
+
+NOTE: The default setting for maximum post size is `2097152` bytes and `900` seconds for the request timeout.
+
+|Enable authentication and authorization auditing. a|
+Auditing is the process of recording key security events in your Payara Server environment. You use audit modules to develop an audit trail of all authentication and authorization decisions. To enable audit logging on the Administration Console, two steps are required:
+
+. On the _Security_ page, select the _Audit Logging Enabled_ checkbox to enable audit logging.
+. Set the `auditOn` property for the active audit module to `true`.
+
+Review the auditing records periodically to detect security breaches and attempted breaches. Noting repeated failed logon attempts or a surprising pattern of security events can prevent serious problems.
+
+|Set appropriate logging for security and SSL log entries.
+|
+Consider setting module log levels for the `javax.enterprise.system.ssl.security.` and `javax.enterprise.system.core.security.` You can set a level from `SEVERE` to `FINEST` (the default is `INFO`), but be aware that the finer logging levels may produce a large log file.
+
+By default, Payara Server logging messages are recorded in the server log, and you can set the file rotation limit, as described in xref:Technical Documentation/Payara Server Documentation/Command Reference/rotate-log.adoc[`rotate-log`]
+
+|Ensure that you have correctly assigned users to the correct groups.
+|Make sure you have assigned the desired set of users to the right groups. In particular, make sure that users assigned to the `asadmin` group need to be members of that group.
+
+|Create no fewer than two user accounts in the `asadmin` group.
+|The default `admin` user is created when you install Payara Server or create a new domain and accept its default username.
+
+For production environments, create at least one other account in the `asadmin` group in case one account password is compromised. When creating asadmin users give them unique names that cannot be easily guessed.
+|=======================================================================
+
+[[securing-applications]]
+== Securing Applications
+
+Although much of the responsibility for securing Payara Server resources in a domain fall within the scope of the server, some security responsibilities lie within the scope of individual applications.
+
+For some security options, Payara Server enables you to determine whether the server or individual applications are responsible. For each application that you deploy in a production environment, review the items in the following table to verify that you have properly secured its resources.
+
+//TODO - Expand this section with modern recommendations
+
+.Securing Applications
+[width="100%",cols="30%,70%a",options="header",]
+|=======================================================================
+|Security Action |Description
+
+|Use JSP comment tags instead of HTML comment tags.
+|Comments in JSP files that might contain sensitive data and or other comments that are not intended for the end user should use the JSP syntax of `<%/* xxx */%>` instead of the HTML syntax `<!-- xxx -->`.
+
+JSP comments, unlike HTML comment blocks, are deleted when the JSP is compiled and therefore cannot be viewed in a web browser.
+
+|Do not install un-compiled JSPs and other source code on a production machine.
+| Always keep source code off of the production machine. Getting access to your source code allows an intruder to find security holes. Consider pre-compiling JSPs and installing only the compiled JSPs on the production machine.
+
+To do this, set the `deploy` subcommand `-precompilejsp` option to true for the component.
+
+When set to true, the `deploy` and `redeploy` subcommands `-precompilejsp` option compiles JSPs during deploy time. If set to `false` (the default), JSPs are compiled during runtime.
+
+|Configure your applications to use secure transport.
+|Set the `transport-guarantee` to
+`CONFIDENTIAL` in the `user-data-constraint` element of the `web.xml` deployment descriptor whenever appropriate.
+
+|Examine applications for security.
+| There are instances where an application's code can lead to a security
+vulnerability.
+
+Of particular concern is code that uses Java native interface (JNI) because Java positions native code outside the scope of the Java security model.
+
+If Java native code behaves in an errant manner, it is only constrained by the operating system. That is, the Java native code can do anything Payara Server itself can do. This potential vulnerability is further complicated by the fact that buffer overflow errors are common in native code and can be used to run arbitrary code.
+
+|If your applications contain untrusted code, enable the Java security manager.
+|The Java security manager defines and enforces permissions for classes that run within a JVM. In many cases, where the threat model does not include malicious code being run in the JVM, the Java security manager is unnecessary.
+
+However, when third parties use Payara Server and untrusted classes are being run, the Java security manager may be useful. See "xref:Technical Documentation/Application Development/Securing Applications.adoc#enabling-and-disabling-the-security-manager[Enabling and Disabling the Security Manager]" in the Application Development section.
+
+|Replace HTML special characters when servlets or JSPs return user-supplied data.
+|
+The ability to return user-supplied data can present a security vulnerability called cross-site scripting (XSS), which can be exploited to steal a user's security authorization.
+
+To remove this security vulnerability, before you return data that a user has supplied, scan the data for HTML special characters. If you find any such characters, replace them with their HTML entity or character reference. Replacing the characters prevents the browser from executing the user-supplied data as HTML.
+
+NOTE: Using third-party libraries that can sanitize the content of an HTML-formatted set of data is recommended in most cases.
+
+|=======================================================================

@@ -1,0 +1,222 @@
+[[request-tracing]]
+= Using Request Tracing in Applications
+:ordinal: 23
+
+Request Tracing in the Payara Platform is done either automatically, by using the MicroProfile OpenTracing `@Traced` annotation or by utilizing OpenTelemetry/OpenTracing APIs. This chapter covers manually decorating your applications to enable explicit Request Tracing.
+
+[[terminology]]
+== Terminology
+
+[[traces-and-spans]]
+=== Traces & Spans
+
+A Span is a named, timed operation that represents an individual unit of work, such as the execution of a JAX-RS method. Since a Span is a unit of work, they typically contain references to other Spans to represent the work in its entirety.
+
+A Trace is the term used to describe the collection of Spans that make up an entire request’s lifecycle from the viewpoint of the Payara Platform: from the request hitting the server to it leaving. A Trace can be made up of simply one Span.
+
+[[references]]
+=== References
+
+The references between Spans are of one of two types: "Child of" or "Follows from":
+
+* _"Child of"_ references are used to denote that a Span is the child of another Span, e.g. a sub-unit of work.
+* _"Follows from"_ references are used to denote that a Span was spawned by another Span, but is not a subunit of work of the parent Span (the parent Span does not depend on the child Span).
+
+[[tags-and-logs]]
+=== Tags and Logs
+
+A Span Tag is simply a `key:value` pair that is added to a Span to provide details about the unit of work. For example, JAX-RS methods automatically set the `http.url` tag to provide information about the URL traced.
+
+A Span Log is a Tag that is paired with a timestamp. As denoted by the name, this is typically used to add information to a Span about an event happening at a specific time during the duration of the Span (e.g. an error).
+
+[[using-the-traced-annotation]]
+== Using the `@Traced` Annotation
+
+The `@Traced` annotation can be placed on CDI Bean methods to automatically trace each call of the method. You can also place the annotation on the class itself to trace all methods within the class, rather than adding the annotation to each method individually.
+
+The `@Traced` annotation accepts two optional parameters:
+
+`operationName`:: defines the operation name of the span. If left blank it will default to the canonical method signature.
+`value`:: a boolean true or false to determine if the method should be traced. Defaults to true.
+
+[source, java]
+----
+import org.eclipse.microprofile.opentracing.Traced;
+
+@RequestScoped
+public class TracedExample {
+
+    @Traced
+    public String method1() {
+        return "anon1";
+    }
+
+    @Traced(operationName = "tracingTest")
+    public String method2() {
+        return "anon2";
+    }
+
+}
+----
+
+The `@Traced` the annotation operates as an Interceptor, so for the decorated methods of
+your CDI Beans to be traced they need to be a) not static or private, and b) accessed externally or via self-injection. This means that in the following example, `method1` of the above class would be traced, and `method2` would not:
+
+[source, java]
+----
+@Path("/")
+@RequestScoped
+public class JaxrsEndpoints {
+
+    @Inject
+    TracedExample tracedExample;
+
+    @GET
+    public String method1Traced() {
+        return tracedExample.method1();
+    }
+
+    @GET
+    public String method2NotTraced() {
+        return new TracedExample().method2();
+    }
+
+}
+----
+
+TIP: Annotations applied to methods take precedence over those applied to classes. This allows you to whitelist or blacklist methods for tracing.
+
+The Maven dependency to add to your application to get access to the `@Traced` annotation is the following:
+
+[source, xml]
+----
+<dependency>
+    <groupId>org.eclipse.microprofile.opentracing</groupId>
+    <artifactId>microprofile-opentracing-api</artifactId>
+    <version>{mpOpenTracingVersion}</version>
+    <scope>provided</scope>
+</dependency>
+----
+
+[[using-the-tracer-class]]
+== Using the OpenTracing `Tracer` class
+
+The OpenTracing `Tracer` class allows you to manually start, finish, and add information to Spans.
+
+To access the tracer in your applications, you can inject it like so:
+
+[source, java]
+----
+import io.opentracing.Tracer;
+
+public class TracedComponent{
+
+    @Inject
+    Tracer tracer;
+}
+----
+
+CAUTION: You can only inject a Tracer when your application is running inside a Payara Platform runtime you cannot do so from a Java SE client. From a Java SE client you must use the OpenTracing.io `GlobalTracer` class, see xref:Technical Documentation/Application Development/Using Jakarta Enterprise Beans Technology.adoc#getting-a-tracer[here] for more details.
+
+Starting a Span, marking it as the active Span (the one from which any children will spawn), and ending it is done like so with a _try-with-resources_ block:
+
+[source, java]
+----
+import io.opentracing.Tracer;
+
+public class TracedComponent{
+    public void tracerExample() {
+        try (Span span = tracer.buildSpan("example").startActive(true)) {
+            // Code to trace
+        }
+    }
+}
+----
+
+If you wish to add any Tags or Logs to your Spans, even those started by the `@Traced` annotation, you can do this like so:
+
+[source, java]
+----
+import io.opentracing.Tracer;
+
+@Path
+@RequestScoped
+public class TracedResource{
+
+    @Inject
+    Tracer tracer;
+
+    @GET
+    @Path
+    @Traced
+    public String example2() {
+        tracer.activeSpan().setTag("exampleTag", "foo").log("exampleLog");
+        return "anon";
+    }
+}
+----
+
+The `Tracer` class also gives you access to the `inject` and `extract` methods, which you can use for tracing across threads and processes. It is recommended however that you simply use a Managed Executor Service for your asynchronous tasks and the default JAX-RS client implementation or MicroProfile REST Client for JAX-RS calls as these will automatically do this for you.
+
+[[disabling-automatic-tracing]]
+== Disabling Automatic Tracing of JAX-RS Methods and MicroProfile REST Client Calls
+By default, calls to JAX-RS methods and any calls by a MicroProfile REST Client are traced.
+
+[[disabling-jaxrs-tracing]]
+=== Disabling Automatic Tracing of JAX-RS Methods
+
+To disable tracing of JAX-RS methods, you can use the `@Traced` annotation on each method or class that you wish to skip tracing of.
+
+[source, java]
+----
+import org.eclipse.microprofile.opentracing.Traced;
+
+@Path("/")
+@RequestScoped
+public class JaxrsEndpoints {
+
+    @Inject
+    TracedExample tracedExample;
+
+    // Automatically traced
+    @GET
+    public String method1Traced() {
+        return tracedExample.method1();
+    }
+
+    // Tracing disabled
+    @GET
+    @Traced(false)
+    public String method2NotTraced() {
+        return new TracedExample().method2();
+    }
+}
+----
+
+You can also use tracing of JAX-RS methods by defining a skip pattern using a
+MicroProfile Config properties file or config source. These skip patterns accept Java regular expressions to match against the URI of your JAX-RS methods.
+
+[source, shell]
+----
+mp.opentracing.server.skip-pattern=/foo|/bar.*
+----
+
+[[disabling-microprofile-rest-client-tracing]]
+=== Disabling Automatic Tracing of MicroProfile REST Client
+
+To disable tracing of MicroProfile REST Client calls, annotate the client interface or method with `@Traced(false)`.
+
+[source, java]
+----
+import org.eclipse.microprofile.opentracing.Traced;
+
+@Traced(false)
+@Path("/")
+public interface ExampleClient {
+
+    @GET
+    @Path("test")
+    @Produces(MediaType.TEXT_PLAIN)
+    Response example();
+}
+----

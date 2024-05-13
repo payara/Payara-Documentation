@@ -1,0 +1,107 @@
+[[using-datagrid-in-your-applications]]
+= Using the Data Grid in your Applications
+:ordinal: 21
+
+This section details how to use the underlying Data Grid Hazelcast instance in Payara Server within application code.
+
+[[accessing-the-jndi-registered-hazelcast-instance]]
+== Accessing the Hazelcast instance via JNDI
+
+By default, the JNDI name of the hazelcast instance is `payara/Hazelcast`, though this can be altered using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set-hazelcast-configuration.adoc[set-hazelcast-configuration] command. You will need to import the following packages into your Java class:
+
+[source, java]
+----
+import com.hazelcast.core.HazelcastInstance;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+----
+
+To import the requisite Hazelcast classes, you will need to set add the Public API artefact as a dependency in the project's `pom.xml` file (in case of Maven projects), or have the Hazelcast JAR set as a project dependency (if using a non-Maven based project).
+
+Here's the Maven dependency:
+
+[source, xml]
+----
+<dependency>
+  <groupId>fish.payara.api</groupId>
+  <artifactId>payara-api</artifactId>
+  <version>${page-version}</version>
+</dependency>
+----
+
+The Hazelcast JAR (for non-Maven projects), can either be downloaded from the http://hazelcast.org/download/[Hazelcast website], or you can make use of the JAR that is packaged in Payara Server. The JAR packaged with Payara can be found at `<Payara Installation Directory>/glassfish/modules/hazelcast.jar`.
+
+The following code sample will initialize a `HazelcastInstance` variable in the instance embedded in Payara:
+
+[source, java]
+----
+public class Component{
+
+    public void businessMethod(){
+        var ctx = new InitialContext();
+        HazelcastInstance instance = (HazelcastInstance) ctx.lookup("payara/Hazelcast");
+    }
+}
+----
+
+WARNING: It is recommended to wrap this block in a `try-catch` clause, since a `NamingException` exception can be generated due to the use of JNDI.
+
+[[using-hazelcast-for-the-web-and-ejb-container-persistence]]
+== Using Hazelcast for Web and EJB Container Persistence
+
+Hazelcast can be used as the persistence provider for both the Web and EJB containers.
+
+[[setting-hazelcast-as-the-persistence-provider-through-the-admin-console]]
+=== Setting Hazelcast as the Persistence provider through the Admin Console
+
+NOTE: Payara Server's initial configuration has the `hazelcast` option as the default setting.
+
+To set up Hazelcast for persistence:
+
+. Select the instance's configuration from the page tree:
+. Select _"Availability Service"_ to view the _"Availability Service"_ page:
++
+image::hazelcast/hazelcast-admin-console-select-availability-service.png[Availability Service]
+
+[[setting-web-persistence]]
+==== Setting Web Persistence
+
+. Open the "Web Container Availability" tab, and select "Hazelcast" from the _Persistence Type_ drop-down menu:
++
+image::hazelcast/hazelcast-admin-console-availability-enable-web-persistence.png[Web Persistence]
+
+. Save the changes.
+
+[[setting-ejb-persistence]]
+==== Setting EJB Persistence
+
+. Open the "EJB Container Availability" tab and select "Hazelcast" from the _Persistence Type_ drop-down menu:
++
+image::hazelcast/hazelcast-admin-console-availability-enable-ejb-persistence.png[EJB Persistence]
+
+. Save the changes.
+
+[[setting-hazelcast-as-the-persistence-provider-using-asadmin]]
+=== Setting Hazelcast as the Persistence provider from the Command Line
+
+To configure the persistence provider with the _asadmin_ CLI, you have to use the _set_ command.
+
+[[for-the-web-container-1]]
+==== For the Web Container
+
+To set Hazelcast as the persistence provider of the Web Container, run the following command:
+
+[source, shell]
+----
+asadmin> set <cluster-config>.availability-service.web-container-availability.persistence-type=hazelcast
+----
+
+[[for-the-ejb-container-1]]
+==== For the EJB Container
+
+To set Hazelcast as the persistence provider of the EJB Container, run the following command:
+
+[source, shell]
+----
+asadmin> set <cluster-config>.availability-service.ejb-container-availability.sfsb-ha-persistence-type=hazelcast
+----

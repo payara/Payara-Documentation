@@ -1,0 +1,317 @@
+[[lite-remote-ejb]]
+= Using Lite Remote EJB Technology
+:ordinal: 10
+
+For scenarios when communication with remote EJBs is needed across a complex network topology or when a server architecture is deployed on a cloud provider, there's a new feature for the EJB server and client applications: A lite and thin client that can be used to communicate via HTTP(S) instead of IIOP-RMI.
+
+Payara Server has support for classic remote EJB since its inception. Classic remote EJB uses the **IIOP-RMI** (Internet Inter-ORB Protocol Remote Method Invocation) protocol for transport communication and the https://omg.org/spec/SEC[CSIv2] (Common Secure Interoperability Protocol Version 2) protocol for security.
+
+While feature rich, these protocols were not designed with firewalls, NAT, (private) clouds, Docker and generally the Internet in mind. For these environments the requirements of the protocol, such as establishing independent connections back from the server to the client, are too troublesome.
+
+The **IIOP-RMI/CSIv2** also requires the use of multiple heavyweight client libraries. In the case of Payara Server the client library (either referenced by the `gf-client.jar` library or the `payara-embedded-all` dependency) is almost as big as the entire server as it's essentially a special form of the ACC (Application Client Container). For this reason a much-needed modernization of the transport and security protocols was needed, and for the environments described only one protocol really works, and that is the HTTP(S) protocol.
+
+Payara Server features an additional complimentary EJB remoting technology based on the HTTP(S) protocol while favoring the use of a thin client library that make remote applications much lighter while circumventing known challenges for the Internet and other scenarios.
+
+IMPORTANT: HTTP(S) for EJB Remoting in Payara Server is a completely different feature from the classic IIOP-RMI/CSIv2-based feature, and does not intend to replace the transport layer protocol used on it, rather it is implemented as an additional independent feature.
+
+IMPORTANT: TX Propagation and Security Propagation is *not supported* by EJB Remoting in Payara Server.
+
+WARNING: In the current version of this feature, not all remote EJB features are implemented yet.
+
+[[configuring-http-for-remote-ejb]]
+== Configuring HTTP(S) for Remote EJBs
+
+HTTP(S) for EJB remoting in Payara Server makes use of a special web endpoint on which is located by default on the path `/ejb-invoker`.
+
+//TODO - A new section in General Administration should be introduced in order to teach the user how to configure the EJB invoker HTTP endpoint.
+
+IMPORTANT: This endpoint is disabled out of the box, and it can be enabled using the `set-ejb-invoker-configuration` asadmin command.
+
+[[configuring-thin-client]]
+== Configuring the Thin Client Dependency
+
+Client applications that wish to use HTTP(S) as the transport protocol when calling remote EJBs will have to use a *special thin-client* dependency. To do this, you can add the following Maven dependency to your client project:
+
+[source, xml]
+----
+<dependency>
+    <groupId>fish.payara.extras</groupId>
+    <artifactId>ejb-http-client</artifactId>
+    <version>{page-version}</version>
+</dependency>
+----
+
+This artifact requires a patched version of the Jersey client which is pulled intransitive. This patched version is available within our https://nexus.payara.fish/repository/payara-artifacts[Payara Nexus Repository].
+The Maven repository definition is present in the pom.xml file of the `ejb-http-client` artifact. However, when your dependencies are managed by a private artifact repository, for example, you might need to update it to refer to the Payara Nexus repository.
+
+Also, we recommend having a look at the BOM feature so that versions can be defined more consistently.
+
+Finally, the code that executes the call to the remote EJB must be modified in some manner. To obtain a type-safe proxy for any remote EJB bean, the traditional approach via JNDI is still used. An example is given below:
+
+. First, consider the following remote EJB interface:
++
+[source, java]
+----
+@Remote
+public interface BeanRemote {
+    String method();
+}
+----
+
+. Second, consider a (secured) EJB that implements that interface and resides in a EJB application called "test" deployed on a Payara server instance that is listening in `http://localhost:8080`:
++
+[source, java]
+----
+@Stateless
+public class Bean implements BeanRemote, Serializable {
+    private static final long serialVersionUID = 1L;
+    @Override
+    @RolesAllowed("g1")
+    public String method() {
+        return "method";
+    }
+}
+----
+
+. Given the above, the following client code can be used to obtain a proxy to the `BeanRemote` bean and invoke a remote method defined on it:
++
+[source, java]
+----
+import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
+import static javax.naming.Context.PROVIDER_URL;
+import java.util.Properties;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+public class RemoteEJBLiteClient{
+    public static void main(String... args) throws NamingException{
+        Properties environment = new Properties();
+        environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
+        environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
+        InitialContext ejbRemoteContext = new InitialContext(environment);
+        BeanRemote beanRemote = (BeanRemote) ejbRemoteContext.lookup("java:global/test/Bean");
+        beanRemote.method(); // returns "method"
+    }
+}
+----
+
+[[calling-secured-bean]]
+=== Calling a Secured Remote EJB
+
+When calling a secured EJB using the `ejb-invoker` endpoint, there are some considerations in place for the client code:
+
+. If the remote EJB is secured with transport confidentiality (and integrity) enabled like this:
++
+[source, xml]
+----
+<ejb>
+    <ejb-name>Bean</ejb-name>
+    <ior-security-config>
+        <transport-config>
+            <integrity>REQUIRED</integrity>
+            <confidentiality>REQUIRED</confidentiality>
+            <establish-trust-in-target>SUPPORTED</establish-trust-in-target>
+            <establish-trust-in-client>SUPPORTED</establish-trust-in-client>
+        </transport-config>
+    </ior-security-config>
+</ejb>
+----
++
+Then, the corresponding HTTP endpoint to use would be `https://localhost:8181/ejb-invoker` instead.
+
+. If the remote EJB also has authentication enabled (via username and password credentials) like this:
++
+[source, xml]
+----
+<ejb>
+    <ejb-name>Bean</ejb-name>
+    <as-context>
+        <auth-method>USERNAME_PASSWORD</auth-method>
+        <realm>default</realm>
+        <required>true</required>
+    </as-context>
+</ejb>
+----
++
+Then the credentials required to correctly authenticate the user for the call have to be specified in the JNDI context with the following properties:
++
+* `javax.naming.Context.SECURITY_PRINCIPAL` for the username
+* `javax.naming.Context.SECURITY_CREDENTIALS` for the password
+
+Here's an example of the complete client code used to call a secured remote EJB:
+
+[source, java]
+----
+import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
+import static javax.naming.Context.PROVIDER_URL;
+import static javax.naming.Context.SECURITY_CREDENTIALS;
+import static javax.naming.Context.SECURITY_PRINCIPAL;
+import java.util.Properties;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+public class RemoteEJBLiteClient{
+
+    public static void main(String... args) throws NamingException{
+        Properties environment = new Properties();
+        environment.put(INITIAL_CONTEXT_FACTORY,"fish.payara.ejb.rest.client.RemoteEJBContextFactory");
+        environment.put(PROVIDER_URL, "https://localhost:8181/ejb-invoker");
+        environment.put(SECURITY_PRINCIPAL, "u1");
+        environment.put(SECURITY_CREDENTIALS, "p1");
+        InitialContext ejbRemoteContext = new InitialContext(environment);
+        BeanRemote beanRemote = (BeanRemote) ejbRemoteContext.lookup("java:global/test/Bean");
+        beanRemote.method(); // returns "method"
+    }
+}
+----
+
+IMPORTANT: When accessing secured EJBs you *should* use only HTTPS (that means, enabling confidential transport requirements to the remote EJB), as the submitted credentials will be transferred in clear text (not encrypted, only base64 encoded), which is a security risk you should avoid in any production environment.
+
+[[jndi-customization-options]]
+=== JNDI Customization Options
+
+Under the covers the remote EJB proxy uses a JAX-RS (Jersey) REST client builder in order to establish communication with the remote server. If you want to customize and modify the parameters for this communication (timeouts, keystores, etc.) the following JNDI context properties can be used to this end:
+
+[cols="6,10,10",options="header"]
+.`JNDI Options for Custom HTTP(S) Communication`
+|===
+|Property |Behaviour| Type
+|`fish.payara.connectTimeout`
+| The connection timeout. A value of *0* represents that the wait is indefinite. Negative values are not allowed. Unit is microseconds.
+| `Number` (from which it's `Long` value is taken) or a `String` that can be converted to a `Long` value.
+|`fish.payara.readTimeout`
+| The timeout to read a response. If the remote Payara doesn't respond within the defined time a ProcessingException is thrown with a `TimeoutException` as its cause. A value of *0* represents that the wait is indefinite. Negative values are not allowed. Unit is microseconds.
+| `Number` (from which it's `Long` value is taken) or a `String` that can be converted to a `Long` value.
+|`fish.payara.keyStore`
+| The key store to be used by the proxy. The key store contains the private key as well as certificates with its associated public keys.
+| Instance of `java.security.KeyStore` or a `String` representing its fully qualified classname.
+|`fish.payara.trustStore`
+| The trust store to be used by the proxy. The trust store must contain the certificates that are needed to communicate with the remote Payara Server.
+| Instance of `java.security.KeyStore` or a `String` representing its fully qualified classname.
+|`fish.payara.sslContext`
+| The SSL context that will be used by the proxy for creating secured connections to the Payara remote server. This context *must* be fully initialized, including the trust and key managers. Should not be used in conjunction with the `fish.payara.keyStore` and/or `fish.payara.trustStore` properties.
+| Instance of `javax.net.ssl.SSLContext` or a `String` representing its fully qualified classname.
+|`fish.payara.hostnameVerifier`
+| The hostname verifier to be used by the proxy to verify the endpoint's hostname against the identification information of it.
+| Instance of a `javax.net.ssl.HostnameVerifier` or a `String` representing its fully qualified classname.
+|`fish.payara.provider.principal`
+| The principal to be used by the proxy to access the secured endpoint.
+| Instance of a `String`.
+|`fish.payara.provider.credentials`
+| The credentials to be used by the proxy to access the secured endpoint.
+| Instance of a `String`.
+|`fish.payara.provider.authType`
+| To specify the authentication type of the secured endpoint. By default `BASIC` is defined.
+| Instance of a `String`.
+|`fish.payara.requestFilter`
+| To register the custom filter for the client request invoked by proxy.
+| Instance of a `jakarta.ws.rs.client.ClientRequestFilter` or a `Class` implementing `jakarta.ws.rs.client.ClientRequestFilter`.
+|`fish.payara.responseFilter`
+| To register the custom filter for the client response received by proxy.
+| Instance of a `jakarta.ws.rs.client.ClientResponseFilter ` or a `Class` implementing `jakarta.ws.rs.client.ClientResponseFilter`.
+|`fish.payara.executorService`
+| The executor service that will be used for executing asynchronous tasks. _(for future use)_
+| Instance of `java.util.concurrent.ExecutorService` or a `String` representing its fully qualified classname.
+|`fish.payara.scheduledExecutorService`
+| The executor service that will be used for executing scheduled asynchronous tasks. _(For future use)_
+| Instance of `java.util.concurrent.ScheduledExecutorService` or string representing fully qualified classname.
+|`fish.payara.withConfig`
+| The configuration for the internal JAX-RS/Jersey REST client.
+| Instance of `jakarta.ws.rs.core.Configuration` or a `String` representing its fully qualified classname.
+|`fish.payara.clientAdapter`
+| Implementation of client side adapter to use for intercepting JNDI lookups (see below)
+| Instance of `fish.payara.ejb.http.client.adapter.ClientAdapter`
+|===
+
+The constants are also exposed as static attributes of the `fish.payara.ejb.rest.client.RemoteEJBContextFactory` class.
+
+[[system-properties-fallbacks]]
+=== System Properties Fallbacks
+
+The JNDI customization options listed above as well the environment variables defined in `javax.naming.Context` (except `APPLET`) can be set by setting a system property of the same name that will act as a fallback.
+
+That means it will not override an environment variable that is already present but would be used in the case that it is not defined when `InitialContextFactory.getInitialContext` is invoked.
+
+[[client-side-adapter]]
+== Client-side adapter
+
+EJB Lite connector is, in its current form, suited for invoking stateless remote EJBs.
+However, if you're using the connector with existing clients, those may depend on stateful interactions, like invoking stateful EJBs or accessing application server data sources and connection factories.
+
+Client side adapters serve the purpose of emulating stateful behavior at the client and delegate the requests to stateful backend, when all information from the client is collected.
+
+The API of client side adapters is prescribed by interface `fish.payara.ejb.http.client.adapter.ClientAdapter`:
+
+[source,java]
+----
+public interface ClientAdapter {
+    /*
+     * @param jndiName jndi name requested for lookup
+     * @param remoteContext naming context for remote EJB invocation
+     * @return Optional.of(proxy) if adapter provides a proxy for given name, Optional.empty() otherwise
+     * @throws NamingException if downstream lookup fails, or other validation doesn't pass
+     */
+    Optional<Object> makeLocalProxy(String jndiName, Context remoteContext)
+        throws NamingException;
+}
+----
+
+To make use of the adapter, put an instance of `ClientAdapter` into JNDI context property `fish.payara.clientAdapter`. Every JNDI lookup will be  first passed to the adapter instance in such case. If adapter returns a non-empty `Optional` value, tit will be passed back to the client.
+
+[[composing-multiple-adapters]]
+=== Composing multiple adapters
+
+Client side emulation might require stubbing diverse JNDI names and return types, and handling all of that in a single ClientAdapter implementation would result in not very maintainable code. Therefore, the client library offers two classes that help with composition of multiple Client adapters into the parent instance to be passed to `RemoteEJBContextFactory`:
+
+* `CompositeClientAdapter` concatenates multiple client adapter instances, calling adapters in a defined order and returning first non-empty proxy provided by the adapters.
+* `ClientAdapterCustomizer` is a decorator, that helps separate JNDI name matching from instantiation of client adapter.
+
+Most used method of customizer is `matchPrefix`, which will only call downstream adapter when requested JNDI name matches prefix.
+
+NOTE: This prefix is stripped before invoking the downstream adapter.
+
+[[composite-client-adapter-example]]
+==== Composite Client Adapter example
+
+[source,java]
+----
+
+public class Application{
+    public static void main(String[] args){
+        Properties props = new Properties();
+        props.put(Context.INITIAL_CONTEXT_FACTORY, RemoteEJBContextFactory.FACTORY_CLASS);
+        props.put(Context.PROVIDER_URL, "http://not.relevant/");
+        props.put(RemoteEJBContextFactory.CLIENT_ADAPTER,
+                CompositeClientAdapter.newBuilder()
+                    .register(customize(new ConnectionFactoryAdapter()).matchPrefix("jms/"),
+                            customize(QueueAdapter.class).matchPrefix("queue/"))
+                    .build()
+                );
+        Context context = new InitialContext(props);
+    }
+}
+----
+
+See link:https://javadoc.io/doc/fish.payara.extras/ejb-http-client[API documentation] of the client library for detailed description of `ClientAdapterCustomizer` methods and contracts of `CompositeClientAdapter`.
+
+[[known-limitations]]
+== Known Limitations
+
+[[serialization-limitations]]
+=== Serialization Limitations
+
+The HTTP adapter utilizes http://json-b.net/[JSON-B] for serialization. This places limits on types of objects that can be transmitted as method arguments or return types. The serialization can be customized by means of JSON-B annotations.
+
+. By default, only public properties and fields are transferred
+. Complex object graphs should form a tree and not contain cyclic references
+. Polymorphism is not supported by default
+
+[[programming-model-limitations]]
+=== Programming Model Limitations
+
+The HTTP adapter uses stateless HTTP requests. In its current form, it is unfit for invoking stateful objects like `@Stateful` Enterprise Java Beans, or using server resources like `DataSource` or `ConnectionFactory`.
+
+[[see-also]]
+== See Also
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-ejb-invoker-configuration.adoc#get-ejb-invoker-configuration[`get-ejb-invoker-configuration`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-ejb-invoker-configuration.adoc#set-ejb-invoker-configuration[`set-ejb-invoker-configuration`]

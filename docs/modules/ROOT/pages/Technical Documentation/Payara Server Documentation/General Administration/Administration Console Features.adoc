@@ -1,0 +1,153 @@
+[[admin-console-features]]
+= Administration Console Features
+:ordinal: 4
+
+This page documents features specific to the administration console, focusing on Payara Server enhancements.
+
+[[asadmin-recorder]]
+== Asadmin Recorder
+
+This feature allows you to record the actions you take in the admin console as asadmin commands, aiding with automating or reproducing your setup across multiple Payara Server installations.
+
+[[starting-and-stopping-the-asadmin-recorder]]
+=== Starting and Stopping the Asadmin Recorder
+
+//TODO - This fragment is commented since the button on the Admin Console is not working properly. On a future release this may be restored. Additionally, the screenshot in the fragment corresponds to Payara Community.
+////
+From the admin console, you should be able to see a button labelled _Enable Asadmin Recorder_ or _Disable Asadmin Recorder_, depending on whether the asadmin recorder feature is enabled or not.
+
+Clicking this button will enable or disable the asadmin recorder feature respectively:
+
+image:recorder/enable-recorder.png[Enable recorder in Web Console]
+
+image:recorder/disable-recorder.png[Disable recorder in Web Console]
+
+Once enabled, actions in the admin console that have a corresponding `asadmin` command will be recorded to a file. By default, this file is located in the domain directory, and is called `asadmin-commands.txt`.
+////
+
+You can enable or disable the asadmin recorder on its configuration page (detailed in the following section), or by using the following asadmin commands:
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-asadmin-recorder.adoc#enable-asadmin-recorder[`enable-asadmin-recorder`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/disable-asadmin-recorder.adoc#disable-asadmin-recorder[`disable-asadmin-recorder`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-asadmin-recorder-configuration.adoc#set-asadmin-recorder-configuration[`set-asadmin-recorder-configuration`]
+
+Once enabled or disabled, the asadmin recorder will remain enabled/disabled until specifically enabled or disabled again through the web console or using the appropriate Asadmin CLI command.
+
+This means that the asadmin recorder will remain enabled or disabled across server restarts.
+
+[[configuring-the-asadmin-recorder]]
+=== Configuring the Asadmin Recorder
+
+To configure the asadmin recorder, navigate to the following page in the admin console: _server -> Asadmin Recorder_:
+
+image:recorder/recorder-config.png[Asadmin Recorder configuration]
+
+You will be presented with the following configuration options:
+
+_Enabled_:: Sets whether the asadmin recorder service should be enabled or disabled.
+_Filter Commands_:: Sets whether to exclude the `asadmin` commands and regular expressions listed in the _Filtered Commands_ setting from being recorded.
+_Output Location_:: The absolute file path for the `asadmin` commands to be written to. This defaults to a file called _asadmin-commands.txt_ in the domain directory.
+_Filtered Commands_:: A comma separated list of asadmin commands and regular expressions to be excluded from being recorded if the _Filter Commands_ option is enabled.
+
+The default regular expressions and asadmin commands set in the _Filtered Commands_ option are a selection of commands and regular expressions that are typically not needed for any automation purposes, yet are still sometimes called by commands and through navigation of the admin console.
+
+If you remove any of these commands from the filtered commands list, or choose not to filter any commands at all, the asadmin commands script is liable to get filled up with these commands. Due to this behavior, it is advised that you only add to this list, only removing the defaults if you really need to.
+
+Be sure to click on the _Save_ button to have any changes you make take effect.
+
+In addition to using the admin console, you can configure the asadmin recorder service using the `set-asadmin-recorder-configuration` command. See xref:Technical Documentation/Payara Server Documentation/Command Reference/set-asadmin-recorder-configuration.adoc#set-asadmin-recorder-configuration[`set-asadmin-recorder-configuration`]
+
+[[running-the-generated-scripts]]
+=== Running the Generated Scripts
+
+Documentation on running asadmin scripts can be found in xref:Technical Documentation/Payara Server Documentation/General Administration/General Runtime Administration.adoc#to-run-a-set-of-asadmin-subcommands-from-a-file[this section].
+
+[[asadmin-commands]]
+=== Asadmin Commands
+
+The following is the list of available asadmin commands to configure the asadmin recorder:
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-asadmin-recorder-configuration.adoc#get-asadmin-recorder-configuration[`get-asadmin-recorder-configuration`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-asadmin-recorder-configuration.adoc#set-asadmin-recorder-configuration[`set-asadmin-recorder-configuration`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-asadmin-recorder.adoc#enable-asadmin-recorder[`enable-asadmin-recorder`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/disable-asadmin-recorder.adoc#disable-asadmin-recorder[`disable-asadmin-recorder`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin-recorder-enabled.adoc#asadmin-recorder-enabled[`asadmin-recorder-enabled`]
+
+[[admin-console-auditing-service]]
+== Admin Console Auditing Service
+
+This feature allows users to log all actions and operations executed via the admin console for auditing purposes.
+
+[[configuring-the-auditing-service]]
+=== Configuring the Auditing Service
+
+All operations executed by users with access to the admin console will be translated to events that correspond to the specific admin user that executed the operation and the `asadmin` command (and its parameters) that is equivalent to the operation being executed in the admin console. For example if the default `admin` user modifies the monitoring level of the _Web Services Container_, the following event will be generated:
+
+[source, log]
+----
+AUDIT - admin issued command set with parameters
+{
+    DEFAULT: [configs.config.server-config.monitoring-service.module-monitoring-levels.web-services-container=HIGH]
+}
+----
+
+The auditing service will relay these events to the xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Notification Service.adoc[Notification Service]. In this manner, administrators can be alerted of suspicious activity as soon as possible.
+
+This service can be configured from the admin console and from the command line.
+
+[[from-the-admin-console]]
+==== From the Admin Console
+
+The auditing service configuration can be found in the web console under `Configurations` -> `<configuration-name>` -> `Security` -> `Admin Audit`:
+
+image:admin-console/admin-audit-menu.png[Admin Audit Service in Web Console]
+
+Once enabled, actions in the admin console that have a corresponding `asadmin` command will be sent to the xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Notification Service.adoc[Notification service].
+
+Check the *Enabled* option (and the *Dynamic* option too if you don't want to
+restart the domain) to switch the auditing service on.
+
+The *Audit Level* options sets the level of operations that will be logged:
+
+**MODIFIERS**:: (Default setting) All operations that modify the configuration of the server in some capacity.
+**ACCESSORS**:: All operations query the configuration of the server in some capacity.
+**INTERNAL**:: All existing operations, including internal operations of the server.
+
+Aside from this configuration setting, you can also define which notifiers will be used to relay the admin console audit events by moving them to the **Selected Notifiers** box.
+
+image:request-tracing/select-notifiers.png[Activate Notifiers in the Admin Console]
+
+IMPORTANT: Keep in mind that for audit events to be relayed to the
+selected notifiers, both the Notification Service and each selected notifier must be enabled and configured beforehand.
+
+TIP: You don't need to manually add each notifier on this screen. When enabling
+a notifier on its configuration screen, the server will **automatically** add it to the list of selected notifiers for the Admin audit service. This same result occurs when enabling the notifier using the appropriate _asadmin_ command.
+
+[[from-the-commandline]]
+==== From the Command Line
+
+The following is the list of available asadmin commands to configure the auditing service:
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-admin-audit-configuration.adoc#set-admin-audit-configuration[`set-admin-audit-configuration`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-admin-audit-configuration.adoc#get-admin-audit-configuration[`get-admin-audit-configuration`]
+
+[[admin-console-environment-warning]]
+== Admin Console Environment Warning
+
+When working with multiple shared environments, it is common for restrictions to be in place on what modifications can be allowed for a given domain. For example, the test environment cannot deviate significantly from the target production environment without potentially invalidating the test.
+
+One way to ensure no accidental changes are made would be to revoke access to the admin console, but this has the downside of preventing engineers from seeing the current settings in the event that a bug is found.
+
+As an alternative, Payara Server ships with a configurable warning bar to ensure any user will see a warning message in while viewing the console:
+
+image:admin-console/environment-warning.png[alt="Payara Server Environment Warning"]
+
+The warning can be configured in the admin console as seen in the screenshot above. There is a new "_Environment Warning_" tab in the "_Domain_" section which allows you to configure the text and colours of the warning message.
+
+[[configuring-the-environment-warning-via-asadmin]]
+=== Configuring the Environment Warning via Asadmin
+
+The following is the list of available asadmin commands to get and set the configuration the Environment Warning.
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/set-environment-warning-configuration.adoc#set-environment-warning-configuration[`set-environment-warning-configuration`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/get-environment-warning-configuration.adoc#get-environment-warning-configuration[`get-environment-warning-configuration`]

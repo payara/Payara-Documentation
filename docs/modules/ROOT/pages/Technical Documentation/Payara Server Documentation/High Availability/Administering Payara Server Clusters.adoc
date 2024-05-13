@@ -1,0 +1,517 @@
+[[administering-payara-server-clusters]]
+= Administering Payara Server Clusters
+:ordinal: 3
+
+IMPORTANT: Clusters have been deprecated and officially replaced with Deployment Groups. +
+We do not recommend setting up highly-available architectures using traditional clusters.
+
+A cluster is a collection of Payara Server instances that work together as one logical entity. A cluster provides a runtime environment for one or more Jakarta Platform, Enterprise Edition (Jakarta EE) applications. A cluster provides high availability through failure protection, scalability, and load balancing.
+
+[[about-payara-server-clusters]]
+== About Payara Server Clusters
+
+A cluster is a named collection of Payara Server instances that share the same applications, resources, and configuration information.
+
+For information about Payara Server instances, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#administering-payara-server-instances[Administering Payara Server Instances].
+
+Payara Server enables you to administer all the instances in a cluster as a single unit from a single host, regardless of whether the instances reside on the same host or different hosts. You can perform the same operations on a cluster that you can perform on an un-clustered instance, for example, deploying applications and creating resources.
+
+A cluster provides high availability through failure protection, scalability, and load balancing.
+
+* Failure protection. If an instance or a host in a cluster fails, Payara Server detects the failure and recovers the user session state.
++
+If a load balancer is configured for the cluster, the load balancer redirects requests from the failed instance to other instances in the cluster.
++
+Because the same applications and resources are on all instances in the cluster, an instance can fail over to any other instance in the cluster.
++
+To enable the user session state to be recovered, each instance in a cluster sends in-memory state data to another instance. As state data is updated in any instance, the data is replicated.
+* Scalability. If increased capacity is required, you can add instances to a cluster with no disruption in service. When an instance is added or removed, the changes are handled automatically.
+* Load balancing. If instances in a cluster are distributed among different hosts, the workload can be distributed among the hosts to increase overall system throughput.
+
+[[group-management-service]]
+== Group Management Service
+
+The Group Management Service (GMS) is an infrastructure component that is enabled for the instances in a cluster. When GMS is enabled, if a clustered instance fails, the cluster and the Domain Administration Server (DAS) are aware of the failure and can take action when failure occurs.
+
+NOTE: GMS is a core service of the Shoal framework.
+
+[[about-gms-in-payar-server]]
+== About GMS in Payara Server
+
+In previous versions of Payara Server, specifically Payara Server 4.x, clusters were  implemented using the Group Management Service (GMS) and the Shoal framework to allow server instances to communicate between each other and coordinate high-availability features. GMS enables instances to participate in a cluster by detecting changes in cluster membership and notifying instances of the changes.
+
+Starting in Payara Server 5, GMS has been replaced internally with the use of Hazelcast, the technology used to provision the server's Data Grid functionality. This replacement has been implemented in an encapsulated manner: Users will still interact with GMS settings via the Admin Console and Asadmin CLI, but under the covers the communication is managed through a set of adapters that use Hazelcast. This was done to keep a certain degree of backward compatibility between Payara Server 4 and 5.
+
+To this effect, most of the configuration settings listed in the next section may not properly work as clusters have been effectively replaced by deployment groups.
+
+[[gms-configuration-settings]]
+=== GMS Configuration Settings
+
+Payara Server has the following types of GMS settings:
+
+* GMS cluster settings — These are determined during cluster creation. For more information about these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-create-a-cluster[To Create a Cluster].
+* GMS configuration settings — These are determined during configuration creation and are explained here.
+
+The following GMS configuration settings are used in GMS for group discovery and failure detection:
+
+`group-discovery-timeout-in-millis`::
+Indicates the amount of time (in milliseconds) an instance's GMS module will wait during instance startup for discovering other members of the group.
++
+The `group-discovery-timeout-in-millis` timeout value should be set to the default or higher. The default is 5000.
+
+`max-missed-heartbeats`::
+Indicates the maximum number of missed heartbeats that the health monitor counts before the instance can be marked as a suspected failure. GMS also tries to make a peer-to-peer connection with the suspected member. If the maximum number of missed heartbeats is exceeded and peer-to-peer connection fails, the member is marked as a suspected failure. The default value is `3`.
+
+`heartbeat-frequency-in-millis`::
+Indicates the frequency (in milliseconds) at which a heartbeat is sent by each server instance to the cluster.
++
+The failure detection interval is the `max-missed-heartbeats` multiplied by the `heartbeat-frequency-in-millis`. Therefore, the combination of defaults, 3 multiplied by 2000 milliseconds, results in a failure detection interval of 6 seconds.
++
+Lowering the value of `heartbeat-frequency-in-millis` below the default would result in more frequent heartbeat messages being sent out from each member. This could potentially result in more heartbeat messages in the network than a system needs for triggering failure detection protocols. The effect of this varies depending on how quickly the deployment environment needs to have failure detection performed. That is, the (lower) number of retries with a lower heartbeat interval would make it quicker to detect failures.
++
+However, lowering this value could result in false positives because you could potentially detect a member as failed when, in fact, the member's heartbeat is reflecting the network load from other parts of the server. Conversely, a higher timeout interval results in fewer heartbeats in the system because the time interval between heartbeats is longer. As a result, failure detection would take a longer. In addition, a startup by a failed member during this time results in a new join notification but no failure notification, because failure detection and verification were not completed.
++
+The default value is `2000`.
+
+`verify-failure-waittime-in-millis`::
+Indicates the verify suspect protocol's timeout used by the health monitor. After a member is marked as suspect based on missed heartbeats and a failed peer-to-peer connection check, the verify suspect protocol is activated and waits for the specified timeout to check for any further health state messages received in that time, and to see if a peer-to-peer connection can be made with the suspect member. If not, then the member is marked as failed and a failure notification is sent.
++
+The default value is `1500`.
+
+`verify-failure-connect-timeout-in-millis`::
+Indicates the time it takes for the GMS to detect a hardware or network failure of a server instance. Be careful not to set this value too low. The smaller this timeout value is, the greater the chance of detecting false failures. That is, the instance has not failed but doesn't respond within the short window of time.
++
+The default value is `10000`.
+
+The heartbeat frequency, maximum missed heartbeats, peer-to-peer connection-based failure detection, and the verify timeouts are all needed to ensure that failure detection is robust and reliable in Payara Server.
+
+For the dotted names for each of these GMS configuration settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#dotted-names-for-gms-settings[Dotted Names for GMS Settings]. For the steps to specify these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings].
+
+[[dotted-names-for-gms-settings]]
+=== Dotted Names for GMS Settings
+
+Below are sample xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/get.adoc[`get`] subcommands to get all the GMS configuration settings (attributes associated with the referenced `mycfg` configuration) and GMS cluster settings (attributes and properties associated with a cluster named `mycluster`).
+
+[source,shell]
+----
+asadmin> get "configs.config.mycfg.group-management-service.*"
+
+configs.config.mycfg.group-management-service.failure-detection.heartbeat-frequency-in-millis=2000
+configs.config.mycfg.group-management-service.failure-detection.max-missed-heartbeats=3
+configs.config.mycfg.group-management-service.failure-detection.verify-failure-connect-timeout-in-millis=10000
+configs.config.mycfg.group-management-service.failure-detection.verify-failure-waittime-in-millis=1500
+configs.config.mycfg.group-management-service.group-discovery-timeout-in-millis=5000
+
+asadmin> get clusters.cluster.mycluster
+
+clusters.cluster.mycluster.config-ref=mycfg
+clusters.cluster.mycluster.gms-bind-interface-address=${GMS-BIND-INTERFACE-ADDRESS-mycluster}
+clusters.cluster.mycluster.gms-enabled=true
+clusters.cluster.mycluster.gms-multicast-address=228.9.245.47
+clusters.cluster.mycluster.gms-multicast-port=9833
+clusters.cluster.mycluster.name=mycluster
+
+asadmin> get "clusters.cluster.mycluster.property.*"
+clusters.cluster.mycluster.property.GMS_LISTENER_PORT=${GMS_LISTENER_PORT-mycluster}
+clusters.cluster.mycluster.property.GMS_MULTICAST_TIME_TO_LIVE=4
+clusters.cluster.mycluster.property.GMS_LOOPBACK=false
+clusters.cluster.mycluster.property.GMS_TCPSTARTPORT=9090
+clusters.cluster.mycluster.property.GMS_TCPENDPORT=9200
+----
+
+The last `get` subcommand displays only the properties that have been explicitly set.
+
+For the steps to specify these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings] and xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-change-gms-settings-after-cluster-creation[To Change GMS Settings After Cluster Creation].
+
+[[to-preconfigure-nondefault-gms-configuration-settings]]
+=== To Preconfigure Nondefault GMS Configuration Settings
+
+You can preconfigure GMS with values different than the defaults without requiring a restart of the DAS and the cluster.
+
+. Create a configuration using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/copy-config.adoc[`copy-config`] subcommand. For example:
++
+[source,shell]
+----
+asadmin> copy-config default-config mycfg
+----
+For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
+. Set the values for the new configuration's GMS configuration settings. For example:
++
+[source,shell]
+----
+asadmin> set configs.config.mycfg.group-management-service.group-discovery-timeout-in-millis=8000
+asadmin> set configs.config.mycfg.group-management-service.failure-detection.max-missed-heartbeats=5
+----
+For a complete list of the dotted names for these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#dotted-names-for-gms-settings[Dotted Names for GMS Settings].
+. Create the cluster so it uses the previously created configuration. For example:
++
+[source,shell]
+----
+asadmin> create-cluster --config mycfg mycluster
+----
+You can also set GMS cluster settings during this step. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-create-a-cluster[To Create a Cluster].
+. Create server instances for the cluster. For example:
++
+[source,shell]
+----
+asadmin> create-instance --node localhost-domain1 --cluster mycluster instance01
+asadmin> create-instance --node localhost-domain1 --cluster mycluster instance02
+----
+. Start the cluster. For example:
++
+[source,shell]
+----
+asadmin> start-cluster mycluster
+----
+
+You can also view the full syntax and options of a subcommand by typing `asadmin help` subcommand at the command line.
+
+[[to-change-gms-settings-after-cluster-creation]]
+=== To Change GMS Settings After Cluster Creation
+
+To avoid the need to restart the DAS and the cluster, configure GMS configuration settings before cluster creation as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings].
+
+To avoid the need to restart the DAS and the cluster, configure the GMS cluster settings during cluster creation as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-create-a-cluster[To Create a Cluster].
+
+Changing any GMS settings using the `set` subcommand after cluster creation requires a domain administration server (DAS) and cluster restart as explained here.
+
+. Ensure that the DAS and cluster are running. Remote subcommands require a running server.
+. Use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/get.adoc[`get`] subcommand to determine the settings to change. For example:
++
+[source,shell]
+----
+asadmin> get "configs.config.mycfg.group-management-service.*"
+
+configs.config.mycfg.group-management-service.failure-detection.heartbeat-frequency-in-millis=2000
+configs.config.mycfg.group-management-service.failure-detection.max-missed-heartbeats=3
+configs.config.mycfg.group-management-service.failure-detection.verify-failure-connect-timeout-in-millis=10000
+configs.config.mycfg.group-management-service.failure-detection.verify-failure-waittime-in-millis=1500
+configs.config.mycfg.group-management-service.group-discovery-timeout-in-millis=5000
+----
+For a complete list of the dotted names for these settings, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#dotted-names-for-gms-settings[Dotted Names for GMS Settings].
+. Use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand to change the settings. For example:
++
+[source,shell]
+----
+asadmin> set configs.config.mycfg.group-management-service.group-discovery-timeout-in-millis=6000
+----
+. Use the `get` subcommand again to confirm that the changes were made. For example:
++
+[source,shell]
+----
+asadmin> get configs.config.mycfg.group-management-service.group-discovery-timeout-in-millis
+----
+. Restart the DAS. For example:
++
+[source,shell]
+----
+asadmin> stop-domain domain1
+asadmin> start-domain domain1
+----
+. Restart the cluster. For example:
++
+[source,shell]
+----
+asadmin> stop-cluster mycluster
+asadmin> start-cluster mycluster
+----
+
+You can also view the full syntax and options of a subcommand by typing `asadmin help` subcommand at the command line.
+
+[[to-check-the-health-of-instances-in-a-cluster]]
+=== To Check the Health of Instances in a Cluster
+
+The `list-instances` is the quickest way to evaluate the health of a cluster and to detect if cluster is properly operating; that is, all members of the cluster are running and visible to DAS.
+
+. Ensure that the DAS and cluster are running. Remote subcommands require a running server.
+. Check whether server instances in a cluster are running by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`] subcommand.
+
+This example checks the health of a cluster named `mycluster`.
+
+[source,shell]
+----
+asadmin> list-instances mycluster
+instance01   running
+instance02   running
+Command list-instances executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-instances` at the command line.
+
+[[using-the-multi-homing-feature-with-gms]]
+=== Using the Multi-Homing Feature With GMS
+
+Multi-homing enables Payara Server clusters to be used in an environment that uses multiple Network Interface Cards (NICs). A multi-homed host has multiple network connections, of which the connections may or may not be the on same network.
+Multi-homing provides the following benefits:
+
+* Provides redundant network connections within the same subnet. Having multiple NICs ensures that one or more network connections are available for communication.
+* Supports communication across two or more different subnets. The DAS and all server instances in the same cluster must be on the same subnet for GMS communication, however.
+* Binds to a specific IPv4 address and receives GMS messages in a system that has multiple IP addresses configured. The responses for GMS messages received on a particular interface will also go out through that interface.
+* Supports separation of external and internal traffic.
+
+[[traffic-separation-using-multi-homing]]
+==== *Traffic Separation Using Multi-Homing*
+
+You can separate the internal traffic resulting from GMS from the external traffic. Traffic separation enables you plan a network better and augment certain parts of the network, as required.
+
+Consider a simple cluster, `c1`, with three instances, `i101`, `i102`, and `i103`. Each instance runs on a different machine.
+
+In order to separate the traffic, the multi-homed machine should have at least two IP addresses belonging to different networks. The first IP as the external IP and the second one as internal IP. The objective is to expose the external IP to user requests, so that all the traffic from the user requests would be through them.
+The internal IP is used only by the cluster instances for internal communication through GMS.
+
+The following procedure describes how to set up traffic separation.
+
+To configure multi-homed machines for GMS without traffic separation, skip the steps or commands that configure the `EXTERNAL-ADDR` system property, but perform the others.
+
+To avoid having to restart the DAS or cluster, perform the following steps in the specified order.
+
+*To set up traffic separation, follow these steps:*
+
+. Create the system properties `EXTERNAL-ADDR` and `GMS-BIND-INTERFACE-ADDRESS-c1` for the DAS.
+* `asadmin create-system-properties` `target` `server EXTERNAL-ADDR=192.155.35.4`
+* `asadmin create-system-properties` `target` `server GMS-BIND-INTERFACE-ADDRESS-c1=10.12.152.20`
+. Create the cluster with the default settings. Use the following command:
++
+[source,shell]
+----
+asadmin create-cluster c1
+----
+A reference to a system property for GMS traffic is already set up by default in the `gms-bind-interface-address` cluster setting. The default value of this setting is `${GMS-BIND-INTERFACE-ADDRESS-`cluster-name`}`.
+. When creating the clustered instances, configure the external and GMS IP addresses. +
+Use the following commands:
+* `asadmin create-instance` `node` `localhost` `cluster` `c1` `systemproperties` `EXTERNAL-ADDR=192.155.35.5:GMS-BIND-INTERFACE-ADDRESS-c1=10.12.152.30 i101`
+* `asadmin create-instance` `node` `localhost` `cluster` `c1` `systemproperties` `EXTERNAL-ADDR=192.155.35.6:GMS-BIND-INTERFACE-ADDRESS-c1=10.12.152.40 i102`
+* `asadmin create-instance` `node` `localhost` `cluster` `c1` `systemproperties` `EXTERNAL-ADDR=192.155.35.7:GMS-BIND-INTERFACE-ADDRESS-c1=10.12.152.50 i103`
+. Set the address attribute of HTTP listeners to refer to the `EXTERNAL-ADDR` system properties. Use the following commands:
++
+[source,shell]
+----
+asadmin set c1-config.network-config.network-listeners.network-listener.http-1.address=\${EXTERNAL-ADDR}
+asadmin set c1-config.network-config.network-listeners.network-listener.http-2.address=\${EXTERNAL-ADDR}
+----
+
+[[creating-listing-and-deleting-clusters]]
+== Creating, Listing, and Deleting Clusters
+
+Payara Server enables you to create clusters, obtain information about clusters, and delete clusters that are no longer required.
+
+[[to-create-a-cluster]]
+=== To Create a Cluster
+
+Use the `create-cluster` subcommand in remote mode to create a cluster.
+
+To ensure that the GMS can detect changes in cluster membership, a cluster's GMS settings must be configured correctly. To avoid the need to restart the DAS and the cluster, configure a cluster's GMS settings when you create the cluster.
+If you change GMS settings for an existing cluster, the DAS and the cluster must be restarted to apply the changes.
+
+When you create a cluster, Payara Server automatically creates a Message Queue cluster for the Payara Server cluster.
+
+For more information about Message Queue clusters, see xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring JMS High Availability.adoc#using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server].
+
+*Before You Begin*
+
+If the cluster is to reference an existing named configuration, ensure that the configuration exists. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration].
+
+If you are using a named configuration to preconfigure GMS settings, ensure that these settings have the required values in the named configuration.
+
+For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings].
+
+If you are configuring the cluster's GMS settings when you create the cluster, ensure that you have the following information:
+
+* The address on which GMS listens for group events
+* The port number of the communication port on which GMS listens for group events
+* The maximum number of iterations or transmissions that a multicast message for GMS events can experience before the message is discarded
+* The lowest port number in the range of ports from which GMS selects a TCP port on which to listen
+* The highest port number in the range of ports from which GMS selects a TCP port on which to listen
+
+If the DAS is running on a multihome host, ensure that you have the Internet Protocol (IP) address of the network interface on the DAS host to which GMS binds.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the `create-cluster` subcommand.
+
+NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for configuring the cluster, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-cluster.adoc[`create-cluster`] help page.
+
+* If multicast transport is available, run the `create-cluster` subcommand as follows:
++
+[source,shell]
+----
+asadmin> create-cluster --config configuration
+--multicastaddress multicast-address --multicastport multicast-port
+--properties GMS_MULTICAST_TIME_TO_LIVE=max-iterations:
+GMS_TCPSTARTPORT=start-port:GMS_TCPENDPORT=end-port cluster-name
+----
+* If multicast transport is not available, run the `create-cluster` subcommand as follows:
++
+[source,shell]
+----
+asadmin> create-cluster --config configuration --properties GMS_DISCOVERY_URI_LIST=discovery-instances:GMS_LISTENER_PORT=gms-port cluster-name
+----
+
+configuration::
+  An existing named configuration that the cluster is to reference.
+multicast-address::
+  The address on which GMS listens for group events.
+multicast-port::
+  The port number of the communication port on which GMS listens for
+  group events.
+max-iterations::
+  The maximum number of iterations or transmissions that a multicast message for GMS events can experience before the message is discarded.
+discovery-instances::
+  Instances to use for discovering the cluster.
+gms-port::
+  The port number of the port on which the cluster listens for messages from GMS.
+start-port::
+  The lowest port number in the range of ports from which GMS selects a TCP port on which to listen. The default is 9090.
+end-port::
+  The highest port number in the range of ports from which GMS selects a TCP port on which to listen. The default value is 9200.
+cluster-name::
+  Your choice of name for the cluster that you are creating.
+. If necessary, create a system property to represent the IP address of the network interface on the DAS host to which GMS binds. This step is necessary only if the DAS is running on a multihome host.
++
+[source,shell]
+----
+asadmin> create-system-properties
+GMS-BIND-INTERFACE-ADDRESS-cluster-name=das-bind-address
+----
+cluster-name::
+  The name that you assigned to the cluster in Step 2.
+das-bind-address::
+  The IP address of the network interface on the DAS host to which GMS binds.
+
+This example creates a cluster that is named `ltscluster` for which port 1169 is to be used for secure IIOP connections. Because the `--config` option is not specified, the cluster references a copy of the named configuration `default-config` that is named `ltscluster-config`.
+
+[source,shell]
+----
+asadmin> create-cluster --systemproperties IIOP_SSL_LISTENER_PORT=1169 ltscluster
+Command create-cluster executed successfully.
+----
+
+*Next Steps*
+
+After creating a cluster, you can add Payara Server instances to the cluster as explained in the following sections:
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Named Configurations.adoc#to-create-a-named-configuration[To Create a Named Configuration]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc#to-preconfigure-nondefault-gms-configuration-settings[To Preconfigure Nondefault GMS Configuration Settings]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring JMS High Availability.adoc#using-message-queue-broker-clusters-with-payara-server[Using Message Queue Broker Clusters With Payara Server]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-cluster.adoc[`create-cluster`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-system-properties.adoc[`create-system-properties`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help create-cluster`
+* `asadmin help create-system-properties`
+
+[[to-list-all-clusters-in-a-domain]]
+=== To List All Clusters in a Domain
+
+Use the `list-clusters` subcommand in remote mode to obtain information about existing clusters in a domain.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-clusters.adoc[`list-clusters`] subcommand.
++
+[source,shell]
+----
+asadmin> list-clusters
+----
+
+This example lists all clusters in the current domain.
+
+[source,shell]
+----
+asadmin> list-clusters
+pmdclust not running
+ymlclust not running
+Command list-clusters executed successfully.
+----
+
+This example lists the clusters that contain an instance that resides on the node `sj01`.
+
+[source,shell]
+----
+asadmin> list-clusters sj01
+ymlclust not running
+Command list-clusters executed successfully.
+----
+
+*See Also*
+
+xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-clusters.adoc[`list-clusters`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-clusters` at the command line.
+
+[[to-delete-a-cluster]]
+=== To Delete a Cluster
+
+Use the `delete-cluster` subcommand in remote mode to remove a cluster from the DAS configuration.
+
+If the cluster's named configuration was created automatically for the cluster and no other clusters or unclustered instances refer to the configuration, the configuration is deleted when the cluster is deleted.
+
+*Before You Begin*
+
+Ensure that following prerequisites are met:
+
+* The cluster that you are deleting is stopped. For information about how to stop a cluster, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-stop-a-cluster[To Stop a Cluster].
+* The cluster that you are deleting contains no Payara Server instances. For information about how to remove instances from a cluster, see the following sections:
+** xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
+** xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+
+Follow these steps:
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Confirm that the cluster is stopped.
++
+[source,shell]
+----
+asadmin> list-clusters cluster-name
+----
+cluster-name::
+  The name of the cluster that you are deleting.
+. Confirm that the cluster contains no instances.
++
+[source,shell]
+----
+asadmin> list-instances cluster-name
+----
+cluster-name::
+  The name of the cluster that you are deleting.
+. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-cluster.adoc[`delete-cluster`] subcommand.
++
+[source,shell]
+----
+asadmin> delete-cluster cluster-name
+----
+cluster-name::
+  The name of the cluster that you are deleting.
+
+This example confirms that the cluster `adccluster` is stopped and contains no instances and deletes the cluster `adccluster`.
+
+[source,shell]
+----
+asadmin> list-clusters adccluster
+adccluster not running
+Command list-clusters executed successfully.
+asadmin> list-instances adccluster
+Nothing to list.
+Command list-instances executed successfully.
+asadmin> delete-cluster adccluster
+Command delete-cluster executed successfully.
+----
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-stop-a-cluster[To Stop a Cluster]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-cluster.adoc[`delete-cluster`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-clusters.adoc[`list-clusters`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help delete-cluster`
+* `asadmin help list-clusters`
+* `asadmin help list-instances`

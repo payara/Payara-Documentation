@@ -1,0 +1,1153 @@
+[[payara-platform-deployment-descriptor-files]]
+= Payara Platform Deployment Descriptor Files
+:ordinal: 3
+
+This appendix describes the element hierarchies in the Payara Platform deployment descriptors that are supported on top of the standard Jakarta EE deployment descriptors.
+
+[[about-the-payara-platform-deployment-descriptors]]
+== About the Payara Platform Deployment Descriptors
+
+Each deployment descriptor XML file has a corresponding Document Type Definition (DTD) file, which defines the elements, data, and attributes that the deployment descriptor file can contain.
+
+For example, the `glassfish-application_6_0-1.dtd` file defines the structure of the `glassfish-application.xml` file. The DTD files for the Payara Server deployment descriptors are located in the `as-install/lib/dtds` directory.
+
+The Platform Server deployment descriptor files must be readable and writable by the file owners. In each deployment descriptor file, sub-elements must be defined in the order in which they are listed under each Sub-elements heading, unless otherwise noted.
+
+For general information about DTD files and XML, see the XML specification at `http://www.w3.org/TR/REC-xml`.
+
+IMPORTANT: Do not edit the DTD files; their contents change only with new versions of Payara Server.
+
+The following table lists the Payara Platform deployment descriptors and their DTD files.
+
+.Payara Platform Deployment Descriptors and DTDs
+
+//TODO - Add DTDs for Payara Platform dd files
+[cols="3,3,4",options="header"]
+|===
+|Deployment Descriptor |DTD File |Description
+
+| `glassfish-application.xml`
+| `glassfish-application_6_0-1.dtd`
+| Configures an entire Jakarta EE application (EAR file).
+
+|
+`glassfish-web.xml`
+
+`payara-web.xml`
+| `glassfish-web-app_3_0-1.dtd`
+| Configures a web application (WAR file).
+
+| `glassfish-ejb-jar.xml`
+| `glassfish-ejb-jar_3_1-1.dtd`
+|Configures an enterprise bean (EJB JAR file).
+
+| `glassfish-application-client.xml`
+| `glassfish-application-client_6_0-1.dtd`
+| Configures an Application Client Container (ACC) client (JAR file).
+
+|
+`glassfish-resources.xml`
+
+`payara-resources.xml`
+| `glassfish-resources_1_5.dtd`
+| Configures application-scoped resources.
+
+| `sun-acc.xml`
+| `sun-application-client-container_1_2.dtd`
+| Configures the Application Client Container.
+
+This is more of a configuration file than a deployment descriptor. Payara Server provides a default file in the `domain-dir/config` directory.
+
+Specifying a different file is optional.
+
+| `sun-cmp-mappings.xml`
+| `sun-cmp-mapping_1_2.dtd`
+| Configures container-managed persistence for an EJB 2.0 or 2.1 entity bean.
+|===
+
+IMPORTANT: Deployment descriptors whose names start with the `glassfish-` prefix are referred as "original" deployment descriptor files from Eclipse GlassFish, since these files names and DTDs were created while supporting Eclipse GlassFish and their support has been inherited by the Payara Platform.
+
+[[the-glassfish-application.xml-file]]
+== The glassfish-application.xml File
+
+The `glassfish-application.xml` file configures an entire Jakarta EE application (EAR file). The element hierarchy is as follows:
+
+[source,text]
+----
+glassfish-application
+.  web
+.  .  web-uri
+.  .  context-root
+.  pass-by-reference
+.  unique-id
+.  security-role-mapping
+.  .  role-name
+.  .  principal-name
+.  .  group-name
+.  realm
+.  ejb-ref
+.  .  ejb-ref-name
+.  .  jndi-name
+.  resource-ref
+.  .  res-ref-name
+.  .  jndi-name
+.  .  default-resource-principal
+.  .  .  name
+.  .  .  password
+.  resource-env-ref
+.  .  resource-env-ref-name
+.  .  jndi-name
+.  service-ref
+.  .  service-ref-name
+.  .  port-info
+.  .  .  service-endpoint-interface
+.  .  .  wsdl-port
+.  .  .  .  namespaceURI
+.  .  .  .  localpart
+.  .  .  stub-property
+.  .  .  .  name
+.  .  .  .  value
+.  .  .  call-property
+.  .  .  .  name
+.  .  .  .  value
+.  .  .  message-security-binding
+.  .  .  .  message-security
+.  .  .  .  .  message
+.  .  .  .  .  .  java-method
+.  .  .  .  .  .  .  method-name
+.  .  .  .  .  .  .  method-params
+.  .  .  .  .  .  .  .  method-param
+.  .  .  .  .  .  operation-name
+.  .  .  .  .  request-protection
+.  .  .  .  .  response-protection
+.  .  call-property
+.  .  .  name
+.  .  .  value
+.  .  wsdl-override
+.  .  service-impl-class
+.  .  service-qname
+.  .  .  namespaceURI
+.  .  .  localpart
+.  message-destination-ref
+.  .  message-destination-ref-name
+.  .  jndi-name
+.  message-destination
+.  .  message-destination-name
+.  .  jndi-name
+.  archive-name
+.  compatibility
+.  keep-state
+.  version-identifier
+.  classloading-delegate
+.  enable-implicit-cdi
+.  whitelist-package
+.  scanning-exclude
+.  scanning-include
+----
+
+.sample `glassfish-application.xml` file:
+[source,xml]
+----
+<!DOCTYPE glassfish-application PUBLIC "-//GlassFish.org//DTD
+GlassFish Application Server 3.1 Java EE Application 6.0//EN"
+"http://glassfish.org/dtds/glassfish-application_6_0-1.dtd">
+<glassfish-application>
+   <unique-id>67488732739338240</unique-id>
+</glassfish-application>
+----
+
+[[the-glassfish-web.xml-file]]
+== The `glassfish-web.xml` and `payara-web.xml` Files
+
+The `glassfish-web.xml` file configures a web application (WAR file). It is an original Eclipse GlassFish deployment descriptor.
+
+The `payara-web.xml` is a matching Payara Platform variant which is recommended to be used whenever possible.
+
+Their element hierarchy is as follows:
+
+[source,text]
+----
+glassfish-web-app
+.  context-root
+.  security-role-mapping
+.  .  role-name
+.  .  principal-name
+.  .  group-name
+.  servlet
+.  .  servlet-name
+.  .  principal-name
+.  .  webservice-endpoint
+.  .  .  port-component-name
+.  .  .  endpoint-address-uri
+.  .  .  login-config
+.  .  .  .  auth-method
+.  .  .  message-security-binding
+.  .  .  .  message-security
+.  .  .  .  .  message
+.  .  .  .  .  .  java-method
+.  .  .  .  .  .  .  method-name
+.  .  .  .  .  .  .  method-params
+.  .  .  .  .  .  .  .  method-param
+.  .  .  .  .  .  operation-name
+.  .  .  .  .  request-protection
+.  .  .  .  .  response-protection
+.  .  .  transport-guarantee
+.  .  .  service-qname
+.  .  .  tie-class
+.  .  .  servlet-impl-class
+.  .  .  debugging-enabled
+.  .  .  property (with attributes)
+.  .  .  .  description
+.  idempotent-url-pattern
+.  session-config
+.  .  session-manager
+.  .  .  manager-properties
+.  .  .  .  property (with attributes)
+.  .  .  .  .  description
+.  .  .  store-properties
+.  .  .  .  property (with attributes)
+.  .  .  .  .  description
+.  .  session-properties
+.  .  .  property (with attributes)
+.  .  .  .  description
+.  .  cookie-properties
+.  .  .  property (with attributes)
+.  .  .  .  description
+.  ejb-ref
+.  .  ejb-ref-name
+.  .  jndi-name
+.  resource-ref
+.  .  res-ref-name
+.  .  jndi-name
+.  .  default-resource-principal
+.  .  .  name
+.  .  .  password
+.  resource-env-ref
+.  .  resource-env-ref-name
+.  .  jndi-name
+.  service-ref
+.  .  service-ref-name
+.  .  port-info
+.  .  .  service-endpoint-interface
+.  .  .  wsdl-port
+.  .  .  .  namespaceURI
+.  .  .  .  localpart
+.  .  .  stub-property
+.  .  .  .  name
+.  .  .  .  value
+.  .  .  call-property
+.  .  .  .  name
+.  .  .  .  value
+.  .  .  message-security-binding
+.  .  .  .  message-security
+.  .  .  .  .  message
+.  .  .  .  .  .  java-method
+.  .  .  .  .  .  .  method-name
+.  .  .  .  .  .  .  method-params
+.  .  .  .  .  .  .  .  method-param
+.  .  .  .  .  .  operation-name
+.  .  .  .  .  request-protection
+.  .  .  .  .  response-protection
+.  .  call-property
+.  .  .  name
+.  .  .  value
+.  .  wsdl-override
+.  .  service-impl-class
+.  .  service-qname
+.  .  .  namespaceURI
+.  .  .  localpart
+.  message-destination-ref
+.  .  message-destination-ref-name
+.  .  jndi-name
+.  cache
+.  .  cache-helper
+.  .  .  property (with attributes)
+.  .  .  .  description
+.  .  default-helper
+.  .  .  property (with attributes)
+.  .  .  .  description
+.  .  property (with attributes)
+.  .  .  description
+.  .  cache-mapping
+.  .  .  servlet-name
+.  .  .  url-pattern
+.  .  .  cache-helper-ref
+.  .  .  dispatcher
+.  .  .  timeout
+.  .  .  refresh-field
+.  .  .  http-method
+.  .  .  key-field
+.  .  .  constraint-field
+.  .  .  .  constraint-field-value
+.  class-loader
+.  .  property (with attributes)
+.  .  .  description
+.  jsp-config
+.  locale-charset-info
+.  .  locale-charset-map
+.  .  parameter-encoding
+.  parameter-encoding
+.  property (with attributes)
+.  .  description
+.  valve
+.  message-destination
+.  .  message-destination-name
+.  .  jndi-name
+.  webservice-description
+.  .  webservice-description-name
+.  .  wsdl-publish-location
+.  keep-state
+.  version-identifier
+.  jaxrs-roles-allowed-enabled
+.  scanning-exclude
+.  scanning-include
+.  whitelist-package
+----
+
+.A sample `payara-web.xml` file:
+[source,xml,subs=attributes+]
+----
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server {page-version}//EN" "{payaraWebDtd}">
+<payara-web-app>
+    <session-config>
+        <session-manager/>
+    </session-config>
+    <resource-ref>
+        <res-ref-name>mail/Session</res-ref-name>
+        <jndi-name>mail/Session</jndi-name>
+    </resource-ref>
+    <jsp-config/>
+</payara-web-app>
+----
+
+[[the-glassfish-ejb-jar.xml-file]]
+== The `glassfish-ejb-jar.xml` File
+
+The `glassfish-ejb-jar.xml` file configures an enterprise bean (EJB JAR file). The element hierarchy is as follows:
+
+[source,text]
+----
+glassfish-ejb-jar
+.  security-role-mapping
+.  .  role-name
+.  .  principal-name
+.  .  group-name
+.  enterprise-beans
+.  .  name
+.  .  unique-id
+.  .  ejb
+.  .  .  ejb-name
+.  .  .  jndi-name
+.  .  .  ejb-ref
+.  .  .  .  ejb-ref-name
+.  .  .  .  jndi-name
+.  .  .  resource-ref
+.  .  .  .  res-ref-name
+.  .  .  .  jndi-name
+.  .  .  .  default-resource-principal
+.  .  .  .  .  name
+.  .  .  .  .  password
+         clustered-bean
+.  .  .  clustered-key-name
+.  .  .  clustered-lock-type
+.  .  .  clustered-attach-postconstruct
+.  .  .  clustered-detach-predestroy
+.  .  .  resource-env-ref
+.  .  .  .  resource-env-ref-name
+.  .  .  .  jndi-name
+.  .  .  service-ref
+.  .  .  .  service-ref-name
+.  .  .  .  port-info
+.  .  .  .  .  service-endpoint-interface
+.  .  .  .  .  wsdl-port
+.  .  .  .  .  .  namespaceURI
+.  .  .  .  .  .  localpart
+.  .  .  .  .  stub-property
+.  .  .  .  .  .  name
+.  .  .  .  .  .  value
+.  .  .  .  .  call-property
+.  .  .  .  .  .  name
+.  .  .  .  .  .  value
+.  .  .  .  .  message-security-binding
+.  .  .  .  .  .  message-security
+.  .  .  .  .  .  .  message
+.  .  .  .  .  .  .  .  java-method
+.  .  .  .  .  .  .  .  .  method-name
+.  .  .  .  .  .  .  .  .  method-params
+.  .  .  .  .  .  .  .  .  .  method-param
+.  .  .  .  .  .  .  .  operation-name
+.  .  .  .  .  .  .  request-protection
+.  .  .  .  .  .  .  response-protection
+.  .  .  .  call-property
+.  .  .  .  .  name
+.  .  .  .  .  value
+.  .  .  .  wsdl-override
+.  .  .  .  service-impl-class
+.  .  .  .  service-qname
+.  .  .  .  .  namespaceURI
+.  .  .  .  .  localpart
+.  .  .  message-destination-ref
+.  .  .  .  message-destination-ref-name
+.  .  .  .  jndi-name
+.  .  .  pass-by-reference
+.  .  .  cmp
+.  .  .  .  mapping-properties
+.  .  .  .  is-one-one-cmp
+.  .  .  .  one-one-finders
+.  .  .  .  .  finder
+.  .  .  .  .  .  method-name
+.  .  .  .  .  .  query-params
+.  .  .  .  .  .  query-filter
+.  .  .  .  .  .  query-variables
+.  .  .  .  .  .  query-ordering
+.  .  .  .  prefetch-disabled
+.  .  .  .  .  query-method
+.  .  .  .  .  .  method-name
+.  .  .  .  .  .  method-params
+.  .  .  .  .  .  .  method-param
+.  .  .  principal
+.  .  .  .  name
+.  .  .  mdb-connection-factory
+.  .  .  .  jndi-name
+.  .  .  .  default-resource-principal
+.  .  .  .  .  name
+.  .  .  .  .  password
+.  .  .  jms-durable-subscription-name
+.  .  .  jms-max-messages-load
+.  .  .  ior-security-config
+.  .  .  .  transport-config
+.  .  .  .  .  integrity
+.  .  .  .  .  confidentiality
+.  .  .  .  .  establish-trust-in-target
+.  .  .  .  .  establish-trust-in-client
+.  .  .  .  as-context
+.  .  .  .  .  auth-method
+.  .  .  .  .  realm
+.  .  .  .  .  required
+.  .  .  .  sas-context
+.  .  .  .  .  caller-propagation
+.  .  .  is-read-only-bean
+.  .  .  refresh-period-in-seconds
+.  .  .  commit-option
+.  .  .  cmt-timeout-in-seconds
+.  .  .  use-thread-pool-id
+.  .  .  gen-classes
+.  .  .  .  remote-impl
+.  .  .  .  local-impl
+.  .  .  .  remote-home-impl
+.  .  .  .  local-home-impl
+.  .  .  bean-pool
+.  .  .  .  steady-pool-size
+.  .  .  .  resize-quantity
+.  .  .  .  max-pool-size
+.  .  .  .  pool-idle-timeout-in-seconds
+.  .  .  .  max-wait-time-in-millis
+.  .  .  bean-cache
+.  .  .  .  max-cache-size
+.  .  .  .  resize-quantity
+.  .  .  .  is-cache-overflow-allowed
+.  .  .  .  cache-idle-timeout-in-seconds
+.  .  .  .  removal-timeout-in-seconds
+.  .  .  .  victim-selection-policy
+.  .  .  mdb-resource-adapter
+.  .  .  .  resource-adapter-mid
+.  .  .  .  activation-config
+.  .  .  .  .  description
+.  .  .  .  .  activation-config-property
+.  .  .  .  .  .  activation-config-property-name
+.  .  .  .  .  .  activation-config-property-value
+.  .  .  webservice-endpoint
+.  .  .  .  port-component-name
+.  .  .  .  endpoint-address-uri
+.  .  .  .  login-config
+.  .  .  .  .  auth-method
+.  .  .  .  .  realm
+.  .  .  .  message-security-binding
+.  .  .  .  .  message-security
+.  .  .  .  .  .  message
+.  .  .  .  .  .  .  java-method
+.  .  .  .  .  .  .  .  method-name
+.  .  .  .  .  .  .  .  method-params
+.  .  .  .  .  .  .  .  .  method-param
+.  .  .  .  .  .  .  operation-name
+.  .  .  .  .  .  request-protection
+.  .  .  .  .  .  response-protection
+.  .  .  .  transport-guarantee
+.  .  .  .  service-qname
+.  .  .  .  tie-class
+.  .  .  .  servlet-impl-class
+.  .  .  .  debugging-enabled
+.  .  .  .  property (with subelements)
+.  .  .  .  .  name
+.  .  .  .  .  value
+.  .  .  flush-at-end-of-method
+.  .  .  .  method
+.  .  .  .  .  description
+.  .  .  .  .  ejb-name
+.  .  .  .  .  method-name
+.  .  .  .  .  method-intf
+.  .  .  .  .  method-params
+.  .  .  .  .  .  method-param
+.  .  .  checkpointed-methods
+.  .  .  checkpoint-at-end-of-method
+.  .  .  .  method
+.  .  .  .  .  description
+.  .  .  .  .  ejb-name
+.  .  .  .  .  method-name
+.  .  .  .  .  method-intf
+.  .  .  .  .  method-params
+.  .  .  .  .  .  method-param
+.  .  .  per-request-load-balancing
+.  .  pm-descriptors
+.  .  cmp-resource
+.  .  .  jndi-name
+.  .  .  default-resource-principal
+.  .  .  .  name
+.  .  .  .  password
+.  .  .  property (with subelements)
+.  .  .  .  name
+.  .  .  .  value
+.  .  .  create-tables-at-deploy
+.  .  .  drop-tables-at-undeploy
+.  .  .  database-vendor-name
+.  .  .  schema-generator-properties
+.  .  .  .  property (with subelements)
+.  .  .  .  .  name
+.  .  .  .  .  value
+.  .  message-destination
+.  .  .  message-destination-name
+.  .  .  jndi-name
+.  .  webservice-description
+.  .  .  webservice-description-name
+.  .  .  wsdl-publish-location
+.  .  property (with sub-elements)
+.  .  .  name
+.  .  .  value
+.  compatibility
+.  disable-nonportable-jndi-names
+.  keep-state
+.  version-identifier
+   webservice-default-login-config
+----
+
+NOTE: If any configuration information for an enterprise bean is not specified in the `glassfish-ejb-jar.xml` file, it defaults to a corresponding setting in the EJB container if an equivalency exists.
+
+.A sample `glassfish-ejb-jar.xml` file:
+[source,xml]
+----
+<!DOCTYPE glassfish-ejb-jar PUBLIC "-//GlassFish.org//
+DTD GlassFish Application Server 3.1 EJB 3.1//EN"
+"http://glassfish.org/dtds/glassfish-ejb-jar_3_1-1.dtd">
+<glassfish-ejb-jar>
+    <enterprise-beans>
+        <ejb>
+            <ejb-name>CustomerEJB</ejb-name>
+            <jndi-name>customer</jndi-name>
+            <bean-pool>
+                <steady-pool-size>10</steady-pool-size>
+                <resize-quantity>10</resize-quantity>
+                <max-pool-size>100</max-pool-size>
+                <pool-idle-timeout-in-seconds>600</pool-idle-timeout-in-seconds>
+            </bean-pool>
+            <bean-cache>
+                <max-cache-size>100</max-cache-size>
+                <resize-quantity>10</resize-quantity>
+                <removal-timeout-in-seconds>3600</removal-timeout-in-seconds>
+                <victim-selection-policy>LRU</victim-selection-policy>
+            </bean-cache>
+        </ejb>
+        <cmp-resource>
+            <jndi-name>jdbc/__default</jndi-name>
+            <create-tables-at-deploy>true</create-tables-at-deploy>
+            <drop-tables-at-undeploy>true</drop-tables-at-undeploy>
+        </cmp-resource>
+    </enterprise-beans>
+    <keep-state>true</keep-state>
+</glassfish-ejb-jar>
+----
+
+[[the-glassfish-application-client.xml-file]]
+== The `glassfish-application-client.xml` file
+
+The `glassfish-application-client.xml` file configures an Application Client Container (ACC) client (JAR file). The element hierarchy is as follows:
+
+[source,text]
+----
+glassfish-application-client
+.  ejb-ref
+.  .  ejb-ref-name
+.  .  jndi-name
+.  resource-ref
+.  .  res-ref-name
+.  .  jndi-name
+.  .  default-resource-principal
+.  .  .  name
+.  .  .  password
+.  resource-env-ref
+.  .  resource-env-ref-name
+.  .  jndi-name
+.  service-ref
+.  .  service-ref-name
+.  .  port-info
+.  .  .  service-endpoint-interface
+.  .  .  wsdl-port
+.  .  .  .  namespaceURI
+.  .  .  .  localpart
+.  .  .  stub-property
+.  .  .  .  name
+.  .  .  .  value
+.  .  .  call-property
+.  .  .  .  name
+.  .  .  .  value
+.  .  .  message-security-binding
+.  .  .  .  message-security
+.  .  .  .  .  message
+.  .  .  .  .  .  java-method
+.  .  .  .  .  .  .  method-name
+.  .  .  .  .  .  .  method-params
+.  .  .  .  .  .  .  .  method-param
+.  .  .  .  .  .  operation-name
+.  .  .  .  .  request-protection
+.  .  .  .  .  response-protection
+.  .  call-property
+.  .  .  name
+.  .  .  value
+.  .  wsdl-override
+.  .  service-impl-class
+.  .  service-qname
+.  .  .  namespaceURI
+.  .  .  localpart
+.  message-destination-ref
+.  .  message-destination-ref-name
+.  .  jndi-name
+.  message-destination
+.  .  message-destination-name
+.  .  jndi-name
+.  java-web-start-access
+.  .  context-root
+.  .  eligible
+.  .  vendor
+.  .  jnlp-doc
+.  version-identifier
+----
+
+.A sample `glassfish-application-client.xml` file:
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glassfish-application-client
+"http://glassfish.org/dtds/glassfish-application-client_6_0-2.dtd">
+<glassfish-application-client>
+  <message-destination-ref>
+    <message-destination-ref-name>ClientQueue</message-destination-ref-name>
+    <jndi-name>jms/security_mdb_OutQueue</jndi-name>
+  </message-destination-ref>
+</glassfish-application-client>
+----
+
+[[the-glassfish-resources.xml-file]]
+== The `glassfish-resources.xml` and `payara-resources.xml` Files
+
+The `glassfish-resources.xml` file configures application-scoped resources. It is an original Eclipse GlassFish deployment descriptor.
+
+The `payara-resources.xml` is a matching Payara Platform variant that supports additional elements.
+
+Their element hierarchy is as follows:
+
+[source,text]
+----
+resources
+.  custom-resource
+.  .  description
+.  .  property (with attributes)
+.  .  .  description
+.  external-jndi-resource
+.  .  description
+.  .  property (with attributes)
+.  .  .  description
+.  jdbc-resource
+.  .  description
+.  .  property (with attributes)
+.  .  .  description
+.  mail-resource
+.  .  description
+.  .  property (with attributes)
+.  .  .  description
+.  admin-object-resource
+.  .  description
+.  .  property (with attributes)
+.  .  .  description
+.  connector-resource
+.  .  description
+.  .  property (with attributes)
+.  .  .  description
+.  resource-adapter-config
+.  .  property (with attributes)
+.  .  .  description
+.  jdbc-connection-pool
+.  .  description
+.  .  log-jdbc-calls
+.  .  property (with attributes)
+.  .  .  description
+.  connector-connection-pool
+.  .  description
+.  .  security-map
+.  .  .  principal
+.  .  .  user-group
+.  .  .  backend-principal
+.  .  property (with attributes)
+.  .  .  description
+.  work-security-map
+.  .  description
+.  .  principal-map
+.  .  group-map
+.  managed-executor-service (*)
+.  managed-scheduled-executor-service (*)
+.  managed-thread-factory (*)
+----
+
+IMPORTANT: The elements marked as `(*)` are only supported in the payara-resources.xml deployment descriptor variant.
+
+. A sample `payara-resources.xml`
+[source,xml,subs=attributes+]
+----
+<!DOCTYPE resources PUBLIC "-//Payara.fish//DTD Payara Server {page-version} Resource Definitions//EN" "{payaraResourcesDtd}">
+<resources>
+    <!-- Connects to MySql database called 'test' on a server called 'database' -->
+    <jdbc-connection-pool name="jdbc/testConnPool"
+                          res-type="javax.sql.DataSource"
+                          datasource-classname="com.mysql.jdbc.jdbc2.optional.MysqlDataSource"
+                          pool-resize-quantity="2"
+                          max-pool-size="32"
+                          steady-pool-size="8">
+        <property name="URL" value="jdbc:mysql://database:3306/test"/>
+        <property name="User" value="root"/>
+        <property name="Password" value="password"/>
+    </jdbc-connection-pool>
+    <jdbc-resource enabled="true" jndi-name="jdbc/testDS" object-type="user" pool-name="jdbc/testConnPool">
+        <description>Test DataSource jdbc/testDS for Connection Pool jdbc/testConnPool</description>
+    </jdbc-resource>
+</resources>
+----
+
+[[the-sun-acc.xml-file]]
+== The sun-acc.xml File
+
+The `sun-acc.xml` file configures the Application Client Container. This is more of a configuration file than a deployment descriptor.
+
+Payara Server provides a default file in the `domain-dir/config` directory. Specifying a different file is optional. The element hierarchy is as follows:
+
+[source,text]
+----
+client-container
+.  target-server
+.  .  description
+.  .  security
+.  .  .  ssl
+.  .  .  cert-db
+.  auth-realm
+.  .  property (with attributes)
+.  client-credential
+.  .  property (with attributes)
+.  log-service
+.  .  property (with attributes)
+.  message-security-config
+.  .  provider-config
+.  .  .  request-policy
+.  .  .  response-policy
+.  .  .  property (with attributes)
+.  property (with attributes)
+----
+
+[[the-sun-cmp-mappings.xml-file]]
+== The `sun-cmp-mappings.xml` File
+
+The `sun-cmp-mappings.xml` file configures container-managed persistence for an EJB 2.0 or 2.1 entity bean on older versions of the Jakarta EE specification.
+
+The element hierarchy is as follows:
+
+[source,text]
+----
+sun-cmp-mappings
+.  sun-cmp-mapping
+.  .  schema
+.  .  entity-mapping
+.  .  .  ejb-name
+.  .  .  table-name
+.  .  .  cmp-field-mapping
+.  .  .  .  field-name
+.  .  .  .  column-name
+.  .  .  .  read-only
+.  .  .  .  fetched-with
+.  .  .  .  .  default
+.  .  .  .  .  level
+.  .  .  .  .  named-group
+.  .  .  .  .  none
+.  .  .  cmr-field-mapping
+.  .  .  .  cmr-field-name
+.  .  .  .  column-pair
+.  .  .  .  .  column-name
+.  .  .  .  fetched-with
+.  .  .  .  .  default
+.  .  .  .  .  level
+.  .  .  .  .  named-group
+.  .  .  .  .  none
+.  .  .  secondary-table
+.  .  .  .  table-name
+.  .  .  .  column-pair
+.  .  .  .  .  column-name
+.  .  .  consistency
+.  .  .  .  none
+.  .  .  .  check-modified-at-commit
+.  .  .  .  lock-when-loaded
+.  .  .  .  check-all-at-commit
+.  .  .  .  lock-when-modified
+.  .  .  .  check-version-of-accessed-instances
+.  .  .  .  .  column-name
+----
+
+.A sample database schema definition:
+[source, mysql]
+----
+create table TEAMEJB(
+   TEAMID varchar2(256) not null,
+   NAME varchar2(120) null,
+   CITY char(30) not null,
+   LEAGUEEJB_LEAGUEID varchar2(256) null,
+   constraint PK_TEAMEJB primary key (TEAMID)
+);
+
+create table PLAYEREJB(
+   POSITION varchar2(15) null,
+   PLAYERID varchar2(256) not null,
+   NAME char(64) null,
+   SALARY number(10, 2) not null,
+   constraint PK_PLAYEREJB primary key (PLAYERID)
+);
+
+create table LEAGUEEJB(
+   LEAGUEID varchar2(256) not null,
+   NAME varchar2(256) null,
+   SPORT varchar2(256) null,
+);
+
+create table PLAYEREJBTEAMEJB (
+   PLAYEREJB_PLAYERID varchar2(256) null,
+   TEAMEJB_TEAMID varchar2(256) null
+);
+
+alter table TEAMEJB add constraint FK_LEAGUE foreign key (LEAGUEEJB_LEAGUEID) references LEAGUEEJB (LEAGUEID);
+
+alter table PLAYEREJBTEAMEJB add constraint FK_TEAMS foreign key (PLAYEREJB_PLAYERID) references PLAYEREJB (PLAYERID);
+
+alter table PLAYEREJBTEAMEJB add constraint FK_PLAYERS foreign key (TEAMEJB_TEAMID) references TEAMEJB (TEAMID);
+----
+
+.A corresponding sample `sun-cmp-mappings.xml` file:
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<sun-cmp-mappings>
+<sun-cmp-mapping>
+    <schema>Roster</schema>
+    <entity-mapping>
+        <ejb-name>TeamEJB</ejb-name>
+        <table-name>TEAMEJB</table-name>
+        <cmp-field-mapping>
+            <field-name>teamId</field-name>
+            <column-name>TEAMEJB.TEAMID</column-name>
+        </cmp-field-mapping>
+        <cmp-field-mapping>
+            <field-name>name</field-name>
+            <column-name>TEAMEJB.NAME</column-name>
+        </cmp-field-mapping>
+        <cmp-field-mapping>
+            <field-name>city</field-name>
+            <column-name>TEAMEJB.CITY</column-name>
+        </cmp-field-mapping>
+        <cmr-field-mapping>
+            <cmr-field-name>league</cmr-field-name>
+            <column-pair>
+                <column-name>TEAMEJB.LEAGUEEJB_LEAGUEID</column-name>
+                <column-name>LEAGUEEJB.LEAGUEID</column-name>
+            </column-pair>
+            <fetched-with>
+                <none/>
+            </fetched-with>
+        </cmr-field-mapping>
+        <cmr-field-mapping>
+            <cmr-field-name>players</cmr-field-name>
+            <column-pair>
+                <column-name>TEAMEJB.TEAMID</column-name>
+                <column-name>PLAYEREJBTEAMEJB.TEAMEJB_TEAMID</column-name>
+            </column-pair>
+            <column-pair>
+                <column-name>PLAYEREJBTEAMEJB.PLAYEREJB_PLAYERID</column-name>
+                <column-name>PLAYEREJB.PLAYERID</column-name>
+            </column-pair>
+            <fetched-with>
+                <none/>
+            </fetched-with>
+        </cmr-field-mapping>
+    </entity-mapping>
+    <entity-mapping>
+        <ejb-name>PlayerEJB</ejb-name>
+        <table-name>PLAYEREJB</table-name>
+        <cmp-field-mapping>
+            <field-name>position</field-name>
+            <column-name>PLAYEREJB.POSITION</column-name>
+        </cmp-field-mapping>
+        <cmp-field-mapping>
+            <field-name>playerId</field-name>
+            <column-name>PLAYEREJB.PLAYERID</column-name>
+        </cmp-field-mapping>
+        <cmp-field-mapping>
+            <field-name>name</field-name>
+            <column-name>PLAYEREJB.NAME</column-name>
+        </cmp-field-mapping>
+        <cmp-field-mapping>
+            <field-name>salary</field-name>
+            <column-name>PLAYEREJB.SALARY</column-name>
+        </cmp-field-mapping>
+        <cmr-field-mapping>
+            <cmr-field-name>teams</cmr-field-name>
+            <column-pair>
+                <column-name>PLAYEREJB.PLAYERID</column-name>
+                <column-name>PLAYEREJBTEAMEJB.PLAYEREJB_PLAYERID</column-name>
+            </column-pair>
+            <column-pair>
+                <column-name>PLAYEREJBTEAMEJB.TEAMEJB_TEAMID</column-name>
+                <column-name>TEAMEJB.TEAMID</column-name>
+            </column-pair>
+            <fetched-with>
+                <none/>
+            </fetched-with>
+        </cmr-field-mapping>
+    </entity-mapping>
+    <entity-mapping>
+        <ejb-name>LeagueEJB</ejb-name>
+        <table-name>LEAGUEEJB</table-name>
+        <cmp-field-mapping>
+            <field-name>leagueId</field-name>
+            <column-name>LEAGUEEJB.LEAGUEID</column-name>
+        </cmp-field-mapping>
+        <cmp-field-mapping>
+            <field-name>name</field-name>
+            <column-name>LEAGUEEJB.NAME</column-name>
+        </cmp-field-mapping>
+        <cmp-field-mapping>
+            <field-name>sport</field-name>
+            <column-name>LEAGUEEJB.SPORT</column-name>
+        </cmp-field-mapping>
+        <cmr-field-mapping>
+            <cmr-field-name>teams</cmr-field-name>
+            <column-pair>
+                <column-name>LEAGUEEJB.LEAGUEID</column-name>
+                <column-name>TEAMEJB.LEAGUEEJB_LEAGUEID</column-name>
+            </column-pair>
+            <fetched-with>
+                <none/>
+            </fetched-with>
+        </cmr-field-mapping>
+    </entity-mapping>
+</sun-cmp-mapping>
+</sun-cmp-mappings>
+----
+
+//TODO - Assess whether such support should be properly removed in the future
+
+[[weblogic-server-deployment-descriptor-support-in-payara-server]]
+== WebLogic Server Deployment Descriptor Support in Payara Server
+
+Payara Server offers limited support for the `weblogic-application.xml`, `weblogic.xml`, and `weblogic-webservices.xml` deployment descriptor files.
+
+The only element in `weblogic-application.xml` that Payara Server supports is `security`. The equivalent element in the `glassfish-application.xml` file is `security-role-mapping`.
+
+The elements of `weblogic.xml` that Payara Server supports are explained in the following table.
+
+.`weblogic.xml` Support in Payara Server
+
+[cols="2,6",options="header"]
+|===
+| *`weblogic.xml` Element Name* | *Payara Server Support*
+
+| `role-name` under `security-role-assignment`
+| `role-name` under `security-role-mapping` `glassfish-web.xml` equivalent
+
+| `principal-name` under `security-role-assignment`
+| `principal-name` under `security-role-mapping` `glassfish-web.xml` equivalent
+
+| `resource-description`
+| `resource-ref` `glassfish-web.xml` equivalent, but `resource-link` not supported
+
+| `resource-env-description`
+| `resource-env-ref` `glassfish-web.xml` equivalent, but `resource-link` not supported
+
+| `ejb-reference-description`
+| `ejb-ref` `glassfish-web.xml` equivalent
+
+| `service-reference-description`
+|`service-ref` `glassfish-web.xml` equivalent
+
+| `timeout-secs` under `session-descriptor`
+| `timeoutSeconds` property of `session-properties` `glassfish-web.xml` equivalent
+
+| `invalidation-interval-secs` under `session-descriptor`
+| `reapIntervalSeconds` property of `manager-properties` `glassfish-web.xml` equivalent
+
+| `max-in-memory-sessions` under `session-descriptor`
+| `maxSessions` property of `manager-properties` `glassfish-web.xml` equivalent
+
+| `persistent-store-dir` under `session-descriptor`
+| `directory` property of `store-properties` `glassfish-web.xml` equivalent
+
+| `prefer-web-inf-classes` under `container-descriptor`
+| `delegate` attribute of `class-loader` `glassfish-web.xml` equivalent
+
+| `context-root`
+| `context-root` `glassfish-web.xml` equivalent
+
+| `cookies-enabled` under `session-descriptor`
+| Servlet 3.0
+
+| `cookie-name` under `session-descriptor`
+| Servlet 3.0
+
+| `cookie-path` under `session-descriptor`
+| Servlet 3.0
+
+| `cookie-domain` under `session-descriptor`
+| Servlet 3.0
+
+| `cookie-comment` under `session-descriptor`
+| Servlet 3.0
+
+| `cookie-secure` under `session-descriptor`
+| Servlet 3.0
+
+| `cookie-max-age-secs` under `session-descriptor`
+| Servlet 3.0
+
+| `cookie-http-only` under `session-descriptor`
+| Servlet 3.0
+
+| `url-rewriting-enabled` under `session-descriptor`
+| Servlet 3.0
+
+| `persistent-store-cookie-name` under `session-descriptor`
+| Cookie-based persistence is supported
+
+| `keepgenerated` under `jsp-descriptor`
+| keep generated init parameter of `JspServlet`
+
+| `working-dir` under `jsp-descriptor`
+| scratchdir init parameter of `JspServlet`
+
+| `compress-html-template` under `jsp-descriptor`
+| trimSpaces init parameter of `JspServlet`
+
+| `index-directory-enabled` under `container-descriptor`
+| listings init parameter of `DefaultServlet`
+
+| `index-directory-sort-by` under `container-descriptor`
+| sortedBy init parameter of `DefaultServlet`
+
+| `save-sessions-enabled` under `container-descriptor`
+| Same as `asadmin redeploy` `--keepstate=true` or `keep-state` in `glassfish-web.xml`
+
+| `run-as-principal-name` under `servlet-descriptor`
+| `principal-name` under `servlet` `glassfish-web.xml` equivalent
+
+|===
+
+The elements of `weblogic-webservices.xml` that Payara Server supports are explained in the following table.
+
+.`weblogic-webservices.xml` Support in Payara Server
+[cols="3,6",options="header"]
+|===
+| *`weblogic-webservices.xml` Element Name* | *Payara Server Support*
+
+| `webservice-type`
+| Possible values are `JAXRPC` or `JAXWS`. Payara Server does not support JAX-RPC web services with Jakarta Web Services Metadata annotations.
+The use of this element is limited, because the container can find out if the type is JAX-WS or JAX-RPC based on presence of Jakarta Web Services Metadata annotations.
+
+| `wsdl-publish-file`
+| Same as `wsdl-publish-location` in `glassfish-web.xml`
+
+| `service-endpoint-address`
+| Similar to `endpoint-address-uri` in `glassfish-web.xml`, except that `webservice-contextpath` and `webservice-serviceuri` are specified separately
+
+| `j2ee:login-config`
+| Same as `login-config` in `glassfish-web.xml`
+
+| `j2ee:transport-guarantee`
+| Same as `transport-guarantee` in `glassfish-web.xml`
+
+| `exposed` under `wsdl`
+| Accepts `true` or `false`, defaults to `true`. Controls the publishing of WSDL to clients.
+
+| `stream-attachments`
+| Accepts `true` or `false`, defaults to `true`. Only for JAX-WS web services. Configures the JAX-WS runtime to send attachments in streaming fashion.
+
+| `validate-request`
+|Accepts `true` or `false`, defaults to `false`. Only for JAX-WS web services. Configures the JAX-WS runtime to validate that request messages are as the WSDL definitions specify.
+
+| `http-response-buffersize`
+| Property of `ReliabilityMessagingFeature` configuration, similar to `ReliableMessagingFeature.setDestinationBufferQuota()`
+
+| `reliability-config`
+| Partially supported. Sub-elements map to Metro's `ReliabilityMessagingFeature`.
+
+| `inactivity-timeout` under `reliability-config`
+| Maps to `ReliableMessagingFeature.getSequenceInactivityTimeout()`
+
+| `base-retransmission-interval` under `reliability-config`
+| Maps to `ReliableMessagingFeature.``getMessageRetransmissionInterval()`
+
+| `retransmission-exponential-``backoff` under `reliability-config`
+| Maps to `ReliableMessagingFeature.``getRetransmissionBackoffAlgorithm()`. Returns enum values, one of them is `exponential`.
+
+| `acknowledgement-interval` under `reliability-config`
+| Maps to `ReliableMessagingFeature.``getAcknowledgementTransmissionInterval()`
+
+| `sequence-expiration` under `reliability-config`
+| Maps to `ReliableMessagingFeature.``getSequenceInactivityTimeout()`. In WebLogic Server this value applies regardless of activity.
+In Metro it applies only to inactive sequences.
+
+| `buffer-retry-count` under `reliability-config`
+| Maps to `ReliableMessagingFeature.``getMaxMessageRetransmissionCount()`
+
+| `buffer-retry-delay` under `reliability-config`
+| Maps to `ReliableMessagingFeature.``getMessageRetransmissionInterval()`
+|===
+
+[[deployment-descriptor-precedence-order]]
+== Deployment Descriptor Precedence Order
+
+When multiple vendor deployment descriptors are present in the same module (including deployment descriptors of the original *Eclipse GlassFish* and of the old *Sun Application Server*), the descriptors are processed with the following precedence order in default mode:
+
+----
+WebLogic Server > Payara Platform > Eclipse GlassFish Server > Sun Application Server
+----
+
+The default precedence order can be customized and configured via the system properties documented in the following sections.
+
+[[gfdd-over-wlsdd]]
+=== `gfdd.over.wlsdd`
+
+This system property controls the precedence between original GlassFish Server and WebLogic Server deployment descriptors when they are both present.
+
+When the `gfdd.over.wlsdd` property is set to true, the descriptors are processed in this order:
+
+----
+Payara Platform > GlassFish Server > WebLogic Server > Sun Application Server
+----
+
+[[ignore-wlsdd]]
+=== `ignore.wlsdd`
+
+When the `ignore.wlsdd` property is set to true, the WebLogic Server deployment descriptors will be completely ignored and other descriptors will be processed in the following order:
+
+----
+GlassFish Server > Payara Platform > Sun Application Server
+----

@@ -1,0 +1,335 @@
+[[using-the-java-naming-and-directory-interface]]
+= Using the Java Naming and Directory Interface
+:ordinal: 18
+
+A naming service maintains a set of bindings, which relate names to objects. The Payara Platform's naming service is based on the Java Naming and Directory Interface (JNDI) API.
+The JNDI API allows application components and clients to look up distributed resources, services, and EJB components.
+
+For general information about the JNDI API, see `http://www.oracle.com/technetwork/java/jndi/index.html`.
+
+IMPORTANT: Payara Server's Web Profile supports the EJB 4.0 Lite specification, which allows enterprise beans within web applications, among other features. The Full Profile supports the entire EJB 4.0 specification. For details, see https://jakarta.ee/specifications/enterprise-beans/[Jakarta Enterprise Beans].
+
+[[accessing-the-naming-context]]
+== Accessing the Naming Context
+
+Payara Server provides a naming environment, or context, which is compliant with standard Jakarta EE requirements. A `Context` object provides the methods for binding names to objects, unbinding names from objects, renaming objects, and listing the bindings.
+
+The `InitialContext` is the handle to the Jakarta EE naming service that application components and clients use for lookups.
+
+The JNDI API also provides subcontext functionality. Much like a directory in a file system, a subcontext is a context within a context. This hierarchical structure permits better organization of information. For naming services that support subcontexts, the `Context` class also provides methods for creating and destroying subcontexts.
+
+NOTE: Each resource within a server instance must have a unique name. However, two resources in different server instances or different domains can have the same name.
+
+[[portable-global-jndi-names]]
+=== Portable Global JNDI Names
+
+If an EJB component is a kind of session bean, and it is deployed to any implementation supporting the Jakarta Enterprise Beans 4.0 specification,
+it automatically has one or more portable JNDI names defined based on the syntax in the specification.
+
+NOTE: This is true of existing EJB 3.0 and 2.x applications that are deployed to an implementation supporting EJB 3.1 or newer versions.
+
+No code changes are required to the bean class itself in order to have the portable global JNDI name automatically assigned when deployed to an EJB container.
+
+For more information, see the Jakarta EE Platform Specification, section https://jakarta.ee/specifications/platform/10/jakarta-platform-spec-10.0.html#a616[5.2.2, "Application Component Environment Namespaces]", and the EJB 4.0 Specification, section https://jakarta.ee/specifications/enterprise-beans/4.0/jakarta-enterprise-beans-spec-core-4.0.html#a800[4.4. Access in the Global JNDI Namespace].
+
+NOTE: If the `disable-nonportable-jndi-names` property is set to `false` (the
+default), a Payara Server JNDI name is assigned in addition to a portable global JNDI name.
+
+[[payara-server-vendor-specific-global-jndi-names]]
+=== Payara Server Vendor-Specific Global JNDI Names
+
+Payara Server vendor-specific global JNDI names are assigned according to the following precedence rules:
+
+. A global JNDI name assigned in the `glassfish-ejb-jar.xml`, `payara-web.xml`, or `glassfish-application-client.xml` deployment descriptor file has the highest precedence. See xref:#mapping-references[Mapping References].
+
+.  A global JNDI name assigned in a `mapped-name` element in the `ejb-jar.xml`, `web.xml`, or `application-client.xml` deployment descriptor file has the second-highest precedence. The following elements have `mapped-name` sub-elements: `resource-ref`, `resource-env-ref`, `ejb-ref`, `message-destination`, `message-destination-ref`, `session`,
+`message-driven`, and `entity`.
+
+. A global JNDI name assigned in a `mappedName` attribute of an annotation has the third-highest precedence. The following annotations have `mappedName` attributes: `@jakarta.annotation.Resource`, `@jakarta.ejb.EJB`, `@jakarta.ejb.Stateless`, `@jakarta.ejb.Singleton`, `@jakarta.ejb.Stateful`, and `@javax.ejb.MessageDriven`.
+
+. In most cases, a default global JNDI name is assigned (and recorded in the server log) if no name is assigned in deployment descriptors or annotations.
+
+* For a session or entity bean, a Payara Server specific JNDI name is assigned as follows:
+
+** For an EJB 2.x dependency or a session or entity bean with a remote interface, the default is the fully qualified name of the home interface.
+
+** For an EJB 3.0+ dependency or a session bean with a remote interface, the default is the fully qualified name of the remote business interface.
+
+** If both EJB 2.x and EJB 3.0 remote interfaces are specified, or if more than one 3.0 remote interface is specified, there is no Payara Server specific default.
++
+For an entity bean, a global JNDI name must be assigned.
+
+* For all other component dependencies that must be mapped to global JNDI names, the default is the name of the dependency relative to `java:comp/env`.
++
+For example, in the `@Resource(name="jdbc/Foo") DataSource ds;` annotation, the global JNDI name is `jdbc/Foo`.
+
+[[disabling-payara-server-jndi-names]]
+=== Disabling Payara Server JNDI Names
+
+The EJB specification supported by Payara Server defines portable EJB JNDI names for session beans. Because of this, there is less need to continue to use older vendor-specific JNDI names.
+
+By default, Payara Server specific JNDI names are generated automatically for backward compatibility. However, this can lead to some ease-of-use issues.
+
+For example, deploying two different applications containing a remote EJB component that exposes the same remote interface causes a conflict between the default JNDI names.
+
+The default handling of JNDI specific names in Payara Server can be managed by using the `asadmin` command:
+
+[source,shell]
+----
+asadmin> set server.ejb-container.property.disable-nonportable-jndi-names="true"
+----
+
+The `disable-nonportable-jndi-names` property is a boolean flag that can take the following values:
+
+`false`::
+  Enables the automatic use of Payara Server specific JNDI names in addition to portable global JNDI names. This is the default setting.
+`true`::
+  Disables the automatic use of specific JNDI names. In all cases, only portable global JNDI names are used.
+
+TIP: This setting applies to all session beans deployed in the server.
+
+[[accessing-ejb-components-using-the-cosnaming-naming-context]]
+=== Accessing EJB Components Using the `CosNaming` Naming Context
+
+The preferred way of accessing the naming service, even in code that runs outside a Jakarta EE container, is to use the no-argument `InitialContext` constructor.
+
+However, if EJB client code explicitly instantiates an `InitialContext` that points to the `CosNaming` naming service, it is necessary to set the `java.naming.factory.initial` property to `org.glassfish.jndi.cosnaming.CNCtxFactory` in the client JVM software when accessing EJB components.
+
+You can set this property using the `asadmin create-jvm-options` command, as follows:
+
+[source,shell]
+----
+asadmin> create-jvm-options -Djava.naming.factory.initial=org.glassfish.jndi.cosnaming.CNCtxFactory
+----
+
+Or you can set this property in the code, as follows:
+
+[source,java]
+----
+try {
+    var properties = new Properties();
+    properties.put("java.naming.factory.initial", "org.glassfish.jndi.cosnaming.CNCtxFactory");
+}
+----
+
+The `java.naming.factory.initial` property applies to only one instance. The property is neither cluster or deployment group-aware.
+
+[[accessing-ejb-components-in-a-remote-payara-server]]
+=== Accessing EJB Components in a Remote Payara Server
+
+The recommended approach for looking up an EJB component in a remote Payara Server from a client that is a servlet or EJB component is to use the Interoperable Naming Service syntax.
+
+Host and port information is prepended to any global JNDI names and is automatically resolved during the lookup. The syntax for an interoperable global name is as follows:
+
+[source,text]
+----
+corbaname:iiop:${host}:${port}#{ejbName}
+----
+
+This makes the programming model for accessing EJB components in another Payara Server exactly the same as accessing them in the same server. The deployer can change the way the EJB components are physically distributed without having to change the code.
+
+For Jakarta EE components, the code still performs a `java:comp/env` lookup on an EJB reference. The only difference is that the deployer maps the `ejb-ref` element to an interoperable name in a Payara Server deployment descriptor file instead of to a simple global JNDI name.
+
+For example, suppose a servlet looks up an EJB reference using `java:comp/env/ejb/Foo`, and the target EJB component has a global JNDI name of `a/b/Foo`.
+
+The `ejb-ref` element in `glassfish-web.xml` or `payara-web.xml` looks like this:
+
+[source,xml]
+----
+<ejb-ref>
+   <ejb-ref-name>ejb/Foo</ejb-ref-name>
+   <jndi-name>corbaname:iiop:host:port#a/b/Foo</jndi-name>
+</ejb-ref>
+----
+
+The code looks like this:
+
+[source,java]
+----
+Context ic = new InitialContext();
+Object o = ic.lookup("java:comp/env/ejb/Foo");
+----
+
+For a client that doesn't run within a Jakarta EE container, the code just uses the interoperable global name instead of the simple global JNDI name. For example:
+
+[source,java]
+----
+Context ic = new InitialContext();
+Object o = ic.lookup("corbaname:iiop:host:port#a/b/Foo");
+----
+
+IMPORTANT: Objects stored in the interoperable naming context and component-specific (`java:comp/env`) naming contexts are transient. On each server startup or application reloading, all relevant objects are re-bound to the namespace.
+
+[[naming-environment-for-lifecycle-modules]]
+=== Naming Environment for Lifecycle Modules
+
+Lifecycle listener modules provide a means of running short or long duration tasks based on Java technology within the Payara Server environment, such as instantiation of singletons or RMI servers.
+
+These modules are automatically initiated at server startup and are notified at various phases of the server life cycle.
+
+For details about lifecycle modules, see xref:Technical Documentation/Application Development/Developing Lifecycle Listeners.adoc#developing-lifecycle-listeners[Developing Lifecycle Listeners].
+
+The configured properties for a lifecycle module are passed as properties during server initialization (the `INIT_EVENT`). The initial JNDI naming context is not available until server initialization is complete.
+
+A lifecycle module can get the `InitialContext` for lookups using the method `LifecycleEventContext.getInitialContext()` during, and only during, the `STARTUP_EVENT`, `READY_EVENT`, or `SHUTDOWN_EVENT` server life cycle events.
+
+[[configuring-resources]]
+== Configuring Resources
+
+Payara Server exposes special resources in the naming context environment.
+
+[[external-jndi-resources]]
+=== External JNDI Resources
+
+An external JNDI resource defines custom JNDI contexts and implements the `javax.naming.spi.InitialContextFactory` interface. There is no specific JNDI parent context for external JNDI resources, except for the standard `java:comp/env/`.
+
+Create an external JNDI resource in one of these ways:
+
+* To create an external JNDI resource using the Administration Console, open the _Resources_ component, open the _JNDI_ component, and select _External Resources_.
+* To create an external JNDI resource, use the `asadmin create-jndi-resource` command.
+
+[[custom-resources]]
+=== Custom Resources
+
+A custom resource specifies a custom server-wide resource object factory that implements the `javax.naming.spi.ObjectFactory` interface. There is no specific JNDI parent context for external JNDI resources, except for the standard `java:comp/env/`.
+
+Create a custom resource in one of these ways:
+
+* To create a custom resource using the Administration Console, open the _Resources_ component, open the _JNDI_ component, and select _Custom Resources_.
+* To create a custom resource, use the `asadmin create-custom-resource` command.
+
+[[built-in-factories-for-custom-resources]]
+=== Built-in Factories for Custom Resources
+
+Payara Server provides built-in factories for the following types of custom resources:
+
+* JavaBeans
+* Properties
+* Java Primitives and String objects
+* URLs
+
+It is possible to create custom resources by using a `payara-resources.xml` or `glassfish-resources.xml` deployment descriptor. To this effect, several `glassfish-resources.xml` template files for these built-in factories and a `README` file are available at `as-install/lib/install/templates/resources/custom/`.
+
+[[javabeanfactory]]
+==== *JavaBeanFactory*
+
+To create a custom resource that provides instances of a JavaBean class, follow these steps:
+
+. Set the custom resource's factory class to `org.glassfish.resources.custom.factory.JavaBeanFactory`.
+. Create a property in the custom resource for each setter method in the JavaBean class.
++
+For example, if the JavaBean class has a method named `setAccount`, specify a property named `account` and give it a value.
+. Make sure the JavaBean class is accessible to the Payara Server.
++
+For example, you can place the JavaBean class in the `as-install/lib` directory.
+
+[[propertiesfactory]]
+==== PropertiesFactory
+
+To create a custom resource that provides configuration properties to applications, set the custom resource's factory class to `org.glassfish.resources.custom.factory.PropertiesFactory`, then specify one or both of the following:
+
+* Create a property in the custom resource named `org.glassfish.resources.custom.factory.PropertiesFactory.fileName` and specify as its value the path to a properties file or an XML file.
++
+The path can be absolute or relative to the installation directory. The file must be accessible to the operating system user running the Payara Server's process.
++
+If an XML file is specified, it must match the document type definition (DTD) specified in the API definition of link:https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Properties.html[java.util.Properties].
+
+* Create the desired properties directly as properties of the custom resource.
++
+If both the `fileName` property and other properties are specified, the resulting property set is the union of the contents of both.
++
+If the same property is defined in the file and directly in the custom resource, the value of the latter takes precedence.
+
+[[primitivesandstringfactory]]
+==== PrimitivesAndStringFactory
+
+To create a custom resource that provides Java primitives to applications, follow these steps:
+
+. Set the custom resource's factory class to `org.glassfish.resources.custom.factory.PrimitivesAndStringFactory`.
+. Set the custom resource's resource type to one of the following or its fully qualified wrapper class name equivalent:
++
+* `int`
+* `long`
+* `double`
+* `float`
+* `char`
+* `short`
+* `byte`
+* `boolean`
+* `String`
+
+. Create a property in the custom resource named `value` and give it the value needed by the application.
++
+For example, If the application requires a `double` of value `22.1`, create a property with the name `value` and the value `22.1`.
+
+[[urlfactory]]
+==== URLFactory
+
+To create a custom resource that provides URL instances to applications, follow these steps:
+
+. Set the custom resource's factory class to `org.glassfish.resources.custom.factory.URLObjectFactory`.
+
+. Choose which of the following constructors to use:
++
+* `URL(protocol, host, port, file)`
+* `URL(protocol, host, file)`
+* `URL(spec)`
+
+. Define properties according to the chosen constructor.
++
+For example, for the first constructor, define properties named `protocol`, `host`, `port`, and `file`. Example values might be `http`, `localhost`, `8085`, and `index.html`, respectively.
++
+For the third constructor, define a property named `spec` and assign it the value of the entire URL.
+
+[[using-application-scoped-resources]]
+=== Using Application-Scoped Resources
+
+You can define an application-scoped JNDI resource for an enterprise application, web module, EJB module, connector module, or application client module by supplying a `glassfish-resources.xml` or `payara-resources.xml` deployment descriptor file.
+
+For details, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deploying Applications.adoc#application-scoped-resources[Application-Scoped Resources]" in the Application Deployment section.
+
+[[using-a-custom-jndi.properties-file]]
+== Using a Custom `jndi.properties` File
+
+To use a custom `jndi.properties` file, JAR it and place it in the `domain-dir/lib` directory. This adds the custom `jndi.properties` file to the Common class loader. For more information about class loading, see xref:Technical Documentation/Application Development/Class Loaders.adoc[Class Loaders].
+
+TIP: For each property found in more than one `jndi.properties` file, the Jakarta EE naming service either uses the first value found or concatenates all values, whichever makes sense at runtime.
+
+[[mapping-references]]
+== Mapping References
+
+The following XML elements in the Payara Server deployment descriptors map resource references in application client, EJB, and web application components to JNDI names configured in Payara Server:
+
+`resource-env-ref`:: Maps the `@Resource` or `@Resources` annotation (or the `resource-env-ref` element in the corresponding Jakarta EE XML file) to the absolute JNDI name configured in Payara Server.
+`resource-ref`:: Maps the `@Resource` or `@Resources` annotation (or the `resource-ref` element in the corresponding Jakarta EE XML file) to the absolute JNDI name configured in Payara Server.
+`ejb-ref`:: Maps the `@EJB` annotation (or the `ejb-ref` element in the corresponding Jakarta EE XML file) to the absolute JNDI name configured in Payara Server.
++
+JNDI names for EJB components must be unique. For example, appending the application name and the module name to the EJB name is one way to guarantee unique names.
++
+In this case, `mycompany.pkging.pkgingEJB.MyEJB` would be the JNDI name for an EJB in the module `pkgingEJB.jar`, which is packaged in the `pkging.ear` application.
+
+These elements are part of the `glassfish-web.xml`/`payara-web.xml`, `glassfish-application-client.xml`, `glassfish-ejb-jar.xml`, and `glassfish-application.xml` deployment descriptor files.
+
+For more information about how these elements behave in each of the deployment descriptor files, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#elements-of-the-payara-platform-deployment-descriptors[Elements of the Payara Server Deployment Descriptors]" in the Payara Server Application Deployment section.
+
+The following is an example of a JDBC resource lookup to showcase how to reference resource factories. The same principle is applicable to all resources (such as JMS destinations, JavaMail sessions, and so on).
+
+The `@Resource` annotation in the application code looks like this:
+
+[source, java]
+----
+@Resource(name="jdbc/helloDbDs")
+javax.sql.DataSource ds;
+----
+
+This references a resource with the JNDI name of `java:jdbc/helloDbDs`. If this is the JNDI name of the JDBC resource configured in Payara Server, the annotation alone is enough to reference the resource.
+
+However, you can use a Payara Server specific deployment descriptor to override the annotation. For example, the `resource-ref` element in the `payara-web.xml` file maps the `res-ref-name` (the name specified in the annotation) to the JNDI name of another JDBC resource configured in Payara Server.
+
+[source,xml]
+----
+<resource-ref>
+   <res-ref-name>jdbc/helloDbDs</res-ref-name>
+   <jndi-name>jdbc/helloDbDataSource</jndi-name>
+</resource-ref>
+----

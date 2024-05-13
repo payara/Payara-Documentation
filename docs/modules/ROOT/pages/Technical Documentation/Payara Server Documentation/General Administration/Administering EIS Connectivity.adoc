@@ -1,0 +1,620 @@
+[[administering-eis-connectivity]]
+= Administering EIS Connectivity
+:ordinal: 15
+
+This chapter provides information and procedures for administering connections to enterprise information system (EIS) data in the Payara Server environment by using the `asadmin` command-line utility.
+
+NOTE: If you installed the Web Profile, connector modules that use only outbound communication features and work management that does not involve inbound communication features are supported. Other connector features are supported only in the Full Platform Profile.
+
+Instructions for accomplishing the tasks in this chapter by using the Administration Console are contained in the Administration Console online help.
+
+For information about database connectivity, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc[Administering Database Connectivity].
+
+[[about-eis-connectivity]]
+== About EIS Connectivity
+
+Enterprise information system (EIS) refers to any system that holds the data of an organization. It can be a mainframe, a messaging system, a database system, or an application. Connection resources are used by applications and modules to Create an Administered Object applications and modules to access EIS software.
+
+The key elements of EIS connectivity are the following:
+
+* *Connector Module*. A connector module also called a resource adapter, is a Jakarta EE component that enables applications to interact with EIS software. A connector module is used by Payara Server to implement Java Message Service (JMS). Like other Jakarta EE modules, a connector module is installed when it is deployed. For instructions on creating a connector module, see xref:Technical Documentation/Application Development/Developing Connectors.adoc[Developing Connectors] in the Payara Server Application Development section.
+
+* *Connector Connection Pool*. A connector connection pool is a group of reusable connections for a particular EIS. A connector connection pool is created when you specify the connector module that is associated with the pool. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-connector-connection-pools[Administering Connector Connection Pools].
+
+* *Connector Resource*. A connector resource is a program object that provides an application with a connection to an EIS. A connector resource is created when you specify its JNDI name and its associated connection pool. The JNDI name of a connector resource for an EIS is usually in the `java:comp/env/eis-specific` subcontext. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-connector-resources[Administering Connector Resources].
+
+* *Connector Module Configuration*. A connector module configuration is the information that resides in the domain configuration file (`domain.xml`) for the particular connector module (resource adapter). For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-the-resource-adapter-configuration[Administering the Resource Adapter Configuration].
+
+* *Connector Security Map*. A connector security map associates the caller identity of the application (principal or user group) to a suitable EIS principal or group. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-connector-security-maps[Administering Connector Security Maps].
+
+* *Connector Work Security Map*. A connector work security map associates the caller identity of the work submitted by the connector module (resource adapter) EIS principal or EIS user group to a suitable principal or user group in the Payara Server security domain. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-connector-work-security-maps[Administering Connector Work Security Maps].
+
+* *Administered Object*. An administered object provides specialized functionality for an application, such as providing access to a parser that is specific to the connector module and its associated EIS. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-administered-objects[Administering Administered Objects].
+
+At runtime, the following sequence occurs when an application connects to an EIS:
+
+. The application gets the connector resource (data source) associated with the EIS by making a call through the JNDI API. Using the JNDI name of the connector resource, the naming and directory service locates the resource. Each EIS resource specifies a connector connection pool.
+. Using the connector resource, the application gets an EIS connection. Payara Server retrieves a physical connection from the connection pool that corresponds to the EIS resource. The pool defines connection attributes such as the EIS name, username, and password.
+. After the EIS connection is established, the application can read, modify, and add data to the EIS. The application accesses the EIS information by making calls to the JMS API.
+. When the application is finished accessing the EIS, the application closes the connection and returns the connection to the connection pool.
+
+[TIP]
+--
+You can  view the full syntax and options of the subcommand by typing `asadmin help `subcommand` at the command line. For Example:
+[source,shell]
+----
+asadmin help create-connector-connection-pool
+----
+--
+
+[[administering-connector-connection-pools]]
+== Administering Connector Connection Pools
+
+After a connector module has been deployed, you are ready to create a connector connection pool for it.
+
+[[to-create-a-connector-connection-pool]]
+=== To Create a Connector Connection Pool
+
+Use the `create-connector-connection-pool` subcommand in remote mode to create a connector connection pool for a deployed connector module. When you are building the connector connection pool, certain data specific to the EIS will be required. The value in the mandatory `--connectiondefintion` option provides the EIS info.
+
+Multiple connector resources can specify a single connection pool.
+
+Creating a connector connection pool is a dynamic event and does not require server restart. However, there are some parameters that do require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
+
+Before creating the connector connection pool, the connector must be installed.
+
+.  Ensure that the server is running. Remote subcommands require a running server.
+
+. Create the connector connection pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-connection-pool.adoc[`create-connector-connection-pool`] subcommand. Information about properties for the subcommand is included in this help page.
+
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+. You can verify that a connection pool is usable by using the `ping-connection-pool` subcommand. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-contact-ping-a-connection-pool[To Contact (Ping) a Connection Pool].
+
+.Example 12-1 Creating a Connector Connection Pool
+[source,shell]
+----
+asadmin> create-connector-connection-pool --steadypoolsize 20 --maxpoolsize 100
+--poolresize 2 --maxwait 60000 --raname jmsra --connectiondefinition
+jakarta.jms.QueueConnectionFactory jms/qConnPool
+
+Command create-connector-connection-pool executed successfully
+----
+
+
+[[to-list-connector-connection-pools]]
+=== To List Connector Connection Pools
+
+Use the `list-connector-connection-pools` subcommand in remote mode to list the pools that have been created.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the connector connection pools by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-connection-pools.adoc[`list-connector-connection-pools`)] subcommand.
+
+.Example 12-2 Listing Connector Connection Pools
+[source,shell]
+----
+asadmin> list-connector-connection-pools
+jms/qConnPool
+Command list-connector-connection-pools executed successfully
+----
+
+[[to-connect-to-ping-or-reset-flush-a-connector-connection-pool]]
+=== To Connect to (Ping) or Reset (Flush) a Connector Connection Pool
+
+Use the `ping-connection-pool` or `flush-connection-pool` subcommands in remote mode to perform these tasks on a connection pools. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-contact-ping-a-connection-pool[To Contact (Ping) a Connection Pool] or xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-reset-flush-a-connection-pool[To Reset (Flush) a Connection Pool] for instructions.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. Connect to or reset a connector connection pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/flush-connection-pool.adoc[`flush-connection-pool`] subcommand or the xref:Technical Documentation/Payara Server Documentation/Command Reference/ping-connection-pool.adoc[`ping-connection-pool`] subcommand.
+
+[[to-update-a-connector-connection-pool]]
+=== To Update a Connector Connection Pool
+
+Use the `get` and `set` subcommands to view and change the values of the connector connection pool properties.
+
+. List the connector connection pools by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-connection-pools.adoc[`list-connector-connection-pools`] subcommand.
+
+. View the properties of the connector connection pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/get.adoc[`get`] subcommand.
++
+.For example:
+[source,shell]
+----
+asadmin> get domain.resources.connector-connection-pool.*
+----
+. Set the property of the connector connection pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand.
++
+.For example:
+[source,shell]
+----
+asadmin> set domain.resources.connector-connection-pool
+.conectionpoolname.validate-atmost-once-period-in-seconds=3
+----
+
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+[[to-delete-a-connector-connection-pool]]
+=== To Delete a Connector Connection Pool
+
+Use the `delete-connector-connection-pool` subcommand in remote mode to remove a connector connection pool.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the connector connection pools by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-connection-pools.adoc[`list-connector-connection-pools`] subcommand.
+
+. If necessary, notify users that the connector connection pool is being deleted.
+
+. Delete the connector connection pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-connector-connection-pool.adoc[`delete-connector-connection-pool`] subcommand.
+
+.Example 12-3 Deleting a Connector Connection Pool
+[source,shell]
+----
+asadmin> delete-connector-connection-pool --cascade=false jms/qConnPool
+Command delete-connector-connection-pool executed successfully
+----
+
+[[administering-connector-resources]]
+== Administering Connector Resources
+
+A connector resource provides an application or module with the means of connecting to an EIS. Typically, you create a connector resource for each EIS that is accessed by the applications deployed in the domain.
+
+[[to-create-a-connector-resource]]
+=== To Create a Connector Resource
+
+Use the `create-connector-resource` subcommand in remote mode to register a new connector resource with its JNDI name.
+
+Creating a connector resource is a dynamic event and does not require server restart. However, there are some parameters that do require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
+
+Before creating a connector resource, you must first create a connector connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. Create the connector resource by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-resource.adoc[`create-connector-resource`] subcommand. Information about properties for the subcommand is included in this help page.
+
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+.Example 12-4 Creating a Connector Resource
+[source,shell]
+----
+asadmin> create-connector-resource --poolname jms/qConnPool
+--description "creating sample connector resource" jms/qConnFactory
+Command create-connector-resource executed successfully
+----
+
+[[to-list-connector-resources]]
+=== To List Connector Resources
+
+Use the `list-connector-resources` subcommand in remote mode to list the connector resources that have been created.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the connector connection pools by using the  xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-resources.adoc[`list-connector-resources`] subcommand.
+
+.Example 12-5 Listing Connector Resources
+[source,shell]
+----
+asadmin> list-connector-resources
+jms/qConnFactory
+Command list-connector-resources executed successfully
+----
+
+[[to-update-a-connector-resource]]
+=== To Update a Connector Resource
+
+Use the `get` and `set` subcommands to view and change the values of the connector resource properties.
+
+. List the connector connection pools by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-resources.adoc[`list-connector-resources`] subcommand.
+
+. View the properties of the connector resource by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/get.adoc[`get`] subcommand. +
++
+.For example +
+[source,shell]
+----
+asadmin> get domain.resources.connector-resource.jms/qConnFactory
+----
+. Set the property of the connector resource by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand.
++
+.For example:
+[source,shell]
+----
+asadmin> set domain.resources.connector-resource.jms/qConnFactory.enabled=true
+----
+
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+[[to-delete-a-connector-resource]]
+=== To Delete a Connector Resource
+
+Use the `delete-connector-resource` subcommand in remote mode to remove a connector resource by specifying the JNDI name.
+
+Before deleting a resource, all associations with the resource must be removed.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the connector connection pools by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-resources.adoc[`list-connector-resources`] subcommand.
+
+. If necessary, notify users that the connector resource is being deleted.
+
+. Delete the connector resource by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-connector-resource.adoc[`delete-connector-resource`] subcommand.
+
+.Example 12-6 Deleting a Connector Resource
+[source,shell]
+----
+asadmin> delete-connector-resource jms/qConnFactory
+Command delete-connector-resources executed successfully
+----
+
+[[administering-the-resource-adapter-configuration]]
+== Administering the Resource Adapter Configuration
+
+[[to-create-configuration-information-for-a-resource-adapter]]
+=== To Create Configuration Information for a Resource Adapter
+
+Use the `create-resource-adapter-config` subcommand in remote mode to create configuration information for a resource adapter, also known as a connector module. You can run the subcommand before deploying a resource adapter, so that the configuration information is available at the time of deployment. The resource adapter configuration can also be created after the resource adapter is deployed. In this situation, the resource adapter is restarted with the new configuration.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. Create configuration information by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-resource-adapter-config.adoc[`create-resource-adapter-config`] subcommand. Information about properties for the subcommand is included in this help page.
+
+.Example 12-7 Creating a Resource Adapter Configuration
+[source,shell]
+----
+asadmin> create-resource-adapter-config --property foo=bar
+--threadpoolid mycustomerthreadpool ra1
+Command create-resource-adapter-config executed successfully
+----
+
+[[to-list-resource-adapter-configurations]]
+=== To List Resource Adapter Configurations
+
+Use the `list-resource-adapter-configs` subcommand in remote mode to list the configuration information contained in the domain configuration file (`domain.xml`) for the specified resource adapter (connector module).
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the configurations for a resource adapter by using the  xref:Technical Documentation/Payara Server Documentation/Command Reference/list-resource-adapter-configs.adoc[`list-resource-adapter-configs`] subcommand.
+
+.Example 12-8 Listing Configurations for a Resource Adapter
+[source,shell]
+----
+asadmin> list-resource-adapter-configs
+ra1
+ra2
+Command list-resource-adapter-configs executed successfully
+----
+
+[[to-update-a-resource-adapter-configuration]]
+=== To Update a Resource Adapter Configuration
+
+Use the `get` and `set` subcommands to view and change the values of the resource adapter configuration properties.
+
+. List the configurations for a resource adapter by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-resource-adapter-configs.adoc[`list-resource-adapter-configs`] subcommand.
+
+. View the properties of the connector resource by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/get.adoc[`get`] subcommand. +
++
+.For example:
+[source,shell]
+----
+asadmin>get domain.resources.resource-adapter-config.ra1.*
+----
+
+. Set the property of the connector resource by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand.
++
+.For example:
+[source,shell]
+----
+asadmin> set domain.resources.resource-adapter-config.ra1.raSpecificProperty=value
+----
+
+[[to-delete-a-resource-adapter-configuration]]
+=== To Delete a Resource Adapter Configuration
+
+Use the `delete-resource-adapter-config` subcommand in remote mode to delete the configuration information contained in the domain configuration file (`domain.xml`) for a specified resource adapter (connector module).
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the configurations for a resource adapter by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-resource-adapter-configs.adoc[`list-resource-adapter-configs`] subcommand.
+
+. Delete the configuration for a resource adapter by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-resource-adapter-config.adoc[`delete-resource-adapter-config`] subcommand.
++
+.Example 12-9 Deleting a Resource Adapter Configuration
+[source,shell]
+----
+asadmin> delete-resource-adapter-config ra1
+Command delete-resource-adapter-config executed successfully
+----
+
+[[administering-connector-security-maps]]
+== Administering Connector Security Maps
+
+The EIS is any system that holds the data of an organization. It can be a mainframe, a messaging system, a database system, or an application. The connector security map is used to map the application's credentials to the EIS credentials.
+
+A security map applies to a particular connector connection pool. One or more named security maps can be associated with a connector connection pool.
+
+[[to-create-a-connector-security-map]]
+=== To Create a Connector Security Map
+
+Use the `create-connector-security-map` subcommand in remote mode to create a security map for the specified connector connection pool. If the security map is not present, a new one is created. You can specify back-end EIS principals or back-end EIS user groups. The connector security map configuration supports the use of the wild card asterisk `(*)` to indicate all users or all user groups.
+
+You can also use this subcommand to map the caller identity of the application (principal or user group) to a suitable EIS principal in container-managed authentication scenarios.
+
+For this subcommand to succeed, you must have first created a connector connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. Create a connector security map by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-security-map.adoc[`create-connector-security-map`] subcommand. Information about the options for the subcommand is included in this help page.
+
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If
+your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+.Example 12-10 Creating a Connector Security Map
+[source,shell]
+----
+asadmin> create-connector-security-map --poolname connector-pool1
+--principals principal1, principal2 --mappedusername backend-username securityMap1
+Command create-connector-security-map executed successfully
+----
+
+[[to-list-connector-security-maps]]
+=== To List Connector Security Maps
+
+Use the `list-connector-security-maps` subcommand in remote mode to list the existing security maps belonging to the specified connector connection pool. You can get a simple listing of the connector security maps for a connector connection pool, or you can get a more comprehensive listing that shows the principals of the map.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List existing connector connection pools by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-connection-pools.adoc[`list-connector-connection-pools`] subcommand.
+
+. List the security maps for a specific connector connection pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-security-maps.adoc[`list-connector-security-maps`] subcommand.
+
+.Example 12-11 Listing All Connector Security Maps for a Connector Connection Pool
+[source,shell]
+----
+asadmin> list-connector-security-maps connector-Pool1
+securityMap1
+Command list-connector-security-maps executed successfully.
+----
+
+.Example 12-12 Listing Principals for a Specific Security Map for a Connector Connection Pool
+[source,shell]
+----
+asadmin> list-connector-security-maps --securitymap securityMap1 connector-Pool1
+principal1
+principal1
+Command list-connector-security-maps executed successfully.
+----
+
+.Example 12-13 Listing Principals of All Connector Security Maps for a Connector Connection Pool
+
+[source,shell]
+----
+asadmin> list-connector-security-maps --verbose connector-Pool1
+securityMap1
+principal1
+principal1
+Command list-connector-security-maps executed successfully.
+----
+
+[[to-update-a-connector-security-map]]
+=== To Update a Connector Security Map
+
+Use the `update-connector-security-map` subcommand in remote mode to create or modify a security map for the specified connector connection pool.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+
+. List existing connector security maps by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-security-maps.adoc[`list-connector-security-maps`] subcommand.
+
+. Modify a security map for a specific connector connection pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/update-connector-security-map.adoc[`update-connector-security-map`] subcommand.
+
+. If needed, restart the server.
+Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see  xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+.Example 12-14 Updating a Connector Security Map
+[source,shell]
+----
+asadmin> update-connector-security-map --poolname connector-pool1
+--addprincipals principal1, principal2 securityMap1
+Command update-connector-security-map executed successfully.
+----
+
+[[to-delete-a-connector-security-map]]
+=== To Delete a Connector Security Map
+
+Use the `delete-connector-security-map` subcommand in remote mode to delete a security map for the specified connector connection pool.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. List existing connector connection pools by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-connection-pools.adoc[`list-connector-connection-pools`] subcommand.
+. Delete a security map for a specific connector connection pool by xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-connector-security-map.adoc[`delete-connector-security-map`] subcommand. Information about options for this subcommand is included in this help
+page.
++
+.Example 12-15 Deleting a Connector Security Map
+[source,shell]
+----
+asadmin> delete-connector-security-map --poolname connector-pool1 securityMap1
+
+Command delete-connector-security-map executed successfully
+----
+
+[[administering-connector-work-security-maps]]
+== Administering Connector Work Security Maps
+
+The EIS is any system that holds the data of an organization. It can be a mainframe, a messaging system, a database system, or an application. The connector work security map is used to is used to map the EIS credentials to the credentials of Payara Server security domain.
+
+A security map applies to a particular connector connection pool. One or more named security maps can be associated with a connector connection pool.
+
+[[to-create-a-connector-work-security-map]]
+=== To Create a Connector Work Security Map
+
+Use the `create-connector-work-security-map` subcommand in remote mode to map the caller identity of the work submitted by the connector module (resource adapter) EIS principal or EIS user group to a suitable principal or user group in the Payara Server security domain. One or more work security maps can be associated with a connector module.
+
+The connector security map configuration supports the use of the wild card asterisk (*) to indicate all users or all user groups.
+
+Before creating a connector work security map, you must first create a connector connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. Create the connector work security map by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-work-security-map.adoc[`create-connector-work-security-map`] subcommand. Information about properties for the subcommand is included in this help page.
+
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+.Example 12-16 Creating Connector Work Security Maps
+[source,shell]
+----
+asadmin> create-connector-work-security-map --raname my-resource-adapter-name
+--principalsmap eis-principal-1=server-principal-1,eis-principal-2=server-principal-2,
+eis-principal-3=server-principal-1 workSecurityMap1
+
+asadmin> create-connector-work-security-map --raname my-resource-adapter-name
+--groupsmap eis-group-1=server-group-1,eis-group-2=server-group-2,
+eis-group-3=server-group-1 workSecurityMap2
+Command create-connector-work-security-map executed successfully
+----
++
+The following examples create `workSecurityMap1` and `workSecurityMap2`
+for `my-resource-adapter-name`.
+
+[[to-list-connector-work-security-maps]]
+=== To List Connector Work Security Maps
+
+Use the `list-connector-work-security-maps` subcommand in remote mode to list the work security maps that belong to a specific connector module.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the connector work security maps by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-work-security-maps.adoc[`list-connector-work-security-maps`] subcommand.
+
+
+.Example 12-17 Listing the Connector Work Security Maps
+[source,shell]
+----
+asadmin> list-connector-work-security-maps generic-ra
+generic-ra-groups-map: EIS group=eis-group, mapped group=payara-group
+generic-ra-principals-map: EIS principal=eis-bar, mapped principal=bar
+generic-ra-principals-map: EIS principal=eis-foo, mapped principal=foo
+Command list-connector-work-security-maps executed successfully.
+----
+
+[[to-update-a-connector-work-security-map]]
+=== To Update a Connector Work Security Map
+
+Use the `update-connector-work-security-map` subcommand in remote to modify a work security map that belongs to a specific resource adapter (connector module).
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the connector work security maps by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-work-security-maps.adoc[`list-connector-work-security-maps`] subcommand.
+
+. If necessary, notify users that the connector work security map is being modified.
+
+. Update a connector work security map by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/update-connector-work-security-map.adoc[`update-connector-work-security-map`] subcommand.
+
+.Example 12-18 Updating a Connector Work Security Map
+[source,shell]
+----
+asadmin> update-connector-work-security-map --raname generic-ra
+--removeprincipals eis-foo generic-ra-principals-map
+Command update-connector-work-security-map executed successfully.
+----
+
+[[to-delete-a-connector-work-security-map]]
+=== To Delete a Connector Work Security Map
+
+Use the `delete-connector-work-security-map` subcommand in remote mode to delete a work security map that belongs to a specific connector module (resource adapter).
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the connector work security maps by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-connector-work-security-maps.adoc[`list-connector-work-security-maps`] subcommand.
+
+. Delete a connector work security map by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-connector-work-security-map.adoc[`delete-connector-work-security-map`] subcommand.
+
+.Example 12-19 Deleting a Connector Work Security Map
+[source,shell]
+----
+asadmin> delete-connector-work-security-map --raname my_ra worksecuritymap1
+Command delete-connector-work-security-map executed successfully.
+----
+
+[[administering-administered-objects]]
+== Administering Administered Objects
+
+Packaged within a connector module, an administered object provides specialized functionality for an application. For example, an administered object might provide access to a parser that is specific to the connector module and its associated EIS.
+
+[[to-create-an-administered-object]]
+=== To Create an Administered Object
+
+Use the `create-admin-object` subcommand to create an administered object resource. When creating an administered object resource, name-value pairs are created, and the object is associated to a JNDI name.
+
+Before You Begin
+The resource adapter must be deployed before running this subcommand (`jmsrar.rar`).
+
+. Create an administered object by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-admin-object.adoc[`create-admin-object`] subcommand. Information about properties for the subcommand is included in this help page.
+
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If
+your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+.Example 12-20 Creating an Administered Object
+[source,shell]
+----
+asadmin> create-admin-object --restype jakarta.jms.Queue --raname jmsra
+--description "sample administered object" --property Name=sample_jmsqueue jms/samplequeue
+Command create-admin-object executed successfully
+----
+
+[[to-list-administered-objects]]
+=== To List Administered Objects
+
+Use the `list-admin-object` subcommand in remote mode to list the existing administered objects.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+
+. List the administered objects by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-admin-objects.adoc[`list-admin-objects`] subcommand.
+
+.Example 12-21 Listing Administered Objects
+[source,shell]
+----
+asadmin> list-admin-objects
+jms/samplequeue
+Command list-admin-objects executed successfully
+----
+
+[[to-update-an-administered-object]]
+=== To Update an Administered Object
+
+Use the `get` and `set` subcommands to view and change the values of the administered objects properties.
+
+. List the administered objects by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-admin-objects.adoc[`list-admin-objects`] subcommand.
+
+. View the properties of the administered object by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/get.adoc[`get`] subcommand.
++
+.For example:
+[source,shell]
+----
+asadmin> get domain.resources.admin-object-resource.jms/samplequeue.*
+----
+
+. Set the property of the administered object by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand.
++
+.For example:
+[source,shell]
+----
+asadmin> set domain.resources.admin-object-resource.jms/samplequeue.enabled=false
+----
+
+. If needed, restart the server. Some properties require server restart. See see xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If
+your server needs to be restarted, see see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+[[to-delete-an-administered-object]]
+=== To Delete an Administered Object
+
+Use the `delete-admin-object` subcommand to delete an administered objects.
+
+. List the administered objects by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-admin-objects.adoc[`list-admin-objects`] subcommand.
+
+. If necessary, notify users that the administered object is being deleted.
+
+. Delete an administered object by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-admin-object.adoc[`delete-admin-object`] subcommand.
+
+.Example 12-22 Deleting an Administered Object
+[source,shell]
+----
+asadmin> delete-admin-object jms/samplequeue
+Command delete-admin-object executed successfully
+----
+

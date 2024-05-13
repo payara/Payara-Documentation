@@ -1,0 +1,200 @@
+[[deployment-groups]]
+= Administering Deployment Groups
+:ordinal: 4
+
+Deployment Groups were introduced in Payara Platform 5 as an effective replacement for xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Clusters.adoc[clusters]. Deployment groups are a complement to the xref:Technical Documentation/Payara Server Documentation/High Availability/Administering the Domain Data Grid.adoc[Data Grid] whereas the grid is responsible to managing distributed application data across multiple instances, deployment groups manage how application deployment is targeted in general.
+
+A Deployment Group is a loose grouping of Payara Server instances that can be used as a target for *deployments*. Deployment Groups consist of one or more Payara Server xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#types-of-payara-server-instances[standalone instances] and each instance can belong to one or more deployment groups.
+
+Deployment Groups can then be used to manage the lifecycle of the standalone instances in the group. All instances can be started, re-started and stopped via their corresponding deployment group.
+
+[[deployment-group-benefits]]
+== Deployment Group Benefits
+
+With the introduction of Deployment Groups and the Domain Data Grid, Payara Server instances are the primary resource for management: First, you create the managed servers you need running on various nodes in your environment. You can then add these instances to various deployment groups depending on your business requirements.
+
+For example, imagine you are in a cloud environment, and you have a couple of deployment groups:
+
+* `core-web` running your core e-commerce system
+* `reporting` running applications for management reporting.
+
+With deployment groups in response to peak load it is very simple to re-purpose a reporting instance to the core-web deployment group with a single asadmin command like this:
+
+[source, shell]
+----
+asadmin add-instance-to-deployment-group --instance reporting-1 --deploymentgroup core-web
+----
+
+For another example in a cloud environment (shown below), you could have each IAAS virtual server configured to have a couple of generic Payara Server instances running on them (colored grey). Then, when you come to deploy applications, you could select a number of these instances to be in deployment group 1 (colored blue), a number in deployment group 2 (colored orange) and so on.
+
+With the flexibility to change the distribution as time goes on. As data sharing of sessions is spread throughout the whole Payara Server domain, moving instances between deployment groups does not impact accessibility of web session data.
+
+image:deployment-groups/deployment-group-example.png[Deployment Group Example]
+
+[[managing-deployment-groups]]
+== Managing Deployment Groups
+
+Deployment groups can be created, modified, listed and deleted from both the Admin Console and the Asadmin CLI.
+
+[[creating-a-deployment-group]]
+=== Creating a Deployment Group
+
+Once a new deployment group is created, it will be created in an empty state, as standalone instances will have to be added later.
+
+[[create-using-admin-console]]
+==== Using the Administration Console
+
+To create a new deployment group using the Admin Console, follow these steps:
+
+. Navigate to the _Deployment Groups_ node in the navigation tree.
+. Click on the _New_ button and give the deployment group a unique name.
+. From this screen it is also possible to add a number of new server instances if desired:
++
+image:deployment-groups/deployment-group-new.png[Create New Deployment Group]
++
+IMPORTANT: Instances created in this screen will be created alongside a corresponding xref:Technical Documentation/Payara Server Documentation/Command Reference/Configuration.adoc[configuration] object that is a copy of the `default-config` object. +
+If you want these instances to reference an existing configuration object, it is better to create them from the _Instances_ screen and add them to the deployment group later.
+
+[[create-using-asadmin-cli]]
+==== Using Asadmin commands
+
+To create a new deployment group run the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-deployment-group.adoc[`create-deployment-group`] command:
+
+[source, shell]
+----
+asadmin create-deployment-group test
+----
+
+[[deleting-a-deployment-group]]
+=== Deleting a Deployment Group
+
+A deployment group can be deleted using both the Administration console and from the command line.
+
+IMPORTANT: Instances that belong to a deployment group won't be deleted when the group is deleted.
+
+[[delete-using-admin-console]]
+==== Using the Administration Console
+
+To delete a deployment group using the Admin Console, follow these steps:
+
+. Navigate to the _Deployment Groups_ section in the side panel.
+. Select the group from corresponding table.
+. Click the _Delete_ button.
++
+image:deployment-groups/delete-deployment-group.png[Delete a Deployment Group]
+
+[[delete-using-asadmin-cli]]
+==== Using asadmin commands
+
+To delete a deployment group use the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-deployment-group.adoc[`delete-deployment-group`] command:
+
+[source, shell]
+----
+asadmin> delete-deployment-group test
+----
+
+[[managing-deployment-group-membership]]
+== Managing Deployment Group Membership
+
+Deployment group membership can also be managed by either using the Admin console or the Asadmin CLI.
+
+[[adding-an-instance]]
+=== Adding an Instance
+
+Existing standalone instances be assigned to an existing deployment group via the Admin console by following these steps:
+
+. Navigate to the _Deployment Groups_ node in the navigation tree.
+. Navigate to the deployment group you want to modify.
+. Select the instance to add from the dropdown in the _Instances_ tab.
++
+image:deployment-groups/add-server-to-dg.png[Add a Server to a Deployment Group]
+
+The same result can be achieved from the command line by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/add-instance-to-deployment-group.adoc[`add-instance-to-deployment-group`] command:
+
+[source, shell]
+----
+asadmin add-instance-to-deployment-group --instance testserver --deploymentgroup test2
+----
+
+TIP: Remember that an instance can belong to multiple deployment groups.
+
+[[removing-an-instance]]
+=== Removing an Instance
+
+If you want to remove an instance from a deployment group by using the Admin console follow these steps:
+
+. Navigate to the _Deployment Groups_ node in the navigation tree.
+. Navigate to the deployment group you want to modify.
+. Select the instance and choose the _Remove_ from the _More actions_ drop down.
++
+image:deployment-groups/remove-server-from-dg.png[Remove a Server from a Deployment Group]
+
+The same can be achieved using the Asadmin CLI by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/remove-instance-from-deployment-group.adoc[`remove-instance-from-deployment-group`] command:
+
+[source, shell]
+----
+asadmin remove-instance-from-deployment-group --instance testserver --deploymentgroup test2
+----
+
+[[server-lifecycle-management]]
+== Server Lifecycle Management
+
+Deployment Groups also provide lifecycle management capabilities. You can start a deployment group and all instances currently in the group will be started. Similarly, you can stop a deployment group. In addition, Deployment Groups support a *"rolling restart"* which is Data Grid aware.
+
+In a rolling restart, all instances in the group are stopped and then started again in turn, ensuring that the Data Grid has enough time to adapt and ensure no loss of data during the restart.
+
+To do this from the Admin console, follow these steps:
+
+. Navigate to the _Deployment Groups_ node in the navigation tree.
+. Navigate to the deployment group you want to manage.
+. Choose either the _Start Deployment Group_, _Stop Deployment Group_ or _Restart Deployment Group_ action.
++
+image:deployment-groups/lifecycle-dg.png[Server Lifecycle Management]
+
+TIP: These commands are Data Grid safe and operated in a way as to minimize the danger of data disruption.
+
+The same can be achieved from the command line by using the following Asadmin commands:
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-deployment-group.adoc[`start-deployment-group`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-deployment-group.adoc[`stop-deployment-group`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-deployment-group.adoc[`restart-deployment-group`]
+
+Like this:
+
+[source, shell]
+----
+asadmin start-deployment-group test2
+asadmin restart-deployment-group test2
+asadmin stop-Deployment Group.adoc test2
+----
+
+//TODO - Possibly link back to this section in the Application Deployment section.
+[[deploying-apps-to-deployment-groups]]
+== Deploying Applications to a Deployment Group
+
+To deploy an application to a deployment group when using the Admin console you select the deployment group name in the list of targets in the usual way.
+
+This can be done both on the _Applications_ tab of the corresponding deployment group or on the _Applications_ section of the administration console:
+
+image:deployment-groups/deploy-to-dg.png[Deploy to a deployment group]
+
+To deploy an application from the command line by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/deploy.adoc[`deploy`] command, just specify the deployment group as a *target* like this:
+
+[source, shell]
+----
+asadmin deploy --target test2 test.war
+----
+
+NOTE: The same targeting also works for server resources (connection pools, mail resources, JMS resources, etc.)
+
+[[see-also]]
+== See Also
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering the Domain Data Grid.adoc[Domain Data Grid],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-deployment-group.adoc[`create-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-deployment-group.adoc[`delete-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/start-deployment-group.adoc[`start-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/stop-deployment-group.adoc[`stop-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/restart-deployment-group.adoc[`restart-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/remove-instance-from-deployment-group.adoc[`remove-instance-from-deployment-group`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/add-instance-to-deployment-group.adoc[`add-instance-to-deployment-group`]

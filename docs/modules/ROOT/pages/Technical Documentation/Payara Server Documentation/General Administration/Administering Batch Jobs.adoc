@@ -1,0 +1,307 @@
+[[administering-batch-jobs]]
+= Administering Batch Jobs
+:ordinal: 13
+
+This chapter provides procedures for administering batch jobs in the Payara Server environment by using the `asadmin` command-line utility.
+
+Instructions for accomplishing these tasks by using the Administration Console are contained in the Administration Console online help.
+
+[[about-batch-jobs]]
+== About Batch Jobs
+
+Payara Server provides a batch runtime for the scheduling and execution of batch jobs. Batch jobs are typically long-running, bulk-oriented tasks that contain a series of steps and can be executed without user interaction. Examples include billing, report generation, data format conversion, and image processing.
+
+Batch applications submit jobs to the batch runtime and provide instructions about how and when to execute the steps. The batch runtime processes the steps as directed by job XML documents packaged with the applications and stores information about jobs in a job repository. In Payara Server, the job repository is a database.
+
+For detailed information about batch jobs, batch processing, and the batch processing framework, see "https://jakarta.ee/specifications/batch/2.1/jakarta-batch-spec-2.1.html#introduction-to-jakarta-batch[Batch Processing]" in The Jakarta Batch specifications. The specification defines the programming model for batch applications and the runtime for scheduling and executing batch jobs.
+
+[[viewing-batch-jobs]]
+== Viewing Batch Jobs
+
+You can view detailed information about batch jobs, executions, and steps. Users who log in to the `asadmin` utility or to the Administration Console as administrator are the only users who can view details for all batch jobs submitted by all applications in the Payara Server environment.
+
+
+[[to-list-batch-jobs]]
+=== To List Batch Jobs
+
+Use the `list-batch-jobs` subcommand in remote mode to list batch jobs and job details.
+
+. Ensure that the server is running. +
+Remote subcommands require a running server.
+. List batch jobs by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-jdbc-resources.adoc[list-batch-jobs] subcommand.
+
+[[example-list-batch-jobs]]
+==== *To List Batch Jobs*
+This example lists batch jobs for the default server instance, `server`. Use `list-batch-jobs -l` to list additional details.
+
+[source,shell]
+----
+asadmin> list-batch-jobs
+JOBNAME  INSTANCECOUNT
+payroll  9
+bonus    6
+Command list-batch-jobs executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-batch-jobs` at the command line.
+
+[[to-list-batch-job-executions]]
+=== To List Batch Job Executions
+
+When the batch runtime executes a job, the execution is given a unique execution ID. An execution ID is similar to a process ID. A new execution is created the first time a job is started and every time the existing execution is restarted.
+
+Use the `list-batch-job-executions` subcommand in remote mode to list batch job executions and execution details.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. List batch job executions by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-batch-job-executions.adoc[list-batch-job-executions] subcommand.
+
+[[example-list-batch-job-executions]]
+==== *To List Batch Jobs Executions*
+
+This example lists batch job executions for the default server instance, `server`, and displays specific details. Use `list-batch-job-executions -l` to list additional details.
+
+[source,shell]
+----
+asadmin> list-batch-job-executions -o=jobname,executionid,batchstatus,exitstatus
+JOBNAME  EXECUTIONID  BATCHSTATUS  EXITSTATUS
+payroll  9            COMPLETED    COMPLETED
+bonus    6            FAILED       FAILED
+Command list-batch-job-executions executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-batch-job-executions` at the command line.
+
+[[to-list-batch-job-steps]]
+=== To List Batch Job Steps
+
+A batch job consists of one or more steps. A step is an independent and sequential phase of a batch job.
+
+Use the `list-batch-job-steps` subcommand in remote mode to list steps and step details for a specific batch job execution.
+
+. Ensure that the server is running.
+Remote subcommands require a running server.
+. List the execution ID of an execution by using the `list-batch-job-executions` subcommand.
+. List steps for a specific batch job execution by using the xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc[list-batch-job-steps] subcommand.
+
+[[example-list-batch-job-steps]]
+==== *To List Batch Jobs Steps*
+
+This example lists batch job steps and specific step details for a job execution with the execution ID of `7`. The target is the default server instance, `server`. Use `list-batch-job-steps -l` to list additional details.
+
+Some lines of output are omitted from this example for readability.
+
+[source,shell]
+----
+asadmin> list-batch-job-steps o=stepname,stepid,batchstatus,stepmetrics 7
+STEPNAME   STEPID   BATCHSTATUS   STEPMETRICS
+prepare    7        COMPLETED     METRICNAME          VALUE
+                                  READ_COUNT          8
+                                  WRITE_COUNT         8
+                                  PROCESS_SKIP_COUNT  0
+process    8        COMPLETED     METRICNAME          VALUE
+                                  READ_COUNT          8
+                                  WRITE_COUNT         8
+                                  PROCESS_SKIP_COUNT  0
+...
+Command list-batch-job-steps executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-batch-job-steps` at the command line.
+
+[[configuring-the-batch-runtime]]
+== Configuring the Batch Runtime
+
+The batch runtime uses a data source and a managed executor service to execute batch jobs. The data source stores information about current and past jobs, and the managed executor service provides threads to jobs. Batch runtime configuration data is stored in the `config` element in `domain.xml`.
+
+Payara Server provides a default data source and managed executor service for the execution of batch jobs. For the domain administration server (DAS), the default data source is `jdbc/__TimerPool` and the default managed executor service is `concurrent/__defaultManagedExecutorService`. If you create a standalone server instance or a standalone cluster, the default data source is `jdbc/__default`. You can configure the batch runtime to use different resources.
+
+For more information about data sources, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#administering-database-connectivity[Administering Database Connectivity]. For more information about managed executor services, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Concurrent Resources.adoc#configuring-managed-executor-services[Configuring Managed Executor Services].
+
+[[to-list-the-batch-runtime-configuration]]
+=== To List the Batch Runtime Configuration
+
+Use the `list-batch-runtime-configuration` subcommand in remote mode to display the configuration of the batch runtime.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. Display the configuration of the batch runtime by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-batch-runtime-configuration.adoc[list-batch-runtime-configuration] subcommand.
+. If desired, use the `get` subcommand to view the attributes of the data source and managed executor service resources. For example (output omitted): +
+
+[source,shell]
+----
+asdmin> get resources.jdbc-resource.jdbc/__TimerPool.*
+...
+asdmin> get resources.managed-executor-service.concurrent/__defaultManagedExecutorService.*
+...
+----
+
+[[example-list-batch-runtime-configuration]]
+==== *To List the Batch Job Runtime Configuration*
+
+This example lists the configuration of the batch runtime for the default server instance, `server`.
+
+[source,shell]
+----
+asadmin> list-batch-runtime-configuration
+DATASOURCELOOKUPNAME     EXECUTORSERVICELOOKUPNAME
+jdbc/__TimerPool         concurrent/__defaultManagedExecutorService
+Command list-batch-runtime-configuration executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-batch-runtime-configuration` at the command line.
+
+[[to-configure-the-batch-runtime]]
+=== To Configure the Batch Runtime
+
+Use the `set-batch-runtime-configuration` subcommand in remote mode to configure the batch runtime.
+
+NOTE: Do not change the data source after the first batch job has been submitted to the batch runtime for execution. If the data source must be changed, stop and restart the domain and then make the change before any jobs are started or restarted. However, once the data source has been changed, information stored in the previous data source becomes inaccessible. +
+The managed executor service can be changed after a batch job has been
+submitted to the batch runtime without affecting execution of the job.
+
+.  Ensure that the server is running. +
+Remote subcommands require a running server.
+.  Configure the batch runtime by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/set-batch-runtime-configuration.adoc[set-batch-runtime-configuration] subcommand.
+
+[[example-set-batch-runtime-configuration]]
+==== *To Set Batch Runtime Configuration*
+This example configures the batch runtime for the default server instance, `server`, to use an existing managed executor service named `concurrent/Executor1`.
+
+[source, shell]
+----
+asadmin> set-batch-runtime-configuration --executorservicelookupname concurrent/Executor1
+Command set-batch-runtime-configuration executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help set-batch-runtime-configuration` at the command line.
+
+[[defining-a-schema-name]]
+=== Defining a Schema name
+
+Payara Server allows the ability to define the name of the _database schema_ that will hold all batch job tables. This can be set via the Admin Console or using Asadmin CLI commands.
+
+[[defining-a-schema-name-through-the-admin-console]]
+=== Defining a Schema name through the Admin Console
+
+. Click on the instance or cluster to move to its configuration page.
+. Select the _Batch_ tab, and from there click on the _Configuration_ sub-tab.
+. Enter your desired value in the _Database Schema Name_ field.
+. Save your changes
+
+[[defining-a-schema-name-using-asadmin]]
+==== Defining a Schema name using the Asadmin CLI
+
+It's possible to set the schema using the `set-batch-runtime-configuration` command.
+
+The command requires you to specify the `Executor` or `DataSource` lookup name, which you can do with the `-x` or `-d` options respectively.
+
+The command defaults to targeting the Admin Server instance (`server`), to target a different instance or cluster, use the `--target` option.
+
+To specify the schema name, use the `--schemaName` option, or its shortcut `-n`.
+
+An example can be seen below:
+
+[source, shell]
+----
+asadmin set-batch-runtime-configuration -d jdbc/__default --target cluster1 -n test
+----
+
+[[specifying-a-blank-schema-name]]
+==== Specifying a Blank Schema Name
+
+If you specify a blank schema name, then the schema name will depend on what database vendor is being used:
+
+* On *MySQL*, the _test_ schema will be used
+* On *H2*, *Derby*, *Oracle*, *DB2* and *PostgreSQL* the schema name will be the username of the JDBC  connection pool resource associated with the JDBC resource to which JBatch is configured to use.
+
+NOTE: This behavior only applies if you explicitly specify the schema name as blank; the schema name will still default to `APP` if not overwritten.
+
+[[setting-a-table-prefix-andor-suffix]]
+=== Setting a Table Prefix and/or Suffix
+
+Payara Server allows you to set the prefix and/or the suffix of the batch table name. This can be set via the Admin Console, or using Asadmin CLI commands.
+
+IMPORTANT: The table prefix and suffix settings may be ignored by non-RDBMS based datastores.
+
+[[setting-a-table-prefix-andor-suffix-using-admin-console]]
+==== Setting a Table Prefix and/or Suffix on the Admin Console
+
+. Click on the instance or cluster to move to its configuration page.
+. Select the _Batch_ tab, and the _Configuration_ sub-tab should load.
+. Enter your desired values in the _Table Prefix_ and _Table Suffix_ fields.
+. Save your changes
+
+[[setting-a-table-prefix-andor-suffix-using-asadmin]]
+==== Setting a Table Prefix and/or Suffix using the Asadmin CLI
+
+It's possible to set the table prefix and/or suffix is set using the `set-batch-runtime-configuration` command. The command requires you to specify the `Executor` or `DataSource` lookup name, which you can do with the `-x` or `-d` options respectively.
+
+The command defaults to targeting the Admin Server instance (`server`), to target a different instance or cluster, use the `--target` option.
+
+* To specify the prefix, use the `--tablePrefix` option.
+* To specify the table suffix, use the `--tableSuffix` option.
+
+An example can be seen below:
+
+[source, shell]
+----
+asadmin set-batch-runtime-configuration -d jdbc/__default --target cluster1 --tablePrefix PRE --tableSuffix SFX
+----
+
+[[database-support]]
+=== Database Support
+
+You can configure any of the following RDBMS engines in the same way that you would configure it to use H2 (the default database engine used to manage the JBatch data sources):
+
+* MySQL
+* PostgreSQL
+* Oracle
+* IBM DB2
+
+[[configuration]]
+==== Configuration
+
+On the Admin console:
+
+. Create a Connection Pool:
+.. Navigate to _Resources_ -> _JDBC_ -> _JDBC Connection Pools_ and click
+on _New..._
+.. Give it a name in the _Pool Name_ field, select the resource type from
+the _Resource Type_ drop-down, and choose the _Database Driver Vendor_
+as either *DB2*, *MySQL*, *Oracle*, or *PostgreSQL* from the _Database Driver Vendor_
+menu.
+.. Set any further configuration options on the next page.
+.. Click _Finish_
+. Create a JDBC Resource:
+.. Navigate to _Resources_ -> _JDBC_ -> _JDBC Resources_ and click on _New..._
+.. Give it a name in the _JNDI Name_ field, and select the data source you just
+created from the _Pool Name_ drop-down.
+.. Add any additional properties and select the targets for it to be enabled on.
+.. Click _OK_.
+. Navigate to the Batch configuration page of the instance or cluster:
+. Click on the instance or cluster to move to its configuration page.
+. Select the _Batch_ tab, and the _Configuration_ sub-tab should load.
+. Select the new data source from the _Data Source Lookup Name_ drop-down menu.
+. Save the changes.
+
+[[usage-restrictions]]
+==== Usage Restrictions
+
+The Jakarta Batch runtime will not create internally more than one set of JBatch tables per schema. So in your schema if there exists a set of JBatch tables with prefixes and suffixes in the table names and then specify in the JBatch configuration for the same schema above that you wish to use JBatch tables under a different name (for example no table prefix and suffix) then during the JBatch initialization phase, JBatch will attempt to create these tables since they do not exist.
+
+However since the table constraint names already exist for the existing JBatch tables in the same schema, table creation will fail. One can of course run a_SQL_ script to create the relevant JBatch schema objects under different names.
+
+[[mysql-specifics]]
+==== MySQL Specifics
+
+For MySQL (5/8) database use, it is recommended the following additional property be set:
+
+[cols=",,",options="header",]
+|=====
+|Name |Value |Description
+|`zeroDateTimeBehavior` |`convertToNull` |
+Action for `DATETIME` values that are composed entirely of zeros (used by MySQL to represent invalid dates)
+|=====
+
+IMPORTANT: Depending on the version of MySQL you may also need to set the server property `sql_mode` to blank as JBatch uses `null` and zero dates.
+
+//TODO - Add sections to explain in detail how to clean and purge the JBatch repositories (see purge-jbatch-repository and clean-jbatch-repository commands)

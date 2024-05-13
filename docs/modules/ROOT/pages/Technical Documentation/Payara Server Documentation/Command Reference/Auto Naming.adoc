@@ -1,0 +1,59 @@
+[[auto-naming]]
+= Auto-Naming
+:ordinal: 7
+
+Auto naming is an `asadmin` feature added to help with the naming of instances, deployment groups, and other resources by resolving name conflicts and auto-generating names for dynamic resources.
+
+[[usage]]
+== Usage
+
+The `autoname` option is enabled either by specifying `--autoname` or `-a` on the command line before or after the command name. This is technically an `asadmin` option rather than a command parameter so should be specified before the command name - it will however still accept being specified after the command name (see examples below).
+
+NOTE: There are some circumstances in which specifying the `--autoname` or `-a` option after the command name will result in the option not taking effect, which is why we recommend that you place it always before the command name.
+
+When enabled, this feature allows commands that accept `String` names as their primary parameter (the parameter that you don’t have to specify, e.g. the `instancename` parameter for the `create-instance` command) to generate a name. To automatically generate a name for your instances or resources, simply enable the `autoname` option and omit providing a name.
+
+Specifically for the `create-instance` and `create-local-instance` commands, the `autoname` option can also be used to automatically resolve any name conflicts. When resolving a name conflict, Payara Server will simply append a new name to the existing name, like so: `instance1-BamboozledBarracuda`.
+
+When creating an instance from the admin console, there is a new *Auto Name* checkbox present, which performs the same conflict resolution function as the `autoname` CLI option.
+
+WARNING: This checkbox does not currently allow you to generate an instance name from scratch - it simply resolves any name conflicts.
+
+It should be stressed that these options are optional and disabled by default - if you wish to retain the original behaviour of prompting for a name or refusing to create an instance due to a name conflict, no action is necessary.
+
+[[examples]]
+=== Examples
+
+*Example 1 - Name generation:*
+
+[source,shell]
+----
+asadmin -a create-instance --node localhost-domain1
+-> BemusedCatfish created
+
+asadmin create-local-instance --node localhost-domain1 --autoname
+-> ConfusedCarp created
+
+asadmin create-instance --node localhost-domain1
+Please enter an instance name: instance1
+-> instance1 created
+
+asadmin create-instance --node localhost-domain1
+Please enter an instance name: instance1
+
+-> command failed: instance name already in use
+----
+
+*Example 2 - Name conflict resolution:*
+
+[source,shell]
+----
+asadmin --autoname create-instance --node localhost-domain1 instance1
+-> instance1 created
+
+asadmin create-instance --node localhost-domain1 --autoname instance1
+-> instance1-BemusedCatfish created
+
+asadmin create-instance --node localhost-domain1 instance1
+-> command failed: instance name already in use
+----

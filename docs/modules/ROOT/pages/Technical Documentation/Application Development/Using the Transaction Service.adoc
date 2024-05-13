@@ -1,0 +1,218 @@
+[[using-the-transaction-service]]
+= Using the Transaction Service
+:ordinal: 17
+
+The Jakarta EE platform provides several abstractions that simplify development of dependable transaction processing for applications. This chapter discusses Jakarta EE transactions and transaction support in the Payara Platform.
+
+For more information about the Jakarta Transactions API (JTA) and Java Transaction Service (JTS), see "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Transactions.adoc#administering-transactions[Administering Transactions]" in Payara Server General Administration section and in the https://jakarta.ee/specifications/transactions[Jakarta Transactions specification].
+
+You might also want to read "https://eclipse-ee4j.github.io/jakartaee-tutorial/#transactions[Transactions]" in The Jakarta EE Tutorial.
+
+[[handling-transactions-with-databases]]
+== Handling Transactions with Databases
+
+[[using-jdbc-transaction-isolation-levels]]
+=== Using JDBC Transaction Isolation Levels
+
+Not all database vendors support all transaction isolation levels available in the JDBC API. Payara Server allows specifying any isolation level your database supports. The following table defines transaction isolation levels.
+
+.Transaction Isolation Levels
+[cols="2,3,5", options="header"]
+|===
+|Transaction Isolation Level |`getTransactionIsolation` Return Value |Description
+
+|`read-uncommitted` |`1` |Dirty reads, non-repeatable reads, and phantom reads can occur.
+|`read-committed` |`2` |Dirty reads are prevented; non-repeatable reads and phantom reads can occur.
+|`repeatable-read` |`4` |Dirty reads and non-repeatable reads are prevented; phantom reads can occur.
+|`serializable` |`8` |Dirty reads, non-repeatable reads and phantom reads are prevented.
+|===
+
+By default, the transaction isolation level is undefined (empty), and the JDBC driver's default isolation level is used. You can specify the transaction isolation level in the following ways:
+
+* Select the value from the _Transaction Isolation_ drop-down list on the _New JDBC Connection Pool_ or _Edit Connection Pool_ page in the Administration Console.
+* Specify the `--isolationlevel` option in the `asadmin create-jdbc-connection-pool` command.
+* Specify the `transaction-isolation-level` option in the `asadmin set` command. For example:
++
+[source,shell]
+----
+asadmin set domain1.resources.jdbc-connection-pool.H2Pool.transaction-isolation-level=serializable
+----
+
+NOTE: You cannot execute the `setTransactionIsolation` method during a transaction.
+
+You can set the default transaction isolation level for a JDBC connection pool. For details, see "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool]" in the Payara Server General Administration section.
+
+To verify that a level is supported by your database management system, test your database programmatically using the `supportsTransactionIsolationLevel` method in `java.sql.DatabaseMetaData`, as shown in the following example:
+
+[source, java]
+----
+var ctx = new InitialContext();
+var ds = (DataSource) ctx.lookup("jdbc/MyDatasource");
+var con = ds.getConnection();
+var dbmd = con.getMetaData();
+
+if (dbmd.supportsTransactionIsolationLevel(TRANSACTION_SERIALIZABLE){
+    Connection.setTransactionIsolation(TRANSACTION_SERIALIZABLE);
+}
+----
+
+For more information about these isolation levels and what they mean, see the JDBC API specification.
+
+WARNING: Setting or resetting the transaction isolation level for every `getConnection` call can degrade performance. So by default, the isolation level is not guaranteed.
+
+Applications that change the transaction isolation level on a pooled connection programmatically risk polluting the JDBC connection pool, which can lead to errors. If an application changes the isolation level, enabling the `is-isolation-level-guaranteed` setting in the pool can minimize such errors.
+
+You can guarantee the transaction isolation level in the following ways:
+
+* Check the _Isolation Level Guaranteed_ box on the _New JDBC Connection Pool_ or _Edit Connection Pool_ page in the Administration Console.
+* Specify the `--isisolationguaranteed` option in the `asadmin create-jdbc-connection-pool` command.
+* Specify the `is-isolation-level-guaranteed` option in the `asadmin set` command. For example:
++
+[source,shell]
+----
+asadmin set domain1.resources.jdbc-connection-pool.H2Pool.is-isolation-level-guaranteed=true
+----
+
+[[using-non-transactional-connections]]
+=== Using Non-Transactional Connections
+
+You can specify a non-transactional database connection in any of these ways:
+
+* Check the _Non-Transactional Connections_ box on the N__ew JDBC Connection Pool__ or _Edit Connection Pool_ page in the Administration Console.
+* Specify the `--nontransactionalconnections` option in the `asadmin create-jdbc-connection-pool` command.
+* Specify the `non-transactional-connections` option in the `asadmin set` command. For example:
++
+[source,shell]
+----
+asadmin set domain1.resources.jdbc-connection-pool.H2Pool.non-transactional-connections=true
+----
+
+* Use the Payara Platform's `DataSource` implementation, which provides a `getNonTxConnection` method. This method retrieves a JDBC connection that is not in the scope of any transaction. There are two variants:
++
+[source,java]
+----
+public java.sql.Connection getNonTxConnection() throws java.sql.SQLException
+
+public java.sql.Connection getNonTxConnection(String user, String password) throws java.sql.SQLException
+----
+
+* Create a resource with the JNDI name ending in the `__nontx` suffix. This forces all connections looked up using this resource to be non-transactional.
+
+Typically, a connection is enlisted in the context of the transaction in which a `getConnection` call is invoked. However, a non-transactional connection is not enlisted in a transaction context even if a transaction is in progress.
+
+The main advantage of using non-transactional connections is that the overhead incurred in enlisting and de-listing connections in transaction contexts is avoided.
+
+CAUTION: Use these connections carefully.
+
+For example, if a non-transactional connection is used to query the database while a transaction is in progress that modifies the database, the query retrieves the unmodified data in the database.
+
+This is because the in-progress transaction hasn't committed. For another example, if a non-transactional connection modifies the database and a transaction that is running simultaneously rolls back, the changes made by the non-transactional connection are not rolled back.
+
+Here is a typical use case for a non-transactional connection: a component that is updating a database in a transaction context spanning over several iterations of a loop can refresh cached data by using a non-transactional connection to read data before the transaction commits.
+
+[[handling-transactions-with-enterprise-beans]]
+== Handling Transactions with Enterprise Beans
+
+This section describes the transaction support built into the Jakarta Enterprise Beans programming model.
+
+As a developer, you can write an application that updates data in multiple databases distributed across multiple sites. The application might use EJB servers from different vendors.
+
+[[flat-transactions]]
+=== Flat Transactions
+
+The Jakarta Enterprise Beans specification support for flat (as opposed to nested) transactions. In a flat transaction, each transaction is decoupled and remains independent of other transactions in the system. Another transaction cannot start in the same thread until the current transaction ends.
+
+Flat transactions are the most prevalent model and are supported by most commercial database systems. Although nested transactions offer a finer granularity of control over transactions, they are supported by far fewer commercial database systems.
+
+[[global-and-local-transactions]]
+=== Global and Local Transactions
+
+Both local and global transactions are demarcated using the `jakarta.transaction.UserTransaction` interface, which the client must use. Local transactions bypass the XA commit protocol and are faster.
+
+For more information, see xref:#the-transaction-manager-the-transaction-synchronization-registry-and-usertransaction[The Transaction Manager, the Transaction Synchronization Registry, and `UserTransaction`].
+
+[[commit-options]]
+=== Commit Options
+
+The EJB specification's transaction guidelines are designed to give the container the flexibility to select the disposition of the instance state at the time a transaction is committed. This allows the container to best manage caching an entity object's state and associating an entity object identity with the EJB instances.
+
+There are three commit-time options:
+
+*Option A*:: The container caches a ready instance between transactions. The container ensures that the instance has exclusive access to the state of the object in persistent storage.
++
+In this case, the container does not have to synchronize the instance's state from the persistent storage at the beginning of the next transaction.
++
+IMPORTANT: Commit option A is not supported in Payara Platform's EJB implementation.
+
+*Option B*:: The container caches a ready instance between transactions, but the container does not ensure that the instance has exclusive access to the state of the object in persistent storage.
++
+NOTE: This is the default commit option set in the Payara Platform.
++
+In this case, the container must synchronize the instance's state by invoking the `ejbLoad` lifecycle method from persistent storage at the beginning of the next transaction.
+
+*Option C*:: The container does not cache a ready instance between transactions, but instead returns the instance to the pool of available instances after a transaction has completed.
++
+The life cycle for every business method invocation under commit option C looks like this.
++
+[source,text]
+----
+ejbActivate   ejbLoad   business method   ejbStore   ejbPassivate
+----
++
+If there is more than one transactional client concurrently accessing the same entity, the first client gets the ready instance and subsequent concurrent clients get new instances from the pool.
+
+The `glassfish-ejb-jar.xml` deployment descriptor has an element, `commit-option`, that specifies the commit option to be used. Based on the specified commit option, the appropriate handler is instantiated.
+
+[[bean-level-container-managed-transaction-timeouts]]
+=== Bean-Level Container-Managed Transaction Timeouts
+
+The transaction timeout for the domain is specified using the _Transaction Timeout_ setting of the server's Transaction Service.
+
+A transaction started by the container must commit (or rollback) within this time, regardless of whether the transaction is suspended (and resumed), or the transaction is marked for rollback. The default value, `0`, specifies that the server waits indefinitely for a transaction to complete.
+
+To override this timeout for an individual bean, use the optional `cmt-timeout-in-seconds` element in `glassfish-ejb-jar.xml`. The default value, `0`, specifies that the Transaction Service timeout is used.
+
+The value of `cmt-timeout-in-seconds` is used for all methods in the bean that start a new container-managed transaction.
+
+IMPORTANT: This timeout value is not used if the bean joins a client transaction.
+
+[[handling-transactions-with-jakarta-messaging]]
+== Handling Transactions with Jakarta Messaging
+
+[[transactions-and-non-persistent-messages]]
+=== Transactions and Non-Persistent Messages
+
+During transaction recovery, non-persistent messages might be lost. If the broker fails between the transaction manager `prepare` and `commit` operations, any non-persistent message in the transaction is lost and cannot be delivered.
+
+A message that is not saved to a persistent store is not available for transaction recovery.
+
+[[using-the-configurabletransactionsupport-interface]]
+=== Using the ConfigurableTransactionSupport Interface
+
+The Jakarta Connectors specification allows a resource adapter to use the `transaction-support` attribute to specify the level of transaction support that the resource adapter handles.
+
+However, the resource adapter vendor does not have a mechanism to figure out the current transactional context in which a `ManagedConnectionFactory` is used.
+
+If a `ManagedConnectionFactory` implements an optional interface called `com.sun.appserv.connectors.spi.ConfigurableTransactionSupport`, Payara Server notifies the `ManagedConnectionFactory` of the `transaction-support` configured for the connector connection pool when the `ManagedConnectionFactory` instance is created for the pool.
+
+Connections obtained from the pool can then be used with a transaction level at or lower than the configured value. For example, a connection obtained from a pool that is set to `XA_TRANSACTION` could be used as a `LOCAL` resource in a last-agent-optimized transaction or in a non-transactional context.
+
+[[the-transaction-manager-the-transaction-synchronization-registry-and-usertransaction]]
+== The Transaction Manager, the Transaction Synchronization Registry, and `UserTransaction`
+
+To access a `UserTransaction` instance, you can either look it up using the `java:comp/UserTransaction` JNDI name or inject it using the `@Resource` annotation.
+
+Accessing a `DataSource` using the `Synchronization.beforeCompletion()` method requires setting the _Allow Non-Component Callers_ option of its corresponding JDBC Connection Pool to `true`.
+
+The default setting is `false`. For more information about non-component callers, see xref:Technical Documentation/Application Development/Using the JDBC API for Database Access.adoc#allowing-non-component-callers[Allowing Non-Component Callers].
+
+If possible, you should use the `jakarta.transaction.TransactionSynchronizationRegistry` interface instead of `jakarta.transaction.TransactionManager` , for portability. You can look up the implementation of this interface by using the JNDI name `java:comp/TransactionSynchronizationRegistry`.
+
+For details, see the https://jakarta.ee/specifications/transactions/2.0/apidocs/jakarta/transaction/transactionsynchronizationregistry[`TransactionSynchronizationRegistryInterface`] API documentation and the
+https://jakarta.ee/specifications/transactions[Jakarta Transactions specification].
+
+If accessing the `jakarta.transaction.TransactionManager` implementation is absolutely necessary, you can look up the Payara Platform's implementation of this interface using the JNDI name `java:appserver/TransactionManager`.
+
+CAUTION: This lookup should not be used by application code under any circumstances.
+
+

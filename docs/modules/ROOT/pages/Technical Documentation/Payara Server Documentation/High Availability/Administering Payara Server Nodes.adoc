@@ -1,0 +1,884 @@
+[[administering-payara-server-nodes]]
+= Administering Payara Server Nodes
+:ordinal: 2
+
+A node represents a host on which the Payara Server software is installed. A node must exist for every host on which Payara Server instances reside.
+
+A node's configuration contains information about the host such as the name of the host and the location where the Payara Server is installed on the host.
+
+The following topics are addressed here:
+
+* xref:types-of-payara-server-nodes[Types of Payara Server Nodes]
+* xref:creating-listing-and-deleting-config-nodes[Creating, Listing, Testing, and Deleting SSH Nodes]
+* xref:creating-listing-testing-and-deleting-ssh-nodes[Creating, Listing, and Deleting CONFIG Nodes]
+* xref:creating-listing-and-deleting-docker-nodes[Creating, Listing, and Deleting DOCKER Nodes]
+* xref:updating-and-changing-the-type-of-a-node[Updating and Changing the Type of a Node]
+
+[[types-of-payara-server-nodes]]
+== Types of payara Server Nodes
+
+Each Payara Server node is one of the following types of node:
+
+`DCOM`::
+A `DCOM` node supports communication over the Distributed Component Object Model (DCOM) remote protocol. The DCOM remote protocol is available only on Windows systems. If DCOM is set up, and you plan to administer your Payara Server instances centrally, the instances must reside on `DCOM` nodes.
++
+IMPORTANT: DCOM nodes are not recommended to be used in production environments. +
+See xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc[Enabling Centralized Administration of Payara Server Instances] for more information.
+
+`SSH`::
+An `SSH` node supports communication over secure shell (SSH). If SSH is set up, and you plan to administer your Payara Server instances centrally, the instances must reside on `SSH` nodes.
++
+An `SSH` node's configuration contains the information that is required to connect to the host through SSH. This information includes, for example, the username of the SSH user and the port number for SSH connections to the host.
+`CONFIG`::
+A `CONFIG` node does not support remote communication. If SSH is set up, and you plan to administer your instances locally, the instances can reside on `CONFIG` nodes. You cannot use `CONFIG` nodes for instances that you plan to administer centrally.
++
+Each domain contains a predefined `CONFIG` node that is named `localhost-`domain, where domain is the name of the domain. On the host where the domain administration server (DAS) is running, this node represents the local host.
+`DOCKER`::
+A Docker node is similar to the existing SSH, DCOM, and CONFIG nodes in that it is a virtual representation of a Payara Server installation, providing connection details that the Domain Administration Server (DAS) uses to communicate with the installation to create, stop, start, and delete instances.
++
+Where it differs from these existing node types is that instances created against it are actually housed in Docker containers, and so also contains details on how to communicate with the Docker engine of the remote machine.
+
+[[creating-listing-testing-and-deleting-dcom-nodes]]
+== Creating, Listing, Testing, and Deleting `DCOM` Nodes
+
+A `DCOM` node supports communication over DCOM. If DCOM is set up and, you plan to administer your Payara Server instances centrally, the instances must reside on `DCOM` nodes.
+
+Payara Server enables you to create `DCOM` nodes for use by instances, obtain information about `DCOM` nodes, test if `DCOM` nodes are reachable, and delete `DCOM` nodes that are no longer required.
+
+[[to-create-a-dcom-node]]
+=== To Create a `DCOM` Node
+
+Use the `create-node-dcom` subcommand in remote mode to create a `DCOM` node.
+
+*Before You Begin*
+
+Ensure that the Windows user can use DCOM to connect to the host that the node will represent. By default, the `create-node-dcom` subcommand validates the node's parameters and the DCOM connection to the host. If the Windows user cannot use DCOM to connect to the host, the validation fails.
+
+NOTE: For information about how to determine whether the Windows user can use DCOM to connect to the host, see xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-test-the-connection-over-dcom-to-a-remote-host[To Test the Connection Over DCOM to a Remote Host].
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the `create-node-dcom` subcommand.
++
+Specify the file that contains the alias for the Windows user's password through the `--passwordfile` option of the `asadmin` utility. For more information about this file, see xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-set-up-password-authentication-for-the-windows-user[To Set Up Password Authentication for the Windows User]. +
++
+NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for configuring the node, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-node-dcom.adoc[`create-node-dcom`] help page.
++
+[source,shell]
+----
+C:\> asadmin --passwordfile filename create-node-dcom --nodehost node-host [--installdir install-dir] node-name
+----
++
+filename::
+The name of the file that contains the alias for the Windows user's password.
+node-host::
+The name of the host that the node represents. The name of the host must be specified. Otherwise, an error occurs.
+install-dir::
+The full path to the parent of the base installation directory of the Payara Server software on the host, for example, `C:\payara`.
++
+If the Payara Server software is installed in the same directory on the node's host and the DAS host, you can omit this option.
+node-name::
+Your choice of name for the node that you are creating.
+
+The following example creates the `DCOM` node `wpmdl1` to represent the host `wpmdl1.example.com`. The Payara Server software is installed in the same directory on the DAS host and on the host `wpmdl1.example.com`.
+
+[source,shell]
+----
+C:\> asadmin --passwordfile aspwalias.txt create-node-dcom --nodehost wpmdl1.example.com wpmdl1
+
+Command create-node-dcom executed successfully.
+----
+
+**See Also**
+
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc[`asadmin`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-node-dcom.adoc[`create-node-dcom`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-node-dcom` at the command line.
+
+[[to-list-dcom-nodes-in-a-domain]]
+=== To List `DCOM` Nodes in a Domain
+
+Use the `list-nodes-dcom` subcommand in remote mode to obtain information about existing `DCOM` nodes in a domain.
+
+NOTE: To obtain information about all existing nodes in a domain, use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc[`list-nodes`] subcommand.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-dcom.adoc#list-nodes-dcom[`list-nodes-dcom`] subcommand. +
++
+[source,shell]
+----
+asadmin> list-nodes-dcom
+----
+
+The following example lists the name, type, and host of all `DCOM` nodes in the current domain.
+
+[source,shell]
+----
+asadmin> list-nodes-dcom
+
+xkyd  DCOM  xkyd.example.com
+wpmdl2  DCOM  wpmdl2.example.com
+wpmdl1  DCOM  wpmdl1.example.com
+Command list-nodes-dcom executed successfully.
+----
+
+The following example lists detailed information about all `DCOM` nodes in the current domain.
+
+[source,shell]
+----
+asadmin> list-nodes-dcom --long=true
+NODE NAME    TYPE   NODE HOST            INSTALL DIRECTORY   REFERENCED BY
+xkyd         DCOM   xkyd.example.com     C:\payara
+wpmdl2       DCOM   wpmdl2.example.com   C:\payara       wdi2
+wpmdl1       DCOM   wpmdl1.example.com   C:\payara       wdi1
+Command list-nodes-dcom executed successfully.
+----
+
+*See Also*
+
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc[`list-nodes`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-dcom.adoc[`list-nodes-dcom`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help list-nodes`
+* `asadmin help list-nodes-dcom`
+
+[[to-test-if-a-dcom-node-is-reachable]]
+=== To Test if a `DCOM` Node is Reachable
+
+Use the `ping-node-dcom` subcommand in remote mode to test if a `DCOM` node is reachable.
+
+*Before You Begin*
+
+Ensure that DCOM is configured on the host where the DAS is running and on the host that the node represents.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the `ping-node-dcom` subcommand.
++
+NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for testing the node, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/ping-node-dcom.adoc[`ping-node-dcom`] help page.
++
+[source,shell]
+----
+asadmin> ping-node-dcom node-name
+----
++
+node-name:: The name of the node to test.
+
+The following example tests if the `DCOM` node `wpmdl2` is reachable.
+
+[source,shell]
+----
+asadmin> ping-node-dcom wpmdl2
+
+Successfully made DCOM connection to node wpmdl2 (wpmdl2.example.com)
+Command ping-node-dcom executed successfully.
+----
+
+*See Also*
+
+xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/ping-node-dcom.adoc[`ping-node-dcom`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help ping-node-dcom` at the command line.
+
+[[to-delete-a-dcom-node]]
+=== To Delete a `DCOM` Node
+
+Use the `delete-node-dcom` subcommand in remote mode to delete a `DCOM` node.
+
+Deleting a node removes the node from the configuration of the DAS. The node's directories and files are deleted when the last Payara Server instance that resides on the node is deleted.
+
+*Before You Begin*
+
+Ensure that no Payara Server instances reside on the node that you are deleting. For information about how to delete an instance, see the following sections.
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Confirm that no instances reside on the node that you are deleting.
++
+[source,shell]
+----
+asadmin> list-nodes-dcom --long=true
+----
+
+.  Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-dcom.adoc[`delete-node-dcom`] subcommand.
++
+[source,shell]
+----
+asadmin> delete-node-dcom node-name
+----
++
+node-name::
+The name of the node that you are deleting.
+
+The following example confirms that no instances reside on the `DCOM` node `xkyd` and deletes the node `xkyd`.
+
+[source,shell]
+----
+asadmin> list-nodes-dcom --long=true
+NODE NAME    TYPE   NODE HOST            INSTALL DIRECTORY   REFERENCED BY
+xkyd         DCOM   xkyd.example.com     C:\payara
+wpmdl2       DCOM   wpmdl2.example.com   C:\payara       wdi2
+wpmdl1       DCOM   wpmdl1.example.com   C:\payara       wdi1
+Command list-nodes-dcom executed successfully.
+asadmin> delete-node-dcom xkyd
+Command delete-node-dcom executed successfully.
+----
+
+*See also*
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-dcom.adoc[`delete-node-dcom`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-dcom.adoc[`list-nodes-dcom`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help delete-node-dcom`
+* `asadmin help list-nodes-dcom`
+
+[[creating-listing-testing-and-deleting-ssh-nodes]]
+== Creating, Listing, Testing, and Deleting `SSH` Nodes
+
+An `SSH` node supports communication over SSH. If SSH is set up, and you plan to administer your Payara Server instances centrally, the instances must reside on `SSH` nodes. For information about setting up SSH, see xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#enabling-centralized-administration-of-payara-server-instances[Enabling Centralized Administration of Payara Server Instances].
+
+Payara Server enables you to create `SSH` nodes for use by instances, obtain information about `SSH` nodes, test if `SSH` nodes are reachable, and delete `SSH` nodes that are no longer required.
+
+[[to-create-an-ssh-node]]
+=== To Create an `SSH` Node
+
+Use the `create-node-ssh` subcommand in remote mode to create an `SSH` node.
+
+*Before You Begin*
+
+Ensure that the SSH user can use SSH to log in to the host that the node will represent. By default, the `create-node-ssh` subcommand validates the node's parameters and the SSH connection to the host.
+
+If the SSH user cannot use SSH to log in to the host, the validation fails.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the `create-node-ssh` subcommand.
++
+NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for configuring the node, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-node-ssh.adoc[`create-node-ssh`] help page.
++
+If you are using password authentication for the SSH user, you must specify a password file through the `--passwordfile` option of the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc[`asadmin`] utility. For more information about SSH user authentication, see link:Technical Documentation/Payara Server Documentation/High Availability/ssh-setup.adoc#setting-up-ssh-user-authentication[Setting Up SSH User Authentication].
++
+[source,shell]
+----
+asadmin> create-node-ssh --nodehost node-host [--installdir install-dir ] node-name
+----
++
+node-host::
+  The name of the host that the node represents. The name of the host must be specified. Otherwise, an error occurs.
+install-dir::
+  The full path to the parent of the base installation directory of the Payara Server software on the host, for example,
+  `/export/payara/`. If the Payara Server software is installed in the same directory on the node's host and the DAS host, you can omit this option.
+node-name::
+  Your choice of name for the node that you are creating.
+
+The following example creates the `SSH` node `sj01` to represent the host `sj01.example.com`. The Payara Server software is installed in the same directory on the DAS host and on the host `sj01.example.com`.
+
+[source,shell]
+----
+asadmin> create-node-ssh --nodehost sj01.example.com sj01
+
+Command create-node-ssh executed successfully.
+----
+
+[[create-node-ssh-troubleshooting]]
+==== Troubleshooting
+
+The `create-node-ssh` subcommand might fail to create the node and report the error `Illegal sftp packet len`. If this error occurs, ensure that no the startup file on the remote host displays text for noninteractive shells. Examples of startup files are `.bashrc`, `.cshrc`, `.login`, and `.profile`.
+
+The SSH session interprets any text message that is displayed during login as a file-transfer protocol packet. Therefore, any statement in a startup file that displays text messages corrupts the SSH session, causing this error.
+
+*See also*
+
+xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-node-ssh.adoc[`create-node-ssh`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-node-ssh` at the command line.
+
+*Next Steps*
+
+After creating a node, you can create instances on the node as explained in the following sections:
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-locally[To Create an Instance Locally]
+
+[[to-list-ssh-nodes-in-a-domain]]
+=== To List `SSH` Nodes in a Domain
+
+Use the `list-nodes-ssh` subcommand in remote mode to obtain information about existing `SSH` nodes in a domain.
+
+NOTE: To obtain information about all existing nodes in a domain, use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc[`list-nodes`] subcommand.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-ssh.adoc[`list-nodes-ssh`] subcommand.
++
+[source,shell]
+----
+asadmin> list-nodes-ssh
+----
+
+This example lists the name, type, and host of all `SSH` nodes in the current domain.
+
+[source,shell]
+----
+asadmin> list-nodes-ssh
+sj01  SSH  sj01.example.com
+sj02  SSH  sj02.example.com
+Command list-nodes-ssh executed successfully.
+----
+
+The following example lists detailed information about all `SSH` nodes in the current domain.
+
+[source,shell]
+----
+asadmin> list-nodes-ssh --long=true
+
+NODE NAME   TYPE   NODE HOST          INSTALL DIRECTORY    REFERENCED BY
+sj01        SSH    sj01.example.com   /export/payara   pmd-i1
+sj02        SSH    sj02.example.com   /export/payara   pmd-i2
+Command list-nodes-ssh executed successfully.
+----
+
+*See also*
+
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc[`list-nodes`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-ssh.adoc[`list-nodes-ssh`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help list-nodes`
+* `asadmin help list-nodes-ssh`
+
+[[to-test-if-an-ssh-node-is-reachable]]
+=== To Test if an `SSH` Node is Reachable
+
+Use the `ping-node-ssh` subcommand in remote mode to test if an `SSH` node is reachable.
+
+*Before You Begin*
+
+Ensure that SSH is configured on the host where the DAS is running and on the host that the node represents.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the `ping-node-ssh` subcommand.
++
+NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for testing the node, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/ping-node-ssh.adoc[`ping-node-ssh`] help page.
++
+[source,shell]
+----
+asadmin> ping-node-ssh node-name
+----
+node-name::
+  The name of the node to test.
+
+The following example tests if the `SSH` node `sj01` is reachable.
+
+[source,shell]
+----
+asadmin> ping-node-ssh sj01
+Successfully made SSH connection to node sj01 (sj01.example.com)
+Command ping-node-ssh executed successfully.
+----
+
+*See also*
+
+xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/ping-node-ssh.adoc[`ping-node-ssh`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help ping-node-ssh` at the command line.
+
+[[to-delete-an-ssh-node]]
+=== To Delete an `SSH` Node
+
+Use the `delete-node-ssh` subcommand in remote mode to delete an `SSH` node.
+
+Deleting a node removes the node from the configuration of the DAS. The node's directories and files are deleted when the last Payara Server instance that resides on the node is deleted.
+
+*Before You Begin*
+
+Ensure that no Payara Server instances reside on the node that you are deleting. For information about how to delete an instance, see the following sections.
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Confirm that no instances reside on the node that you are deleting.
++
+[source,shell]
+----
+asadmin> list-nodes-ssh --long=true
+----
+. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-ssh.adoc[`delete-node-ssh`] subcommand.
++
+[source,shell]
+----
+asadmin> delete-node-ssh node-name
+----
+node-name:: The name of the node that you are deleting.
+
+The following example confirms that no instances reside on the `SSH` node `sj01` and deletes the node `sj01`.
+
+[source,shell]
+----
+asadmin> list-nodes-ssh --long=true
+NODE NAME   TYPE   NODE HOST          INSTALL DIRECTORY    REFERENCED BY
+sj01        SSH    sj01.example.com   /export/payara
+sj02        SSH    sj02.example.com   /export/payara   pmd-i2
+
+Command list-nodes-ssh executed successfully.
+asadmin> delete-node-ssh sj01
+Command delete-node-ssh executed successfully.
+----
+
+*See also*
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-ssh.adoc[`delete-node-ssh`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-ssh.adoc[`list-nodes-ssh`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help delete-node-ssh`
+* `asadmin help list-nodes-ssh`
+
+[[creating-listing-and-deleting-config-nodes]]
+== Creating, Listing, and Deleting `CONFIG` Nodes
+
+A `CONFIG` node does not support remote communication. If SSH is set, up and you plan to administer your instances locally, the instances can reside on `CONFIG` nodes. You cannot use `CONFIG` nodes for instances that you plan to administer centrally.
+
+Payara Server enables you to create `CONFIG` nodes for use by instances, obtain information about `CONFIG` nodes, and delete `CONFIG` nodes that are no longer required.
+
+The following topics are addressed here:
+
+* xref:to-create-a-config-node[To Create a CONFIG Node]
+* xref:to-list-config-nodes-in-a-domain[To List CONFIG Nodes in a Domain]
+* xref:to-delete-a-config-node[To Delete a CONFIG Node]
+
+[[to-create-a-config-node]]
+=== To Create a `CONFIG` Node
+
+Use the `create-node-config` command in remote mode to create a `CONFIG` node.
+
+NOTE: If you create an instance locally on a host for which no nodes are defined, you can create the instance without creating a node beforehand. +
+In this situation, Payara Server creates a `CONFIG` node for you. The name of the node is the unqualified name of the host. +
+For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-locally[To Create an Instance Locally].
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the `create-node-config` subcommand.
++
+NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for configuring the node, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-node-config.adoc[`create-node-config`] help page.
++
+[source,shell]
+----
+asadmin> create-node-config [--nodehost node-host] [--installdir install-dir ]
+node-name
+----
+node-host::
+  The name of the host that the node represents. You may omit this option. The name of the host can be determined when instances that reside on the node are created.
+install-dir::
+  The full path to the parent of the base installation directory of the Payara Server software on the host, for example, `/export/payara/`. You may omit this option.
+  The installation directory can be determined when instances that reside on the node are created.
+node-name::
+  Your choice of name for the node that you are creating.
+
+The following example creates the `CONFIG` node `cfg01`. The host that the node represents and the installation directory of the Payara Server software on the host are to be determined when instances are added to the node.
+
+[source,shell]
+----
+asadmin> create-node-config cfg01
+Command create-node-config executed successfully.
+----
+
+*See also*
+
+xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-node-config.adoc[`create-node-config`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-node-config` at the command line.
+
+*Next Steps*
+
+After creating a node, you can create instances on the node as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-locally[To Create an Instance Locally].
+
+[[to-list-config-nodes-in-a-domain]]
+=== To List `CONFIG` Nodes in a Domain
+
+Use the `list-nodes-config` subcommand in remote mode to obtain information about existing `CONFIG` nodes in a domain.
+
+NOTE: To obtain information about all existing nodes in a domain, use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc[`list-nodes`] subcommand.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-config.adoc[`list-nodes-config`] subcommand.
++
+[source,shell]
+----
+asadmin> list-nodes-config
+----
+
+The following example lists the name, type, and host of all `CONFIG` nodes in the current domain.
+
+[source,shell]
+----
+asadmin> list-nodes-config
+localhost-domain1  CONFIG  localhost
+cfg01  CONFIG  cfg01.example.com
+cfg02  CONFIG  cfg02.example.com
+Command list-nodes-config executed successfully.
+----
+
+The following example lists detailed information about all `CONFIG` nodes in the current domain.
+
+[source,shell]
+----
+asadmin> list-nodes-config --long=true
+
+NODE NAME           TYPE     NODE HOST            INSTALL DIRECTORY    REFERENCED BY
+localhost-domain1   CONFIG   localhost            /export/payara
+cfg01               CONFIG   cfg01.example.com    /export/payara   yml-i1
+cfg02               CONFIG   cfg02.example.com    /export/payara   yml-i2
+Command list-nodes-config executed successfully.
+----
+
+*See also*
+
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc[`list-nodes`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-config.adoc[`list-nodes-config`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help list-nodes`
+* `asadmin help list-nodes-config`
+
+[[to-delete-a-config-node]]
+=== To Delete a `CONFIG` Node
+
+Use the `delete-node-config` subcommand in remote mode to delete a `CONFIG` node.
+
+Deleting a node removes the node from the configuration of the DAS. The node's directories and files are deleted when the last Payara Server instance that resides on the node is deleted.
+
+*Before You Begin*
+
+Ensure that no Payara Server instances reside on the node that you are deleting. For information about how to delete an instance that resides on a `CONFIG` node, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally].
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Confirm that no instances reside on the node that you are deleting.
++
+[source,shell]
+----
+asadmin> list-nodes-config --long=true
+----
++
+. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-config.adoc[`delete-node-config`] subcommand.
++
+[source,shell]
+----
+asadmin> delete-node-config node-name
+----
+node-name::
+  The name of the node that you are deleting.
+
+The following example confirms that no instances reside on the `CONFIG` node `cfg01` and deletes the node `cfg01`.
+
+[source,shell]
+----
+asadmin> list-nodes-config --long=true
+
+NODE NAME           TYPE     NODE HOST           INSTALL DIRECTORY    REFERENCED BY
+localhost-domain1   CONFIG   localhost           /export/payara
+cfg01               CONFIG   cfg01.example.com   /export/payara
+cfg02               CONFIG   cfg02.example.com   /export/payara   yml-i2
+Command list-nodes-config executed successfully.
+asadmin> delete-node-config cfg01
+Command delete-node-config executed successfully.
+----
+
+*See also*
+
+* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-config.adoc[`delete-node-config`]
+* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-config.adoc[`list-nodes-config`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
+
+* `asadmin help delete-node-config`
+* `asadmin help list-nodes-config`
+
+[[creating-listing-and-deleting-docker-nodes]]
+== Creating, Listing and Deleting Docker Nodes
+
+As previously explained, a Docker node shares similarities with existing SSH, DCOM, and CONFIG nodes as it serves as a virtual representation of a Payara Server installation.
+
+IMPORTANT: The Docker engine must expose its REST admin service on an HTTP port that is reacheable by the DAS to configure a DOCKER node.
+
+[[exposing-the-docker-rest-admin-service]]
+=== Exposing the Docker REST Admin Service
+
+To expose the REST admin service of the Docker engine, you need to specify the `-H` option in your `DOCKER_OPTS` environment variable, or otherwise specify it in the command that starts the docker service.
+
+For example:
+
+[source, shell]
+----
+DOCKER_OPTS="-H=0.0.0.0:2376"
+----
+
+You can test that it is exposed by navigating to it with your browser (assuming you're exposing the port in the example above): `http://localhost:2376/info`
+
+[[creating-a-docker-node]]
+=== Creating a Docker Node
+
+Creating a Docker node is done in a similar manner to creating an SSH or CONFIG node, either by asadmin command, or by the Nodes page of the admin console.
+
+Docker nodes do have some unique configuration properties however:
+
+* *Docker Password File* - This is the fully-qualified path of the password file that the Docker instance will use for authentication against the DAS.
++
+Please note, that this path should be the path to the file on the *remote* machine. This file should be a standard Payara Server password file as you would use with asadmin. This must be specified, as Docker instances require secure admin to be enabled to start.
+* TLS - Whether or not to use HTTPS to communicate with the Docker engine or not.
+* Docker Port - The port that the Docker engine is listening on. Defaults to `2376`.
+* Docker Image - The Docker image to use. Payara Server will default to using the `payara/server-node:{page-version}` image.
+
+The configuration options of CONFIG nodes are also available, namely `nodehost`, `nodedir`, and `installdir`. Specifying the `nodehost` option remains mandatory, but for docker nodes the `installdir` and `nodedir` options can safely be left as their defaults unless you're specifying your own Docker image.
+
+Please take particular note of the _Docker Password File_ option: this is mandatory and *must be present on the remote machine*. Payara Server does not currently support propagating password files from the DAS to your remote machines. Secure admin must also be enabled for Docker Nodes to function correctly, which entails setting an admin password. See below for an example of enabling secure admin for the default _admin_ user:
+
+[source, shell]
+----
+asadmin change-admin-password --user admin
+Enter the admin password>
+Enter the new admin password>
+Enter the new admin password again>
+Command change-admin-password executed successfully.
+
+asadmin enable-secure-admin
+Authentication failed with password from login store
+Enter admin password for user "admin">
+You must restart all running servers for the change in secure admin to take effect.
+Command enable-secure-admin executed successfully.
+
+asadmin restart-domain
+----
+
+As an example of an extremely simple password file, here is the contents of a sample, `passwordfile.txt`:
+
+[source, shell]
+----
+AS_ADMIN_PASSWORD=changeit
+----
+
+Where `changeit` is the password of the default _admin_ user.
+
+Once you have ensured that you have secure admin enabled, and that a password file granting access to the DAS is present on the remote machine, you can run the asadmin command for creating a Docker node:
+
+[source, shell]
+----
+asadmin create-node-docker --nodehost localhost --dockerPasswordFile /opt/passwordfile.txt --dockerport 2376 docker-node-1
+----
+
+TIP: The admin console page for creating Docker nodes is the same as creating the other node types: simply select `DOCKER` as the node type from the dropdown.
+
+[[configuring-tls]]
+==== Configuring TLS
+
+As Docker must expose an HTTP port, it is recommended that it be protected using TLS outside of development environments.
+
+A full guide for how to do so can be found link:https://docs.docker.com/engine/security/https/[here] In short, create self-signed TLS certificates (or use your own signed ones), and add them to your `DOCKER_OPTS` variable to secure the Docker REST admin service:
+
+[source, shell]
+----
+DOCKER_OPTS="--tlsverify --tlscacert=/home/anon/tls/ca.pem --tlscert=/home/anon/tls/server-cert.pem --tlskey=/home/anon/tls/server-key.pem -H=0.0.0.0:2376"
+----
+
+Assuming you followed this guide, you will need to perform the following steps to allow Payara Server to communicate with the Docker engine correctly:
+
+. Import the CA certificate into the Domain truststore (defaults to `domain-dir/config/cacerts.p12`)
+. Create a PKCS12 bundle from the client certificate and key
+. Import the generated PKCS12 bundle into the Domain's keystore (defaults to `domain-dir/config/keystore.p12`)
+
+Once you've enabled TLS for the Docker REST admin service and added the necessary certificates & keys to Payara Server, you can create a Docker Node with TLS enabled like so:
+
+[source, shell]
+----
+asadmin create-node-docker --nodehost localhost --useTls true --dockerPasswordFile /opt/passwordfile.txt --dockerport 2376 docker-node-1
+----
+
+IMPORTANT: Please ensure that the `useTLS` option of the node matches whether or not you have configured TLS for the Docker engine, as otherwise any communication with the Docker engine will fail.
+
+[[to-delete-a-docker-node]]
+=== To Delete a DOCKER Node
+
+Use the `delete-node-docker` subcommand in remote mode to delete a DOCKER node.
+
+Deleting a node removes the node from the configuration of the DAS and the Docker container that corresponds to the node's system is stopped and removed. Follow these steps to remove a Docker node:
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Confirm that no instances reside on the node that you are deleting.
++
+[source,shell]
+----
+asadmin list-nodes-config --long=true
+----
++
+. Run the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-docker.adoc[`delete-node-docker`] subcommand.
++
+[source,shell]
+----
+asadmin> delete-node-docker node-name
+----
+node-name::
+The name of the node that you are deleting.
+
+[[updating-and-changing-the-type-of-a-node]]
+== Updating and Changing the Type of a Node
+
+Payara Server enables you to update the configuration data of any node and to change the type of a node.
+
+[[to-update-an-ssh-node]]
+=== To Update an `SSH` Node
+
+Use the `update-node-ssh` subcommand in remote mode to update an `SSH` node.
+
+Options of this subcommand specify the new values of the node's configuration data. If you omit an option, the existing value is unchanged.
+
+*Before You Begin*
+
+Ensure that the following prerequisites are met:
+
+* SSH is configured on the host where the DAS is running and on the host that the node represents.
+* The node that you are updating exists.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the `update-node-ssh` subcommand.
++
+[source,shell]
+----
+asadmin> update-node-ssh options node-name
+----
++
+options::
+  Options of the `update-node-ssh` subcommand for changing the node's configuration data. For information about these options, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/update-node-ssh.adoc[`update-node-ssh`] help page.
+node-name::
+  The name of the `SSH` node to update.
+
+The following example updates the host that the node `sj01` represents to `adc01.example.com`.
+
+[source,shell]
+----
+asadmin> update-node-ssh --nodehost adc01.example.com sj01
+Command update-node-ssh executed successfully.
+----
+
+*See also*
+
+xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/update-node-ssh.adoc[`update-node-ssh`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help update-node-ssh` at the command line.
+
+[[to-update-a-config-node]]
+=== To Update a `CONFIG` Node
+
+Use the `update-node-config` subcommand in remote mode to update a `CONFIG` node.
+
+Options of this subcommand specify the new values of the node's configuration data. If you omit an option, the existing value is unchanged.
+
+*Before You Begin*
+
+Ensure that the node that you are updating exists.
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the `update-node-config` subcommand.
++
+[source,shell]
+----
+asadmin> update-node-config options node-name
+----
+options::
+  Options of the `update-node-config` subcommand for changing the node's configuration data. For information about these options, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/update-node-config.adoc[`update-node-config`] help page.
+node-name::
+  The name of the `CONFIG` node to update.
+
+The following example updates the host that the node `cfg02` represents to `adc02.example.com`.
+
+[source,shell]
+----
+asadmin> update-node-config --nodehost adc02.example.com cfg02
+Command update-node-config executed successfully.
+----
+
+*See also*
+
+xref:Technical Documentation/Payara Server Documentation/Command Reference/update-node-config.adoc[`update-node-config`]
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help update-node-config` at the command line.
+
+[[to-change-the-type-of-a-node]]
+=== To Change the Type of a Node
+
+The subcommands for updating a node can also be used to change the type of a node.
+
+IMPORTANT: Due to the structure and mechanisms used to configure `DOCKER` nodes, it is not possible to switch the type of a `DOCKER` node to either `CONFIG`/`SSH` nodes or viceversa.
+
+Changing the type of a `CONFIG` node to a `SSH` node enables remote communication for the node. It is also possible to change an `SSH` node to a `CONFIG` node too.
+
+As part of the process of changing the type of a node, you can also change other configuration data for the node.
+
+Options of the subcommands for updating a node specify the new values of the node's configuration data. For most options, if you omit the option, the existing value is unchanged. However, default values are applied in the following situations:
+
+* Any of the following options of the `update-node-ssh` subcommand is omitted:
+
+** `--sshport`
+** `--sshuser`
+** `--sshkeyfile`
+
+CAUTION: Changing an `SSH` node to a `CONFIG` node disables remote communication for the node.
+
+*Before You Begin*
+
+Ensure that the following prerequisites are met:
+
+* SSH is configured on the host where the DAS is running and on the host that the node represents.
+* The node the type of which you are changing exists.
+
+Execute the following steps:
+
+. Ensure that the DAS is running. Remote subcommands require a running server.
+. Run the appropriate subcommand for updating a node, depending on the type of the node after the change.
++
+config-or-ssh-node-name::
+  The name of the `CONFIG` node or the `SSH` node to change.
+* To change the type of a node to `SSH`, run the `update-node-ssh` subcommand on the node.
++
+options::
+  Options of the `update-node-ssh` subcommand for changing the node's configuration data. For information about these options, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/update-node-ssh.adoc[`update-node-ssh`] help page.
+
+* To change the type of a node to `CONFIG`, run the `update-node-config` subcommand on the node.
++
+[source,shell]
+----
+asadmin> update-node-config [options] ssh-node-name
+----
+options::
+  Options of the `update-node-config` subcommand for changing the node's configuration data. For information about these options, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/update-node-config.adoc[`update-node-config`] help page.
+ssh-node-name::
+  The name of the `SSH` node to change.
+
+The following example changes the `CONFIG` node `cfg02` to an `SSH` node.
+
+[source,shell]
+----
+asadmin> update-node-ssh cfg02
+Command update-node-ssh executed successfully.
+----
+
+*See also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/update-node-config.adoc[`update-node-config`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/update-node-ssh.adoc[`update-node-ssh`]
+
+You can also view the full syntax and options of the subcommand by
+typing the following commands at the command line.
+
+* `asadmin help update-node-config`
+* `asadmin help update-node-ssh`

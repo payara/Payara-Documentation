@@ -1,0 +1,90 @@
+[[deployment-checklist]]
+= Deployment Checklist
+:ordinal: 3
+
+This appendix provides a checklist to get started on evaluation and production using Payara Server.
+
+[[checklist]]
+== Checklist
+
+//TODO - Add additional recommendations
+
+This table provides a checklist of the steps to be performed before deploying an application to production.
+
+.Checklist
+[cols="3,7",options="header"]
+|===
+|Component/Feature |Description
+|Application
+a| Determine the following requirements for the application to be deployed.
+
+* Required/acceptable response time.
+* Peak load characteristics.
+* Necessary persistence scope and frequency.
+* Session timeout in `web.xml`.
+* Fail-over and availability requirements.
+
+|Hardware
+a|
+* Have necessary amounts of hard disk space and memory installed.
+* Use the sizing exercise to identify the requirements for deployment.
+
+|Operating System
+a|
+* Ensure that the product is installed on a supported platform.
+* Ensure that the patch levels are up-to-date and accurate.
+
+|Network Infrastructure
+a|
+* Identify single points of failures and address them.
+* Make sure that the NICs and other network components are correctly configured.
+* Run `ttcp` benchmark test to determine if the throughput meets the requirements/expected result.
+* Setup `ssh` based on your preference.
+
+|Back-ends and other external data sources
+|Check with the domain expert or vendor to ensure that these data sources are configured appropriately.
+
+|System Changes/Configuration
+a|
+* Make sure that changes to `/etc/system` and its equivalent on Windows are completed before running any performance/stress tests.
+* Make sure the changes to the TCP/IP settings are complete.
+* By default, the system comes with lots of services pre-configured. Not all of them are required to be running. Turn off services that are not needed to conserve system resources.
+
+|Installation
+a|
+* Ensure that these servers are not installed on NFS mounted volumes.
+* Check for enough disk space and RAM when installing Payara Server.
+
+|Payara Server Configuration
+a|
+* Logging: Enable access log rotation.
+* Choose the right logging level. `WARNING` is usually appropriate.
+* Configure Jakarta EE containers using the Administration Console.
+* Configure HTTP listeners using the Administration Console.
+* Configure ORB thread pool using the Administration Console.
+* Ensure that the appropriate persistence scope and frequency are used, and they are not overridden underneath in the individual Web/EJB modules.
+* Ensure that only critical methods in the SFSB are checkpointed.
+
+|Java Virtual Machine Configuration
+a|
+* Initially set the minimum and maximum heap sizes to be the same, and at least one GB for each instance.
+* See https://docs.oracle.com/en/java/javase/11/troubleshoot/command-line-options1.html#GUID-A84ECBFB-B6CF-44C3-B627-58BB509C8D05[Java Hotspot VM Options] for more information.
+* When running multiple instances of Payara Server, consider creating a processor set and bind Payara Server to it. This helps in cases where the CMS collector is used to sweep the old generation.
+
+|Configuring time-outs in Payara Server
+a|
+`max-wait-time-millis`:: Wait time to get a connection from the pool before throwing an exception. Default is 6s. Consider changing this value for highly loaded systems where the size of the data being persisted is greater than 50 KB.
+`cache-idle-timeout-in-seconds`:: Time an EJB is allowed to be idle in the cache before it gets passivated. Applies only to entity beans and stateful session beans.
+`removal-timeout-in-seconds`:: Time that an EJB remains passivated (idle in the backup store). Default value is 60 minutes. Adjust this value based on the need for SFSB failover.
+
+//TODO - Garbage Collection advice out of date, depends on JVM in use
+|Tune VM Garbage Collection (GC)
+a|
+Garbage collection pauses of four seconds or more can cause intermittent problems in persisting session state. To avoid this problem, tune the VM heap. In cases where even a single failure to persist data is unacceptable or when the system is not fully loaded, use the CMS collector or the throughput collector.
+
+These can be enabled by adding:
+
+`<jvm-options>-XX:+UseConcMarkSweepGC</jvm-options>`
+
+This option may decrease throughput.
+|===

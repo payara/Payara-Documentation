@@ -1,0 +1,283 @@
+[[administering-the-virtual-machine-for-the-java-platform]]
+= Administering the Virtual Machine for the Java Platform
+:ordinal: 3
+
+The Java Virtual Machine is an interpretive computing engine responsible for running the byte codes in a compiled Java program. The virtual machine translates the
+Java byte codes into the native instructions of the host machine. Payara Server, being a Java process, requires a virtual machine to run and support the
+Java applications running on it. JVM settings are part of an Payara Server configuration.
+
+[[administering-jvm-options]]
+== Administering JVM Options
+
+The commands can be used to configure the JVM settings for Payara Server.
+
+[[to-create-jvm-options]]
+=== To Create JVM Options
+
+Use the `create-jvm-options` subcommand in remote mode to create JVM options in the Java configuration or the profiler elements of the `domain.xml` file.
+If JVM options are created for a profiler, these options are used to record the settings that initiate the profiler.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. Create JVM options by using the `create-jvm-options` subcommand. To create more than one JVM option, use a colon (:) to separate the options.
+If the JVM option itself contains a colon (:), use the backslash (\) to offset the colon delimiter.Information about properties for the subcommand
+is included in this help page.
+. To apply your changes, restart Payara Server.
+
+[[creating-jvm-options-example]]
+==== Example 4-1 Creating JVM Options Example
+
+This example sets multiple Java system properties.
+
+[source,shell]
+----
+asadmin> create-jvm-options -Dunixlocation=/root/example:
+-Dvariable=\$HOME:
+-Doption1=-value1
+created 4 option(s)
+Command create-jvm-options executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-jvm-options` at the command line.
+
+[[to-list-jvm-options]]
+=== To List JVM Options
+
+Use the `list-jvm-options` subcommand in remote mode to list the existing JVM options.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. List JVM options by using the `list-jvm-options` subcommand.
+
+[[listinf-jvm-options-example]]
+==== Example 4-2 Listing JVM Options
+
+This example lists all JVM options.
+
+[source,shell]
+----
+asadmin> list-jvm-options
+-Djava.security.auth.login.config=${com.sun.aas.instanceRoot}/config/login.conf
+-XX: LogVMOutput
+-XX: UnlockDiagnosticVMOptions
+-Dcom.sun.enterprise.config.config_environment_factory_class=com.sun.enterprise.
+config.serverbeans.AppserverConfigEnvironmentFactory
+-Djavax.net.ssl.keyStore=${com.sun.aas.instanceRoot}/config/keystore.jks
+-XX:NewRatio=2
+-Djava.security.policy=${com.sun.aas.instanceRoot}/config/server.policy
+-Djdbc.drivers=org.apache.derby.jdbc.ClientDriver
+-Djavax.net.ssl.trustStore=${com.sun.aas.instanceRoot}/config/cacerts.jks
+-client
+-Djava.ext.dirs=${com.sun.aas.javaRoot}/lib/ext${path.separator}${com.sun.aas.ja
+vaRoot}/jre/lib/ext${path.separator}${com.sun.aas.instanceRoot}/lib/ext${path.se
+parator}${com.sun.aas.derbyRoot}/lib
+-Xmx512m
+-XX:LogFile=${com.sun.aas.instanceRoot}/logs/jvm.log
+Command list-jvm-options executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help list-jvm-options` at the command line.
+
+[[to-delete-jvm-options]]
+=== To Delete JVM Options
+
+Use the `delete-jvm-options` subcommand in remote mode to delete JVM options from the Java configuration or profiler elements of the `domain.xml` file.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. List JVM options by using the `list-jvm-options` subcommand.
+. If necessary, notify users that the JVM option is being deleted.
+. Delete JVM options by using the `delete-jvm-options` subcommand. To remove more than one JVM option, use a colon (:) to separate the options. If the JVM option itself contains a colon, use the backslash (\) to offset the colon delimiter.
+. To apply your changes, restart Payara Server.
+
+[[deleting-a-jvm-option-example]]
+==== Example 4-3 Deleting a JVM Option
+
+This example removes a single JVM option.
+
+[source,shell]
+----
+asadmin> delete-jvm-options -Doption1=-value1
+
+deleted 1 option(s)
+Command delete-jvm-options executed successfully.
+----
+
+[[deleting-multiple-jvm-options]]
+==== Example 4-4 Deleting Multiple JVM Options
+
+This example removes multiple JVM options.
+
+[source,shell]
+----
+asadmin> delete-jvm-options -Doption1=-value1:-Dvariable=\$HOME
+deleted 2 option(s)
+Command delete-jvm-options executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help delete-jvm-options` at the command line.
+
+
+[[Payara-Platform-Proprietary-JVM-Options]]
+=== Payara Platform Proprietary JVM Options
+
+The following is a list of the proprietary JVM Options available for configuration:
+
+[[configfileencoding-option]]
+==== Config File Encoding
+
+*Property*:: `fish.payara.configFileEncoding`
+*Aim*:: Sets the domain.xml parser character encoding. The domain will fail to start if you are using characters not covered by UTF-8 in your configuration without this property configured.
+*Acceptable Values*:: Any JDK supported file encoding charset
+
+[[configuring-jdk-versions-jvm-options]]
+=== Configuring JDK Versions for JVM Options
+
+It is possible to allow specific JVM options configured for a Payara Server instance to be applied only on specific JDK versions. The configuration is flexible since it allows the user to define minimum and maximum versions of all JDKs upon which each JVM option should be applied.
+
+JDK versions must follow standard the standard JDK versioning scheme. The syntax that can be used allows for different levels of granularity in the specified JDK versions. Any of the following would be acceptable:
+
+* `1.8.0.162`
+* `1.8.0u162`
+* `1.8.0`
+* `1.8`
+
+NOTE: If no minimum and/or maximum JDK versions are set for a particular JVM option, it shall be applied no matter which JDK is being used to run the server's instance.
+
+[[using-admin-console]]
+==== Using the Admin Console
+
+To configure the JDK versions for JVM options in the admin console, head to the *Configurations -> <instance configuration> -> JVM Settings* and on the *JVM Options* tab specify the versions in the table:
+
+image::jvm-options/configure-jdk-versions-admin-console.png[Configure JDK versions for JVM options in Admin console]
+
+NOTE: You can omit either the minimum or maximum versions by leaving the fields blank.
+
+[[using-asadmin-commands]]
+==== Using Asadmin commands
+
+
+The `create-jvm-options` asadmin command allows the minimum and maximum JDK versions to be set in the following ways:
+
+. Use the `--min-jvm` and `--max-jvm` arguments to set the versions when running the command:
++
+[source, shell]
+----
+asadmin create-jvm-options --target=server-config --min-jvm=1.8.0u162 "-Djava.awt.headless\=true"
+
+asadmin create-jvm-options --target=server-config --max-jvm=1.8.0u172 "-XX\:+UnlockDiagnosticVMOptions"
+----
++
+NOTE: When using these arguments to set multiple JVM options, the specified versions will be applied for each option.
+
+. Specify the versions using the `[MIN_VERSION | MAX_VERSION]` text syntax for the inclusive version range before each JVM option:
++
+[source, shell]
+----
+asadmin create-jvm-options --target=server-config "[1.8.0u162|]-Djava.awt.headless\=true"
+
+asadmin create-jvm-options --target=server-config "[|1.8.0u172]-XX\:+UnlockDiagnosticVMOptions"
+
+asadmin create-jvm-options --target=server-config "[1.8.0u168|1.8.0u172]-XX\:NewRatio\=2"
+----
+
+The `delete-jvm-options` asadmin command does not require you to specify the JDK version when deleting a JVM option, though you can if you wish.
+
+For example, given the option `[1.8.0.160|1.8.0.200]XX\:NewRatio=3`, either of the following commands are acceptable:
+
+[source, shell]
+----
+asadmin delete-jvm-options "XX\:NewRatio=3"
+
+asadmin delete-jvm-options "[1.8.0.160|1.8.0.200]XX\:NewRatio=3"
+----
+
+[[to-generate-a-jvm-report]]
+=== To Generate a JVM Report
+
+Use the `generate-jvm-report` subcommand in remote mode to generate a JVM report showing the threads (dump of a stack trace), classes, memory, and
+loggers for a specified instance, including the domain administration server (DAS). You can generate the following types of reports: summary (default), class, thread, log.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. Generate the report by using the `generate-jvm-report` subcommand.
+
+[[generating-a-jvm-report-example]]
+==== Example 4-5 Generating a JVM Report
+
+This example displays summary information about the threads, classes, and memory.
+
+[source,shell]
+----
+asadmin> generate-jvm-report --type summary
+Operating System Information:
+Name of the Operating System: Windows XP
+Binary Architecture name of the Operating System: x86, Version: 5.1
+Number of processors available on the Operating System: 2
+System load on the available processors for the last minute: NOT_AVAILABLE.
+(Sum of running and queued runnable entities per minute).
+.
+,
+.
+user.home = C:\Documents and Settings\Jennifer
+user.language = en
+user.name = Jennifer
+user.timezone = America/New_York
+user.variant =
+variable = \$HOME
+web.home = C:\Preview\v3_Preview_release\distributions\web\target\
+Payara\modules\web
+Command generate-jvm-report executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help generate-jvm-report` at the command line.
+
+[[administering-the-profiler]]
+== Administering the Profiler
+
+A profiler generates information used to analyze server performance.
+
+[[to-create-a-profiler]]
+=== To Create a Profiler
+
+A server instance is tied to a particular profiler by the profiler element in the Java configuration. If JVM options are created for a profiler, the options are
+used to record the settings needed to activate a particular profiler. Use the `create-profiler` subcommand in remote mode to create the profiler element in the Java
+configuration.
+
+Only one profiler can exist. If a profiler already exists, you receive an error message that directs you to delete the existing profiler before creating a new one.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. Create a profiler by using the `create-profiler` subcommand. Information about properties for the subcommand is included in this help page.
+. To apply your changes, restart Payara Server.
+
+[[creating-a-profiler-example]]
+==== Example 4-6 Creating a Profiler
+
+This example creates a profiler named `sample_profiler`.
+
+[source,shell]
+----
+asadmin> create-profiler --classpath=/home/appserver/ --nativelibrarypath=/u/home/lib
+--enabled=false --property=defaultuser=admin:password=adminadmin sample_profiler
+Command create-profiler executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help create-profiler` at the command line.
+
+[[to-delete-a-profiler]]
+=== To Delete a Profiler
+
+Use the `delete-profiler` subcommand in remote mode to delete the profiler element from the Java configuration. You can then create a new profiler.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. Delete the profiler by using the `delete-profiler` subcommand.
+. To apply your changes, restart Payara Server.
+
+[[deleting-a-profiler-example]]
+==== *Deleting a Profiler Example*
+
+This example deletes the previously created profiler named `sample_profiler`.
+
+[source,shell]
+----
+asadmin> delete-profiler
+Command delete-profiler executed successfully.
+----
+
+You can also view the full syntax and options of the subcommand by typing `asadmin help delete-profiler` at the command line.

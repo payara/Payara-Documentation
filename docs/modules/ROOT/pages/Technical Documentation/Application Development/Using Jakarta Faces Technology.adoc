@@ -1,0 +1,99 @@
+[[using-jakarta-faces]]
+= Using Jakarta Faces Technology
+:ordinal: 8
+
+This chapter describes how to use the Jakarta Faces (JSF) API.
+
+[[introducing-jakarta-faces]]
+== Introducing Jakarta Faces
+
+Jakarta Faces is a server-side component framework for creating diverse Java technology–based web applications for browser-focused environments.
+
+Jakarta Faces consists of the following:
+
+* An API for representing components and managing their state; handling events, server-side validation, and data conversion; defining page navigation; supporting internationalization and accessibility
+
+* Tag library sets for adding components to web pages and for linking components to server-side objects.
+
+Jakarta Faces provides a well-defined programming model and various *tag libraries*. These tag libraries contain *tag handlers* that implement component tags. These features significantly ease the burden of creating and maintaining web applications with server-side user interfaces.
+
+[[jakarta-faces-applications]]
+=== Jakarta Faces Applications
+
+The functionality provided by a Jakarta Faces application is similar to that of any other Java web-based application. A typical Jakarta Faces application includes the following parts.
+
+* A set of web pages in which components are rendered at runtime.
+* A set of tags to add components to the web page.
+* A set of managed Java beans, which are lightweight, container-managed objects (POJOs).
+** In a Jakarta Faces application, managed beans usually serve as *backing beans*, which define properties to store data and methods and event handlers for UI components on a page.
+* A web deployment descriptor (`web.xml`).
+* _(Optional)_ One or more application configuration resource files, such as a `faces-config.xml` file, which can be used to define page navigation rules and provide further customization options for the application.
+* _(Optional)_ A set of custom objects, which can include custom components, validators, converters, or listeners.
+* _(Optional)_ A set of custom tags for representing custom or complex objects on the page.
+
+[[configurable-jsf-options]]
+== Configurable JSF options
+
+This section documents specific configuration settings that are not available in the standard deployment descriptors or configuration files described above as part of the Jakarta Faces API.
+
+[[parallel-initialization]]
+=== Parallel Initialization
+
+It is possible to specify a Payara Platform specific JSF context parameter in the `web.xml` deployment descriptor, named `fish.payara.faces.enableParallelInit` to provide parallel initialization benefits to the application in question.
+
+[[parallel-initialization-usage]]
+==== Usage
+
+When the `fish.payara.faces.enableParallelInit` context parameter is set to `true` some of the internal initialisation of Mojarra (the JSF implementation Payara Server uses) is performed in parallel.
+
+To this effect, this the platform fork/join thread pool is used, which is the same pool used for processing JDK 8 Streams in parallel.
+
+[[parallel-initialization-example]]
+==== Example
+
+Here's an example that sets the option to `true` in `web.xml`:
+
+[source, xml]
+----
+<context-param>
+    <param-name>fish.payara.faces.enableParallelInit</param-name>
+    <param-value>true</param-value>
+</context-param>
+----
+
+The `fish.payara.faces.enableParallelInit` context parameter can also be combined with the `com.sun.faces.enableThreading` parameter:
+
+[source, xml]
+----
+<context-param>
+    <param-name>com.sun.faces.enableThreading</param-name>
+    <param-value>true</param-value>
+</context-param>
+----
+
+This is an existing Mojarra-specific parameter to also enable parallel initialisation, but in a slightly earlier stage of the initialisation process.
+
+IMPORTANT: As a Payara Platform specific implementation this will use the default Platform Concurrency executor if there is one, if not it will create a single use executor with 5 threads.
+
+[[use-bundled-jsf]]
+== Using an Alternative Jakarta Faces Implementation
+
+As a special case of how the classloader hierarchy can be modified (see xref:Technical Documentation/Application Development/Class Loaders.adoc#configuring-delegation[configuring classloading delegation]), the Payara Platform allows the use of a Jakarta Faces implementation that is bundled on a web application.
+
+This feature may be useful to switch to a different implementation than the default one included with the server.
+
+To configure this feature, you need to indicate within the `payara-web.xml` / `glassfish-web.xml` deployment descriptor that the server should use a bundled Jakarta Faces implementation as follows:
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "{payaraWebDtd}">
+<payara-web-app error-url="">
+    <class-loader delegate="false"/>
+    <property name="useBundledJsf" value="true" />
+</payara-web-app>
+----
+
+By specifying these options, the bundled Jakarta Faces implementation within your web application will be used instead of the default implementation included within the server.
+
+IMPORTANT: If deploying a EAR application you must bundle the Jakarta Faces implementation library within the embedded WAR component. You cannot add an alternative Jakarta Faces implementation as an EAR library.

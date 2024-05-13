@@ -1,0 +1,530 @@
+[[configuring-the-java-persistence-provider]]
+= Configuring the Java Persistence Provider
+:ordinal: 6
+
+This chapter describes EclipseLink, the default persistence provider in Payara Server, and introduces how to use it.
+
+This chapter also tells how to set the default persistence provider in Payara Server and how to use persistence-related features specific to the Payara Platform such as automatic schema generation.
+
+[[eclipselink-overview]]
+== EclipseLink Overview
+
+EclipseLink is the default persistence provider in the Payara Platform. It is a comprehensive standards-based object-persistence and object-transformation framework that provides APIs, schemas, and run-time services for the persistence layer of an application.
+
+EclipseLink implements the following specifications, plus value-added extensions:
+
+Jakarta Persistence (JPA) 3.0+::
+
+JPA is part of the Jakarta EE specification. It includes improvements and enhancements to domain modeling, object/relational mapping, `EntityManager` and `Query` interfaces, and the Jakarta Persistence Query Language (JPQL).
+It includes an API for criteria queries, a metamodel API, and support for validation. The Jakarta Persistence API can be used with non-EJB components outside the EJB container.
++
+For more information, see the https://jakarta.ee/specifications/persistence/[Jakarta Persistence specification]. For basic information about the Jakarta Persistence API, see "https://eclipse-ee4j.github.io/jakartaee-tutorial/#persistence[Persistence]" in The Jakarta EE Tutorial.
+
+Jakarta XML Binding (JAXB):: The EclipseLink JAXB implementation, plus EclipseLink extensions, is called *MOXy*. The `org.eclipse.persistence.moxy.jar` file is bundled as a module in Payara Server.
++
+For more information about MOXy support in Payara Server, see xref:Technical Documentation/Application Development/Developing SOAP Webservices.adoc#the-databinding-provider[The Databinding Provider].
++
+For the JAXB specification, see the https://jakarta.ee/specifications/xml-binding/[Jakarta XML Binding specification].
+
+* EclipseLink binary utilities are not included but can be used with Payara Server. To use them, download the EclipseLink zip file at `http://www.eclipse.org/eclipselink/downloads/` and unzip it. The utility files are located in the `bin` folder and are the following:
+** `jaxb-compiler`: Used to compile Java binding source files.
+** `sdo-compiler`: Used to compile SDO files.
+** `sdo-jaxb-compiler`: Used to compile Java binding source files for SDO components.
++
+NOTE: All utilities are available as both a CMD and BASH shell script.
+
+For information about developing, deploying, and configuring EclipseLink, and applications, see the following resources:
+
+* http://wiki.eclipse.org/EclipseLink[EclipseLink Project Home]
+* https://www.eclipse.org/eclipselink/documentation/[EclipseLink Documentation Center]
+* https://wiki.eclipse.org/EclipseLink/Examples/JPA[EclipseLink JPA Examples]
+
+[[using-eclipselink-in-payara-server]]
+== Using EclipseLink in Payara Server
+
+To run EclipseLink JPA applications in Payara Server, you must configure the server and coordinate certain server and application settings. These are described in the following steps:
+
+. Set up the datasource. See "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#administering-database-connectivity[Administering Database Connectivity]" in Payara Server General Administration section.
+
+. Create the application. For guidance in writing your application, see "https://eclipse-ee4j.github.io/jakartaee-tutorial/#persistence[Persistence]" in The Jakarta EE Tutorial.
+
+. Create the `persistence.xml` file. See xref:#specifying-the-database-for-an-application[Specifying the Database for an Application] for considerations specific to Payara Server.
++
+If you are using the Jakarta Persistence API by calling `Persistence.createEMF()`, see xref:#specifying-the-persistence-provider-for-an-application[Specifying the Persistence Provider for an Application].
+
+. If the security manager is enabled, and you are using the Jakarta Persistence API by calling `Persistence.createEMF()`, see xref:Technical Documentation/Application Development/Securing Applications.adoc#enabling-and-disabling-the-security-manager[Enabling and Disabling the Security Manager].
+
+. Deploy the application.
+
+. Run the application.
+
+. Monitor the application. See "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Monitoring Service.adoc#administering-the-monitoring-service[Administering the Monitoring Service]" in the Payara Server General Administration section.
+
+[[specifying-the-database-for-an-application]]
+== Specifying the Database for an Application
+
+Payara Server uses an embedded H2 database to provision its default datasource, named `jdbc/__default`. If the `transaction-type` element is omitted or specified as `JTA` and both the `jta-data-source` and `non-jta-data-source` elements are omitted in the `persistence.xml` file, the default datasource is used as a JTA data source.
+
+If `transaction-type` is specified as `RESOURCE_LOCAL` and both `jta-data-source` and `non-jta-data-source` are omitted, the default datasource is used as a non-JTA data source.
+
+TIP: To use a non-default database, either specify a value for the `jta-data-source` element, or set the `transaction-type` element to `RESOURCE_LOCAL` and specify a value for the `non-jta-data-source` element.
+
+When using EclipseLink, it attempts to automatically detect the database type based on the connection metadata. This database type is used to issue SQL statements specific to the detected database type's SQL dialect.
+
+You can specify the optional `eclipselink.target-database` property to guarantee that the database type is correct. For example:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    <persistence-unit name ="em1">
+        <jta-data-source>jdbc/MyDB2DB</jta-data-source>
+        <properties>
+            <property name="eclipselink.target-database"  value="DB2"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+----
+
+The following `eclipselink.target-database` property values are allowed.
+Supported platforms have been tested in Payara Server and are found to be Jakarta EE compatible.
+
+[source,text]
+----
+//Supported platforms
+Attunity
+Cloudscape
+DB2
+DB2Mainframe
+DBase
+Derby
+HSQL
+H2
+Informix
+JavaDB
+MaxDB
+MySQL
+MySQL4
+Oracle
+Oracle10
+Oracle11
+Oracle8
+Oracle9
+PointBase
+PostgreSQL
+SQLAnywhere
+SQLServer
+Sybase
+Symfoware
+TimesTen
+----
+
+For more information about the `eclipselink.target-database` property, see https://www.eclipse.org/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#target-database[EclipseLink JPA Extensions - Target Database].
+
+If you are using the Java Persistence API by calling `Persistence.createEMF()`, do not specify the `jta-data-source` or `non-jta-data-source` elements. Instead, specify the `provider` element and any additional properties required by the JDBC driver or the database. For example:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    <persistence-unit name ="em2">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>fish.payara.jpa.JpaBean</class>
+        <properties>
+            <property name="eclipselink.target-database" value="H2"/>
+            <!-- JDBC connection properties -->
+            <property name="eclipselink.jdbc.driver" value="org.h2.Driver"/>
+            <property name="eclipselink.jdbc.url" value="jdbc:h2://localhost:1527/~/testdb"/>
+            <property name="eclipselink.jdbc.user" value="APP"/>
+            <property name="eclipselink.jdbc.password" value="APP"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+----
+
+For configurations of supported and other drivers, see "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]" in the Payara Server General Administration section.
+
+[[specifying-the-persistence-provider-for-an-application]]
+== Specifying the Persistence Provider for an Application
+
+If you are using the default persistence provider in an application that uses the Jakarta Persistence API by injecting or looking up an entity manager or entity manager factory, you do not need to specify the provider explicitly.
+
+If you are using the Jakarta Persistence API by calling `Persistence.createEMF()`, you should always specify the persistence provider for specification compliance. To specify the default provider, set the `provider` element of the `persistence.xml` file to `org.eclipse.persistence.jpa.PersistenceProvider`.
+
+You can specify a non-default persistence provider for an application in the manner described in the Jakarta Persistence API Specification:
+
+. Install the provider. Copy the provider JAR files to the `domain-dir/lib` directory, and restart the Payara Server domain.
++
+The new persistence provider is now available to all modules and applications deployed on servers that share the same configuration.
++
+NOTE: EclipseLink will remain as the default persistence provider.
+
+. In your persistence unit, specify the provider and any properties the provider requires in the `persistence.xml` file. For example:
++
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence">
+    <persistence-unit name ="em3">
+        <provider>com.company.persistence.PersistenceProviderImpl</provider>
+        <properties>
+            <property name="company.database.name" value="MyDB"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+----
+
+[[primary-key-generation-defaults]]
+== Primary Key Generation Defaults
+
+In the descriptions of the `@GeneratedValue`, `@SequenceGenerator`, and `@TableGenerator` annotations in the Jakarta Persistence Specification, certain defaults are noted as specific to the persistence provider. The default persistence provider's primary key generation defaults are listed here.
+
+`@GeneratedValue` defaults are as follows:
+
+* Using `strategy=AUTO` (or no `strategy`) creates a `@TableGenerator` named `SEQ_GEN` with default settings. Specifying a `generator` has no effect.
+* Using `strategy=TABLE` without specifying a `generator` creates a `@TableGenerator` named `SEQ_GEN_TABLE` with default settings.
++
+Specifying a `generator` but no `@TableGenerator` creates and names a `@TableGenerator` with default settings.
+
+* Using `strategy=IDENTITY` or `strategy=SEQUENCE` produces the same results, which are database-specific.
+** For Oracle databases, not specifying a `generator` creates a `@SequenceGenerator` named `SEQ_GEN_SEQUENCE` with default settings.
++
+Specifying a `generator` but no `@SequenceGenerator` creates and names a `@SequenceGenerator` with default settings.
+** For PostgreSQL databases, a `SERIAL` column named entity-table`_`pk-column`_SEQ` is created.
+** For MySQL databases, an `AUTO_INCREMENT` column is created.
+** For other supported databases, an `IDENTITY` column is created.
+
+The `@SequenceGenerator` annotation has one default specific to the default provider. The default `sequenceName` is the specified `name`.
+
+`@TableGenerator` defaults are as follows:
+
+* The default `table` is `SEQUENCE`.
+* The default `pkColumnName` is `SEQ_NAME`.
+* The default `valueColumnName` is `SEQ_COUNT`.
+* The default `pkColumnValue` is the specified `name`, or the default `name` if no `name` is specified.
+
+[[automatic-schema-generation]]
+== Automatic Schema Generation
+
+The automatic schema generation feature of Payara Server defines database tables based on the fields or properties in entities and the relationships between the fields or properties.
+
+This insulates developers from many of the database related aspects of development, allowing them to focus on entity development.
+
+The resulting schema is usable as-is or can be given to a database administrator for tuning with respect to performance, security, and so on.
+
+IMPORTANT: Automatic schema generation is supported on an all-or-none basis: it expects that no tables exist in the database before it is executed. It is not intended to be used as a tool to generate extra tables or constraints. +
+Deployment won't fail if all tables are not created, and un-deployment won't fail if not all tables are dropped. Instead, an error is written to the server log. This is done to allow you to investigate the problem and fix it manually. You should not rely on the partially created database schema to be correct for running the application.
+
+[[annotations]]
+=== Annotations
+
+The following annotations are used in automatic schema generation:
+
+* `@AssociationOverride`
+* `@AssociationOverrides`
+* `@AttributeOverride`
+* `@AttributeOverrides`
+* `@Column`
+* `@DiscriminatorColumn`
+* `@DiscriminatorValue`
+* `@Embedded`
+* `@EmbeddedId`
+* `@GeneratedValue`
+* `@Id`
+* `@IdClass`
+* `@JoinColumn`
+* `@JoinColumns`
+* `@JoinTable`
+* `@Lob`
+* `@ManyToMany`
+* `@ManyToOne`
+* `@OneToMany`
+* `@OneToOne`
+* `@PrimaryKeyJoinColumn`
+* `@PrimaryKeyJoinColumns`
+* `@SecondaryTable`
+* `@SecondaryTables`
+* `@SequenceGenerator`
+* `@Table`
+* `@TableGenerator`
+* `@UniqueConstraint`
+* `@Version`
+
+For information about these annotations, see the Jakarta Persistence Specification.
+
+NOTE: For `@Column` annotations, the `insertable` and `updatable` elements are not used in automatic schema generation.
+
+WARNING: For `@OneToMany` and `@ManyToOne` annotations, no `ForeignKeyConstraint` is created in the resulting DDL files.
+
+[[generation-options]]
+=== Generation Options
+
+Schema generation properties or `asadmin` command line options can control automatic schema generation by the following:
+
+* Creating tables during deployment
+* Dropping tables during un-deployment
+* Dropping and creating tables during redeployment
+* Generating the DDL files
+
+//TODO - Find an updated link to EclipseLink documentation
+Optional schema generation properties control the automatic creation of database tables. You can specify them in the `persistence.xml` file. For more information, see https://www.eclipse.org/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#CHDFDDBF[EclipseLink JPA Extensions for Schema Generation].
+
+The following options of the `asadmin deploy` or `asadmin deploydir` command control the automatic creation of database tables at deployment.
+
+.The `asadmin deploy` and `asadmin deploydir` Generation Options
+[cols="3,1,6a", options="header"]
+|===
+|Option |Default |Description
+
+|`--createtables` |none |If `true`, causes database tables to be created for entities that need them. No unique constraints are created. If `false`, does not create tables. If not specified, the value of the `eclipselink.ddl-generation` property in `persistence.xml` is used.
+
+|`--dropandcreatetables` |none| If `true`, and if tables were automatically created when this  application was last deployed, tables from the earlier deployment are dropped and fresh ones are created.
+
+If `true`, and if tables were not automatically created when this application was last deployed, no attempt is made to drop any tables.
+
+If tables with the same names as those that would have been automatically created are found, the deployment proceeds, but a warning is thrown to indicate that tables could not be created.
+
+If `false`, the `eclipselink.ddl-generation` property setting in `persistence.xml` is overridden.
+
+|===
+
+The following options of the `asadmin undeploy` command control the automatic removal of database tables at un-deployment.
+
+.The `asadmin undeploy` Generation Options
+
+[cols="2,2,6a",options="header"]
+|===
+|Option |Default |Description
+
+|`--droptables` |none | If `true`, causes database tables that were automatically created when the entities were last deployed to be dropped when the entities are un-deployed.
+
+If `false`, does not drop tables.
+
+If not specified, tables are dropped only if the `eclipselink.ddl-generation` property setting in `persistence.xml` is `drop-and-create-tables`.
+
+|===
+
+CAUTION: When `asadmin` deployment options and `persistence.xml` options are both specified, the `asadmin` deployment options take precedence.
+
+[[restrictions-and-optimizations]]
+== Restrictions and Optimizations
+
+This section discusses restrictions and performance optimizations that affect using the Java Persistence API.
+
+[[extended-persistence-context]]
+=== Extended Persistence Context
+
+The Jakarta Persistence API specification does not specify how the container and persistence provider should work together to serialize an extended persistence context. This also prevents successful serialization of a reference to an extended persistence context in a stateful session bean.
+
+Even in a single-instance environment, if a stateful session bean is passivated, its extended persistence context could be lost when the stateful session bean is activated.
+
+In Payara Server, a stateful session bean with an extended persistence context is never passivated and cannot be failed over.
+
+[[using-orderby-with-a-shared-session-cache]]
+=== Using `@OrderBy` with a Shared Session Cache
+
+Setting `@OrderBy` on a `ManyToMany` or `OneToMany` relationship field in which a `List` represents the Many side doesn't work if the session cache is shared. Use one of the following workarounds:
+
+* Have the application maintain the order so the `List` is cached properly.
+* Refresh the session cache using `EntityManager.refresh()` if you don't want to maintain the order during creation or modification of the `List`.
+* Disable session cache sharing in `persistence.xml` as follows:
++
+[source,xml]
+----
+<property name="eclipselink.cache.shared.default" value="false"/>
+----
+
+[[database-case-sensitivity]]
+=== Database Case Sensitivity
+
+Mapping references to column or table names must be in accordance with the expected column or table name case, and ensuring this is the programmer's responsibility.
+
+If column or table names are not explicitly specified for a field or entity, Payara Server uses upper case column names by default, so any mapping references to the column or table names must be in upper case.
+
+If column or table names are explicitly specified, the case of all mapping references to the column or table names must be in accordance with the case used in the specified names.
+
+The following are examples of how case sensitivity affects mapping elements that refer to columns or tables. Keep case sensitivity in mind when writing these mappings.
+
+[[unique-constraints]]
+==== Unique Constraints
+
+If column names are not explicitly specified on a field, unique constraints and foreign key mappings must be specified using uppercase references. For example:
+
+[source,java]
+----
+@Table(name="Department",
+    uniqueConstraints= {
+        @UniqueConstraint(columnNames= "DEPTNAME")
+})
+----
+
+The other way to handle this is by specifying explicit column names for each field with the required case. For example:
+
+[source, java]
+----
+@Table(name="Department",
+        uniqueConstraints={ @UniqueConstraint ( columnNames= { "deptName" } ) } )
+public class Department{
+
+    @Column(name="deptName")
+    private String deptName;
+}
+----
+
+Otherwise, the `ALTER TABLE` statement generated by Payara Server uses the incorrect case, and the creation of the unique constraint fails.
+
+[[foreign-key-mapping]]
+==== Foreign Key Mapping
+
+Use `@OneToMany(mappedBy="COMPANY")` or specify an explicit column name for the `Company` field on the `Many` side of the relationship.
+
+[[sql-result-set-mapping]]
+==== SQL Result Set Mapping
+
+Use the following elements:
+
+[source,xml]
+----
+<sql-result-set-mapping name="SRSMName">
+   <entity-result entity-class="entities.someEntity" />
+   <column-result name="UPPERCASECOLUMNNAME" />
+</sql-result-set-mapping>
+----
+
+Or specify an explicit column name for the `upperCaseColumnName` field.
+
+[[named-native-queries-and-jdbc-queries]]
+==== Named Native Queries and JDBC Queries
+
+Column or table names specified in SQL queries must be in accordance with the expected case. For example, MySQL requires column names in the `SELECT` clause of JDBC queries to be uppercase, while PostgreSQL and Sybase require table names to be uppercase in all JDBC queries.
+
+[[postgresql-case-sensitivity]]
+==== PostgreSQL Case Sensitivity
+
+PostgreSQL stores column and table names in lower case. JDBC queries on PostgreSQL retrieve column or table names in lowercase unless the names are quoted. For example:
+
+[source, postgresql]
+----
+use aliases Select m.ID AS \"ID\" from Department m
+----
+
+Use the backslash as an escape character in the class file, but not in the `persistence.xml` file.
+
+[[sybase-finder-limitation]]
+=== Sybase Finder Limitation
+
+If a finder method with an input greater than 255 characters is executed and the primary key column is mapped to a `VARCHAR` column, Sybase attempts to convert type `VARCHAR` to type `TEXT` and generates the following error:
+
+[source, text]
+----
+com.sybase.jdbc2.jdbc.SybSQLException: Implicit conversion from datatype 'TEXT' to 'VARCHAR' is not allowed. Use the CONVERT function to run this query.
+----
+
+To avoid this error, make sure the finder method input is less than 255 characters.
+
+[[mysql-database-restrictions]]
+=== MySQL Database Restrictions
+
+The following restrictions apply when you use a MySQL database with Payara Server in conjunction with JPA.
+
+* MySQL treats `int1` and `int2` as reserved words. If you want to define `int1` and `int2` as fields in your tables, use `\`int1\`` and `\`int2\`` field names in your SQL file.
+* When `VARCHAR` fields get truncated, a warning is displayed instead of an error. To get an error message, start the MySQL database in strict SQL mode.
+* The order of fields in a foreign key index must match the order in the explicitly created index on the primary table.
+* The `CREATE TABLE` syntax in the SQL file must end with the following line.
++
+[source,mysql]
+----
+)  Engine=InnoDB;
+----
++
+`InnoDB` provides MySQL with a transaction-safe (ACID compliant) storage engine having commit, rollback, and crash recovery capabilities.
+
+* For a `FLOAT` type field, the correct precision must be defined. By default, MySQL uses four bytes to store a `FLOAT` type that does not have an explicit precision definition. For example, this causes a number such as `12345.67890123` to be rounded off to `12345.7` during an `INSERT`.
++
+To prevent this, specify `FLOAT(10,2)` in the DDL file, which forces the database to use an eight-byte double-precision column. For more information, see `https://dev.mysql.com/doc/refman/8.0/en/numeric-types.html`.
+
+* To use `||` as the string concatenation symbol, start the MySQL server with the `--sql-mode="PIPES_AS_CONCAT"` option.
+
+* MySQL always starts a new connection when `autoCommit==true` is set. This ensures that each SQL statement forms a single transaction on its own. If you try to rollback or commit an SQL statement, you get an error message like the following:
++
+[source, text]
+----
+javax.transaction.SystemException: java.sql.SQLException: Can't call rollback when autocommit=true
+javax.transaction.SystemException: java.sql.SQLException: Error open transaction is not closed
+----
++
+To resolve this issue, add `relaxAutoCommit=true` to the JDBC URL.
+
+* MySQL does not allow a `DELETE` on a row that contains a reference to itself. Here is an example that illustrates the issue:
++
+[source, mysql]
+----
+create table EMPLOYEE (
+    empId   int         NOT NULL,
+    salary  float(25,2) NULL,
+    mgrId   int         NULL,
+    PRIMARY KEY (empId),
+    FOREIGN KEY (mgrId) REFERENCES EMPLOYEE (empId)
+) ENGINE=InnoDB;
+
+insert into Employee values (1, 1234.34, 1);
+delete from Employee where empId = 1;
+----
++
+This example fails with the following error message.
++
+[source,text]
+----
+ERROR 1217 (23000): Cannot delete or update a parent row: a foreign key constraint fails
+----
++
+To resolve this issue, change the table creation script to the  following:
++
+[source, mysql]
+----
+create table EMPLOYEE (
+    empId   int         NOT NULL,
+    salary  float(25,2) NULL,
+    mgrId   int         NULL,
+    PRIMARY KEY (empId),
+    FOREIGN KEY (mgrId) REFERENCES EMPLOYEE (empId)
+    ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+insert into Employee values (1, 1234.34, 1);
+delete from Employee where empId = 1;
+----
++
+This can be done only if the foreign key field is allowed to be `null`.
+
+[[jpa-cache-coordination]]
+== Using the Hazelcast EclipseLink Cache Coordination Protocol
+
+If necessary, your can configure the Data Grid (implemented via Hazelcast) as the coordination mechanism for the application's L2 cache (if enabled). To do so, configure the `persistence.xml` deployment descriptor as follows:
+
+. Set the `eclipselink.cache.coordination.protocol` property to `fish.payara.persistence.eclipselink.cache.coordination.HazelcastPublishingTransportManager`
+. Set the `eclipselink.cache.coordination.channel` property to a unique value for the coordination channel's name.
+
+The channel property is optional, but is highly recommended if the application has more than one Persistence Unit. A good practice is to name the channel after the persistence unit.
+
+Here is a complete example:
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8" ?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    <persistence-unit name="MyPU" transaction-type="JTA">
+        <jta-data-source>jdbc/myDataSource</jta-data-source>
+        <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
+        <properties>
+            <property name="eclipselink.cache.coordination.protocol" value="fish.payara.persistence.eclipselink.cache.coordination.HazelcastPublishingTransportManager"/>
+            <property name="eclipselink.cache.coordination.channel" value="MyPUChannel"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+----

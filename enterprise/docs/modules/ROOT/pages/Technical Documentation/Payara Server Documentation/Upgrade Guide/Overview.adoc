@@ -1,0 +1,71 @@
+[[upgrade-payara-server]]
+= Upgrading Payara Server
+
+There are three valid methods of fully upgrading to a newer release of Payara Enterprise. Any of the following methods would work in most circumstances:
+
+NOTE: If you are migrating from Payara Community edition to Payara Enterprise edition, you must use the backup and restore method.
+
+. Backing up and restoring the existing configuration to a new installation.
+xref:Technical Documentation/Payara Server Documentation/Upgrade Guide/Backup and Restore Method.adoc[Read Backup and Restore Method]
+
+. Maintaining completely separate domain and node directories and pointing the new version to the existing directories.
+xref:Technical Documentation/Payara Server Documentation/Upgrade Guide/Domain and Node Directories Method.adoc[Read Domain and Node Directories Method]
+
+. Using the Payara Upgrade Tool.
+xref:Technical Documentation/Payara Server Documentation/Upgrade Guide/Upgrade Tool.adoc[Read Payara Upgrade Tool Method]
+
+[[jdk-11-upgrade-considerations]]
+== JDK 11: Upgrade Considerations
+
+IMPORTANT: Applies when upgrading to Payara Server 5.192 and superior releases
+
+The `domain.xml` configuration file contains instructions for handling JDK 11. Without these instructions, Payara Server will not start up on JDK 11 and/or will throw many exceptions during runtime.
+
+If older, pre-5.192, domains are being migrated this has to be taken into account. The following `jvm-options` have to be added to the `java-config` element in `domain.xml`:
+
+[source, xml]
+----
+<jvm-options>[9|]--add-opens=java.base/jdk.internal.loader=ALL-UNNAMED</jvm-options>
+<jvm-options>[9|]--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED</jvm-options>
+<jvm-options>[9|]--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED</jvm-options>
+<jvm-options>[9|]--add-opens=java.base/java.lang=ALL-UNNAMED</jvm-options>
+<jvm-options>[9|]--add-opens=java.base/java.nio=ALL-UNNAMED</jvm-options>
+<jvm-options>[9|]--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</jvm-options>
+<jvm-options>[9|]--add-opens=java.management/sun.management=ALL-UNNAMED</jvm-options>
+<jvm-options>[9|]--add-opens=java.base/sun.net.www.protocol.jrt=ALL-UNNAMED</jvm-options>
+<jvm-options>[9|]-Xbootclasspath/a:${com.sun.aas.installRoot}/lib/grizzly-npn-api.jar</jvm-options>
+----
+
+The following `jvm-options` have to be removed:
+
+[source, xml]
+----
+<jvm-options>-Djava.endorsed.dirs=${com.sun.aas.installRoot}/modules/endorsed${path.separator}${com.sun.aas.installRoot}/lib/endorsed</jvm-options>
+<jvm-options>-Djava.ext.dirs=${com.sun.aas.javaRoot}/lib/ext${path.separator}${com.sun.aas.javaRoot}/jre/lib/ext${path.separator}${com.sun.aas.instanceRoot}/lib/ext</jvm-options>
+----
+
+[[jdk-17-21-upgrade-considerations]]
+== JDK 17 and 21: Upgrade Considerations
+
+IMPORTANT: Applies when upgrading to Payara Enterprise 5.39.0 and superior releases
+
+The `domain.xml` configuration file contains instructions for handling JDKs 17 and 21. Without these instructions, Payara Server will not start up on JDK 17 and/or will throw many exceptions during runtime.
+
+If older, pre-5.192, domains are being upgraded follow the JDK 11 upgrade considerations steps first, then come back to the JDK 17 & 21 upgrade considerations.
+
+If older, pre-5.39.0, domains are being upgraded to Payara Server 5.39.0 or above, the following `jvm-options` have to be added to the `java-config` element in `domain.xml`:
+
+[source, xml]
+----
+<jvm-options>[17|]--add-exports=java.base/sun.net.www=ALL-UNNAMED</jvm-options>
+<jvm-options>[17|]--add-exports=java.base/sun.security.util=ALL-UNNAMED</jvm-options>
+<jvm-options>[17|]--add-opens=java.base/java.lang.invoke=ALL-UNNAMED</jvm-options>
+<jvm-options>[17|]--add-opens=java.desktop/java.beans=ALL-UNNAMED</jvm-options>
+<jvm-options>[17|]--add-opens=java.base/java.io=ALL-UNNAMED</jvm-options>
+<jvm-options>[17|]--add-exports=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED</jvm-options>
+<jvm-options>[17|]--add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED</jvm-options>
+----
+
+[[migration-5-to-6-considerations]]
+== Payara Server 5 to Payara Server 6 Migration Considerations
+Package names for Corba classes have changed from `com.sun` to `org.glassfish`, therefore if you use the `java.naming.factory.initial` system property you should set it to `org.glassfish.jndi.cosnaming.CNCtxFactory` for Payara Server 6.

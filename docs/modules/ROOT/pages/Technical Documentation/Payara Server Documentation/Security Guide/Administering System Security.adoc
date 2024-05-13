@@ -1,0 +1,1294 @@
+[[administering-system-security]]
+= Administering System Security
+:ordinal: 1
+
+This chapter describes general information about administering system security.
+
+Information on application security is contained in "xref:Technical Documentation/Application Development/Securing Applications.adoc#securing-applications[Securing Applications]" in the Application Development section.
+
+[[about-system-security-in-payara-server]]
+== About System Security in Payara Server
+
+Security is about protecting data, that is, how to prevent unauthorized access or damage to data that is in storage or in transit. Payara Server is built on the Java security model, which uses a sandbox where applications can run safely, without potential risk to systems or users.
+
+System security affects all the applications in a Payara Server environment.
+
+The Jakarta Security specification defines portable, plug-in interfaces for authentication and identity stores, and a new injectable-type `SecurityContext` interface that provides an access point for programmatic security. You can use the built-in implementations of the plug-in SPIs, or write your own custom implementations.
+
+[[authentication]]
+=== Authentication
+
+Authentication is the way in which an entity (a user, an application, or a component) determines that another entity is who it claims to be. An entity uses security credentials to authenticate itself. The credentials might be a username and password, a digital certificate, or something else.
+
+Usually, servers or applications require clients to authenticate themselves. Additionally, clients might require servers to authenticate themselves. When authentication is bidirectional, it is called *mutual authentication*.
+
+When an entity tries to access a protected resource, Payara Server uses the authentication mechanism configured for that resource to determine whether to grant access. For example, a user can enter a set of credentials in a web browser, and if the application verifies those credentials, the user is authenticated. The user is associated with this authenticated security identity for the remainder of the session.
+
+[[authentication-types]]
+==== Authentication Types
+
+Within its deployment descriptors, an application can specify the type of authentication that it uses. The https://jakarta.ee/specifications/security/[Jakarta Security] API provides an alternative mechanism for configuring the type of authentication an application uses.
+
+Payara Server supports specifying the following types of authentication in deployment descriptors:
+
+BASIC::
+Uses the standard `Basic` Authentication Scheme as described in RFC2617. The communication protocol is HTTP (secure transport is optional).
++
+There is no encryption of user credentials unless using secure transport.
++
+This type is not  considered to be a secure method of user authentication unless used in conjunction with an encrypted communications channel, such as that provided by SSL/TLS.
+
+FORM::
+The application provides its own custom login and error webpages. The communication protocol is HTTP (secure transport is optional).
++
+There is no encryption of user credentials unless using secure transport.
+
+CLIENT-CERT::
+The server authenticates the client using a public key certificate.The communication protocol is HTTPS (secure transport required).
+
+DIGEST::
+The server authenticates a user based on a username and a password. Unlike `BASIC` authentication, the plaintext password is never sent over the network, although a hash of the password combined with other parameters is sent.
++
+While `Digest` Authentication is more secure than `Basic` Authentication, usernames and passwords are not strongly protected, and the use of secure transport is heavily recommended.
+
+[[authentication-mechanisms-and-identity-stores]]
+==== Jakarta Security Authentication Mechanisms and Identity Stores
+
+The Jakarta Security API defines the `HttpAuthenticationMechanism` interface, the `IdentityStore` and `IdentityStoreHandler` interfaces.
+
+The `HttpAuthenticationMechanism` interface defines an SPI for writing authentication mechanisms that can be provided with an application and deployed using CDI. Developers can write their own implementations of `HttpAuthenticationMechanism` to support specific authentication token  types or protocols. There are also several built-in authentication mechanisms that perform `BASIC`, `FORM`, and Custom `FORM` authentication.
+
+The `HttpAuthenticationMechanism` interface defines three methods - `validateRequest()`, `secureResponse()`, and `cleanSubject()`. These methods align closely with the methods defined by the Jakarta Authentication's `ServerAuth` interface.
+
+The `IdentityStore` interface provides an abstraction of an identity store that holds user account information including name, password, group membership, and other additional attributes. Implementations of the `IdentityStore` interface are used to validate caller credentials, typically username and password, and retrieve and group information. There are built-in implementations of this interface that can validate credentials against external *LDAP* or *Database* identity stores.
+
+`IdentityStore` is intended primarily for use by `HttpAuthenticationMechanism` implementations, but could be used by other authentication mechanisms, such as a Jakarta Authentication `ServerAuthModule` implementation, or a runtime built-in authentication mechanisms. Though `HttpAuthenticationMechanism` implementations can authenticate users in any manner they choose, the `IdentityStore` interface provides a convenient mechanism.
+
+A significant advantage of using `HttpAuthenticationMechanism` and `IdentityStore` over the declarative mechanisms defined by the Jakarta Servlet specification is that it allows an application to control the identity stores that it authenticates against, in a standard, portable way. You can use the built-in implementations of the plug-in SPIs, or define custom implementations.
+
+[[passwords]]
+==== Passwords
+
+Passwords are your first line of defense against unauthorized access to the components and data of Payara Server. For Information about how to use passwords for Payara Server, see xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#administering-passwords[Administering Passwords].
+
+[[master-password-and-keystores]]
+==== Master Password and Java Keystores
+
+The master password is not tied to a user account, and it is not used for authentication. Instead, Payara Server strictly uses the master password to ONLY encrypt the keystore and truststore used to store keys and certificates for the DAS and instances usage.
+
+When you create a new Payara Server domain, a new self-signed certificate is generated and stored in the domain keystore and truststore. The DAS needs the master password to open both stores at startup. Similarly, the associated server instances need the master password to open their copy of these stores at startup.
+
+If you use a utility such as `keytool` to modify the keystore or truststore, you must provide the master password in that case as well.
+
+NOTE: The default master password (unless changed at domain creation) is `changeit`.
+
+IMPORTANT: The master password is a shared password and must be the same for the DAS and all instances in the domain in order to manage the instances from the DAS. However, because Payara Server never transmits the master password over the network, it is up to you to keep the master password in sync between the DAS and instances.
+
+If you change the master password, you can choose to enter the master password manually when required, or save it in a file.
+
+[[understanding-master-password-synchronization]]
+==== Understanding Master Password Synchronization
+
+Payara Server keeps the keystore and truststore for the DAS and instances in sync, which guarantees that all copies of the stores are encrypted with the same master password at any given time.
+
+However, Payara Server *does not synchronize* the master password itself, and it is possible that the DAS and instances might attempt to use different master passwords.
+
+Consider the following potential scenario:
+
+. You create a domain and instances, using the default master password. As a result, the DAS and instances have keystores and truststores encrypted using `changeit`.
+
+. You use the `change-master-password` subcommand on the DAS to change the master password to `ichangedit`. As a result, the DAS and instance  keystores and truststores are encrypted using `ichangedit`.
+
+. Access to the keystore and truststore from an instance now requires the master password `ichangedit`. You are responsible for changing the master password in each corresponding instance as needed.
+
+If you do not use a master password file, you assume the responsibility for using the `change-master-password` subcommand on the DAS and instances to keep the master passwords in sync.
+
+If you do use a master password file, you assume the responsibility for using the `change-master-password` subcommand on the DAS and instances to keep the master password file in sync.
+
+[[using-the-default-master-password]]
+==== Using the Default Master Password
+
+Payara Server uses the known text string `changeit` as the default master password. This master password is not stored in a file. The default password is a convenience feature and provides no additional security because it is assumed to be widely known.
+
+IMPORTANT: It is recommended to change the default master password in most production environment settings to prevent unwanted access to the server's configured keystore and truststores.
+
+All Payara Server subcommands work as expected with the default master password and there are no synchronization issues.
+
+[[saving-the-master-password-to-a-file]]
+==== Saving the Master Password to a File
+
+The `change-master-password --savemasterpassword` option indicates whether the master password should be written to the file system in the `master-password` file for the DAS or a node. The default setting is `false`.
+
+* For a domain, the master password is kept in the `domain-dir/master-password` file.
+
+* For a node, the master-password file is kept in `as_install/nodes/<node-name>/agent/master-password`.
++
+You can set a master password at the node level and all instances created on that node will use that master-password file. To do this, use the `--nodedir` option and provide the corresponding node name.
+
+You might want to save the master password to the file so that the `start-domain` subcommand can start the server without having to prompt the user.
+
+WARNING: The master-password file is encoded, not encrypted. You must use filesystem permissions to protect the file.
+
+[[using-the-master-password-when-creating-a-domain]]
+==== Using the Master Password When Creating a Domain
+
+The `create-domain --usemasterpassword` option specifies whether the keystore and truststore are encrypted with a master password that is built into the
+system, or by a user-defined master password.
+
+* If `false` (default), the keystore is encrypted with the default master password.
+* If `true`, the subcommand obtains the master password from the `AS_ADMIN_MASTERPASSWORD` entry in the password file you specified in the `--passwordfile` option of the `asadmin` utility. Or, if none is defined, the `--usemasterpassword` option prompts the user for the master password.
+
+[[administration-password]]
+==== Administration Password
+
+An administration password, also known as the admin password, is used to invoke the Administration Console and the Asadmin CLI utility. As with the default `admin` username, the default admin password is usually set during installation, but it can be changed.
+
+For instructions, see xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#to-change-an-administration-password[To Change an Administration Password].
+
+[[encoded-passwords]]
+==== Encoded Passwords
+
+Files that contain encoded passwords need to be protected using file system permissions. These files include the following:
+
+* `domain-dir/master-password`
++
+This file contains the encoded master password and should be protected with the default file system permissions set to `600` (in most *Nix systems).
+
+* Any password file created to pass as an argument by using the `--passwordfile` argument to the `asadmin` CLI.
++
+Additionally, any password file being used for a transient purpose, such as setting up SSH nodes, should be deleted after it has served its purpose.
+
+For instructions, see xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#to-set-a-password-from-a-file[To Set a Password From a File].
+
+[[web-browsers-and-password-storage]]
+==== Web Browsers and Password Storage
+
+Most web browsers can save login credentials entered through HTML forms. This function can be configured by the user and also by applications that employ user credentials. If the function is enabled, credentials entered by the user are stored on their local computer and retrieved by the browser on future visits to the same application.
+
+This function is convenient for users, but can also be a security risk. The stored credentials can be captured by an attacker who gains access to the computer, either locally or through some remote compromise. Further, methods have existed whereby a malicious website can retrieve the stored credentials for other applications, by exploiting browser vulnerabilities or through application-level cross-domain attacks.
+
+It is heavily recommended to disable password storage when prompted for the password of the Administration Console's web interface.
+
+[[password-aliases]]
+==== Password Aliases
+
+To avoid storing passwords in the domain configuration file in clear text, you can create an alias for a password. This process is also known as encrypting a password. For more information, see xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#administering-password-aliases[Administering Password Aliases].
+
+[[authorization]]
+=== Authorization
+
+Authorization, also known as access control, is the means by which users are granted permission to access data or perform operations. After a user is authenticated, the user's level of authorization determines what operations they can perform. A user's authorization is based on the user's roles.
+
+[[roles]]
+==== Roles
+
+A role defines which applications and what parts of each application users can access and what those users or groups can do with the applications. For example, in a personnel application, all employees might be able to see phone numbers and email addresses, but only managers have access to salary information. This application would define at least two roles: `employee` and `manager`. Only users in the `manager` role are allowed to view salary information.
+
+A role is different from a group in that a role defines a function in an application, while a group is a set of users who are related in some way.
+
+For example, the personnel application specify groups such as`full-time`, `part-time`, and `on-leave`. Users in these groups are all employees (the `employee` role). In addition, each user has its own designation that defines an additional level of employment.
+
+Roles are defined in the standard deployment descriptor for the application. The application developer or deployer maps roles to one or more groups in the deployment descriptor for each application. When the application is being packaged and deployed, the application specifies mappings between
+users, groups, and roles, like this:
+
+.Role Mappings
+image:security/securityrolemapping.png["Shows how users are assigned to groups, how users and groups are assigned to roles, and how applications use groups and roles."]
+
+IMPORTANT: By default, group principal names are mapped to roles of the same name. Therefore, the Default Principal To Role Mapping setting is enabled by default on the _Security_ page of the Administration Console. +
+With this setting enabled, if the group name defined on Payara Server matches the role name defined in the application, there is no need to use the runtime deployment descriptor to provide a mapping. The application server will implicitly make this mapping, as long as the names of the groups and roles match (case sensitivity considered).
+
+[[jakarta-authorization]]
+==== Jakarta Authorization
+
+Jakarta Authorization is the specification that defines an interface for pluggable policy providers. This enables you to set up third-party plug-in modules to perform authorization based on custom policies.
+
+[[working-with-the-server.policy-policy-file]]
+==== Working With the `server.policy` Policy File
+
+Each Payara Server domain has its own global Java policy file, located in `domain-dir/config`. The file is named `server.policy`.
+
+A sample `server.policy` file is as follows. Comments in the file describe why various permissions are granted. These permissions are described in more detail in the next section.
+
+[source, policy]
+----
+// classes in lib get all permissions by default
+grant codeBase "file:${com.sun.aas.installRoot}/lib/-" {
+    permission java.security.AllPermission;
+};
+
+// Core server classes get all permissions by default
+grant codeBase "file:${com.sun.aas.installRoot}/modules/-" {
+    permission java.security.AllPermission;
+};
+
+// Apache Felix classes get all permissions by default
+grant codeBase "file:${com.sun.aas.installRoot}/osgi/felix/bin/-" {
+    permission java.security.AllPermission;
+};
+
+// iMQ classes get all permissions by default
+grant codeBase "file:${com.sun.aas.imqLib}/-" {
+    permission java.security.AllPermission;
+};
+
+// H2 driver classes get all permissions by default
+grant codeBase "file:${fish.payara.aas.h2Root}/bin/-" {
+    permission java.lang.RuntimePermission "createClassLoader";
+    permission java.io.FilePermission       "<<ALL FILES>>", "read,write";
+};
+
+// Basic set of required permissions granted to all remaining code
+// The permission FilePermission "<<ALL FILES>>", "read,write"
+// allows all applications to read and write any file in the filesystem.
+
+// It should be changed based on real deployment needs. If you know your
+// applications just need to read/write a few directories consider removing
+// this permission and adding grants indicating those specific directories.
+// against the codebase of your application(s).
+grant {
+    permission java.util.PropertyPermission "*", "read,write";
+
+    permission java.lang.RuntimePermission  "loadLibrary.*";
+    permission java.lang.RuntimePermission  "queuePrintJob";
+    permission java.net.SocketPermission    "*", "connect";
+    permission java.io.FilePermission       "<<ALL FILES>>", "read,write";
+
+    permission java.io.FilePermission "${java.io.tmpdir}${/}-", "delete";
+
+    permission java.util.PropertyPermission "*", "read";
+
+    permission java.lang.RuntimePermission    "modifyThreadGroup";
+    permission java.lang.RuntimePermission    "getClassLoader";
+    permission java.lang.RuntimePermission    "setContextClassLoader";
+    permission javax.management.MBeanPermission "[com.sun.messaging.jms.*:*]", "*";
+};
+
+// The following grant block is only required by Connectors. If Connectors are not in use the recommendation is to remove this grant.
+grant {
+    permission javax.security.auth.PrivateCredentialPermission "jakarta.resource.spi.security.PasswordCredential * \"*\"","read";
+};
+
+// The following grant block is only required for Reflection. If Reflection is not in use the recommendation is to remove this section.
+grant {
+    permission java.lang.RuntimePermission "accessDeclaredMembers";
+};
+
+// Permissions to invoke CORBA objects in server
+grant {
+    permission com.sun.enterprise.security.CORBAObjectPermission "*", "*";
+};
+
+grant {
+    permission java.io.SerializablePermission "enableSubclassImplementation";
+};
+
+grant {
+    permission javax.management.MBeanPermission "sun.management.*", "*";
+    permission javax.management.MBeanPermission "javax.management.*", "*";
+    permission javax.management.MBeanPermission "[amx:*]", "*";
+    permission javax.management.MBeanPermission "[amx-support:*]", "*";
+    permission java.lang.management.ManagementPermission "monitor";
+    permission javax.management.MBeanPermission "com.hazelcast.*", "*";
+    permission javax.management.MBeanPermission "fish.payara.*", "*";
+};
+
+grant  codeBase "file:${com.sun.aas.instanceRoot}/applications/-"{
+    permission java.io.FilePermission       "<<ALL FILES>>", "read,write";
+};
+----
+
+[[changing-the-default-permissions]]
+==== Changing the Default Permissions
+
+The Payara Server internal server code is granted all permissions. These grants are covered by the `AllPermission` grant blocks to various parts of the server infrastructure code. Do not modify these entries.
+
+Application permissions are granted in the default `grant` block. These permissions apply to all code not part of the internal server code listed previously.
+
+The section beginning with the comment _"Basic set of required permissions..."_ provides the basic set of permissions granted to all remaining code.
+
+Specifically, the following permission allows all applications to read and write all properties and read and write all files on the file system:
+
+[source, policy]
+----
+permission java.util.PropertyPermission "*", "read,write";
+permission java.io.FilePermission       "<<ALL FILES>>", "read,write";
+----
+
+While this grant provides optimum flexibility, it is inherently unsecure. For enhanced security, change this permission based on your real deployment needs.
+
+For example, consider removing this permission and assign default read and write permissions only to the application's install directory (context-root). This example uses `com.sun.aas.instanceRoot`, which specifies the top level directory for a server instance:
+
+[source,policy]
+----
+grant codeBase "file:${com.sun.aas.instanceRoot}/applications/MyApp/-"{
+    permission java.io.FilePermission "file:${com.sun.aas.instanceRoot} /applications/MyApp/-", "read,write";
+}
+----
+
+For any application that needs to read and write additional directories, you would then have to explicitly allow such permissions by adding specific grants. In general, you should add extra permissions only to the applications or modules that require them, not to all applications deployed to a domain.
+
+[[auditing]]
+=== Auditing
+
+Auditing is the means used to capture security-related events for the purpose of evaluating the effectiveness of security measures. Payara Server uses audit modules to capture audit trails of all authentication and authorization decisions. Payara Server provides a default audit module, as well as the ability to plug in custom audit modules. The scope of the audit module is the entire server, which means that all the applications on the server will use the same audit module.
+
+For administration instructions, see xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#administering-audit-modules[Administering Audit Modules].
+
+[[firewalls]]
+=== Firewalls
+
+A firewall controls the flow of data between two or more networks, and manages communications between the networks. A firewall can consist of both hardware and software elements. The following guidelines pertain primarily to Payara Server:
+
+* In general, firewalls should be configured so that clients can access the necessary TCP/IP ports.
++
+For example, if the HTTP listener is operating on port `8080`, configure the firewall to allow HTTP requests on port `8080` only. Likewise, if HTTPS requests are set up for port `8081`, you must configure the firewalls to allow HTTPS requests on port `8081`.
+
+* If direct Remote Method Invocations over Internet Inter-ORB Protocol (RMI-IIOP) access from the Internet to EJB modules is required, open the ORB listener port as well.
++
+CAUTION: Opening the ORB port to all possible clients is strongly discouraged because it creates security risks. Instead, create a valid access list of remote hosts that should access remote EJB modules and configure the firewall to grant them specific access.
+
+* In a "double firewall" architecture, you must configure the outer firewall to allow for HTTP and HTTPS transactions. You must configure the inner firewall to allow the HTTP server plug-in to communicate with Payara Server behind the firewall.
+
+[[certificates-and-secure-transport]]
+=== Certificates and Secure Transport
+
+[[certificates]]
+==== Certificates
+
+Certificates, also known as *digital certificates*, are electronic files that uniquely identify users and resources on the Internet and public networks. Certificates also enable secure, confidential communication between two entities. Usually, there are two different kinds of certificates:
+
+* Personal certificates, used by individuals.
+* Server certificates, used to establish secure-transport sessions between the server and clients through secure sockets layer (SSL) and transport layer security (TLS) technologies.
+
+Certificates are based on *public key cryptography*, which uses pairs of digital keys to encrypt, or encode, information so the information can be read only by its intended recipient. The recipient then decrypts the information to read it.
+
+A key pair contains a public key and a private key. The owner distributes the public key and makes it available to anyone, which is embedded on a digital certificate. The private key on the other hand is always kept secret. Because the keys are mathematically related, data encrypted with one key can only be decrypted with the other key in the pair.
+
+Certificates are issued by a trusted third party called a *Certification Authority (CA)*. The CA is analogous to a passport office: it validates the certificate holder's identity and signs the certificate so that it cannot be forged or tampered with. After a CA has signed a certificate, the holder can present it as proof of identity and to establish encrypted, confidential communications.
+
+Most importantly, a certificate binds the owner's public key to the owner's identity.
+
+In addition to the public key, a digital certificate typically includes information such as the following:
+
+* The name of the holder and other identification, such as the URL of the web server using the certificate, or an individual's email address
+* The name of the CA that issued the certificate
+* The certificate's expiration date
+
+Certificates are governed by the technical specifications of the *X.509 format*. To verify the identity of a user in the `certificate` realm, the authentication service verifies an X.509 certificate, using the common name field (`CN`) of the X.509 certificate as the principal name.
+
+[[certificate-chains]]
+==== Certificate Chains
+
+A certificate chain is a series of certificates issued by successive CA certificates, eventually ending in a root CA certificate.
+
+Most modern web browsers are preconfigured with a set of root CA certificates that the browser automatically trusts. Any certificates from elsewhere must come with a certificate chain to verify their validity.
+
+When a certificate is first generated, it is a called a *self-signed certificate*. A self-signed certificate is one for which the issuer (signer) is the same as the subject (the entity whose public key is being authenticated by the certificate). When the owner sends a certificate signing request (CSR) to a CA, then imports the response, the self-signed certificate is replaced by a chain of certificates.
+
+At the bottom of the chain is the certificate (reply) issued by the CA authenticating the subject's public key. The next certificate in the chain is one that authenticates the CA's public key. Usually, this is a self-signed certificate (that is, a certificate from the CA authenticating its own public key) and the last certificate in the chain.
+
+In other cases, the CA can return a chain of certificates. In this situation, the bottom certificate in the chain is the same (a certificate signed by the CA, authenticating the public key of the key entry), but the second certificate in the chain is a certificate signed by a different CA, authenticating the public key of the CA to which you sent the CSR. Then, the next certificate in the chain is a certificate authenticating the second CA's key, and so on, until a self-signed root certificate is reached.
+
+Each certificate in the chain (after the first) thus authenticates the public key of the signer entity of the previous certificate in the chain.
+
+[[certificate-files]]
+==== Certificate Files
+
+During Payara Server installation, a self-signed certificate is generated in Java Secure Socket Extension (JSSE) format suitable for internal testing. By default, Payara Server stores its certificate information in certificate databases in the `domain-dir/config` directory:
+
+Keystore file::
+  The `keystore.jks` file contains the certificate, including its private key. The keystore file is protected with a password. +
+  Each keystore entry has a unique alias. After installation, the Payara Server keystore has a single entry with an alias of `s1as` that corresponds to the self-signed certificate and its key.
+
+Truststore file::
+  The `cacerts.p12` file contains trusted certificates, including public keys for other entities. For a trusted certificate, the server has confirmed that the public key in the certificate belongs to the certificate's owner. These trusted certificates generally include those of recognized CAs.
+
+[[secure-sockets-layer]]
+==== Secure Sockets Layer
+
+Secure Sockets Layer (SSL) is a standard for securing Internet communications and transactions. Secure web applications use HTTPS (HTTP over SSL). The HTTPS protocol uses certificates to ensure confidential and secure communications between server and clients. In an SSL connection, both the client and the server encrypt data before sending it. Data is decrypted upon receipt.
+
+When a Web browser (client) wants to connect to a secure site, an SSL handshake happens, like this:
+
+. The browser sends a message over the network requesting a secure session (typically, by requesting a URL that begins with `https` instead of `http`).
+. The server responds by sending its certificate (including its public key).
+. The browser verifies that the server's certificate is valid and is signed by a CA whose certificate is in the browser's database (and who is trusted). It also verifies that the supplied certificate has not expired and is still valid.
+. If the certificate is valid, the browser generates a one-time, unique session key and encrypts it with the server's public key. The browser then sends the encrypted session key to the server so that they both have a copy.
+. The server decrypts the message using its private key and recovers the session key to fully establish the handshake.
+
+After the handshake, the client has verified the identity of the website, and only the client and the Web server have a copy of the session key. From this point forward, the client and the server use the session key to encrypt all their communications with each other. Thus, their communications are ensured to be secure.
+
+To use SSL, Payara Server must have a certificate for each external interface or IP address that accepts secure connections. The HTTPS service of most web servers will not run unless a certificate has been installed. For instructions on applying SSL to HTTP listeners, see "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering HTTP Connectivity.adoc#configure-an-http-listener-for-ssl[To Configure an HTTP Listener for SSL]" in the Payara Server General Administration section.
+
+[[ciphers]]
+==== Ciphers
+
+A cipher is a cryptographic algorithm used for encryption or decryption. SSL and TLS protocols support a variety of ciphers used to authenticate the server and client to each other, transmit certificates, and establish session keys.
+
+Some ciphers are stronger and more secure than others. Clients and servers can support different cipher suites. During a secure connection, the client and the server agree to use the strongest cipher that they both have enabled for communication, so it is usually sufficient to enable all ciphers.
+
+[[name-based-virtual-hosts]]
+==== Name-based Virtual Hosts
+
+Using name-based virtual hosts for a secure application can be problematic. This is a design limitation of the SSL protocol itself. The SSL handshake, where the client browser accepts the server certificate, must occur before the HTTP request is accessed. As a result, the request information containing the virtual host name cannot be determined prior to authentication, and it is therefore not possible to assign multiple certificates to a single IP address.
+
+If all virtual hosts on a single IP address need to authenticate against the same certificate, the addition of multiple virtual hosts probably will not interfere with normal SSL operations on the server. Be aware, however, that most browsers will compare the server's domain name against the domain name (corresponding to the `CN` entry) listed in the certificate, if any (applicable primarily to official, CA-signed certificates). If the domain names do not match, most browsers will display a warning and fail the validation. In general, only address-based virtual hosts are commonly used with SSL in a production environment.
+
+[[understanding-the-appservcertificateloginmodule-class]]
+==== Understanding the `AppservCertificateLoginModule` Class
+
+Payara Server provides the `AppservCertificateLoginModule` class to allow developers to implement a custom implementation of a login module that interacts with client certificates. This class provides some convenience methods for accessing the certificates, the application name and so forth, and for adding the group principals to the subject.
+
+The convenience methods include the following:
+
+`getAppName()`::
+  Returns the name of the application to be authenticated. This may be useful when a single `LoginModule` has to handle multiple applications that use certificates.
+`getCerts()`::
+  Returns the certificate chain as an array of `java.security.cert.X509Certificate` certificates.
+`getX500Principal()`::
+  Returns the distinguished (`DN`) principal from the first certificate in the chain.
+`getSubject()`::
+  Returns the subject that is being authenticated.
+`commitUserAuthentication(final String[] groups)`::
+  This method sets the authentication status to success if the groups parameter is non-null.
++
+WARNING: This method is called after the authentication has succeeded. If the authentication failed, do not call this method.
+
+NOTE: You do not have to extend the convenience base class, you can extend the JAAS LoginModule `javax.security.auth.spi.LoginModule` instead if you so choose.
+
+[[example-appservcertificateloginmodule-code]]
+==== Example `AppservCertificateLoginModule` Code
+
+The following example shows a custom implementation of a certificate login module using the `AppservCertificateLoginModule` class.
+
+Take note of the following points from the example:
+
+* The `getX500Principal()` method returns the subject(subject distinguished name) value from the first certificate in the client certificate chain as an `X500Principal`.
+* From that `X500Principal`, the `getName()` method then returns a string representation of the X.500 distinguished name using the format defined in RFC 2253 (LDAP v3).
+* The example uses the `getAppName()` method to determine the application name. It also determines the organizational unit (`OU`) from the distinguished name.
+* The example concatenates the application name with the value of `OU`, and uses it as the group name in the `commitUserAuthentication` method.
+
+[source,java]
+----
+
+public class CustomCertificateLoginModule extends AppservCertificateLoginModule {
+
+    @Override
+    protected void authenticateUser() throws LoginException {
+        // Get the distinguished name from the X500Principal.
+        var st = new StringTokenizer(getX500Principal().getName(), "B \t\n\r\f,");
+        while (st.hasMoreTokens()) {
+            var next = st.nextToken();
+            /*
+             Set appname:OU as the group name.
+             At this point, one has the application name and the DN of
+             the certificate. A suitable login decision can be made here.
+             */
+            if (next.startsWith("OU=")) {
+                commitUserAuthentication(new String[]{getAppName() + ":" + next.substring(3)});
+                return;
+            }
+        }
+        throw new LoginException("No OU found in the DN of the supplied certificate");
+    }
+}
+----
+
+[[setting-the-jaas-context]]
+===== Setting the JAAS Context
+
+After you create your LoginModule, you must plug it in to a jaas-context, which you then specify as a parameter to the certificate realm's configuration in Payara Server.
+
+To do this, perform the following steps:
+
+. Specify a new jaas-context for the Certificate realm in the `domain-dir/config/login.conf` file. Using the previous example configuration would look like this:
++
+[source,policy]
+----
+certRealm {
+    fish.payara.security.examples.CustomCertificateLoginModule required;
+};
+----
+
+. Specify this jaas-context as a parameter to the `set` subcommand in the
+`configs.config.server-config.security-service.auth-realm.certificate.property.jaas-context=`<jaas-context-name>
+property. For example:
++
+[source,shell]
+----
+asadmin set configs.config.server-config.security-service.auth-realm.certificate.property.jaas-context=certRealm configs.config.server-config.security-service.auth-realm.certificate.property.jaas-context=certRealm
+
+Command set executed successfully.
+----
+. Optionally, get the value you just set to make sure that it is correct.
++
+[source,shell]
+----
+asadmin get configs.config.server-config.security-service.auth-realm.certificate.property.jaas-context
+
+configs.config.server-config.security-service.auth-realm.certificate.property.jaas-context=certRealm
+
+Command get executed successfully.
+----
+
+[[administering-passwords]]
+== Administering Passwords
+
+There are multiple ways to administer passwords. You can rely on administrators to keep passwords secret and change the passwords regularly. You can set up files for storing passwords so that `asadmin` CLI subcommands can access these files rather than having users type the  commands.
+
+You can also encrypt passwords by setting up aliases so that sensitive passwords are not clearly visible in the `domain.xml` configuration file.
+
+[[to-change-the-master-password]]
+=== To Change the Master Password
+
+The master password gives access to the keystore and truststore used by the domain. This password is not tied to an operating system user. You should treat this overall shared password as sensitive data to secure. Payara Server never uses it for authentication and never transmits it over the network.
+
+When a domain is created, you can choose to type its master password manually when required, or to obscure it in a password file. If there is no password file, you are prompted for the master password. If there is a password file, but you want to change access to require prompting, remove the file. The
+default master password is `changeit`.
+
+IMPORTANT: When changing the master password, it has to be changed on all configured nodes as well as on the DAS. The master password on nodes is only stored once in the node, for all instances that are on hosted on that node.
+
+Use the `change-master-password` subcommand in local mode to modify the master password.
+
+CAUTION: If you change the master password and are not using a master password file, the `start-instance` and `start-cluster` subcommands are not able to determine the master password. In this case, you must start those instances locally by using the `start-local-instance` command.
+
+When the master password is saved, it is saved in the `domain-dir/config/master-password` file.
+
+Follow these steps to correctly change the master password on an existing domain:
+
+. Stop the domain first.
+. Change the master password for the domain by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/change-master-password.adoc[`change-master-password`] subcommand. +
+You will be prompted for the old and new passwords based on whether you have been previously logged into the domain.
+. Start the domain again.
+
+The following example changes the master password for the `custom-domain` domain:
+
+[source,shell]
+----
+asadmin> change-master-password custom-domain
+----
+
+If you have already logged into the domain using the xref:Technical Documentation/Payara Server Documentation/Command Reference/login.adoc[`login`] subcommand, you are prompted for the new master password:
+
+[source,shell]
+----
+Please enter the new master password>
+Please enter the new master password again>
+----
+
+If you are not logged into the domain, you are prompted for both the old and the new master passwords:
+
+[source,shell]
+----
+Please enter the master password>
+Please enter the new master password>
+Please enter the new master password again>
+----
+
+Information similar to the following is displayed:
+
+[source,shell]
+----
+Master password changed for domain44ps
+----
+
+[[additional-considerations-when-starting-instances]]
+=== Additional Considerations when starting instances through CLI subcommands
+
+If you change the master password for the DAS, the `start-domain` and `start-local-instance` subcommands allow you to provide it during domain
+or instance startup in one of three ways:
+
+* Via the master-password file
+* By entering it interactively
+* Via the Asadmin CLI `--passwordfile` option
+
+The `start-instance`, `start-cluster` and `start-deployment-group` subcommands require additional considerations. If you create a domain with a master password other than the default, an associated remote instance, cluster or deployment group must have access to the master password in order to properly start.
+
+However, for security reasons Payara Server never transmits the master password or the master password file over the network.
+
+Consider the following scenario:
+
+. Change the master password on the DAS and save it with the `--savemasterpassword` option.
+. Create an instance on another host using the subcommand `create-instance`. Payara Server then copies the keystore and truststore from the DAS to the remote instance, but it DOES not copy the master password file.
+. Try to start the instance using the `start-instance` subcommand. An error results preventing the instance to correctly start.
+
+The `start-instance` command is looking for the master-password file in the node directory on the instance's host machine, and it is not there by default. Therefore, the subcommand fails.
+
+You can use the `change-master-password` subcommand to make sure the correct password is used in this password file, as described in the following section.
+
+NOTE: The `start-instance`, `start-cluster` and `start-deployment-group` subcommands do not include any other way for you to provide the password. If you change the master password and are not using a master password file, the `start-instance` and `start-cluster` subcommands will not be able to determine the master password. +
+In this case, you must start the instances locally by using `start-local-instance` command.
+
+[[remotely-starting-an-instance-using-a-password-file]]
+=== Remotely starting an instance using a password file
+
+Assume that you have changed the master password on the DAS and you want to make the same change for all instances.
+
+The `start-instance`, `start-cluster` and `start-deployment-group` subcommands automatically use the master password file if it exists in the instance filesystem. You can use the `change-master-password` subcommand to make sure the password file exists and that the correct password is used.
+
+Here's a concrete set of steps that showcase how to manage the master password from a domain's creation:
+
+. From the DAS, create a domain and set the master password.
++
+[source, shell]
+----
+asadmin create-domain --savemasterpassword true <domain-name>
+----
+
+. Start the domain.
++
+[source, shell]
+----
+asadmin start-domain <domain-name>
+----
+
+. Create a remote SSH node.
++
+[source, shell]
+----
+asadmin create-node-ssh --nodehost <host-name> --installdir /usr/local/payara <node-name>
+----
+
+. Create a new instance on the node.
++
+[source, shell]
+----
+asadmin create-instance --node <node-name> <instance-name>
+----
+
+. Before you start the instance, on the node's host machine run the   `change-master-password` with the `---savemasterpassword` option to
+create a file called `master-password` in the `agents` directory so that the instance can correctly start up.
++
+.Locally on the remote node's host:
+[source, shell]
+----
+asadmin change-master-password --savemasterpassword true --nodedir /usr/local/payara <node-name>
+
+Enter the current master password>
+Enter the new master password>
+Enter the new master password again>
+
+Command change-master-password executed successfully.
+----
++
+Remember that when you created the domain you specified a new master password. This master password was then used to encrypt the keystore and truststore for the DAS, and these stores were copied to the instance as a result of the `create-instance` subcommand.
++
+Therefore, enter the master password you set when you created the domain as both the current master password and again as the new master password. You enter it as the new master password because you do not want to change the master password for the instance and make it out of
+sync with the DAS.
+
+. Run the `start-instance` from the DAS.
++
+[source, shell]
+----
+asadmin start-instance <instance-name>
+----
+
+NOTE: The master password file is associated with the node and not with an instance. After the master password file exists in the node directory on the instance machine, additional instances can be created, started and stopped from the DAS with no additional considerations.
+
+[[to-change-an-administration-password]]
+=== To Change an Administration Password
+
+Use the `change-admin-password` subcommand in remote mode to change an administration password. The default administration user is `admin`. When run, you will be prompted for the old and new admin passwords, with confirmation.
+
+When using the default domains shipped with Payara Server, the default administration user will have a blank password.
+
+NOTE: If there is a single user called `admin` that does not have a password, you are not prompted for login information when running any Asadmin CLI commands that affect a running domain or access the Admin console.
+
+WARNING: If secure administration is enabled as described in link:Technical Documentation/Payara Server Documentation/Security Guide/administrative-security.adoc#running-secure-admin[Running Secure Admin], you cannot change an administration password to a blank value under any circumstance.
+
+. Change the admin password by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/change-admin-password.adoc#change-admin-password[`change-admin-password`] subcommand.
+. Enter the old and new admin passwords when prompted.
+. Restart the Payara Server domain.
+
+This example changes the admin password for user anonymous from `adminadmin` to `newadmin`:
+
+[source,shell]
+----
+asadmin change-admin-password --username anonymous
+----
+
+You are prompted to enter the old and the new admin passwords:
+
+[source,shell]
+----
+Enter admin password>adminadmin
+Enter new admin password>newadmin
+Enter new admin password again>newadmin
+
+Command change-admin-password executed successfully.
+----
+
+[[to-set-a-password-from-a-file]]
+=== To Set a Password From a File
+
+Instead of typing a specific password (like the admin password or the master password) at the command line, you can supply the password for a command from a text file such as `passwords.txt`.
+
+The `--passwordfile` option of the Asadmin CLI utility takes the name of the file that contains the passwords. The entry for a specific password in the file must have the `AS_ADMIN_` prefix followed by the password name in uppercase letters.
+
+NOTE: Any password file created to pass as an argument by using the `--passwordfile` argument to the `asadmin` utility should be protected with the corresponding file system permissions. Additionally, any password file being used for a transient purpose, such as setting up SSH among nodes, should be deleted after it has served its purpose.
+
+For a complete list of the types of passwords that can be specified, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc[`asadmin`] command help page. Here are a couple of examples of password names used by the file.
+
+[source, text]
+----
+AS_ADMIN_MASTERPASSWORD
+AS_ADMIN_USERPASSWORD
+AS_ADMIN_ALIASPASSWORD
+----
+
+For example, to specify an administrative password, add an entry similar to the following to the password  file, where `adminadmin` is the current password:
+
+[source,text]
+----
+AS_ADMIN_PASSWORD=adminadmin
+----
+
+Save your changes. You can now specify the password file in an `asadmin` subcommand. In this example, `passwords.txt` is the file that contains the password:
++
+[source,shell]
+----
+asadmin delete-jdbc-resource --user admin --passwordfile passwords.txt jdbc/CustomPool
+----
+
+[[administering-password-aliases]]
+=== Administering Password Aliases
+
+A password alias is used to indirectly access a password so that the password itself does not appear in cleartext in the domain's `domain.xml` configuration file.
+
+Storing and passing passwords in cleartext is a security risk, and may violate some corporate security policies. In such cases, you can use password aliases to protect your passwords.
+
+[[create-a-password-alias]]
+==== Create a Password Alias
+
+Use the `create-password-alias` subcommand in remote mode to create an alias for a password in the domain. The password corresponding to the alias name is stored in an encrypted form in the domain configuration file.
+
+The `create-password-alias` subcommand takes both a secure interactive form, in which users are prompted for all information, and a more script-friendly form, in which the password is propagated on the command line.
+
+You can also use the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand to remove and replace the password in the configuration file. For example:
+
+[source,shell]
+----
+asadmin set --user admin server.jms-service.jms-host.default_JMS_host.
+admin-password='${ALIAS=jms-password}'
+----
+
+To create a new password alias follow these steps:
+
+. Run the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-password-alias.adoc[`create-password-alias`] subcommand.
+. Type the password for the alias when prompted.
+. Add the alias to a password file.
++
+For example, assume the use of a password file such as `passwords.txt`. Assume further that you want to add an alias for the `AS_ADMIN_USERPASSWORD` entry that is read by the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-file-user.adoc[`create-file-user`] subcommand.
++
+You would add the following line to the password file:
++
+[source, text]
+----
+AS_ADMIN_USERPASSWORD=${ALIAS=user-password-alias}
+----
++
+Where `user-password-alias` is the new password alias.
+
+. Now execute the corresponding command that requires the alias in the password file. Here's an example that uses the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-file-user.adoc[`create-file-user`] subcommand:
++
+[source, shell]
+----
+asadmin --passwordfile passwords.txt create-file-user user1
+----
+
+Here's another example that creates the new `jms-password` alias for the `admin` user:
+
+[source,shell]
+----
+asadmin> create-password-alias --user admin jms-password
+----
+
+Then, you are prompted to type the password for the alias:
+
+[source,shell]
+----
+Please enter the alias password> secret-password
+Please enter the alias password again> secret-password
+Command create-password-alias executed successfully.
+----
+
+Here's another example that creates a new password alias using the provided name. The user is then prompted to enter the associated password twice.
+
+[source, shell]
+----
+asadmin> create-password-alias example-alias-name
+Enter the alias password>
+Enter the alias password again>
+Command create-password-alias executed successfully.
+----
+
+[[to-list-password-aliases]]
+==== To List Password Aliases
+
+Use the `list-password-aliases` subcommand in remote mode to list existing the password aliases.
+
+This example lists all existing password aliases:
+
+[source,shell]
+----
+asadmin list-password aliases
+jmspassword-alias
+
+Command list-password-aliases executed successfully
+----
+
+[[to-delete-a-password-alias]]
+==== To Delete a Password Alias
+
+Use the `delete-password-alias` subcommand in remote mode to delete an existing password alias.
+
+This example deletes the password alias `jmspassword-alias`:
+
+[source,shell]
+----
+asadmin> delete-password-alias jmspassword-alias
+
+Command list-password-aliases executed successfully
+----
+
+[[to-update-a-password-alias]]
+===== To Update a Password Alias
+
+Use the `update-password-alias` subcommand in remote mode to change the password for an existing password alias. The `update-password-alias` subcommand takes both a secure interactive form, in which the user is prompted for all information, and a more script-friendly form, and the password is propagated on the command line.
+
+This example updates the password for the `jmspassword-alias` alias:
+
+[source,shell]
+----
+asadmin> update-password-alias jsmpassword-alias
+----
+
+You are prompted to type the new password for the alias:
+
+[source,shell]
+----
+Please enter the alias password> new-secret-password
+Please enter the alias password again> new-secret-password
+Command update-password-alias executed successfully
+----
+
+[[using-password-alias-admin-console]]
+=== Using a password alias within the Admin Console
+
+To use a password alias, navigate to any configuration view where you would have previously entered a password in plaintext format:
+
+image::password-aliases/password-aliases-unused.png[Password in plain text]
+
+In place of the password, you can enter an alias which corresponds to the password in the form: `${ALIAS=<password-alias-name>}`:
+
+image::password-aliases/password-aliases-using.png[Placeholder for Password Alias]
+
+[[managing-passwords-admin-console]]
+=== Managing Password Aliases through the Admin Console
+
+Here are instructions on managing password aliases through the web administration console.
+
+[[creating-password-alias]]
+==== Creating a password alias
+
+. To create a new password alias for the domain, select *Domain* on the page tree, then select the *Password Aliases* tab and click the *New* button:
++
+image::password-aliases/password-aliases-new.png[Create new password alias]
+
+. On the next page, enter the name of the alias, and the password, twice:
++
+image::password-aliases/password-aliases-creation.png[Password alias creation]
+
+. Finally, press the *OK* button to create your new alias:
++
+image::password-aliases/password-aliases-created.png[Password alias created]
+
+[[modifying-password-alias]]
+==== Modifying a password alias
+
+To modify an existing password alias, select it on the *Password Aliases* page. On the *Edit Password Alias* page you are able to change the entered password.
+
+image::password-aliases/password-aliases-modifying.png[Modifying password alias]
+
+[[deleting-password-alias]]
+==== Deleting a password alias
+
+To delete a password alias, go to the *Password Aliases page*, tick the checkbox of the password alias you wish to delete and then press the *Delete* button:
+
+image::password-aliases/password-aliases-deleting.png[Deleting password alias]
+
+
+[[using-password-alias-microprofile]]
+=== MicroProfile Config support
+
+Password aliases can also be accessed using MicroProfile Config, as detailed xref:/Technical Documentation/MicroProfile/Config/Overview.adoc[here].
+
+[[administering-audit-modules]]
+== Administering Audit Modules
+
+Payara Server allows the integration of special audit modules that can be used to create audit trails of all authentication and authorization decisions made by the container. Audit modules are simple POJO (Plain Old Java Object) classes that can be used to programmatically take special actions when authentication or authorization events are triggered.
+
+Every Audit module must extend the `com.sun.appserv.security.AuditModule` class, which is an abstract class that offers a collection of operation methods that can be used to identify successful or unsuccessful authentication and authorization events.
+
+[[to-create-an-audit-module]]
+=== To Create an Audit Module
+
+Use the `create-audit-module` subcommand in remote mode to create an audit module for the add-on component that implements the audit capabilities.
+
+Create an audit module by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-audit-module.adoc[`create-audit-module`] subcommand.
+
+This example creates an audit module named `sampleAuditModule`:
+
+[source,shell]
+----
+asadmin create-audit-module --classname com.sun.appserv.auditmodule --property defaultuser=admin:Password=admin sampleAuditModule
+
+Command create-audit-module executed successfully.
+----
+
+[[to-list-audit-modules]]
+=== To List Audit Modules
+
+Use the `list-audit-modules` subcommand in remote mode to list the audit modules on one of the following targets:
+
+* The DAS, `server` (the default)
+* A specified server instance
+* A specified configuration object.
+
+List registered audit modules by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-audit-modules.adoc#list-audit-modules[`list-audit-modules`] subcommand.
+
+This example lists the audit modules registered on the DAS:
+
+[source,shell]
+----
+asadmin list-audit-modules
+
+audit-module : default
+audit-module : sampleAuditModule
+
+Command list-audit-modules executed successfully.
+----
+
+[[to-delete-an-audit-module]]
+=== To Delete an Audit Module
+
+Use the `delete-audit-module` subcommand in remote mode to delete an existing audit module.
+
+Delete an audit module by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-audit-module.adoc#delete-audit-module[`delete-audit-module`] subcommand.
+
+This example deletes the `sampleAuditModule` audit module:
+
+[source,shell]
+----
+asadmin delete-audit-module sampleAuditModule
+
+Command delete-audit-module executed successfully.
+----
+
+[[administering-jsse-certificates]]
+== Administering JSSE Certificates
+
+The Java SE SDK ships with the `keytool` utility, which enables you to set up and work with Java Secure Socket Extension (JSSE) digital certificates and similar formats. You can administer public/private key pairs and associated certificates, and cache the public keys (in the form of certificates) of their communicating peers.
+
+[[to-generate-a-certificate-by-using-keytool]]
+=== To Generate a Certificate by Using the `keytool` utility
+
+By default, the `keytool` utility creates a keystore file in the directory where the utility is run. The following are steps to generate a certificate using the `keytool` utility an import it in the domain's keystore and truststore. These commands should be run from the domain's configuration directory.
+
+. Change to the directory that contains the keystore and truststore files.
++
+TIP: Always generate the certificate in the directory containing the keystore and truststore files.
+
+. Generate the certificate in the keystore file, `keystore.p12`, using the following command format:
++
+[source,shell]
+----
+keytool -genkey -alias keyAlias -keyalg RSA -keypass changeit -storepass changeit -keystore keystore.p12
+----
++
+Use any unique name as the alias. If you have changed the keystore or private key password from the default (`changeit`), substitute the
+new password for `changeit`. The default key password alias is `s1as`.
++
+A prompt will ask for your name, organization, and other information.
+
+. Export the generated certificate to the `server.cer` file, using the following command format:
++
+[source,shell]
+----
+keytool -export -alias keyAlias -storepass changeit -file server.cer -keystore keystore.p12
+----
+
+. If a certificate signed by a certificate authority is required, the following section.
+
+. Import the certificate to the truststore, using the following command:
++
+[source,shell]
+----
+keytool -import -v -trustcacerts -alias keyAlias -file server.cer -keystore cacerts.p12 -storepass changeit -keypass changeit
+----
++
+If you have changed the keystore or private key password from the default (`changeit`), substitute the new password.
++
+Information about the certificate is displayed and a prompt appears asking if you want to trust the certificate.
+. Type `yes`, then press Enter.
++
+Information similar to the following is displayed:
++
+[source,shell]
+----
+Certificate was added to keystore
+[Saving cacerts.p12]
+----
+
+. To apply your changes, restart the Payara Server domain and corresponding instances.
+
+The following is an example on how to create a Self-Signed Certificate in a PKCS12 Keystore by Using an *RSA Key Algorithm*:
+
+[source,shell]
+----
+keytool -genkey -noprompt -trustcacerts -keyalg RSA -alias ${cert.alias} -dname ${dn.name} -keypass ${key.pass} -keystore ${keystore.file} -storepass ${keystore.pass}
+----
+
+The following is an example on how to create a Self-Signed Certificate in a PKCS12 Keystore by using the default key algorithm:
+
+[source,shell]
+----
+keytool -genkey -noprompt -trustcacerts -alias ${cert.alias} -dname ${dn.name} -keypass ${key.pass} -keystore ${keystore.file} -storepass ${keystore.pass}
+----
+
+The following command will display detailed information about all certificates present in a keystore:
+
+[source,shell]
+----
+keytool -list -v -keystore ${keystore.file} -storepass ${keystore.pass}
+----
+
+The following command will display detailed information about a specific certificate identified by the supplied alias in a keystore:
+
+[source,shell]
+----
+keytool -list -v -alias ${cert.alias} -keystore ${keystore.file}
+-storepass ${keystore.pass}
+----
+
+[[generate-and-sign-certificate-using-keytool]]
+=== Generate and Sign Certificate by Using `keytool`
+
+After creating a certificate, the owner must sign the certificate to prevent forgery. E-commerce sites, or those for which authentication of identity is important, can purchase a signed certificate from a trustworthy Certificate Authority (CA) or third parties associated with one.
+
+TIP: If integrity is not a concern (in some rare cases), for example if private secure communications are all that is required, you can save the time and expense involved in obtaining a CA certificate by using a self-signed certificate.
+
+The following steps outline how to create and sign a new certificate:
+
+. First, delete the default self-signed certificate:
++
+[source,shell]
+----
+keytool -delete -alias s1as -keystore keystore.p12 -storepass <store_passwd>
+----
++
+NOTE: `s1as` is the default alias of the Payara Server keystore.
+
+. Generate a new key pair to be used by the certificate:
++
+[source,shell]
+----
+keytool -genkeypair -keyalg <key_alg> -keystore keystore.p12 -validity <val_days> -alias s1as
+----
++
+Where `<key_alg>` is the algorithm to be used for generating the key pair, for example `RSA`, and `<val_days>` is the number of days that the certificate should be considered valid.
++
+In addition to generating a key pair, the command wraps the public key into a self-signed certificate and stores the certificate and the private key in a new keystore entry identified by the inputted alias.
++
+IMPORTANT: For HTTPS hostname verification, it is important to ensure that the name of the certificate (CN) matches the fully-qualified hostname of your site (fully-qualified domain name). If the names do not match, clients connecting to the server will see a security alert stating that the name of the certificate does not match the name of the site.
+
+. Generate a Certificate Signing Request (CSR):
++
+[source,shell]
+----
+keytool -certreq -alias s1as -file <certreq_file> -keystore keystore.p12 -storepass <store_passwd>
+----
++
+Where `<certreq_file>` is the file in which the CSR is stored (for example, `s1as.csr`) and <store_passwd> is the password for the keystore (which corresponds to the domain's master password).
+
+. Submit the CSR to a Certificate Authority to get a signed certificate. In response, you should receive a signed server certificate. Make sure to import into your browser the CA certificate of the CA (if not already present) and any intermediate certificates indicated by the CA in the reply.
+
+. Download the CA certificate and any intermediate CA certificates and store them in local files.
+
+. Import the CA certificate (if not already present) and any intermediate CA certificates (if not already present) indicated by the CA into the domain's truststore:
++
+[source,shell]
+----
+keytool -import -v -trustcacerts -alias <CA-Name> -file ca.cert -keystore cacerts.p12 -storepass <store_passwd>
+----
+
+. Replace the original self-signed certificate with the certificate you obtained from the CA, as stored in a file such as `s1as.cert`:
++
+[source,shell]
+----
+keytool -import -v -trustcacerts -alias s1as -file s1as.cert -keystore keystore.jks -storepass <store_passwd>
+----
++
+When you import the certificate using the same original alias `s1as`, the `keytool` utility treats it as a command to replace the original certificate with
+the certificate obtained as a reply to a CSR.
++
+After running the command, you should see that the certificate `s1as` in the keystore is no longer the original self-signed certificate, but is now the  certificate delivered by the CA.
++
+Consider the following example that compares an original `s1as` certificate with a new `s1as` certificate obtained from VeriSign:
++
+[source,text]
+----
+Original s1as (self-signed):
+
+Owner: CN=demo.payara.fish, OU=Payara, O=Payara Foundation, L=Great Malvern, ST=Worcestershire, C=UK
+Issuer: CN=demo.payara.fish, OU=Payara, O=Payara Foundation, L=Great Malvern, ST=Worcestershire, C=UK
+Serial number: 472acd34
+Valid from: Fri Nov 02 12:39:40 GMT+05:30 2023 until: Mon Oct 30 12:39:40 GMT+05:30 2033
+
+New s1as (contains signed cert from CA):
+
+Owner: CN=demo.payara.fish, OU=Payara, O=Payara Foundation, L=Great Malvern, ST=Worcestershire, C=UK
+Issuer: CN=VeriSign Trial Secure Server Test CA, OU=Terms of use at https://www.verisign.com/cps/testca (c)05, OU="For Test Purposes Only. No assurances.", O="VeriSign, Inc.", C=US
+Serial number: 1375de18b223508c2cb0123059d5c440
+Valid from: Sun Nov 11 05:30:00 GMT+05:30 2023 until: Mon Nov 26 05:29:59 GMT+05:30 2025
+----
+
+. To apply your changes, restart the Payara Server domain.
+
+[[example-15]]
+.Example 15 Importing an RFC/Text-Formatted Certificate Into a JKS Keystore
+
+[[to-delete-a-certificate-by-using-keytool]]
+=== To Delete a Certificate by Using `keytool`
+
+Use the `keytool delete` command to delete an existing certificate.
+
+Here's an example on how to delete an existing certificate from the truststore using the following command:
+
+[source,shell]
+----
+keytool -delete -alias keyAlias -keystore cacerts.p12 -storepass password
+----
+
+[[administering-jacc-providers]]
+== Administering Jakarta Authorization / JACC Providers
+
+The Jakarta Authorization specification (formerly known as Java Authorization Contract for Containers - JACC) defines an interface for pluggable authorization providers (commonly known as JACC providers) based on policies. This enables the administrator to set up third-party plug-in modules to perform authorization.
+
+Payara Server includes Administration Console support and subcommands to support JACC providers, as follows:
+
+* create `create-jacc-provider`
+* delete `delete-jacc-provider`
+* list `list-jacc-providers`
+
+IMPORTANT: Payara Server includes a default JACC provider named `default` which you should not delete under any circumstance.
+
+Payara Server allows Jakarta Authorization compliant JACC providers to be registered, so they can be used as third-party authorization modules for applications deployed on its corresponding domain.
+
+[[administering-jacc-providers-from-the-administration-console]]
+=== Administering JACC Providers From the Administration Console
+
+To use the Administration Console to administer JACC providers, perform the following steps:
+
+. Select _Configurations_ and expand the entry.
+. Select the server configuration for which you want to administer JACC providers and expand the entry.
+. Select _Security_ and expand the entry.
+. Select _JACC Providers_. The existing JACC providers are shown on this page.
++
+image:security/jacc-providers.png[Configured JACC Providers]
++
+. To create a new provider, click _New_.
++
+Enter the *Name*, *Policy Configuration* (the class that implements the policy configuration factory) and the *Policy Provider* (the class that implements the policy factory) for the new JACC provider.
++
+You can also enter optional properties to further configure the provider.
++
+. To delete an existing JACC provider, select that provider and click Delete.
+
+[[administering-jacc-providers-from-the-command-line]]
+=== Administering JACC Providers from the Command Line
+
+To use the Asadmin CLI to administer JACC providers, perform the following steps:
+
+. To create a JACC provider, use the `create-jacc-provider` subcommand. The following example shows how to create a JACC provider named `testJACC` on the default server target.
++
+[source,shell]
+----
+asadmin create-jacc-provider --policyproviderclass fish.payara.security.jacc.sample.TestPolicyProvider --policyconfigfactoryclass fish.payara.security.jacc.provider.PolicyConfigurationFactoryImpl testJACC
+----
+
+. To delete a JACC provider, use the `delete-jacc-provider` subcommand. The following example shows how to delete a JACC provider named `testJACC` from the default domain:
++
+[source,shell]
+----
+asadmin delete-jacc-provider testJACC
+----
+
+. To list the available providers, use the `list-jacc-providers` subcommand. The following example shows how to list JACC providers for a running domain:
++
+[source,shell]
+----
+asadmin> list-jacc-providers
+default
+
+Command list-jacc-providers executed successfully.
+----
+
+[[how-to-install-a-custom-jacc-provider-per-server]]
+=== How to install a custom JACC provider per Server (Global)
+
+Having coded a JACC provider, the first thing to do it is to make these classes available for the server. For that purpose, you need to put the implementation JAR, with all its dependencies, under the `as-install/lib` folder.
+
+The next thing to do is to tell Payara you want to use the custom JACC provider. To do this, you have to execute the following administration command:
+
+[source, shell]
+----
+asadmin create-jacc-provider --policyConfigurationFactoryProvider=com.example.CustomPolicyConfigurationFactory --policyProvider=com.example.CustomPolicy --target=server-config custom-provider set configs.config.server-config.security-service.jacc=custom-provider
+----
+
+This will result in the following configuration element added to the _domain.xml_ file:
+
+[source, xml]
+----
+<security-service jacc="custom-provider">
+    <jacc-provider policy-provider="com.example.CustomPolicy" name="custom-provider"
+      policy-configuration-factory-provider="com.example.CustomPolicyConfigurationFactory">
+    </jacc-provider>
+    <!-- More providers can be defined -->
+</security-service>
+----
+
+As you can see on the XML excerpt, more JACC providers can be defined (by default, the `simple` and `default` providers are already defined), but only one will be used at runtime, specified by the `jacc` attribute on the `security-service` element.
+
+[[how-to-install-a-custom-jacc-provider-per-application]]
+=== How to install a custom JACC provider per Application (Local)
+
+With a custom JACC provide per server, applications deployed to a single server can't have their own custom authorization contracts. In this case, having a custom JACC Provider per application makes more sense by using the `fish.payara.jacc.JaccConfigurationFactory` API.
+
+IMPORTANT: To access this API, you will need to add a dependency to the xref:Technical Documentation/Public API/Overview.adoc[Payara Public API] first.
+
+In the example below, when an application is deployed, a custom JACC provider is registered programmatically using the `JaccConfigurationFactory (consisting of a JACC `PolicyConfigurationFactory` and `Policy` implementation objects) in the `contextInitialized` method of `ServletContextListener`.
+
+[source, java]
+----
+@WebListener
+public class JaccInstaller implements ServletContextListener {
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+
+        JaccConfigurationFactory
+                .getJaccConfigurationFactory()
+                .registerContextProvider(
+                        getAppContextId(sce.getServletContext()),
+                        new CustomPolicyConfigurationFactory(),
+                        new CustomPolicy()
+                );
+
+    }
+
+    private String getAppContextId(ServletContext servletContext) {
+        return servletContext.getVirtualServerName() + " " + servletContext.getContextPath();
+    }
+}
+----

@@ -1,0 +1,666 @@
+= Overview of Payara Server Administration
+
+Payara Server provides a runtime for developing and deploying Jakarta EE Platform and Eclipse MicroProfile applications.
+
+As an administrator of Payara Server, your main responsibilities are to establish a secure Payara Server environment and to oversee the services, resources, and users that participate in that environment.
+
+Your key tasks include configuring resources and services, managing Payara Server at runtime, and fixing problems that are associated with the server's operation.
+
+[[default-settings-and-locations]]
+== Default Settings and Locations
+
+After installation, you might need to perform some immediate configuration tasks to make your installation function as intended.
+
+If configuration defaults have been accepted, some features are enabled and some not. For an overview of initial configuration tasks for Payara Server services and resources, see xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#initial-configuration-tasks[Initial Configuration Tasks].
+
+In addition, you might want to reset default passwords, change names or locations of files, and so on.
+
+The following tables list the default administration values.
+
+NOTE: The default administrator login is `admin`, with no password, which means that no login is required.
+
+[[table-default-settings-and-locations]]
+=== Default Administration Values
+
+//TODO - Add additional ports (Hazelcast~Data-Grid, for example)
+[width="100%",cols="43%,57%",options="header",]
+|===
+|Item
+|Default
+
+|Domain Name
+|`domain1`
+
+|Master Password
+|`changeit`
+
+|Administration User
+|`admin`
+
+|Administration Server Port
+|`4848`
+
+|HTTP Port
+|`8080`
+
+|HTTPS Port
+|`8181`
+
+|Pure JMX Clients Port
+|`8686`
+
+|Message Queue Port
+|`7676`
+
+|IIOP Port
+|`3700`
+
+|IIOP/SSL Port
+|`3820`
+
+|IIOP/SSL Port With Mutual Authentication
+|`3920`
+|===
+
+[[table-default-settings-and-locations-2]]
+.Default Locations
+
+[width="100%",cols="43%,57%",options="header",]
+|===
+|Item
+|Default
+
+|Command-line Utility (`asadmin`)
+|`as-install/bin`
+
+|Configuration Files
+|`domain-dir/config`
+
+|Log Files
+|`domain-dir/logs`
+
+|===
+
+
+[[configuration-tasks]]
+== Configuration Tasks
+
+Some configuration tasks must be performed directly after installation for your Payara Server environment to work as intended. For example, if you are using a database with Payara Server, you need to set up database connectivity right away.
+
+Some configuration situations are ongoing and will require you to make changes many times during the life of your installation. You can use either the Administration Console or the `asadmin` utility to modify the configuration. Changes are automatically applied to the appropriate configuration file.
+
+[[initial-configuration-tasks]]
+=== Initial Configuration Tasks
+
+This section maps the common configuration tasks to the command-line procedures in this guide. In some situations, the resource or service is automatically enabled and your configuration tasks involve adjusting or changing the default settings to suit your specific needs.
+
+The following resources and services frequently require configuration immediately after installation:
+
+System Properties::
+  See xref:Technical Documentation/Payara Server Documentation/General Administration/General Runtime Administration.adoc#administering-system-properties[Administering System Properties].
+Domains::
+  The initial `domain1` is created during installation. Additional configuration tasks might include such tasks as configuring additional domains or setting up automatic restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#administering-domains[Administering Domains].
+JVM::
+  The initial tasks for configuring the JVM include creating JVM options and profilers.
+Logging::
+  By default, logging is enabled, so basic logging works without additional configuration. However, you might want to change log levels, property values, or the location of log files. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#administering-the-logging-service[Administering the Logging Service].
+Monitoring::
+  By default, the monitoring service is enabled. However, monitoring for the individual modules is not enabled, so your first monitoring task is to enable monitoring for the modules that you want to monitor. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Monitoring Service.adoc#administering-the-monitoring-service[Administering the Monitoring Service].
+Life Cycle Modules::
+  See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Lifecycle Modules.adoc#administering-life-cycle-modules[Administering Life Cycle Modules].
+Security::
+  * System Security. Initial configuration tasks might include setting up passwords, audit modules, and certificates. See "xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#administering-system-security[Administering System Security]" in the Payara Server Security Guide.
+  * User Security. Initial configuration tasks might include creating authentication realms and file users. See "xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering User Security.adoc#administering-user-security[Administering User Security]" in the Payara Server Security Guide.
+  * Message Security. Initial configuration tasks might include configuring a Java Cryptography Extension (JCE) provider, enabling default and non-default security providers, and configuring message protection policies. See "xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering Message Security.adoc#administering-message-security[Administering Message Security]" in the Payara Server Security Guide.
+Database Connectivity::
+  The initial tasks involved in configuring Payara Server to connect to an external database include creating a Java Database Connectivity (JDBC) connection pool, creating a JDBC resource, and integrating a JDBC driver. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#administering-database-connectivity[Administering Database Connectivity].
+EIS Connectivity::
+  The initial tasks involved in configuring Payara Server to connect to an enterprise information system (EIS) include creating a connector connection pool, creating a connector resource, editing a resource adapter configuration, creating a connector security map, creating a connector work security map, and creating an administered object (if needed).
+  See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-eis-connectivity[Administering EIS Connectivity].
+Internet Connectivity::
+  The initial tasks involved in making deployed web applications accessible by internet clients include creating HTTP network listeners and virtual servers, and configuring the HTTP listeners for SSL (if needed). See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering HTTP Connectivity.adoc#administering-http-connectivity[Administering Internet Connectivity].
+Object Request Broker (ORB)::
+  An initial configuration task might involve creating an IIOP listener. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the ORB.adoc#administering-the-object-request-broker-orb[Administering the Object Request Broker (ORB)].
+JavaMail Service::
+  An initial configuration task might involve creating a JavaMail
+  resource. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Jakarta Mail Service.adoc#administering-the-javamail-service[Administering the JavaMail Service].
+Java Message Service (JMS)::
+  Initial configuration tasks might include creating a physical destination, creating connection factories or destination resources, creating a JMS host (if the default JMS host is not adequate), adjusting connection pool settings (if needed), and configuring resource adapters for JMS. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#administering-the-java-message-service-jms[Administering the Java Message Service (JMS)].
+JNDI Service::
+  An initial configuration task might involve creating a JNDI resource.
+  See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the JNDI Service.adoc#administering-the-java-naming-and-directory-interface-jndi-service[Administering the Java Naming and Directory Interface (JNDI) Service].
+
+Information and instructions for accomplishing the tasks by using the Administration Console are contained in the Administration Console online help.
+
+[[how-dotted-names-work-for-configuration]]
+=== How Dotted Names Work for Configuration
+
+After the initial configuration is working, you will continue to manage ongoing configuration for the life of your Payara Server installation.
+
+You might need to adjust resources to improve productivity, or issues might arise that require settings to be modified or defaults to be reset. In some situations, an `asadmin` subcommand is provided for updating, such as the `update-connector-work-security-map` subcommand. However, most updating is done by using the `list`, `get`, and `set` subcommands with dotted names. For detailed information about dotted names, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/Dotted Names.adoc[`dotted-names`(5ASC)] help page.
+
+NOTE: Dotted names also apply to monitoring, but the method is slightly different. For information on using dotted names for monitoring, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Monitoring Service.adoc#how-the-monitoring-tree-structure-works[How the Monitoring Tree Structure Works].
+
+The general process for working with configuration changes on the command line is as follows:
+
+*  List the modules for the component of interest. +
+The following single mode example uses the `|` (pipe) character and the `grep` command to narrow the search:
++
+[source,shell]
+----
+asadmin list "*" | grep http | grep listener
+----
+Information similar to the following is returned:
++
+[source,text]
+----
+configs.config.server-config.network-config.network-listeners.network-listener.http-listener-1
+configs.config.server-config.network-config.network-listeners.network-listener.http-listener-2
+configs.config.server-config.network-config.protocols.protocol.admin-listener.http
+configs.config.server-config.network-config.protocols.protocol.admin-listener.http.file-cache
+configs.config.server-config.network-config.protocols.protocol.http-listener-1
+configs.config.server-config.network-config.protocols.protocol.http-listener-1.http
+configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.file-cache
+configs.config.server-config.network-config.protocols.protocol.http-listener-2
+configs.config.server-config.network-config.protocols.protocol.http-listener-2.http
+configs.config.server-config.network-config.protocols.protocol.http-listener-2.http.file-cache
+configs.config.server-config.network-config.protocols.protocol.http-listener-2.ssl
+----
+
+*  Get the attributes that apply to the module you are interested in.
++
+The following multimode example gets the attributes and values for `http-listener-1`:
++
+[source,shell]
+----
+asadmin> get server-config.network-config.network-listeners.network-listener.http-listener-1.*
+----
++
+Information similar to the following is returned:
++
+[source,text]
+----
+server.http-service.http-listener.http-listener-1.acceptor-threads = 1
+server.http-service.http-listener.http-listener-1.address = 0.0.0.0
+server.http-service.http-listener.http-listener-1.blocking-enabled = false
+server.http-service.http-listener.http-listener-1.default-virtual-server = server
+server.http-service.http-listener.http-listener-1.enabled = true
+server.http-service.http-listener.http-listener-1.external-port =
+server.http-service.http-listener.http-listener-1.family = inet
+server.http-service.http-listener.http-listener-1.id = http-listener-1
+server.http-service.http-listener.http-listener-1.port = 8080
+server.http-service.http-listener.http-listener-1.redirect-port =
+server.http-service.http-listener.http-listener-1.security-enabled = false
+server.http-service.http-listener.http-listener-1.server-name =
+server.http-service.http-listener.http-listener-1.xpowered-by = true
+----
+
+*  Modify an attribute by using the `set` subcommand.
++
+This example sets the `security-enabled` attribute of `http-listener-1` to true:
++
+[source,shell]
+----
+asadmin> set server.http-service.http-listener.http-listener-1.security-enabled = true
+----
+
+[[configuration-files]]
+=== Configuration Files
+
+The bulk of the configuration information about Payara Server resources, applications, and instances is stored in the `domain.xml` configuration file. This file is the central repository for a given administrative domain and contains an XML representation of the Payara Server domain model. The default location for the `domain.xml` file is `domain-dir/config`.
+
+IMPORTANT: Payara Server maintains a backup of the `domain.xml` file that is named `domain.xml.bak`. The purpose of this file is solely to enable Payara Server to start a domain if the `domain.xml` file cannot be read. Do not modify or delete the `domain.xml.bak` file and do not use this file for any other purpose.
+
+The `logging.properties` file is used to configure logging levels for individual modules. The default `logging.properties` file is located in the same directory as the `domain.xml` file. For further information on the `logging.properties` file, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#logging-properties[Logging Properties].
+
+The `asenv.conf` file is located in the `as-install/config` directory. Its purpose is to store the Payara Server environment variables, such as the installation location of the database, Message Queue, and so on.
+
+CAUTION: Changes are automatically applied to the appropriate configuration file. Do not edit the configuration files directly. Manual editing is prone to error and can have unexpected results.
+
+[[impact-of-configuration-changes]]
+=== Impact of Configuration Changes
+
+Some configuration changes require that you restart the DAS or Payara Server instances for the changes to take effect. Other changes are applied dynamically without requiring that the DAS or instances be restarted. The procedures in this guide indicate when a restart is required. Payara Server enables you to determine whether the DAS or an instance must be restarted to apply configuration changes.
+
+Some changes to resources or connection pools affect the applications that use the resources or connection pools. These changes do not require restart. However, any applications that use the resources or connection pools must be disabled and re-enabled or redeployed for the change to take effect.
+
+[[to-determine-whether-the-das-or-an-instance-requires-restart]]
+==== *To Determine Whether the DAS or an Instance Requires Restart*
+
+. Ensure that the DAS is running. +
+To obtain information about the DAS or an instance, a running server is
+required.
+. Do one of the following:
+* To determine if the DAS requires restart, list the domains in your
+Payara Server installation. +
+Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-domains.adoc[`list-domains`] subcommand for this purpose.
++
+[source,shell]
+----
+asadmin> list-domains [--domaindir domain-root-dir]
+----
++
+The domain-root-dir is the directory that contains the directories in which individual domains' configuration is stored. The default is `as-install/domains`, where `as-install` is the base installation directory of the Payara Server software.
++
+If the DAS requires restart, a statement that restart is required is displayed.
+
+* To determine if an instance requires restart, list information about the instance.
++
+Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`] subcommand for this purpose:
++
+[source,shell]
+----
+asadmin> list-instances instance-name
+----
++
+The instance-name is the name of the instance for which you are listing information.
++
+If the instance requires restart, one of the following pieces of information is displayed: a statement that restart is required, or a list of configuration changes that are not yet applied to the instance.
+
+[[example-to-determine-whether-the-das-or-an-instance-requires-restart]]
+==== *Example 1-1 Determine whether the DAS or an instance requires restart*
+
+This example determines that the DAS for the domain `domain1` requires restart to apply configuration changes.
+
+[source,shell]
+----
+asadmin> list-domains
+domain1 running, restart required to apply configuration changes
+Command list-domains executed successfully.
+----
+
+[[example-to-determine-whether-the-das-or-an-instance-requires-restart-2]]
+==== *Example 1-2 Determine whether the DAS or an instance requires restart*
+
+This example determines that the instance `pmd-i1` requires restart to apply configuration changes.
+
+[source,shell]
+----
+asadmin> list-instances pmd-i1
+pmd-i1   running;  requires restart
+Command list-instances executed successfully.
+----
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-domains.adoc[`list-domains`]
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-instances.adoc[`list-instances`]
+
+You can also view the full syntax and options of the subcommands by typing the following commands at the command line.
+
+* `asadmin help list-domains`
+* `asadmin help list-instances`
+
+//TODO - This section needs updating and reviewing which other changes are dynamic and which ones do not require a restart
+
+[[configuration-changes-that-require-restart]]
+==== *Configuration Changes That Require Restart*
+
+The following configuration changes require restart for the changes to take effect:
+
+* Changing JVM options
+* Changing port numbers
+* Changing log handler elements
+* Configuring certificates
+* Managing HTTP, JMS, IIOP, JNDI services
+* Enabling or disabling secure administration as explained in "xref:Technical Documentation/Payara Server Documentation/Security Guide/Managing Administrative Security.adoc#running-secure-admin[Running Secure Admin]" in the Payara Server Security Guide
+
+[[dynamic-configuration-changes]]
+==== *Dynamic Configuration Changes*
+
+With dynamic configuration, changes take effect while the DAS or instance is running. The following configuration changes do not require restart:
+
+* Adding or deleting add-on components
+* Adding or removing JDBC, JMS, and connector resources and pools (Exception: Some connection pool properties affect applications.)
+* Changing a system property that is not referenced by a JVM option or a port
+* Adding file realm users
+* Changing logging levels
+* Enabling and disabling monitoring
+* Changing monitoring levels for modules
+* Enabling and disabling resources and applications
+* Deploying, un-deploying, and redeploying applications
+
+
+[[changes-that-affect-applications]]
+==== *Changes That Affect Applications*
+
+Some changes to resources or connection pools affect the applications that use the resources or connection pools. These changes do not require restart. However, any applications that use the resources or connection pools must be disabled and re-enabled or redeployed for the change to take effect.
+
+NOTE: If you do not know which applications use the changed resources or connection pools, you can apply these changes by restarting the clusters or Payara Server instances to which applications are deployed. However, to minimize the disruption to the services that your applications provide, avoid restarting clusters or instances to apply these changes if possible.
+
+The following changes affect applications:
+
+* Creating or deleting resources (Exception: Changes to some JDBC, JMS, or connector resources do not affect applications.)
+* Modifying the following JDBC connection pool properties:
+** `datasource-classname`
+** `associate-with-thread`
+** `lazy-connection-association`
+** `lazy-connection-enlistment`
+** JDBC driver vendor-specific properties
+* Modifying the following connector connection pool properties:
+
+** `resource-adapter-name`
+** `connection-definition-name`
+** `transaction-support`
+** `associate-with-thread`
+** `lazy-connection-association`
+** `lazy-connection-enlistment`
+** Vendor-specific properties
+
+[[administration-tools]]
+== Administration Tools
+
+For the most part, you can perform the same tasks by using either the graphical Administration Console or the `asadmin` command-line utility, however, there are exceptions.
+
+[[administration-console]]
+=== Administration Console
+
+The Administration Console is a browser-based utility that features an easy-to-navigate graphical interface that includes extensive online help for the administrative tasks.
+
+To use the Administration Console, the domain administration server (DAS) must be running. Each domain has its own DAS, which has a unique port number. When Payara Server was installed, you chose a port number for the DAS, or used the default port of 4848. You also specified a username and password if you did not accept the default login (`admin` with no password).
+
+When specifying the URL for the Administration Console, use the port number for the domain to be administered. The format for starting the Administration Console in a web browser is `http://hostname:port`. For example:
+
+[source,text]
+----
+https://admin.payara.fish:4848
+----
+
+If the Administration Console is running on the host where Payara Server was installed, specify `localhost` for the host name. For example:
+
+[source,text]
+----
+http://localhost:4848
+----
+
+If the Administration Console is run on a host different from the host where Payara Server was installed, a secure connection (`https` instead of `http`) is used. Some browsers do not display pages on secure connections by default and must be configured to permit secure protocols (SSL and TLS).
+
+You can display the help material for a page in the Administration Console by clicking the Help button on the page. The initial help page describes the functions and fields of the page itself.
+
+If you try to use the Administration Console from a system through a proxy server on another system back to the original system, while using the system's full host name (instead of `localhost` or `127.0.0.1`) you are denied access because the request is treated as a remote request, which requires that the secure administration feature (secure admin) to be enabled.
+
+To avoid this situation, do one of the following:
+
+* Do not use a proxy server.
+* Use `localhost` or `127.0.0.1` as the host name.
+* Enable secure admin so that what Payara Server interprets as a remote request is accepted as such.
+
+To enable secure admin, see "xref:Technical Documentation/Payara Server Documentation/Security Guide/Managing Administrative Security.adoc[Managing Administrative Security]" in the Payara Server Security Guide.
+
+[[asadmin-utility]]
+=== `asadmin` Utility
+
+The `asadmin` utility is a command-line tool that runs subcommands for identifying the operation or task that you want to perform. You can run `asadmin` subcommands either from a command prompt or from a script.Running `asadmin` subcommands from a script is helpful for automating repetitive tasks. Basic information about how the `asadmin` utility works can be found in the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`(1M)] help page. For instructions on using the `asadmin` utility, see xref:Technical Documentation/Payara Server Documentation/General Administration/General Runtime Administration.adoc#using-the-asadmin-utility[Using the `asadmin` Utility].
+
+To issue an `asadmin` subcommand in the standard command shell (single mode), go to the `as-install/bin` directory and type the `asadmin` command followed by a subcommand. For example:
+
+[source,shell]
+----
+asadmin list-jdbc-resources
+----
+
+You can invoke multiple command mode (multimode) by typing `asadmin` at the command prompt, after which the `asadmin>` prompt is presented. The `asadmin` utility continues to accept subcommands until you exit multimode and return to the standard command shell. For example:
+
+[source,shell]
+----
+asadmin> list-jdbc-resources
+----
+
+You can display a help page for any `asadmin` subcommand by typing `help` before the subcommand name. For example:
+
+[source,shell]
+----
+asadmin> help restart-domain
+----
+
+or
+
+[source,shell]
+----
+asadmin help restart-domain
+----
+
+A collection of the `asadmin` help pages is available in HTML and PDF format in the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc[Payara Server Reference Manual].
+
+[[rest-interfaces]]
+=== REST Interfaces
+
+Payara Server provides representational state transfer (REST) interfaces to enable you to access monitoring and configuration data for Payara Server, including data that is provided by newly installed add-on components. For more information, see xref:Technical Documentation/Payara Server Documentation/General Administration/General Runtime Administration.adoc#using-rest-interfaces-to-administer-payara-server[Using REST Interfaces to Administer Payara Server].
+
+[[osgi-module-management-subsystem]]
+=== OSGi Module Management Subsystem
+
+The OSGi module management subsystem that is provided with Payara Server is the http://felix.apache.org/[Apache Felix OSGi framework] .
+
+To administer this framework, use either the http://felix.apache.org/documentation/subprojects/apache-felix-remote-shell.html[Apache Felix Gogo] remote shell. This shell is provided with Payara Server. The shell uses the Felix Gogo shell-service to interact with the OSGi module management subsystem.
+
+This tool allows you to perform administrative tasks on OSGi bundles such as:
+
+* Browsing installed OSGi bundles
+* Viewing the headers of installed OSGi bundles
+* Installing OSGi bundles
+* Controlling the life cycle of installed bundles
+
+//TODO - This requires extensive verification
+[[to-enable-the-apache-felix-gogo-remote-shell]]
+==== *To Enable the Apache Felix Gogo Remote Shell*
+
+By default, the Apache Felix Gogo remote shell in Payara Server is disabled. Before using the shell to administer OSGi bundles in Payara Server, you must enable the shell.
+
+Enabling the Apache Felix Gogo remote shell in Payara Server involves changing the value of the property `glassfish.osgi.start.level.final`. This property controls whether the OSGi start level service enables the shell when the DAS or a Payara Server instance is started.
+
+. Ensure that the DAS is running.
+. Change the value of the `glassfish.osgi.start.level.final` property from `2` to `3`.
++
+If the domain includes clustered or standalone instances on remote hosts, perform this step on each remote host. You can change this value either by creating a Java system property or by editing a file.
++
+To change this value by creating a Java system property, create the system property `glassfish.osgi.start.level.final` with a value of `3`:
++
+[source,shell]
+----
+asadmin> create-jvm-options --target target -Dglassfish.osgi.start.level.final=3
+----
++
+To change this value by editing a file, edit the plain-text file `as-install/config/osgi.properties` to change the value of the `glassfish.osgi.start.level.final` property from `2` to `3`.
+
+. Restart the DAS.
+
+For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+[[to-run-apache-felix-gogo-remote-shell-commands]]
+==== *To Run Apache Felix Gogo Remote Shell Commands*
+
+The Apache Felix Gogo remote shell is integrated with the Payara  Server `asadmin` command line utility. You can use the `asadmin` subcommands `osgi` and `osgi-shell` to access the remote shell and run  OSGi shell commands.
+
+[[to-run-remote-shell-commands-using-the-osgi-subcommand]]
+==== *To Run Remote Shell Commands Using the `osgi` Subcommand*
+
+The `osgi` subcommand delegates the command line to the Apache Felix  Gogo remote shell for the execution of OSGi shell commands. Commands are executed by the remote shell and results are returned by the `asadmin` utility. The `osgi` subcommand is supported in remote mode only.
+
+. Ensure that the server is running. Remote commands require a running server.
+. Access the remote shell by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/osgi.adoc[`osgi`] subcommand. For the full syntax and options for this subcommand, see `osgi`.
+
+[[to-run-remote-shell-commands-using-the-osgi-shell-subcommand]]
+==== *To Run Remote Shell Commands Using the `osgi-shell` Subcommand*
+
+The `osgi-shell` subcommand provides interactive access to the Apache Felix Gogo remote shell for the execution of OSGi shell commands. OSGi shell commands are executed on the server and results are printed on the client. You can run multiple commands from a file or run commands interactively. The `osgi-shell` subcommand is supported in local mode only. Unlike other local subcommands, however, the DAS and the server instance whose shell is being accessed must be running.
+
+. Ensure that the server is running.
+. Access the remote shell by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/redeploy.adoc#redeploy[`osgi-shell`] subcommand. For the full syntax and options for this subcommand, see `osgi-shell`.
+
+[[example-to-run-remote-shell-commands-using-the-osgi-shell-subcommand]]
+==== *Example 1-3 To run remote shell commands using the osgi-shell subcommand*
+
+This example lists Apache Felix Gogo remote shell commands. Some lines of output are omitted from this example for readability.
+
+[source,shell]
+----
+asadmin> osgi help
+
+felix:bundlelevel
+felix:cd
+felix:frameworklevel
+gogo:cat
+gogo:each
+gogo:echo
+
+asadmin> osgi-shell
+Use "exit" to exit and "help" for online help.
+
+gogo$ help
+felix:bundlelevel
+felix:cd
+felix:frameworklevel
+gogo:cat
+gogo:each
+gogo:echo
+----
+
+[[example-to-run-remote-shell-commands-using-the-osgi-shell-subcommand-2]]
+==== *Example 1-4 To run remote shell commands using the osgi-shell subcommand 2*
+
+This example runs the Felix Remote Shell Command `lb` without any arguments to list all installed OSGi bundles. Some lines of output are omitted from this example for readability.
+
+[source,shell]
+----
+asadmin> osgi lb
+START LEVEL 2
+ID|State      |Level|Name
+ 0|Active     |    0|System Bundle
+ 1|Active     |    1|Metro Web Services API OSGi Bundle
+ 2|Active     |    1|jakarta.annotation API
+Command osgi executed successfully.
+
+asadmin> osgi-shell
+Use "exit" to exit and "help" for online help.
+gogo$ lb
+START LEVEL 2
+ID|State      |Level|Name
+ 0|Active     |    0|System Bundle
+ 1|Active     |    1|Metro Web Services API OSGi Bundle
+ 2|Active     |    1|jakarta.annotation API
+gogo$
+----
+
+[[example-to-run-remote-shell-commands-using-the-osgi-shell-subcommand-3]]
+==== *Example 1-5 To run remote shell commands using the osgi-shell subcommand 3*
+
+This example runs the Felix Remote Shell Command `inspect` with the `service` option and the `capability` option to determine the services that OSGi bundle `251` provides. Some lines of output are omitted from this example for readability.
+
+[source,shell]
+----
+asadmin> osgi inspect service capability 251
+Payara EJB Container for OSGi Enabled EJB Applications (251) provides services:
+---------------------------------------------------------------------------
+objectClass = org.glassfish.osgijavaeebase.Extender
+service.id = 68
+-----
+objectClass = org.glassfish.osgijavaeebase.OSGiDeployer
+service.id = 69
+service.ranking = -2147483648
+Command osgi executed successfully.
+...
+asadmin> osgi -shell
+Use "exit" to exit and "help" for online help.
+gogo$ inspect service capability 251
+Payara EJB Container for OSGi Enabled EJB Applications (251) provides services:
+---------------------------------------------------------------------------
+objectClass = org.glassfish.osgijavaeebase.Extender
+service.id = 68
+...
+gogo$
+----
+
+[[java-monitoring-and-management-console-jconsole]]
+=== Java Monitoring and Management Console (JConsole)
+
+Java SE provides tools to connect to an MBean server and view the MBeans that are registered with the server. JConsole is one such popular JMX Connector Client and is available as part of the standard Java SE distribution.
+
+For instructions on integrating JConsole in the Payara Server environment, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Monitoring Service.adoc#configuring-jconsole-to-view-payara-server-monitoring-data[Configuring JConsole to View Payara Server Monitoring Data].
+
+[[instructions-for-administering-payara-server]]
+== Instructions for Administering Payara Server
+
+Information and instructions on performing most of the administration tasks from the command line are provided in this document and in the `asadmin` utility help pages. For instructions on accessing `asadmin` online help, see xref:Technical Documentation/Payara Server Documentation/General Administration/General Runtime Administration.adoc#to-display-help-information-for-the-asadmin-utility-or-a-subcommand[To Display Help Information for the `asadmin` Utility or a Subcommand].
+
+[[phone-home]]
+== Phone Home
+
+All Payara Platform distributions report back a limited amount of information about their specific configuration at launch time. No sensitive data about your machine or specific usage of Payara Server is sent to 0s or any member of the Payara Services team.
+
+Gathered phone home data is sent via a `GET` request to http://www.payara.fish/phonehome
+
+The following is the list of information attributes gathered by the Phone Home service:
+
+[cols=",",options="header",]
+|=======================================================================
+|Attribute |Example
+|Payara Server Version |{page-version} #badassfish
+|Java Virtual Machine Version |1.8.0_121
+|Domain Uptime |36500
+|Number of nodes in the domain |1
+|Number of instances in the domain |2
+|Randomly generated UUID
+|eaa6fe2c-2388-4aa7-fdcc-288c7b318ddfeaa6ef23-2388-4aa7-8dcc-288c7b318ddf
+|=======================================================================
+
+This is the only data which the phone home service gathers from your system.
+
+NOTE: The UUID is specific to the DAS and is randomly generated on startup, so it is not machine specific.
+
+[[what-is-the-data-used-for]]
+=== What is the data used for?
+
+The phone home data is presently used to gather usage statistics about the corresponding distribution, such as how long users typically run instances, and what versions they use.
+
+Previously this could only be done at an extremely simple level from downloads over time, giving us no idea how Payara Server is used beyond specific interactions with contributors and customers which may not accurately represent the state of our user base.
+
+The phone home service was designed as a non-intrusive survey tool which would only gather data specific to Payara and has no contact with any running applications, or indeed anything on your machine other than the mentioned attributes.
+
+=== Disabling and Enabling Phone Home
+
+The phone home service is enabled by default when starting a Payara Server. The phone home service can be easily disabled in the following ways.
+
+[[enable-phone-home]]
+=== Enable the Phone Home service
+
+[source, shell]
+----
+asadmin> enable-phone-home
+----
+See xref:Technical Documentation/Payara Server Documentation/Command Reference/enable-phone-home.adoc#enable-phone-home[`enable-phone-home`]
+
+
+[[disable-phone-home]]
+=== Disable the Phone Home service
+
+[[disable-with-asadmin]]
+==== Using Asadmin
+
+Run this asadmin command and then restart the server to disable PhoneHome
+
+[source, shell]
+----
+asadmin> disable-phone-home
+----
+See  xref:Technical Documentation/Payara Server Documentation/Command Reference/disable-phone-home.adoc#disable-phone-home[`disable-phone-home`]
+
+[[removing-the-service-module]]
+==== Disable by Removing The Service Module
+
+- Navigate to the `${PAYARA_INSTALL_DIR}/glassfish/modules` directory
+- Delete the `phonehome-bootstrap.jar` module.
+
+[[list-phone-home]]
+=== List the current status of the Phone Home service.
+
+[source, shell]
+----
+asadmin> list-phone-home
+----
+See xref:Technical Documentation/Payara Server Documentation/Command Reference/list-phone-home.adoc#list-phone-home[`list-phone-home`]
+
+
+=== See Also
+
+* xref:/Technical Documentation/Payara Micro Documentation/Payara Micro Configuration and Management/Micro Management/Command Line Options/Disable Phone Home.adoc[Disable PhoneHome in Payara Micro]
+* https://github.com/payara/Payara/blob/master/nucleus/payara-modules/phonehome-bootstrap/src/main/java/fish/payara/nucleus/phonehome/PhoneHomeTask.java[Phone Home Source Code]
+
