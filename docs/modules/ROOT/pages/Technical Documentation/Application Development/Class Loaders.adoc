@@ -1,25 +1,23 @@
 [[classloading]]
-= Classloading
+= Class Loaders
+:ordinal: 1
 
 NOTE: This section strictly applies to Payara Server.
 
 Payara Server extends the default JVM classloading and provides additional classes, which are loaded by the class loaders included by default on this distribution. Understanding Payara Server class loaders can help you determine where to place supporting JAR and resource files for your modules and applications.
 
-[[class-loaders]]
-== Class Loaders
-
 Understanding Payara Server class loaders can help you determine where to place supporting JAR and resource files for your modules and applications.
 
 In a JVM implementation, the class loaders dynamically load a specific Java class file needed for resolving a dependency. For example, when an instance of `java.util.Enumeration` needs to be created, one of the class loaders loads the relevant class into the environment.
 
-For information about class loader debugging, see xref:Technical Documentation/Application Development/debugging-apps.adoc#class-loader-debugging[Class Loader Debugging].
+For information about class loader debugging, see xref:Technical Documentation/Application Development/Debugging Applications.adoc#class-loader-debugging[Class Loader Debugging].
 
 [[standard-classloading]]
 == Standard Classloading
 
 In a JVM implementation, the class loaders dynamically load a specific Java class file needed for resolving a dependency. For example, when an instance of `java.util.Enumeration` needs to be created, one of the class loaders loads the relevant class into the environment.
 
-For information about class loader debugging, see xref:Technical Documentation/Application Development/debugging-apps.adoc#class-loader-debugging[Class Loader Debugging].
+For information about class loader debugging, see xref:Technical Documentation/Application Development/Debugging Applications.adoc#class-loader-debugging[Class Loader Debugging].
 
 Class loaders in Payara Server follow a delegation hierarchy by default.
 
@@ -63,7 +61,7 @@ Parents both the *Applib* class loader and the *LifeCycleModule* class loader.
 |LifeCycleModule
 |The LifeCycleModule class loader is created once per lifecycle module. Each lifecycle module's classpath is used to construct its own class loader.
 
-For more information on lifecycle modules, see xref:Technical Documentation/Application Development/lifecycle-listeners.adoc#developing-lifecycle-listeners[Developing Lifecycle Listeners].
+For more information on lifecycle modules, see xref:Technical Documentation/Application Development/Developing Lifecycle Listeners.adoc#developing-lifecycle-listeners[Developing Lifecycle Listeners].
 
 |Applib
 |The `Applib` class loader loads the library classes (specifically, libraries of the `app` type), specified during deployment, for a specific enabled module or Jakarta EE application;
@@ -136,7 +134,7 @@ To circumvent this limitation for libraries, utility classes, or individually de
 
 If an internal server resource, such as a JDBC connection pool, requires an additional library, you can install it directly into the Payara Server domain too.
 
-To install a library into a server domain, use the asadmin xref:Technical Documentation/Payara Server Documentation/Command Reference/add-library.adoc#add-library-command[add-library] command.
+To install a library into a server domain, use the asadmin xref:Technical Documentation/Payara Server Documentation/Command Reference/add-library.adoc#add-library[add-library] command.
 
 This command accepts the `--type` argument, which accepts the following options:
 
@@ -183,7 +181,7 @@ You can specify module or application-specific library classes in one of the fol
 
 * Use the `asadmin add-library` command with the `--type app` option. For details, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/add-library.adoc[add-library].
 
-NOTE: None of these alternatives apply to application clients. For more information, see xref:Technical Documentation/Application Development/java-clients.adoc#using-libraries-with-application-clients[Using Libraries with Application Clients].
+NOTE: None of these alternatives apply to application clients. For more information, see xref:Technical Documentation/Application Development/Developing Java Clients.adoc#using-libraries-with-application-clients[Using Libraries with Application Clients].
 
 You can update a library JAR file using dynamic reloading or by restarting (disabling and re-enabling) a module or application. To add or remove library JAR files, you can redeploy the module or application. Application libraries are included in the _Applib_ class loader. Paths to libraries can be relative or absolute.
 
@@ -194,7 +192,7 @@ TIP: You can also use application-specific class loading to access different ver
 If multiple applications or modules refer to the same libraries, classes in those libraries are automatically shared. This can reduce the memory footprint and allow sharing of static information. However, applications or modules using application-specific libraries are not portable.
 
 NOTE: If you see an access control error message when you try to use a library, you may need to grant permission to the library in the
-`server.policy` file. For more information, see xref::Technical Documentation/Application Development/securing-apps.adoc#changing-permissions-for-an-application[Changing Permissions for an Application].
+`server.policy` file. For more information, see xref:Technical Documentation/Application Development/Securing Applications.adoc#changing-permissions-for-an-application[Changing Permissions for an Application].
 
 [[packaging-the-client-jar-for-one-application-in-another-application]]
 === Packaging the Client JAR for One Application in Another Application

@@ -1,5 +1,6 @@
 [[using-enterprise-javabeans-technology]]
 = Using Jakarta Enterprise Beans Technology
+:ordinal: 9
 
 This chapter describes how Jakarta Enterprise Beans (EJB) technology is supported in the Payara Platform.
 
@@ -119,7 +120,7 @@ Another parameter, `pool-idle-timeout-in-seconds`, allows the administrator to s
 [[caching-parameters]]
 ==== Caching Parameters
 
-Payara Server provides a way that completely avoids caching of entity beans, using commit option `C`. Commit option `C` is particularly useful if beans are accessed in large number but very rarely reused. For additional information, refer to xref:Technical Documentation/Application Development/transaction-service.adoc#commit-options[Commit Options].
+Payara Server provides a way that completely avoids caching of entity beans, using commit option `C`. Commit option `C` is particularly useful if beans are accessed in large number but very rarely reused. For additional information, refer to xref:Technical Documentation/Application Development/Using the Transaction Service.adoc#commit-options[Commit Options].
 
 Payara Server caches can be either bounded or unbounded. Bounded caches have limits on the number of beans that they can hold beyond which beans are passivated. For stateful session beans, there are three ways (LRU, NRU and FIFO) of picking victim beans when cache overflow occurs.
 
@@ -398,7 +399,7 @@ For more information about `glassfish-ejb-jar.xml`, see "xref:Technical Document
 The passivated beans are stored on the file system. The Session Store Location setting in the EJB container allows an administrator to specify the directory where passivated beans are stored. By default, passivated stateful session beans are stored in application-specific subdirectories created under `${domain-dir}/session-store`.
 
 NOTE: Make sure the `delete` option is set in the `server.policy` file, or expired file-based sessions might not be deleted properly.
-For more information about `server.policy`, see xref:Technical Documentation/Application Development/securing-apps.adoc#the-server.policy-file[The `server.policy` File].
+For more information about `server.policy`, see xref:Technical Documentation/Application Development/Securing Applications.adoc#the-server.policy-file[The `server.policy` File].
 
 The Session Store Location setting also determines where the session state is persisted if it is in a High Availability environment; see xref:#choosing-a-persistence-store[Choosing a Persistence Store].
 
@@ -448,13 +449,13 @@ For example, failover might work because the class implementing that type is *se
 |===
 
 For more information about the `InitialContext`, see
-xref:Technical Documentation/Application Development/jndi.adoc#accessing-the-naming-context[Accessing the Naming Context]. For more information about transaction recovery, see xref:Technical Documentation/Application Development/transaction-service.adoc#using-the-transaction-service[Using the Transaction Service]. For more information about Administered Objects, see "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#administering-jms-physical-destinations[Administering JMS Physical Destinations]" in the Payara Server General Administration section.
+xref:Technical Documentation/Application Development/Using the Java Naming and Directory Interface.adoc#accessing-the-naming-context[Accessing the Naming Context]. For more information about transaction recovery, see xref:Technical Documentation/Application Development/Using the Transaction Service.adoc#using-the-transaction-service[Using the Transaction Service]. For more information about Administered Objects, see "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#administering-jms-physical-destinations[Administering JMS Physical Destinations]" in the Payara Server General Administration section.
 
 If a server instance to which an RMI-IIOP client request is sent crashes during the request processing (before the response is prepared and sent back to the client), an error is sent to the client.
 
 The client must retry the request explicitly. When the client retries the request, the request is sent to another server instance in the cluster, which retrieves session state information for this client.
 
-HTTP sessions can also be saved in a persistent store in case a server instance fails. In addition, if a distributable web application references an SFSB, and the web application's session fails over, the EJB reference is also failed over. For more information, see xref:Technical Documentation/Application Development/webapps.adoc#distributed-sessions-and-persistence[Distributed Sessions and Persistence].
+HTTP sessions can also be saved in a persistent store in case a server instance fails. In addition, if a distributable web application references an SFSB, and the web application's session fails over, the EJB reference is also failed over. For more information, see xref:Technical Documentation/Application Development/Developing Web Applications.adoc#distributed-sessions-and-persistence[Distributed Sessions and Persistence].
 
 If an SFSB that uses session persistence is un-deployed while the Payara Server instance is stopped, the session data in the persistence store might not be cleared. To prevent this, undeploy the SFSB while the Payara Server instance is running.
 
@@ -624,7 +625,7 @@ Read-only beans are best suited for situations where the underlying data never c
 Read-only beans have the following characteristics:
 
 * Only entity beans can be read-only beans.
-* Either bean-managed persistence (BMP) or container-managed persistence (CMP) is allowed. If CMP is used, do not create the database schema during deployment. Instead, work with your database administrator to populate the data into the tables. See xref:Technical Documentation/Application Development/container_managed-persistence.adoc#using-container-managed-persistence[Using Container-Managed Persistence].
+* Either bean-managed persistence (BMP) or container-managed persistence (CMP) is allowed. If CMP is used, do not create the database schema during deployment. Instead, work with your database administrator to populate the data into the tables. See xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#using-container-managed-persistence[Using Container-Managed Persistence].
 * Only container-managed transactions are allowed; read-only beans cannot start their own transactions.
 * Read-only beans don't update any bean state.
 * `ejbStore` is never called by the container.
@@ -753,7 +754,7 @@ This section describes message-driven beans and explains the requirements for cr
 [[message-driven-bean-configuration]]
 === Message-Driven Bean Configuration
 
-For information about setting up load balancing for message-driven beans, see xref:Technical Documentation/Application Development/jms.adoc#load-balanced-message-inflow[Load-Balanced Message Inflow].
+For information about setting up load balancing for message-driven beans, see xref:Technical Documentation/Application Development/Using Jakarta Messaging.adoc#load-balanced-message-inflow[Load-Balanced Message Inflow].
 
 [[connection-factory-and-destination]]
 ==== *Connection Factory and Destination*
@@ -904,7 +905,7 @@ Because xref:Technical Documentation/Payara Server Documentation/High Availabili
 To ensure correct behaviour of persistent timers within a deployment group, the following conditions need to be met:
 
 * The EJB Timer Service needs to use shared storage --an external database-- or xref:Technical Documentation/Payara Server Documentation/High Availability/Administering the Domain Data Grid.adoc[the DataGrid].
-* All instances of a deployment group, and the Domain Administration Server MUST share the same configuration settings for the EJB Timer Service (see xref:Technical Documentation/Application Development/ejb.adoc#ejb-timer-service[here] for more information).
+* All instances of a deployment group, and the Domain Administration Server MUST share the same configuration settings for the EJB Timer Service (see xref:Technical Documentation/Application Development/Using Jakarta Enterprise Beans Technology.adoc#ejb-timer-service[here] for more information).
 * Applications with persistent timers are deployed to a deployment group and not managed on instance level afterward.
 * Instances are members of only a single deployment group
 

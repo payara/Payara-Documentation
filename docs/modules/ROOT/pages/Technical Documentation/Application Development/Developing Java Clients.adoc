@@ -1,12 +1,13 @@
 [[developing-java-clients]]
 = Developing Java Clients
+:ordinal: 12
 
 This chapter describes how to develop, assemble, and deploy remote Java clients.
 
 NOTE: The Web Profile of Payara Server supports the Jakarta Enterprise Beans 4.0 Lite specification, which allows enterprise beans within web applications, among other features.
 The full Payara Server supports the entire EJB 4.0 specification. For details, see https://jakarta.ee/specifications/enterprise-beans/[Jakarta Enterprise Beans]. +
 Accordingly, the Application Client Container is supported only in the Full Profile, not in the Web Profile. +
-JMS resources are supported only in the Full Profile, not in the Web Profile. See xref:Technical Documentation/Application Development/jms.adoc#using-jakarta-messaging[Using the Java Message Service].
+JMS resources are supported only in the Full Profile, not in the Web Profile. See xref:Technical Documentation/Application Development/Using Jakarta Messaging.adoc#using-jakarta-messaging[Using the Java Message Service].
 
 [[introducing-the-application-client-container]]
 == Introducing the Application Client Container
@@ -17,7 +18,7 @@ The ACC communicates with Payara Server using RMI-IIOP protocol and manages the 
 
 NOTE: Compared to other Jakarta EE containers, the ACC is lightweight.
 
-For information about debugging application clients, see xref:Technical Documentation/Application Development/debugging-apps.adoc#application-client-debugging[Application Client Debugging].
+For information about debugging application clients, see xref:Technical Documentation/Application Development/Debugging Applications.adoc#application-client-debugging[Application Client Debugging].
 
 IMPORTANT: Interoperability between application clients and Payara Servers running under different Payara Platform major versions is not supported. The same can be said if both server and client are running under different major Java versions.
 
@@ -29,13 +30,13 @@ in turn, requires contact with the server's naming service.
 
 To authenticate the end user, the ACC prompts for any required information, such as a username and password. The ACC itself provides a very simple dialog box to prompt for and read these values.
 
-The ACC integrates with Payara Server's authentication system. It also supports SSL (Secure Socket Layer)/IIOP if configured and when necessary; see xref:Technical Documentation/Application Development/java-clients.adoc#using-rmiiiop-over-ssl[Using RMI/IIOP Over SSL].
+The ACC integrates with Payara Server's authentication system. It also supports SSL (Secure Socket Layer)/IIOP if configured and when necessary; see xref:Technical Documentation/Application Development/Developing Java Clients.adoc#using-rmiiiop-over-ssl[Using RMI/IIOP Over SSL].
 
 You can provide an alternate implementation to gather authentication information, tailored to the needs of the application client. To do so, include the class to perform these duties in the application client and identify the fully-qualified name of this class in the `callback-handler` element of the `application-client.xml` descriptor for the client. The ACC uses this class instead of its default class for asking for and reading the authentication information.
 
 The class must implement the `javax.security.auth.callback.CallbackHandler` interface. See the https://jakarta.ee/specifications/platform/[Jakarta EE Platform specification], section 10.2, **Application Clients: Security**, for more details.
 
-Application clients can use a programmatic login mechanism by xref:Technical Documentation/Application Development/securing-apps.adoc#programmatic-login-using-the-programmaticlogin-class[using the `ProgrammaticLogin` Class].
+Application clients can use a programmatic login mechanism by xref:Technical Documentation/Application Development/Securing Applications.adoc#programmatic-login-using-the-programmaticlogin-class[using the `ProgrammaticLogin` Class].
 
 [[acc-naming]]
 === ACC Naming
@@ -70,7 +71,7 @@ This section describes the procedure to develop, assemble, and deploy client app
 === To Access an EJB Component From an Application Client
 
 . In your client code, reference the EJB component by using an `@EJB` annotation or by looking up the JNDI name as defined in the `ejb-jar.xml` file. +
-For more information about naming and lookups, see xref:Technical Documentation/Application Development/jndi.adoc#accessing-the-naming-context[Accessing the Naming Context]. +
+For more information about naming and lookups, see xref:Technical Documentation/Application Development/Using the Java Naming and Directory Interface.adoc#accessing-the-naming-context[Accessing the Naming Context]. +
 If load balancing is enabled as in Step 7 and the EJB components being accessed are in a different cluster, the endpoint list must be included in the lookup, as follows:
 +
 [source,text]
@@ -78,7 +79,7 @@ If load balancing is enabled as in Step 7 and the EJB components being accessed 
 corbaname:host1:port1,host2:port2,.../NameService#ejb/jndi-name
 ----
 . Define the `@EJB` annotations or the `ejb-ref` elements in the `application-client.xml` file. Define the corresponding `ejb-ref` elements in the`glassfish-application-client.xml` file. +
-For more information on the `glassfish-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in the Payara Server Application Deployment section. For a general explanation of how to map JNDI names using reference elements, see xref:Technical Documentation/Application Development/jndi.adoc#mapping-references[Mapping References].
+For more information on the `glassfish-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in the Payara Server Application Deployment section. For a general explanation of how to map JNDI names using reference elements, see xref:Technical Documentation/Application Development/Using the Java Naming and Directory Interface.adoc#mapping-references[Mapping References].
 . Deploy the application client and EJB component together in an application. +
 To get the client JAR file, use the `--retrieve` option of the `asadmin deploy` command. +
 To retrieve the stubs and ties generated during deployment, use the `asadmin get-client-stubs` command.
@@ -131,7 +132,7 @@ For detailed instructions on developing a JMS client, see "https://eclipse-ee4j.
 For information on configuring JMS resources, see "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#administering-jms-connection-factories-and-destinations[Administering JMS Connection Factories and Destinations]" in the Payara Server General Administration section.
 
 . Define the `@Resource` or `@Resources` annotations or the `resource-ref` elements in the `application-client.xml` file. Define the corresponding `resource-ref` elements in the `glassfish-application-client.xml` file. +
-For more information on the `glassfish-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in the Payara Server Application Deployment section. For a general explanation of how to map JNDI names using reference elements, see xref:Technical Documentation/Application Development/jndi.adoc#mapping-references[Mapping References].
+For more information on the `glassfish-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in the Payara Server Application Deployment section. For a general explanation of how to map JNDI names using reference elements, see xref:Technical Documentation/Application Development/Using the Java Naming and Directory Interface.adoc#mapping-references[Mapping References].
 
 . Ensure that the client JAR file includes the following files:
 * A Java class to access the resource.
@@ -742,7 +743,7 @@ You can configure RMI/IIOP over SSL in two ways: using a username and password, 
 
 To use a username and password, configure the `ior-security-config` element in the `glassfish-ejb-jar.xml` file. The following configuration establishes SSL between an application client and an EJB component using a username and password.
 
-The user has to log in to the ACC using either the `sun-acc.xml` mechanism or the xref:Technical Documentation/Application Development/securing-apps.adoc#programmatic-login-using-the-programmaticlogin-class[Programmatic Login Using the `ProgrammaticLogin` Class] mechanism.
+The user has to log in to the ACC using either the `sun-acc.xml` mechanism or the xref:Technical Documentation/Application Development/Securing Applications.adoc#programmatic-login-using-the-programmaticlogin-class[Programmatic Login Using the `ProgrammaticLogin` Class] mechanism.
 
 [source,xml]
 ----
@@ -862,7 +863,7 @@ The Libraries field in the Administration Console's deployment page and the `--l
 
 Neither do the `as-install/lib`, `domain-dir/lib`, and `domain-dir/lib/classes` directories comprising the Common Class Loader.
 
-These apply only to applications and modules deployed to the server. For more information, see xref:Technical Documentation/Application Development/class-loaders.adoc#class-loaders[Class Loaders].
+These apply only to applications and modules deployed to the server. For more information, see xref:Technical Documentation/Application Development/Class Loaders.adoc#class-loaders[Class Loaders].
 
 To use libraries with an application client, package the application client in an application (EAR file).
 Then, either place the libraries in the `/lib` directory of the EAR file or specify their location in the application client JAR file's manifest `Class-Path`.
@@ -995,7 +996,7 @@ If load balancing is enabled as in Step 1 and the EJB components being accessed 
 corbaname:host1:port1,host2:port2,.../NameService#ejb/jndi-name
 ----
 +
-For more information about naming and lookups, see xref:Technical Documentation/Application Development/jndi.adoc#accessing-the-naming-context[Accessing the Naming Context].
+For more information about naming and lookups, see xref:Technical Documentation/Application Development/Using the Java Naming and Directory Interface.adoc#accessing-the-naming-context[Accessing the Naming Context].
 
 . Deploy the EJB component to be accessed. For more information on deployment, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Overview.adoc#about-deployment-tools[About Deployment Tools]" in the Application Deployment section.
 

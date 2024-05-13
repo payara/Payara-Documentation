@@ -1,5 +1,6 @@
 [[developing-connectors]]
 = Developing Connectors
+:ordinal: 13
 
 NOTE: This section strictly applies to Payara Server Full Profile.
 
@@ -35,9 +36,9 @@ In the Administration Console, connector, JMS, and JDBC resources are handled di
 In Payara Server, all communication to an EIS, whether to a message provider or an RDBMS, happens through the Connector architecture.
 To provide JMS infrastructure to clients, Payara Server uses the *Open Message Queue* (OpenMQ) software. To provide JDBC infrastructure to clients, Payara Server uses its own JDBC system resource adapters. Payara Server automatically makes these system resource adapters available to any client that requires them.
 
-For more information about JMS in the Payara Server, see xref:Technical Documentation/Application Development/jms.adoc#using-jakarta-messaging[Using the Java Message Service].
+For more information about JMS in the Payara Server, see xref:Technical Documentation/Application Development/Using Jakarta Messaging.adoc#using-jakarta-messaging[Using the Java Message Service].
 
-For more information about JDBC in the Payara Server, see  xref:Technical Documentation/Application Development/jdbc.adoc#using-the-jdbc-api-for-database-access[Using the JDBC API for Database Access].
+For more information about JDBC in the Payara Server, see xref:Technical Documentation/Application Development/Using the JDBC API for Database Access.adoc#using-the-jdbc-api-for-database-access[Using the JDBC API for Database Access].
 
 [[connector-configuration]]
 === Connector Configuration
@@ -104,7 +105,7 @@ You can override the properties (`config-property` elements) specified in the `r
 
 You can specify configuration properties either before or after resource adapter deployment. If you specify properties after deploying the resource adapter, the existing resource adapter is restarted with the new properties.
 
-You can also use token replacement for overriding resource adapter configuration properties in individual server instances when the resource adapter is deployed to a cluster. For example, for a property called `inboundPort`, you can assign the value `${inboundPort}`. You can then assign a different value to this system property for each server instance. Changes to system properties take effect upon server restart.
+You can also use token replacement for overriding resource adapter configuration properties in individual server instances when the resource adapter is deployed to a cluster. For example, for a property called `inboundPort`, you can assign the value `$\{inboundPort\}`. You can then assign a different value to this system property for each server instance. Changes to system properties take effect upon server restart.
 
 [[testing-a-connector-connection-pool]]
 === Testing a Connector Connection Pool
@@ -196,7 +197,7 @@ asadmin set server.connector-service.class-loading-policy="global"
 
 Transactions that involve multiple resources or multiple participant processes are distributed or global transactions. A global transaction can involve one non-XA resource if last agent optimization is enabled. Otherwise, ALL resources must be XA-aware.
 
-For more information about transactions in Payara Server, see xref:Technical Documentation/Application Development/transaction-service.adoc#using-the-transaction-service[Using the Transaction Service].
+For more information about transactions in Payara Server, see xref:Technical Documentation/Application Development/Using the Transaction Service.adoc#using-the-transaction-service[Using the Transaction Service].
 
 The Jakarta Connectors specification requires that if a resource adapter supports `XATransaction`, the `ManagedConnection` created from that resource adapter must support BOTH distributed and local transactions. Therefore, even if a resource adapter supports `XATransaction`, you can configure its connector connection pools as non-XA or without transaction support for better performance.
 
@@ -234,7 +235,7 @@ A resource adapter supporting inbound communication provides an instance of an `
 WARNING: An endpoint activation fails if the required property values
 are not specified. Values for the properties that are overridden in the message-driven bean's deployment descriptor are applied to the `ActivationSpec` JavaBean when the message-driven bean is deployed.
 
-Administered objects can also be specified for a resource adapter, and these JavaBeans are specific to a messaging style or message provider. For example, some messaging styles may need applications to use special administered objects (such as `Queue` and `Topic` objects in JMS). Applications use these objects to send and synchronously receive messages using connection objects using messaging style APIs. For more information about administered objects,  see xref:Technical Documentation/Application Development/jms.adoc#using-jakarta-messaging[Using the Java Message Service].
+Administered objects can also be specified for a resource adapter, and these JavaBeans are specific to a messaging style or message provider. For example, some messaging styles may need applications to use special administered objects (such as `Queue` and `Topic` objects in JMS). Applications use these objects to send and synchronously receive messages using connection objects using messaging style APIs. For more information about administered objects, see xref:Technical Documentation/Application Development/Using Jakarta Messaging.adoc#using-jakarta-messaging[Using the Java Message Service].
 
 [[outbound-communication-support]]
 == Outbound Communication Support
@@ -260,7 +261,6 @@ they are specific to a messaging provider. In the following sample message-drive
 ----
 <!--  A sample MDB that listens to a JMS Topic -->
 <!-- message-driven bean deployment descriptor -->
-...
  <activation-config>
    <activation-config-property>
      <activation-config-property-name>
@@ -288,7 +288,6 @@ they are specific to a messaging provider. In the following sample message-drive
   </activation-config-property>
  ...
  </activation-config>
-...
 ----
 
 When the message-driven bean is deployed, the value for the `resource-adapter-mid` element in the `glassfish-ejb-jar.xml` file is set to the resource adapter module name that delivers messages to the message endpoint (to the message-driven bean). In the following example, the `jmsra` JMS resource adapter, which is the bundled resource adapter for the Message Queue message provider, is specified as the resource adapter module identifier for the `SampleMDB` bean.
