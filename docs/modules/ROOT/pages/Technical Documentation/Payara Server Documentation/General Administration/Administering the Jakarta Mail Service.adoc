@@ -1,0 +1,148 @@
+[[administering-the-javamail-service]]
+= Administering the Jakarta Mail Service
+:ordinal: 19
+
+Payara Server includes the Jakarta Mail API along with Jakarta Mail service providers that allow an application component to send email notifications over the Internet and to read email from IMAP and POP3 mail servers.
+
+Instructions for accomplishing the tasks in this chapter by using the Administration Console are contained in the Administration Console online help.
+
+[[about-javamail]]
+== About Jakarta Mail
+
+The Jakarta Mail API is a set of abstract APIs that model a mail system. The Jakarta Mail API provides a platform-independent and protocol-independent framework to build mail and messaging applications and provide facilities for reading and sending electronic messages. Service providers implement particular protocols.
+
+Using the API you can add email capabilities to your applications. Jakarta Mail provides access from Java applications to Internet Message Access Protocol (IMAP) and Simple Mail Transfer Protocol (SMTP) capable mail servers on your network or the Internet.
+
+NOTE: The API does not provide mail server functionality; you must have access to a mail server to use Jakarta Mail.
+
+The Jakarta Mail API is implemented as an optional package in the Jakarta platform and is also available as part of the Jakarta EE platform.
+
+To learn more about the Jakarta Mail API, consult the https://jakarta.ee/specifications/mail/2.0/jakarta-mail-spec-2.0.html[Jakarta Mail specification].
+
+[[administering-javamail-resources]]
+== Administering Jakarta Mail Resources
+
+When you create a mail session, the server-side components and applications are enabled to access Jakarta Mail services with JNDI, using the session properties you assign for them. When creating a mail session, you can designate the mail hosts, the transport and store protocols, and the default mail user so that components that use Jakarta Mail do not have to set these properties. Applications that are heavy email users benefit because Payara Server creates a single session object and makes the session available to any component that needs it.
+
+.Jakarta Mail's settings such as the following can be specified:
+[header, cols="2,8"]
+|===
+| Jakarta Mail settings  | Description
+
+| JNDI Name
+| The unique name for the mail session. Use the naming sub-context prefix mail/ for Jakarta Mail resources. For example: `mail/MySession`
+
+| Mail Host
+| The host name of the default mail server. The connect methods of the store and transport objects use this value if a protocol-specific host property is not supplied.
++
+The name must be resolvable to an actual host name.
+
+| Default User
+| The default username to provide when connecting to a mail server. The connect methods of the store and transport objects use this value if a protocol-specific username property is not supplied.
+
+| Default Return Address
+| The email address of the default user, in the form: `username@host.domain`.
+
+| Description
+| A descriptive statement for the component.
+
+| Session
+| Indicates whether the mail session is enabled or disabled at this time
+
+|===
+
+[[to-create-a-javamail-resource]]
+=== To Create a Jakarta Mail Resource
+
+Use the `create-javamail-resource` subcommand in remote mode to create a Jakarta Mail session resource. The JNDI name for a Jakarta Mail session resource customarily includes the mail/ naming subcontext, For example: `mail/MyMailSession.`
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. Create a Jakarta Mail resource by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-javamail-resource.adoc[`create-javamail-resource`] subcommand.
+Information about the properties for the subcommand is included in this help page.
+. To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+==== Example - Creating a Jakarta Mail Resource
+
+[source,shell]
+----
+asadmin> create-javamail-resource --mailhost localhost
+--mailuser sample --fromaddress sample\@sun\.com mail/MyMailSession
+Command create-javamail-resource executed successfully.
+----
+This example creates a Jakarta Mail resource named `mail/MyMailSession`. The escape character (\) is used in the `--fromaddress` option to distinguish the dot (.) and at sign (@).
+
+[[to-list-javamail-resources]]
+=== To List JavaMail Resources
+
+Use the `list-javamail-resources` subcommand in remote mode to list the existing JavaMail session resources.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. List the Jakarta Mail resources by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-javamail-resources.adoc[`list-javamail-resources`] subcommand.
+
+==== Example - Listing Jakarta Mail Resources
+
+[source,shell]
+----
+asadmin> list-javamail-resources
+mail/MyMailSession
+Command list-javamail-resources executed successfuly.
+----
+This example lists the Jakarta Mail resources on `localhost`.
+
+[[to-update-a-javamail-resource]]
+=== To Update a Jakarta Mail Resource
+
+. List the Jakarta Mail resources by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-javamail-resources.adoc[`list-javamail-resources`] subcommand.
+. Modify the values for the specified Jakarta Mail source by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand. The resource is identified by its dotted name.
+
+==== Example - Updating a Jakarta Mail Resource
+
+[source,shell]
+----
+asadmin> set server.resources.mail-resource.mail/
+MyMailSession.user=joeserver.resources.mail-resource.mail/
+MyMailSession.user=joe
+Command set executed successfully.
+----
+This example changes `joeserver` to `joe`.
+
+[[to-delete-a-javamail-resource]]
+=== To Delete a Jakarta Mail Resource
+
+Use the `delete-javamail-resource` subcommands in remote mode to delete a Jakarta Mail session resource.
+
+References to the specified resource must be removed before running the `delete-javamail-resource` subcommands.
+
+. Ensure that the server is running. Remote subcommands require a running server.
+. List the Jakarta Mail resources by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-javamail-resources.adoc[`list-javamail-resources`] subcommands.
+. Delete a Jakarta Mail resource by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-javamail-resource.adoc[`delete-javamail-resource`] subcommands.
+. To apply your changes, restart Payara Server. xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
+
+==== Example - Deleting a Jakarta Mail Resource
+
+[source,shell]
+----
+asadmin> delete-javamail-resource mail/MyMailSession
+Command delete-javamail-resource executed successfully.
+----
+
+This example deletes the Jakarta Mail session resource named `mail/MyMailSession`.
+
+[[from-the-admin-console]]
+== Configure a Jakarta Mail session from the Admin Console
+
+Jakarta Mail sessions are added from the `Resources` tab on the left pane of the Admin Console.
+
+Select `New` on the `Sessions` table to create a new Jakarta Mail session:
+
+image:mail/admin-console-javamail-location.png[image]
+
+Emails will be sent with a return address of `example@example.com`, using `SMTP` to send mail and `IMAP` to retrieve mail. With the current implementation of the Jakarta Mail API there is no alternative transport protocol provided by default, though as an alternative to the default store protocol of `imap`, `pop3` is available.
+
+Typically, when setting up `SMTP` access, three additional properties must be specified in the Additional Properties table: enabling `startTLS`, enabling authentication, and the password.
+
+These allow for extra security when sending emails and will not always be required - check with your email provider for their specific configuration.
+
+The example below shows the configuration of a mail host:
+
+image:mail/admin-console-javamail-configuration.png[image]

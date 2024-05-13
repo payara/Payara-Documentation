@@ -1,5 +1,6 @@
 [[administering-the-java-message-service-jms]]
 = Administering the Java Message Service (JMS)
+:ordinal: 20
 
 The Java Message Service (JMS) API is a messaging standard that allows Jakarta EE applications and components, including message-driven beans (MDBs), to create, send, receive, and read messages. It enables distributed communication that is loosely coupled, reliable, and asynchronous.
 
@@ -21,7 +22,7 @@ JMS Hosts::
   * Embedded type, in which the JMS host runs in the same JVM as the Payara instance; its configuration and lifecycle are managed by the JMS service
   * Local type, in which the JMS host runs separately on the same host as the Payara instance; its configuration and lifecycle are managed by the JMS service
   * Remote type, in which the JMS host represents a Message Queue broker or broker cluster that is external to the JMS service; its operation is managed using Message Queue administrative tools +
-  For more information about JMS host types, see xref:Technical Documentation/Payara Server Documentation/General Administration/jms.adoc#about-jms-host-types[About JMS Host Types].
+  For more information about JMS host types, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#about-jms-host-types[About JMS Host Types].
 JMS Connection Factory Resources::
   JMS connection factory resources house the information that applications use to connect to a JMS provider. For each JMS connection factory, the JMS service automatically maintains a Payara connector resource and a Payara connector connection pool in order to support connection pooling and fail-over.
 JMS Destination Resources::
@@ -52,7 +53,7 @@ The attributes you can set are:
 
 `type`::
   The JMS host type the service is to use. Available choices are
-  `EMBEDDED`, `LOCAL` and `REMOTE`. See xref:Technical Documentation/Payara Server Documentation/General Administration/jms.adoc#about-jms-host-types[About JMS Host Types] for more information.
+  `EMBEDDED`, `LOCAL` and `REMOTE`. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#about-jms-host-types[About JMS Host Types] for more information.
 `init-timeout-in-seconds`::
   The number of seconds Payara Server waits for the JMS service to start before aborting the startup.
 `start-args`::
@@ -301,7 +302,7 @@ Payara Server provides the following types of destination objects: +
 * `Topic` objects, used for publish-subscribe communication
 
 The subcommands in this section can be used to administer both the connection factory resources and the destination resources.
-For information on JMS service support of connection pooling and failover, see xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring JMS High Availability.adoc#connection-failover[Connection Failover] in the Payara Server High Availability section. For instructions on administering physical destinations, see xref:Technical Documentation/Payara Server Documentation/General Administration/jms.adoc#administering-jms-physical-destinations[Administering JMS Physical Destinations].
+For information on JMS service support of connection pooling and failover, see xref:Technical Documentation/Payara Server Documentation/High Availability/Configuring JMS High Availability.adoc#connection-failover[Connection Failover] in the Payara Server High Availability section. For instructions on administering physical destinations, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#administering-jms-physical-destinations[Administering JMS Physical Destinations].
 
 [[to-create-a-connection-factory-or-destination-resource]]
 === To Create a Connection Factory or Destination Resource
@@ -313,15 +314,15 @@ Use the `create-jms-resource` command in remote `asadmin` mode to create a JMS c
 TIP: To specify the `addresslist` property (in the format `host:mqport,host2:mqport,host3:mqport`) for the `asadmin create-jms-resource` command, escape the : by using `\\`. For example, `host1\\:mqport,host2\\:mqport,host3\\:mpqport`.
 
 To update a JMS connection factory, use the `set` subcommand for the underlying connector connection pool,
-See xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#to-update-a-connector-connection-pool[To Update a Connector Connection Pool].
+See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#to-update-a-connector-connection-pool[To Update a Connector Connection Pool].
 
-To update a destination, use the `set` subcommand for the admin object resource. See xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#to-update-an-administered-object[To Update an Administered Object].
+To update a destination, use the `set` subcommand for the admin object resource. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#to-update-an-administered-object[To Update an Administered Object].
 
 . Ensure that the server is running. Remote `asadmin` subcommands require a running server.
 . Create a JMS resource by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-jms-resource.adoc[`create-jms-resource`] command. +
 Information about the properties for the subcommand is included in this help page.
 . If needed, restart the server. +
-Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-17-5-creating-a-jms-connection-factory]]
 ==== *Example 17-5 Creating a JMS Connection Factory*
@@ -411,7 +412,7 @@ Command delete-jms-resource executed successfully
 [[administering-jms-physical-destinations]]
 == Administering JMS Physical Destinations
 
-Messages are delivered for routing and delivery to consumers by using physical destinations in the JMS provider. A physical destination is identified and encapsulated by an administered object (such as a `Topic` or `Queue` destination resource) that an application component uses to specify the destination of messages it is producing and the source of messages it is consuming. For instructions on configuring a destination resource, see xref:Technical Documentation/Payara Server Documentation/General Administration/jms.adoc#to-create-a-connection-factory-or-destination-resource[To Create a Connection Factory or Destination Resource].
+Messages are delivered for routing and delivery to consumers by using physical destinations in the JMS provider. A physical destination is identified and encapsulated by an administered object (such as a `Topic` or `Queue` destination resource) that an application component uses to specify the destination of messages it is producing and the source of messages it is consuming. For instructions on configuring a destination resource, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#to-create-a-connection-factory-or-destination-resource[To Create a Connection Factory or Destination Resource].
 
 If a message-driven bean is deployed and the physical destination it listens to does not exist, Payara Server automatically creates the physical destination and sets the value of the `maxNumActiveConsumers` property to `-1`. However, it is good practice to create the physical destination beforehand. The first time that an application accesses a destination resource, Message Queue automatically creates the physical destination specified by the Name property of the destination resource. This automatically created physical destination is temporary and expires after a period specified by a Message Queue configuration property, provided that there are no messages in it and no message producers or consumers connected to it.
 
@@ -424,7 +425,7 @@ Because a physical destination is actually a Message Queue object rather than a 
 
 . Ensure that the server is running. Remote `asadmin` subcommands require a running server.
 . Create a JMS physical destination by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-jmsdest.adoc[`create-jmsdest`] subcommand. Information about the properties for the subcommand is included in this help page.
-. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 
 [[example-17-10-creating-a-jms-physical-destination]]
@@ -464,7 +465,7 @@ Use the `flush-jmsdest` subcommand in remote `asadmin` mode to purge the message
 
 . Ensure that the server is running. Remote `asadmin` subcommands require a running server.
 . Purge messages from the JMS physical destination by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/flush-jmsdest.adoc[`flush-jmsdest`] subcommand.
-. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see  xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see  xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 ==== *Example 17-12 Flushing Messages From a JMS Physical Destination*
 [source,shell]

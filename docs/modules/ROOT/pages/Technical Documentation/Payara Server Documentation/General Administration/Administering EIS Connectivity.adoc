@@ -1,5 +1,6 @@
 [[administering-eis-connectivity]]
 = Administering EIS Connectivity
+:ordinal: 15
 
 This chapter provides information and procedures for administering connections to enterprise information system (EIS) data in the Payara Server environment by using the `asadmin` command-line utility.
 
@@ -7,7 +8,7 @@ NOTE: If you installed the Web Profile, connector modules that use only outbound
 
 Instructions for accomplishing the tasks in this chapter by using the Administration Console are contained in the Administration Console online help.
 
-For information about database connectivity, see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc[Administering Database Connectivity].
+For information about database connectivity, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc[Administering Database Connectivity].
 
 [[about-eis-connectivity]]
 == About EIS Connectivity
@@ -18,17 +19,17 @@ The key elements of EIS connectivity are the following:
 
 * *Connector Module*. A connector module also called a resource adapter, is a Jakarta EE component that enables applications to interact with EIS software. A connector module is used by Payara Server to implement Java Message Service (JMS). Like other Jakarta EE modules, a connector module is installed when it is deployed. For instructions on creating a connector module, see xref:ROOT:Technical Documentation/Application Development/connectors.adoc[Developing Connectors] in the Payara Server Application Development section.
 
-* *Connector Connection Pool*. A connector connection pool is a group of reusable connections for a particular EIS. A connector connection pool is created when you specify the connector module that is associated with the pool. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#administering-connector-connection-pools[Administering Connector Connection Pools].
+* *Connector Connection Pool*. A connector connection pool is a group of reusable connections for a particular EIS. A connector connection pool is created when you specify the connector module that is associated with the pool. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-connector-connection-pools[Administering Connector Connection Pools].
 
-* *Connector Resource*. A connector resource is a program object that provides an application with a connection to an EIS. A connector resource is created when you specify its JNDI name and its associated connection pool. The JNDI name of a connector resource for an EIS is usually in the `java:comp/env/`eis-specific` subcontext. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#administering-connector-resources[Administering Connector Resources].
+* *Connector Resource*. A connector resource is a program object that provides an application with a connection to an EIS. A connector resource is created when you specify its JNDI name and its associated connection pool. The JNDI name of a connector resource for an EIS is usually in the `java:comp/env/eis-specific` subcontext. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-connector-resources[Administering Connector Resources].
 
-* *Connector Module Configuration*. A connector module configuration is the information that resides in the domain configuration file (`domain.xml`) for the particular connector module (resource adapter). For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#administering-the-resource-adapter-configuration[Administering the Resource Adapter Configuration].
+* *Connector Module Configuration*. A connector module configuration is the information that resides in the domain configuration file (`domain.xml`) for the particular connector module (resource adapter). For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-the-resource-adapter-configuration[Administering the Resource Adapter Configuration].
 
-* *Connector Security Map*. A connector security map associates the caller identity of the application (principal or user group) to a suitable EIS principal or group. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#administering-connector-security-maps[Administering Connector Security Maps].
+* *Connector Security Map*. A connector security map associates the caller identity of the application (principal or user group) to a suitable EIS principal or group. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-connector-security-maps[Administering Connector Security Maps].
 
-* *Connector Work Security Map*. A connector work security map associates the caller identity of the work submitted by the connector module (resource adapter) EIS principal or EIS user group to a suitable principal or user group in the Payara Server security domain. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#administering-connector-work-security-maps[Administering Connector Work Security Maps].
+* *Connector Work Security Map*. A connector work security map associates the caller identity of the work submitted by the connector module (resource adapter) EIS principal or EIS user group to a suitable principal or user group in the Payara Server security domain. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-connector-work-security-maps[Administering Connector Work Security Maps].
 
-* *Administered Object*. An administered object provides specialized functionality for an application, such as providing access to a parser that is specific to the connector module and its associated EIS. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#administering-administered-objects[Administering Administered Objects].
+* *Administered Object*. An administered object provides specialized functionality for an application, such as providing access to a parser that is specific to the connector module and its associated EIS. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-administered-objects[Administering Administered Objects].
 
 At runtime, the following sequence occurs when an application connects to an EIS:
 
@@ -46,7 +47,6 @@ asadmin help create-connector-connection-pool
 ----
 --
 
-
 [[administering-connector-connection-pools]]
 == Administering Connector Connection Pools
 
@@ -59,7 +59,7 @@ Use the `create-connector-connection-pool` subcommand in remote mode to create a
 
 Multiple connector resources can specify a single connection pool.
 
-Creating a connector connection pool is a dynamic event and does not require server restart. However, there are some parameters that do require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
+Creating a connector connection pool is a dynamic event and does not require server restart. However, there are some parameters that do require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
 
 Before creating the connector connection pool, the connector must be installed.
 
@@ -67,9 +67,9 @@ Before creating the connector connection pool, the connector must be installed.
 
 . Create the connector connection pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-connection-pool.adoc[`create-connector-connection-pool`] subcommand. Information about properties for the subcommand is included in this help page.
 
-. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
-. You can verify that a connection pool is usable by using the `ping-connection-pool` subcommand. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#to-contact-ping-a-connection-pool[To Contact (Ping) a Connection Pool].
+. You can verify that a connection pool is usable by using the `ping-connection-pool` subcommand. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-contact-ping-a-connection-pool[To Contact (Ping) a Connection Pool].
 
 .Example 12-1 Creating a Connector Connection Pool
 [source,shell]
@@ -102,7 +102,7 @@ Command list-connector-connection-pools executed successfully
 [[to-connect-to-ping-or-reset-flush-a-connector-connection-pool]]
 === To Connect to (Ping) or Reset (Flush) a Connector Connection Pool
 
-Use the `ping-connection-pool` or `flush-connection-pool` subcommands in remote mode to perform these tasks on a connection pools. See xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#to-contact-ping-a-connection-pool[To Contact (Ping) a Connection Pool] or xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#to-reset-flush-a-connection-pool[To Reset (Flush) a Connection Pool] for instructions.
+Use the `ping-connection-pool` or `flush-connection-pool` subcommands in remote mode to perform these tasks on a connection pools. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-contact-ping-a-connection-pool[To Contact (Ping) a Connection Pool] or xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-reset-flush-a-connection-pool[To Reset (Flush) a Connection Pool] for instructions.
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
@@ -131,7 +131,7 @@ asadmin> set domain.resources.connector-connection-pool
 .conectionpoolname.validate-atmost-once-period-in-seconds=3
 ----
 
-. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[to-delete-a-connector-connection-pool]]
 === To Delete a Connector Connection Pool
@@ -163,15 +163,15 @@ A connector resource provides an application or module with the means of connect
 
 Use the `create-connector-resource` subcommand in remote mode to register a new connector resource with its JNDI name.
 
-Creating a connector resource is a dynamic event and does not require server restart. However, there are some parameters that do require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
+Creating a connector resource is a dynamic event and does not require server restart. However, there are some parameters that do require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
 
-Before creating a connector resource, you must first create a connector connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
+Before creating a connector resource, you must first create a connector connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
 . Create the connector resource by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-resource.adoc[`create-connector-resource`] subcommand. Information about properties for the subcommand is included in this help page.
 
-. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 .Example 12-4 Creating a Connector Resource
 [source,shell]
@@ -220,7 +220,7 @@ asadmin> get domain.resources.connector-resource.jms/qConnFactory
 asadmin> set domain.resources.connector-resource.jms/qConnFactory.enabled=true
 ----
 
-. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[to-delete-a-connector-resource]]
 === To Delete a Connector Resource
@@ -337,14 +337,14 @@ Use the `create-connector-security-map` subcommand in remote mode to create a se
 
 You can also use this subcommand to map the caller identity of the application (principal or user group) to a suitable EIS principal in container-managed authentication scenarios.
 
-For this subcommand to succeed, you must have first created a connector connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
+For this subcommand to succeed, you must have first created a connector connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
 . Create a connector security map by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-security-map.adoc[`create-connector-security-map`] subcommand. Information about the options for the subcommand is included in this help page.
 
-. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If
-your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If
+your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 .Example 12-10 Creating a Connector Security Map
 [source,shell]
@@ -406,7 +406,7 @@ Remote subcommands require a running server.
 . Modify a security map for a specific connector connection pool by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/update-connector-security-map.adoc[`update-connector-security-map`] subcommand.
 
 . If needed, restart the server.
-Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see  xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see  xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 .Example 12-14 Updating a Connector Security Map
 [source,shell]
@@ -448,13 +448,13 @@ Use the `create-connector-work-security-map` subcommand in remote mode to map th
 
 The connector security map configuration supports the use of the wild card asterisk (*) to indicate all users or all user groups.
 
-Before creating a connector work security map, you must first create a connector connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
+Before creating a connector work security map, you must first create a connector connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#to-create-a-connector-connection-pool[To Create a Connector Connection Pool].
 
 . Ensure that the server is running. Remote subcommands require a running server.
 
 . Create the connector work security map by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-connector-work-security-map.adoc[`create-connector-work-security-map`] subcommand. Information about properties for the subcommand is included in this help page.
 
-. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 .Example 12-16 Creating Connector Work Security Maps
 [source,shell]
@@ -546,8 +546,8 @@ The resource adapter must be deployed before running this subcommand (`jmsrar.ra
 
 . Create an administered object by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-admin-object.adoc[`create-admin-object`] subcommand. Information about properties for the subcommand is included in this help page.
 
-. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If
-your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If
+your server needs to be restarted, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 .Example 12-20 Creating an Administered Object
 [source,shell]
@@ -597,8 +597,8 @@ asadmin> get domain.resources.admin-object-resource.jms/samplequeue.*
 asadmin> set domain.resources.admin-object-resource.jms/samplequeue.enabled=false
 ----
 
-. If needed, restart the server. Some properties require server restart. See see xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If
-your server needs to be restarted, see see xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. If needed, restart the server. Some properties require server restart. See see xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart]. If
+your server needs to be restarted, see see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[to-delete-an-administered-object]]
 === To Delete an Administered Object

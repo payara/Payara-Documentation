@@ -1,5 +1,6 @@
 [[administering-web-applications]]
 = Administering Web Applications
+:ordinal: 22
 
 This chapter explains how to administer web applications in the Payara Server environment.
 
@@ -90,7 +91,7 @@ You can use the Administration Console to edit the `default-web.xml` file, or ed
 
 . Place the JAR file for the filter, security constraint, or other feature in the domain-dir`/lib` directory.
 . Edit the domain-dir`/config/default-web.xml` file to refer to the JAR file.
-. To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[redirecting-a-url]]
 == Redirecting a URL
@@ -133,8 +134,8 @@ When you use the `jk-enabled` attribute of the network listener, you do not need
 * For information on installing `mod_jk`, see `http://tomcat.apache.org/connectors-doc/webserver_howto/apache.html`.
 . Configure the following files:
 * `apache2/conf/httpd.conf`, the main Apache configuration file
-* `apache2/conf/workers.properties` xref:Technical Documentation/Payara Server Documentation/General Administration/webapps.adoc#example-6-4[Example 6-4] and
-xref:Technical Documentation/Payara Server Documentation/General Administration/webapps.adoc#example-6-5[Example 6-5] provide examples of configuring these two files.
+* `apache2/conf/workers.properties` xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Web Applications.adoc#example-6-4[Example 6-4] and
+xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Web Applications.adoc#example-6-5[Example 6-5] provide examples of configuring these two files.
 . Start Apache HTTP Server (`httpd`).
 . Start Payara Server with at least one web application deployed. +
 In order for the `mod_jk`-enabled network listener to start listening for requests, the web container must be started. Normally, this is achieved by deploying a web application.
@@ -159,7 +160,7 @@ jk-connector.jk-configuration-file=domain-dir/config/glassfish-jk.properties
 asadmin> set configs.config.server-config.thread-pools.thread-pool.\
 http-thread-pool.max-thread-pool-size=value
 ----
-. To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+. To apply your changes, restart Payara Server. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 [[example-6-4]]
 ==== *Example 6-4 `httpd.conf` File for `mod_jk`*
@@ -189,7 +190,7 @@ JkMount /glassfish-test/* worker1
 [[example-6-5]]
 ==== *Example 6-5 `workers.properties` File for `mod_jk`*
 
-This example shows a `workers.properties` that is set for `mod_jk`. This `workers.properties` file is referenced in the second line of xref:Technical Documentation/Payara Server Documentation/General Administration/webapps.adoc#example-6-4[Example 6-4].
+This example shows a `workers.properties` that is set for `mod_jk`. This `workers.properties` file is referenced in the second line of xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Web Applications.adoc#example-6-4[Example 6-4].
 
 [source,text]
 ----
@@ -212,8 +213,8 @@ Load balancing is the process of dividing the amount of work that a computer has
 In order to support stickiness, the Apache `mod_jk` load balancer relies on a `jvmRoute` system property that is included in any `JSESSIONID` received by the load balancer. This means that every Payara Server instance that is front-ended by the Apache load balancer must be configured with a unique
 `jvmRoute` system property.
 
-.  On each of the instances, perform the steps in  xref:Technical Documentation/Payara Server Documentation/General Administration/webapps.adoc#to-enable-mod_jk[To Enable `mod_jk`]. +
-If your instances run on the same machine, you must choose different JK ports. The ports must match `worker.worker*.port` in your `workers.properties` file. See the properties file in xref:Technical Documentation/Payara Server Documentation/General Administration/webapps.adoc#example-6-5[Example 6-5].
+.  On each of the instances, perform the steps in  xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Web Applications.adoc#to-enable-mod_jk[To Enable `mod_jk`]. +
+If your instances run on the same machine, you must choose different JK ports. The ports must match `worker.worker*.port` in your `workers.properties` file. See the properties file in xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Web Applications.adoc#example-6-5[Example 6-5].
 
 . On each of the instances, create the `jvmRoute` system property of Payara Server by using the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-jvm-options.adoc[`create-jvm-options`] subcommand. +
 Use the following format:
@@ -346,9 +347,9 @@ This procedure does not enable SSL transfer between `mod_jk` and Payara Server. 
 
 Before You Begin, The self-signed certificate must be configured.
 
-. Perform the steps in xref:Technical Documentation/Payara Server Documentation/General Administration/webapps.adoc#to-enable-mod_jk[To Enable `mod_jk`].
+. Perform the steps in xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Web Applications.adoc#to-enable-mod_jk[To Enable `mod_jk`].
 . Start another Payara Server with at least one web application deployed. In order for the `mod_jk`-enabled network listener to start listening for requests, the web container must be started. Normally, this is achieved by deploying a web application.
-. Follow instructions from xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#to-configure-an-http-listener-for-ssl[To Configure and HTTP Listener for SSL] on the `mod_jk` connector. +
+. Follow instructions from xref:Technical Documentation/Payara Server Documentation/General Administration/Administering HTTP Connectivity.adoc#to-configure-an-http-listener-for-ssl[To Configure and HTTP Listener for SSL] on the `mod_jk` connector. +
 Use the following format:
 +
 [source,shell]
@@ -426,7 +427,7 @@ asadmin> set configs.config.server-config.thread-pools.thread-pool.\
 http-thread-pool.max-thread-pool-size=value
 ----
 . To apply your changes, restart Payara Server. +
-See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 * For more information on Apache, see `http://httpd.apache.org/`.
 * For more information on the Apache `mod_proxy_ajp` Connector, see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html and https://httpd.apache.org/docs/2.4/mod/mod_proxy_ajp.html.
@@ -514,6 +515,6 @@ AJP_INSTANCE_NAME=instance3
 In this example, `instance1`, `instance2` and `instance3` are the names of the Payara Server instances in the cluster.
 
 . To apply your changes, restart Payara Server.
-See xref:Technical Documentation/Payara Server Documentation/General Administration/domains.adoc#to-restart-a-domain[To Restart a Domain].
+See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Domains.adoc#to-restart-a-domain[To Restart a Domain].
 
 

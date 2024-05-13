@@ -1,5 +1,6 @@
 [[administering-transactions]]
 = Administering Transactions
+:ordinal: 22
 
 This chapter discusses how to manage the transaction service for the Payara Server environment by using the `asadmin` command-line utility.
 Instructions for manually recovering transactions are also included.
@@ -46,7 +47,7 @@ transaction completion, and recovery work. An example of such a resource manager
 * *Resource Adapter*. A system-level software library is used by Payara Server or a client to connect to a resource manager. A resource adapter
 is typically specific to a resource manager. The resource adapter is available as a library and is used within the address space of the client using it.
 An example of such a resource adapter is a Java Database Connectivity (JDBC) driver. For information on supported JDBC drivers,
-see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
+see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 
 * *Transactional User Application*. In the Payara Server environment, the transactional user application uses Java Naming and Directory Interface (JNDI)
 to look up transactional data sources and, optionally, the user transaction).
@@ -63,14 +64,14 @@ There are three types of transaction resource managers:
 see xref:ROOT:Technical Documentation/Application Development/transaction-service.adoc#using-jdbc-transaction-isolation-levels[Using JDBC Transaction Isolation Levels] in
 the Payara Server Application Development section. +
 The Payara Server supports a variety of JDBC XA drivers. For configurations of supported and other drivers,
-see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
+see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 
 * *Java Message Service (JMS) Providers* - Use of transactions ensures that messages are reliably delivered. The Payara Server is integrated with Open Message Queue,
 a fully capable JMS provider. For more information about transactions and the JMS API,
-see xref:Technical Documentation/Payara Server Documentation/General Administration/jms.adoc#administering-the-java-message-service-jms[Administering the Java Message Service (JMS)].
+see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#administering-the-java-message-service-jms[Administering the Java Message Service (JMS)].
 
 * *J2EE Connector Architecture (CA) components* - Use of transactions prevents legacy EIS systems from being left in inconsistent states due to incomplete updates.
-For more information about connectors, see xref:Technical Documentation/Payara Server Documentation/General Administration/connectors.adoc#administering-eis-connectivity[Administering EIS Connectivity].
+For more information about connectors, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering EIS Connectivity.adoc#administering-eis-connectivity[Administering EIS Connectivity].
 
 [[transaction-scope]]
 === Transaction Scope
@@ -92,7 +93,7 @@ to commit two or more resources.
 Transactions that involve multiple resources or multiple participant processes are distributed or global transactions.
 A global transaction can involve one non-XA resource if last agent optimization is enabled. Otherwise, all resources must be XA.
 The `use-last-agent-optimization` property is set to `true` by default. For details about how to set this property,
-see xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#configuring-the-transaction-service[Configuring the Transaction Service].
+see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Transactions.adoc#configuring-the-transaction-service[Configuring the Transaction Service].
 
 If only one XA resource is used in a transaction, one-phase commit occurs, otherwise the transaction is coordinated with a two-phase commit protocol.
 
@@ -134,7 +135,7 @@ server-config.transaction-service.property.disable-distributed-transaction-loggi
 server-config.transaction-service.property.xaresource-txn-timeout = 0
 server-config.transaction-service.property.pending-txn-cleanup-interval = -1
 server-config.transaction-service.property.use-last-agent-optimization = true
-server-config.transaction-service.property.delegated-recovery = false 
+server-config.transaction-service.property.delegated-recovery = false
 server-config.transaction-service.property.wait-time-before-recovery-insec = 60
 server-config.transaction-service.property.purge-cancelled-transactions-after = 0
 server-config.transaction-service.property.commit-one-phase-during-recovery = false
@@ -215,10 +216,10 @@ Use the `rollback-transaction` subcommand in remote mode to roll back a specific
 asadmin> set cluster1-config.monitoring-service.module-monitoring-levels.transaction-service=HIGH
 ----
 . Use the `freeze-transaction-service` subcommand to halt in-process
-transactions. See xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#to-stop-the-transaction-service[To Stop the Transaction Service].
+transactions. See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Transactions.adoc#to-stop-the-transaction-service[To Stop the Transaction Service].
 . Identify the ID of the transaction you want to roll back. +
 To see a list of IDs of active transactions, use the `get` subcommand with the `--monitor` option to get the monitoring data for the `activeids` statistic.
-See xref:Technical Documentation/Payara Server Documentation/General Administration/monitoring.adoc#transaction-service-statistics[Transaction Service Statistics]. For example:
+See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Monitoring Service.adoc#transaction-service-statistics[Transaction Service Statistics]. For example:
 +
 [source,shell]
 ----
@@ -290,7 +291,7 @@ Payara Server can perform automatic recovery in these ways:
 * Periodic automatic recovery is performed by a background thread if the `pending-txn-cleanup-interval` property is set to a positive value.
 
 Changing these settings requires a server restart. For more information about how to change these settings,
-see xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#configuring-the-transaction-service[Configuring the Transaction Service].
+see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Transactions.adoc#configuring-the-transaction-service[Configuring the Transaction Service].
 If commit fails during recovery, a message is written to the server log.
 
 [[to-manually-recover-transactions]]
@@ -304,7 +305,7 @@ If a standalone server fails, only the full startup recovery process can recover
 
 For an installation of multiple server instances, you can use manual transaction recovery from a surviving server instance to recover transactions after a server failure.
 For manual transaction recovery to work properly, transaction logs must be stored on a shared file system that is accessible to all server instances.
-See xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#transaction-logging[Transaction Logging].
+See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Transactions.adoc#transaction-logging[Transaction Logging].
 
 When you execute `recover-transactions` in non-delegated mode, you can recover transactions that didn't complete two-phase commit because of a resource crash.
 To use manual transaction recovery in this way, the following conditions must be met:
@@ -334,10 +335,10 @@ Transaction recovered.
 === Distributed Transaction Recovery
 
 To enable cluster-wide automatic recovery, you must first facilitate storing of transaction logs in a shared file system.
-See xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#transaction-logging[Transaction Logging].
+See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Transactions.adoc#transaction-logging[Transaction Logging].
 
 Next, you must set the transaction service's `delegated-recovery` property to `true` (the default is `false`). For information about setting
-`tx-log-dir` and `delegated-recovery`, see xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#configuring-the-transaction-service[Configuring the Transaction Service].
+`tx-log-dir` and `delegated-recovery`, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Transactions.adoc#configuring-the-transaction-service[Configuring the Transaction Service].
 
 [[recovery-workarounds-and-limitations]]
 === Recovery Workarounds and Limitations
@@ -372,10 +373,10 @@ You must configure the following `grant` statements in your Oracle database to s
 
 [source,text]
 ----
-grant select on SYS.DBA_PENDING_TRANSACTIONS to user; 
-grant execute on SYS.DBMS_SYSTEM to user; 
-grant select on SYS.PENDING_TRANS$ to user; 
-grant select on SYS.DBA_2PC_NEIGHBORS to user; 
+grant select on SYS.DBA_PENDING_TRANSACTIONS to user;
+grant execute on SYS.DBMS_SYSTEM to user;
+grant select on SYS.PENDING_TRANS$ to user;
+grant select on SYS.DBA_2PC_NEIGHBORS to user;
 grant execute on SYS.DBMS_XA to user;
 grant select on SYS.DBA_2PC_PENDING to user;
 ----
@@ -391,7 +392,7 @@ The `XAResource.commit` method also has some issues.
 
 To disable the Payara Server workaround, set the
 `oracle-xa-recovery-workaround` property value to `false`. For details
-about how to set this property, see xref:Technical Documentation/Payara Server Documentation/General Administration/transactions.adoc#configuring-the-transaction-service[Configuring the Transaction Service].
+about how to set this property, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Transactions.adoc#configuring-the-transaction-service[Configuring the Transaction Service].
 This workaround is used unless explicitly disabled.
 
 [[delegated-recovery-after-server-crash-doesnt-work-on-mysql]]
@@ -424,7 +425,7 @@ The transaction service writes transactional activity into transaction logs so t
 asadmin> create-system-properties --target server TX-LOG-DIR=/inst1/logs
 ----
 For information about setting `log-root` and other general logging settings,
-see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#administering-the-logging-service[Administering the Logging Service].
+see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#administering-the-logging-service[Administering the Logging Service].
 
 * Turn off transaction logging by setting the `disable-distributed-transaction-logging` property to `true` and the `automatic-recovery` attribute to `false`.
 Do this only if performance is more important than transaction recovery.

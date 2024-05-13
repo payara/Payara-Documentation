@@ -1,5 +1,6 @@
 [[administering-the-logging-service]]
 = Administering the Logging Service
+:ordinal: 7
 
 This chapter provides instructions on how to configure logging and how to view log information in the Payara Server environment.
 
@@ -65,12 +66,12 @@ as-install-parent directory
                                          server.log
 ----
 
-You can change the default name or location of a log file by modifying the logging properties file for the corresponding instance, described in xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#to-change-the-name-and-location-of-the-log-file[To Change the Name and Location of the Log File].
+You can change the default name or location of a log file by modifying the logging properties file for the corresponding instance, described in xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#to-change-the-name-and-location-of-the-log-file[To Change the Name and Location of the Log File].
 
 [[log-records]]
 ==== *Log Records*
 
-Payara Server writes log records in either the Oracle Diagnostics Logging (ODL) format or the Uniform Log Formatter (ULF) format. The default format is ODL. For information about changing the format, see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#setting-the-log-file-format[Setting the Log File Format].
+Payara Server writes log records in either the Oracle Diagnostics Logging (ODL) format or the Uniform Log Formatter (ULF) format. The default format is ODL. For information about changing the format, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#setting-the-log-file-format[Setting the Log File Format].
 
 A custom formatter can also be used by specifying the fully qualified name of a class that extends the `java.util.logging.Formatter` class. The custom formatter class can be packaged in a JAR file and placed in the `domain-dir/lib/ext` directory, or implemented as a Hundred-Kilobyte Kernel (HK2) service and the JAR containing the formatter implementation placed in the `as-install/modules` directory.
 
@@ -131,14 +132,14 @@ The following is an example of a log record formatted in the ULF format:
 [#|2013-04-18T09:27:44.315-0700|INFO|Payara Server {page-version}|jakarta.enterprise.web.core| _ThreadID=15;_ThreadName=RunLevelControllerThread-1366302462682;_TimeMillis=1366302464315;_LevelValue=800;_MessageID=AS-WEB-CORE-00306;| Setting JAAS app name glassfish-web|#]
 ----
 
-The Administration Console presents log records in a more readable display. For information about viewing log records using the Administration Console, see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#viewing-log-records[Viewing Log Records].
+The Administration Console presents log records in a more readable display. For information about viewing log records using the Administration Console, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#viewing-log-records[Viewing Log Records].
 
 [[log-rotation]]
 ==== *Log Rotation*
 
 By default, when a log file grows to 2 MB, Payara Server renames (rotates) the file to incorporate a timestamp and creates a new log file. The log file is renamed as `server.log` date, where date is the date and time that the file was rotated.
 
-You can configure the logging service to change the default settings for log file rotation, as explained in xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#setting-log-file-rotation[Setting Log File Rotation].
+You can configure the logging service to change the default settings for log file rotation, as explained in xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#setting-log-file-rotation[Setting Log File Rotation].
 
 [[logger-namespaces]]
 === Logger Namespaces
@@ -203,8 +204,8 @@ org.glassfish.wasp      <INFO>
 org.jvnet.hk2.osgiadapter       <INFO>
 ----
 
-For information about how to display logger namespaces and log levels, see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#to-list-log-levels[To List Log Levels].
-For information about how to display a list of loggers and logger details, see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#to-list-loggers[To List Loggers].
+For information about how to display logger namespaces and log levels, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#to-list-log-levels[To List Log Levels].
+For information about how to display a list of loggers and logger details, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#to-list-loggers[To List Loggers].
 
 [[logging-targets]]
 === Logging Targets
@@ -327,7 +328,7 @@ This example changes the name of the cluster log file for `Cluster1` to `cluster
 asadmin list-log-attributes Cluster1
 
 com.sun.enterprise.server.logging.GFFileHandler.alarms <false>
-com.sun.enterprise.server.logging.GFFileHandler.file 
+com.sun.enterprise.server.logging.GFFileHandler.file
 <${com.sun.aas.instanceRoot}/logs/server.log>
 com.sun.enterprise.server.logging.GFFileHandler.flushFrequency  <1>
 .
@@ -576,7 +577,7 @@ You can set the format for log records in log files.
 
 Use the `set-log-file-format` subcommand in remote mode to set the formatter used by Payara Server to format log records in log files. You can also use the `set-log-attributes` subcommand.
 
-Log formats for all server instances in a cluster will be the same. For information about log formats, see xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#log-records[Log Records].
+Log formats for all server instances in a cluster will be the same. For information about log formats, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#log-records[Log Records].
 
 NOTE: Changing the log format forces log rotation to avoid mixed format in the same file.
 
@@ -763,7 +764,7 @@ You can view the full syntax and options of the subcommand by typing `asadmin he
 [[setting-log-file-rotation]]
 === Setting Log File Rotation
 
-As explained in xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#log-files[Log Files], Payara Server by default rotates log files when they reach `2 MB` in size.
+As explained in xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#log-files[Log Files], Payara Server by default rotates log files when they reach `2 MB` in size.
 
 However, you can change the default rotation settings. For example, you can change the file size at which the server rotates the log file, or you can configure a server to rotate log files based on a time interval.
 
@@ -805,7 +806,7 @@ com.sun.enterprise.server.logging.GFFileHandler.rotationLimitInBytes
 logging attribute set with value 1000000.
 These logging attributes are set for ManagedServer1.
 ManagedServer1 :
-com.sun.enterprise.server.logging.GFFileHandler.rotationLimitInBytes 
+com.sun.enterprise.server.logging.GFFileHandler.rotationLimitInBytes
 logging attribute set with value 1000000.
 These logging attributes are set for ManagedServer1.
 
@@ -837,12 +838,12 @@ com.sun.enterprise.server.logging.GFFileHandler.rotationTimelimitInMinutes
 logging attribute set with value 10.
 These logging attributes are set for Cluster1.
 ClusterServer1 :
-com.sun.enterprise.server.logging.GFFileHandler.rotationTimelimitInMinutes 
+com.sun.enterprise.server.logging.GFFileHandler.rotationTimelimitInMinutes
 logging attribute set with value 10.
 These logging attributes are set for Cluster1.
 
 ClusterServer2 :
-com.sun.enterprise.server.logging.GFFileHandler.rotationTimelimitInMinutes 
+com.sun.enterprise.server.logging.GFFileHandler.rotationTimelimitInMinutes
 logging attribute set with value 10.
 These logging attributes are set for Cluster1.
 
@@ -876,7 +877,7 @@ The following example sets the log limit number of retained log files for the DA
 asadmin set-log-attributes
 
 com.sun.enterprise.server.logging.GFFileHandler.maxHistoryFiles=10
-com.sun.enterprise.server.logging.GFFileHandler.maxHistoryFiles 
+com.sun.enterprise.server.logging.GFFileHandler.maxHistoryFiles
 logging attribute set with value 10.
 These logging attributes are set for server.
 Command set-log-attributes executed successfully.
@@ -932,7 +933,7 @@ You can view the full syntax and options of the subcommand by typing `asadmin he
 [[adding-a-custom-logging-handler]]
 === Adding a Custom Logging Handler
 
-By default, Payara Server log records are captured in a server log file using the format described in xref:Technical Documentation/Payara Server Documentation/General Administration/logging.adoc#viewing-log-records[Log Records].
+By default, Payara Server log records are captured in a server log file using the format described in xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Logging Service.adoc#viewing-log-records[Log Records].
 
 However, you may find that you want to log messages to a different location, such as a database or a remote server, or log messages from specific loggers to your own file. This can be done by implementing a custom log handler.
 
@@ -1201,12 +1202,12 @@ Use the following command to set maximum file size option:
 asadmin> set configs.config.server-config.http-service.access-log.maximum-file-size=5000000
 ----
 
-For more information on how to configure HTTP Access logging, see xref:Technical Documentation/Payara Server Documentation/General Administration/http_https.adoc#administering-http-configurations[Administering HTTP Configurations].
+For more information on how to configure HTTP Access logging, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering HTTP Connectivity.adoc#administering-http-configurations[Administering HTTP Configurations].
 
 [[notification-logging]]
 == Notification Service Logging
 
-The Notification Service captures information about events which come from other services, such as the JMX Monitoring Service, the HealthCheck service or the Request Tracing service and captures this information so that xref:Technical Documentation/Payara Server Documentation/General Administration/notification-service.adoc#notifiers[all configured notifiers] can redirect these events. The Log Notifier, turned on by default, will print these notifications events in the server's log.
+The Notification Service captures information about events which come from other services, such as the JMX Monitoring Service, the HealthCheck service or the Request Tracing service and captures this information so that xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Notification Service.adoc#notifiers[all configured notifiers] can redirect these events. The Log Notifier, turned on by default, will print these notifications events in the server's log.
 
 It is possible to configure the Log Notifier to store its output in a
 separate log file.

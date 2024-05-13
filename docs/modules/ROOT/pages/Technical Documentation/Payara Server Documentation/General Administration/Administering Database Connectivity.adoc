@@ -1,5 +1,6 @@
 [[administering-database-connectivity]]
 = Administering Database Connectivity
+:ordinal: 14
 
 This chapter provides procedures for performing database connectivity tasks in the Payara Server environment.
 
@@ -10,13 +11,13 @@ A database management system (DBMS) provides facilities for storing, organizing,
 
 The key elements of database connectivity are the following:
 
-* Database. The repository where data is stored for an enterprise. Jakarta EE applications access relational databases through the JDBC API. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#setting-up-the-database[Setting Up the Database].
-* JDBC Connection Pool. A JDBC connection pool is a group of reusable connections for a particular database. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#administering-jdbc-connection-pools[Administering JDBC Connection Pools].
+* Database. The repository where data is stored for an enterprise. Jakarta EE applications access relational databases through the JDBC API. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#setting-up-the-database[Setting Up the Database].
+* JDBC Connection Pool. A JDBC connection pool is a group of reusable connections for a particular database. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#administering-jdbc-connection-pools[Administering JDBC Connection Pools].
 * JDBC Resource. A JDBC resource (data source) provides applications with a means of connecting to a database. To create a JDBC resource,
 specify the connection pool with which it is associated. Multiple JDBC resources can specify a single connection pool. A JDBC resource is
 identified by its Java Naming and Directory Interface (JNDI) name. For administration procedures,
-see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#administering-jdbc-resources[Administering JDBC Resources].
-* JDBC Driver. A database driver is a software component that enables a Java application to interact with a database connectivity API . Each database requires its own driver. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#integrating-the-jdbc-driver[Integrating the JDBC Driver].
+see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#administering-jdbc-resources[Administering JDBC Resources].
+* JDBC Driver. A database driver is a software component that enables a Java application to interact with a database connectivity API . Each database requires its own driver. For administration procedures, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#integrating-the-jdbc-driver[Integrating the JDBC Driver].
 
 At runtime, the following sequence occurs when an application connects to a database:
 
@@ -39,19 +40,19 @@ Most applications use relational databases to store, organize, and retrieve data
 . Install a compatible JDBC relational database product.
 . Install a supported JDBC driver for the database product.
 +
-For a list of drivers supported by Payara Server, see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
+For a list of drivers supported by Payara Server, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 . Make the JDBC driver JAR file accessible to the domain administration server (DAS).
 +
-See xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#integrating-the-jdbc-driver[Integrating the JDBC Driver].
+See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#integrating-the-jdbc-driver[Integrating the JDBC Driver].
 . Create the database. The application provider usually delivers scripts for creating and populating the database.
 
 *Next Steps*
 
 You are now ready to create a connection pool for the database, and a JDBC resource that points to the connection pool.
-See xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool] and
-xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#to-create-a-jdbc-resource[To Create a JDBC Resource].
+See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool] and
+xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-create-a-jdbc-resource[To Create a JDBC Resource].
 The final step is to integrate the JDBC driver into an administrative domain as described in
-xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#integrating-the-jdbc-driver[Integrating the JDBC Driver].
+xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#integrating-the-jdbc-driver[Integrating the JDBC Driver].
 
 [[to-start-the-database]]
 === To Start the Database
@@ -140,25 +141,25 @@ It is possible to create a JDBC connection pool using administration commands or
 
 Use the `create-jdbc-connection-pool` subcommand in remote mode to register a new JDBC connection pool with the specified JDBC connection pool name. A JDBC connection pool or a connector connection pool can be created with authentication. You can either use a subcommand option to specify user, password, or other connection information using the `asadmin` utility, or specify the connection information in the XML descriptor file.
 
-One connection pool is needed for each database, possibly more depending on the application. When you are building the connection pool, certain data specific to the JDBC driver and the database vendor is required. You can find some of the following specifics in xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]:
+One connection pool is needed for each database, possibly more depending on the application. When you are building the connection pool, certain data specific to the JDBC driver and the database vendor is required. You can find some of the following specifics in xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers]:
 
 * Database vendor name
 * Resource type, such as `javax.sql.DataSource` (local transactions only) `javax.sql.XADataSource` (global transactions)
 * Data source class name
 * Required properties, such as the database name (URL), username, and password
 
-Creating a JDBC connection pool is a dynamic event and does not require server restart. However, there are some parameters that do require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
+Creating a JDBC connection pool is a dynamic event and does not require server restart. However, there are some parameters that do require server restart. See xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
 
 *Before You Begin*
 
-Before creating the connection pool, you must first install and integrate the database and its associated JDBC driver. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#setting-up-the-database[Setting Up the Database].
+Before creating the connection pool, you must first install and integrate the database and its associated JDBC driver. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#setting-up-the-database[Setting Up the Database].
 
 . Ensure that the server is running. +
 Remote subcommands require a running server.
 . Create the JDBC connection pool by using the
 xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-jdbc-connection-pool.adoc#create-jdbc-connection-pool[`create-jdbc-connection-pool`] subcommand.
 . If needed, restart the server. Some parameters require server restart. See
-xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
+xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
 
 //TODO - Needs to be updated with H2 examples
 
@@ -267,7 +268,7 @@ Command ping-connection-pool executed successfully
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help ping-connection-pool` at the command line.
 
-You can also specify that a JDBC connection pool is automatically tested when created or reconfigured by setting its `--ping` option to `true`(the default is `false`). See xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC ConnectionPool] or xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#to-update-a-jdbc-connection-pool[To Update a JDBC Connection Pool].
+You can also specify that a JDBC connection pool is automatically tested when created or reconfigured by setting its `--ping` option to `true`(the default is `false`). See xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC ConnectionPool] or xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-update-a-jdbc-connection-pool[To Update a JDBC Connection Pool].
 
 [[to-reset-flush-a-connection-pool]]
 ==== *To Reset (Flush) a Connection Pool*
@@ -309,7 +310,7 @@ For example: `asadmin set resources.jdbc-connection-pool.H2Pool.steady-pool-size
 . If needed, restart the server.
 
 Some parameters require server restart. See +
-xref:Technical Documentation/Payara Server Documentation/General Administration/overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
+xref:Technical Documentation/Payara Server Documentation/General Administration/Overview.adoc#configuration-changes-that-require-restart[Configuration Changes That Require Restart].
 
 
 [[connection-pool-sizing]]
@@ -750,7 +751,7 @@ Because all JNDI names are in the `java:comp/env` subcontext, when specifying th
 
 *Before You Begin*
 
-Before creating a JDBC resource, you must first create a JDBC connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool].
+Before creating a JDBC resource, you must first create a JDBC connection pool. For instructions, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-create-a-jdbc-connection-pool[To Create a JDBC Connection Pool].
 
 . Ensure that the server is running. Remote subcommands require a running server.
 . Create a JDBC resource by using the
@@ -854,7 +855,7 @@ Payara Server  includes a preconfigured JDBC resource with the JNDI name `jdbc/_
 [[to-enable-the-jdbc__default-resource-for-a-clustered-environment]]
 ==== *To Enable the `jdbc/__default` Resource for a Clustered Environment*
 
-Instructions for creating JDBC resources in general are provided in xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#to-create-a-jdbc-resource[To Create a JDBC Resource]. Use the following procedure to enable the preconfigured `jdbc/__default` resource for a clustered Payara Server environment.
+Instructions for creating JDBC resources in general are provided in xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#to-create-a-jdbc-resource[To Create a JDBC Resource]. Use the following procedure to enable the preconfigured `jdbc/__default` resource for a clustered Payara Server environment.
 
 . Create the `jdbc/__default` resource reference for the cluster. for example: 'asadmin create-resource-ref --target cluster-name jdbc/__default'
 . Enable the resource on the DAS that manages the cluster, for example: 'asadmin set resources.jdbc-connection-pool.DerbyPool.property.serverName=DAS-machine-name'
@@ -879,7 +880,7 @@ To use JDBC features, you must choose a JDBC driver to work with Payara Server, 
 [[supported-database-drivers]]
 ==== *Supported Database Drivers*
 
-For a list of the JDBC drivers currently supported by the Payara Server, see the Payara Release Notes. For configurations of supported and other drivers, see xref:Technical Documentation/Payara Server Documentation/General Administration/jdbc.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
+For a list of the JDBC drivers currently supported by the Payara Server, see the Payara Release Notes. For configurations of supported and other drivers, see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering Database Connectivity.adoc#configuration-specifics-for-jdbc-drivers[Configuration Specifics for JDBC Drivers].
 
 NOTE: Because the drivers and databases supported by the Payara Server are constantly being updated, and because database vendors continue to upgrade their products, always check with Oracle technical support for the latest database support information.
 
@@ -1315,7 +1316,7 @@ set configs.config.server-config.monitoring-service.module-monitoring-levels.jdb
 ----
 
 The information can be consulted via the JMX beans or the Rest monitoring interface. These need to be activated also,
-see xref:Technical Documentation/Payara Server Documentation/General Administration/monitoring.adoc#jmx-monitoring-service[jmx monitoring configuration] and xref:Technical Documentation/Payara Server Documentation/General Administration/monitoring.adoc#rest-monitoring[rest monitoring configuration] on how to do this.
+see xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Monitoring Service.adoc#jmx-monitoring-service[jmx monitoring configuration] and xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Monitoring Service.adoc#rest-monitoring[rest monitoring configuration] on how to do this.
 
 [[view-sql-statment-overview]]
 == Viewing statements
