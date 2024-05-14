@@ -106,7 +106,7 @@ Successfully logged into Start URL: https://d-9067bf6e6d.awsapps.com/start
 
 This process will open a local browser window so that the current user can provide its credentials using this simple process:
 
-. Start the session 
+. Start the session
 +
 image::cloud-connectors/sqs-connector/aws-login-page-1.png[Amazon Web Services Session Start]
 
@@ -133,10 +133,10 @@ To send messages, here's how the connection factory definition looks like:
 
 [source, java]
 ----
-@ConnectionFactoryDefinition ( 
+@ConnectionFactoryDefinition (
   name = "java:app/amazonsqs/factory",
   interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
-  resourceAdapter = "amazon-sqs-rar-1.0.0"
+  resourceAdapter = "amazon-sqs-rar-2.1.0",
   properties = {"region=us-east-1"}
 )
 ----
@@ -146,9 +146,9 @@ And for receiving messages, here's how the MDB definition looks like:
 [source, java]
 ----
 @MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "ENV={queueURL}"), 
+    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "ENV={queueURL}"),
     @ActivationConfigProperty(propertyName = "region", propertyValue = "ENV={region}"),
-    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1") 
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1")
 })
 public class ReceiveSQSMessage implements AmazonSQSListener {
 
