@@ -17,41 +17,47 @@ Once deployed, a message similar to this one should be printed out to the server
 
 Sending messages to Amazon SQS can be done via the JCA and an Amazon specific API. In order to start using this API to send messages, a resource has to be defined via the JCA API; a connection factory.
 
-The connection factory has to be given a name, which can be any name that is valid for JNDI. The `java:app` namespace is typically recommended to be used. The type of the connection factory to be used for Amazon SQS is `fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory`, and we have to specify the resource adapter name which is here `amazon-sqs-rar-0.8.0.rar`.
+The connection factory has to be given a name, which can be any name that is valid for JNDI. The `java:app` namespace is typically recommended to be used. The type of the connection factory to be used for Amazon SQS is `fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory`, and we have to specify the resource adapter name which is here `amazon-sqs-rar-2.1.0.rar`.
 
-Finally the AWS account details have to be specified in the properties of the corresponding JMS resource definitions.
+Finally, the AWS account details have to be specified in the properties of the corresponding JMS resource definitions.
 
 The following gives an example:
 
 [source, java]
 ----
-@ConnectionFactoryDefinition ( 
+@ConnectionFactoryDefinition (
   name = "java:app/amazonsqs/factory",
   interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
-  resourceAdapter = "amazon-sqs-rar-0.8.0"
+  resourceAdapter = "amazon-sqs-rar-2.1.0",
   properties = {"awsAccessKeyId=<accessKeyID>", "awsSecretKey=<secretKey>", "region=eu-west-2"}
 )
+public class SendSQSMessage {
+}
 ----
 
-With the above definition in place the following code shows an example of sending a message:
+With the above definition in place, the following code shows an example of sending a message:
 
 [source, java]
 ----
 @Singleton
 @Startup
 public class SendSQSMessage {
- 
+
  @Resource(lookup = "java:app/amazonsqs/factory")
  private AmazonSQSConnectionFactory factory;
- 
+
  @PostConstruct
  public void init() {
     try (AmazonSQSConnection connection = factory.createConnection()) {
-        connection.sendMessage(new SendMessageRequest("<queueURL>", "Hello World"));
+        SendMessageRequest sendMsgRequest = SendMessageRequest.builder()
+                        .queueUrl("<queueURL>")
+                        .messageBody("Hello World")
+                        .build();
+        connection.sendMessage(sendMsgRequest);
     }
     catch (Exception ex) {
     }
- }  
+ }
 }
 ----
 
@@ -65,23 +71,94 @@ The following gives an example:
 [source, java]
 ----
 @MessageDriven(activationConfig = {
- @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "someKey"),
- @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "someSecretKey"),
- @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "someQueueURL"), 
- @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1"), 
- @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2") 
+    @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "someKey"),
+    @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "someSecretKey"),
+    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "someQueueURL"),
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1"),
+    @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2")
 })
 public class ReceiveSQSMessage implements AmazonSQSListener {
 
- @OnSQSMessage
- public void receiveMessage(Message message) {
+    @OnSQSMessage
+    public void receiveMessage(Message message) {
      // Handle message
- }
+    }
 }
 ----
 
+[[large-message-support]]
+== Large Message Support
 
-The full list of config properties is given below:
+By default, the AWS Java SDK has a message size limitation of `256KB`, which can be restrictive for certain use cases.
+
+To address this limitation, the Payara Cloud Connector offers enhanced support for sending and receiving larger messages, surpassing the `256KB` restriction by leveraging Amazon S3 storage. To enable this feature, configure the S3 bucket name using the `s3BucketName` property.
+
+[[prerequisites-for-larger-message-support]]
+=== Prerequisites for Larger message support
+
+Before testing the larger message support feature, ensure the following prerequisites are met:
+
+. Create an S3 Bucket in AWS:
+* Create a new Amazon S3 bucket in your AWS account where larger messages will be stored.
+
+. IAM Role Permissions:
+- Add `AmazonS3FullAccess` or related permissions to the IAM role associated with your application.
+- This permission ensures that your application has the necessary access to the S3 bucket for storing and retrieving larger messages.
+
+[[sending-large-messages]]
+=== Sending Large Messages
+
+To send messages larger than `256KB`, include the `s3BucketName` property in the connection factory definition. Specify the desired AWS S3 bucket name to store these larger messages.
+
+For example:
+
+[source, java]
+----
+@ConnectionFactoryDefinition (
+    name = "java:app/amazonsqs/factory",
+    interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
+    resourceAdapter = "amazon-sqs-rar-2.1.0",
+    properties = {"awsAccessKeyId=<accessKeyID>", "awsSecretKey=<secretKey>", "region=eu-west-2", "s3BucketName=MyS3Bucket"}
+)
+@Singleton
+@Startup
+public class SendSQSMessage {
+}
+----
+
+After configuring the connection factory with the S3 bucket name, you can send larger messages using the provided Amazon SQS API, as demonstrated in the previous examples.
+
+[[receiving-large-messages]]
+=== Receiving Large Messages
+
+To receive larger messages, update the Message Driven Bean (MDB) configuration with the `s3BucketName` property:
+
+[source, java]
+----
+@MessageDriven(activationConfig = {
+    @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "someKey"),
+    @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "someSecretKey"),
+    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "someQueueURL"),
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1"),
+    @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2"),
+    @ActivationConfigProperty(propertyName = "s3BucketName", propertyValue = "MyS3Bucket"),
+    @ActivationConfigProperty(propertyName = "s3FetchMessage", propertyValue = "true")
+})
+public class ReceiveSQSMessage implements AmazonSQSListener {
+
+    @OnSQSMessage
+    public void receiveMessage(Message message) {
+     // Handle larger message
+    }
+}
+----
+
+Configure the `s3BucketName` property along with other properties to specify the AWS S3 bucket where larger messages are stored.
+
+[[config-properties]]
+== Configuration Properties
+
+The full list of configuration properties is given below:
 
 [cols="2,1,1,7",options="header"]
 |===
@@ -135,5 +212,25 @@ The full list of config properties is given below:
 |String
 |All
 |The list of attribute names that should be fetched with the message (MDB Only)
+
+|`s3BucketName`
+|String
+|None
+|AWS S3 bucket name for storing larger messages
+
+|`s3SizeThreshold`
+|Integer
+|0
+|AWS S3 size threshold for storing messages (in bytes)
+
+|`s3KeyPrefix`
+|String
+|None
+|AWS S3 key prefix for organizing stored messages
+
+|`s3FetchMessage`
+|Boolean
+|true
+|Flag to fetch the full message from S3 when it exceeds the size threshold. If set to `false`, only the message metadata for larger messages, including the bucket name and message key, will be returned instead of the full message.
 
 |===
