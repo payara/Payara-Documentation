@@ -252,6 +252,7 @@ This is by design, implemented to avoid a https://github.com/payara/Payara/issue
 * xref:configuring-config-specifc-hazelcast-with-the-admin-console[Configuring Server Config Specific Hazelcast Settings with the Admin Console]
 * xref:configuring-hazelcast-on-domain-creation[Configuring Hazelcast on Domain Creation]
 * xref:configuring-config-specific-data-grid-start-port[Configuring Config Specific Data Grid Start Port for an Instance]
+* xref:configuring-hazelcast-cp-subsystem[Configuring the Hazelcast CP Subsystem]
 
 [[setting-hazelcast-configuration-file]]
 === Setting a custom Hazelcast Configuration File
@@ -383,6 +384,19 @@ The xref:Technical Documentation/Payara Server Documentation/Command Reference/s
 ----
 asadmin> set-hazelcast-configuration --dynamic=true --configSpecificDataGridStartPort=2900 --target=instance1-config
 ----
+
+[[configuring-hazelcast-cp-subsystem]]
+=== Configuring the Hazelcast CP Subsystem
+
+The CP Subsystem is a component of a Hazelcast cluster that builds a strongly consistent layer for a set of distributed data structures. The CP Subsystem withstands server and client failures and offer special features to Payara Server applications.
+
+You can read more about the CP subsystem in the official link:https://docs.hazelcast.com/hazelcast/5.3/cp-subsystem/cp-subsystem[Hazelcast Platform documentation].
+
+To enable the CP subsystem, you will have to configure the `hazelcast.cp-subsystem.cp-member-count` system property to a value greater than zero (read the recommendations in the Hazelcast Platform documentation to pick a suitable member count). Hazelcast recommends that a minimum of `3` members need to be configured for the CP subsystem to work as intended.
+
+Additionally, the `hazelcast.cp-subsystem.auto-promote` Payara Platform system property can be used to configure an auto-promote behaviour that will allow other server instances to join the CP subsystem when detected by the DAS.
+
+CAUTION: The CP subsystem is not actively tested as a recommended feature of Payara Server and should be used with extreme caution on highly dynamic environments.
 
 [[viewing-data-grid-members]]
 == Viewing Data Grid Members
