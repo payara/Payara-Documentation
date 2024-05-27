@@ -1,7 +1,7 @@
 = Data Grid Configuration
 :ordinal: 2
 
-This section details the multiple configuration settings available for both the Data Grid 
+This section details the multiple configuration settings available for both the Data Grid
 
 WARNING: If you are using MacOS and have screen sharing enabled, Payara Server will fail to start due to screen sharing using port `5900`, the same as the default Hazelcast port. You can disable MacOS screen sharing in Preferences -> Sharing, Disable "Screen Sharing"`, or xref:configuring-config-specific-data-grid-start-port[change the Hazelcast start port].
 
@@ -58,7 +58,7 @@ Payara Server supports configuring Hazelcast through the Admin Console and asadm
 
 Configuration of Hazelcast is divided into four sections. The first section  applies to the whole domain, the second section applies to specific configurations and therefore to Payara Server instances that use that configuration, the third section covers how certain settings can be specified when a domain is created and the final section covers how to configure config specific Data Grid Start Port during or after the creation of an instance.
 
-Using a Hazelcast configuration file will cause the settings set via the Admin Console and _asadmin_ commands to be ignored. Any parameters not specified in the configuration file reverting to the Hazelcast defaults, even if they are specified in the Admin Console or _domain.xml_ 
+Using a Hazelcast configuration file will cause the settings set via the Admin Console and _asadmin_ commands to be ignored. Any parameters not specified in the configuration file reverting to the Hazelcast defaults, even if they are specified in the Admin Console or _domain.xml_
 
 IMPORTANT: The https://github.com/hazelcast/hazelcast/blob/master/hazelcast/src/main/resources/hazelcast-default.xml[Hazelcast defaults settings] are not necessarily the same as the Payara Server's Hazelcast default settings).
 
@@ -165,7 +165,7 @@ The following options can be used with the `create-domain` command to specify ce
 
 | `--hazelcastdasport` | Port Number | The port to run Hazelcast on for the DAS. If this port is busy and auto-increment option is enabled, the port specified will be incremented until a valid port is found. The `--hazelcastdasport` option cannot be used with the `--portbase` option. The `--hazelcastdasport` option overrides the `hazelcast.das.port` property of the `--domainproperties` option. | 4900 | No
 | `--hazelcaststartport` | Port Number | The port the other Payara Server instances use to run Hazelcast on. If this port is busy and auto-increment  option is enabled, the port specified will be incremented until a valid port is found. The `--hazelcaststartport` option cannot be used with the `--portbase`  option. The `--hazelcaststartport` option overrides the `hazelcast.start.port` property of the `--domainproperties` option. | 5900 | No
-| `--hazelcastautoincrement` | Boolean | By default the Data Grid uses the next unoccupied port that is available starting with the start port. When 
+| `--hazelcastautoincrement` | Boolean | By default the Data Grid uses the next unoccupied port that is available starting with the start port. When
 auto-increment is turned off an occupied start port results in a startup failure instead. The `--hazelcastautoincrement` option overrides the `hazelcast.auto.inrement` property of the `--domainproperties` option. | 5900 | No
 |====
 
@@ -264,7 +264,7 @@ The following examples demonstrate creating an instance with `--dataGridStartPor
 asadmin> asadmin create-instance --dataGridStartPort 2900 --node localhost-domain1 instance1
 
 Command _create-instance-filesystem executed successfully.
-Port Assignments for server instance instance1: 
+Port Assignments for server instance instance1:
 OSGI_SHELL_TELNET_PORT=26666
 JAVA_DEBUGGER_PORT=29009
 JMS_PROVIDER_PORT=27676
@@ -291,7 +291,7 @@ localhost-domain1. To use a different DAS, create a new node using create-node-s
 create-node-config. Create the instance with the new node and correct
 host and port:
 asadmin --host das_host --port das_port create-local-instance --node node_name instance_name.
-Port Assignments for server instance instance2: 
+Port Assignments for server instance instance2:
 OSGI_SHELL_TELNET_PORT=26667
 JAVA_DEBUGGER_PORT=29010
 JMS_PROVIDER_PORT=27677
@@ -338,7 +338,7 @@ As noted above, the `set-hazelcast-configuration` asadmin command is used to bot
 |Option|Type|Description|Default|Mandatory
 |`--enabled`| Boolean| Enables Hazelcast. If no `target` is specified, this will enable Hazelcast on the domain configuration _(server-config)_. If no arguments are specified, defaults to _true_. If other options are specified, asadmin will interactively prompt for `--enabled`.| _true_ | No
 |`--target`|Config Name|Specifies the instance or cluster to configure. |`domain`|No
-|`--dynamic` |Boolean|Enable or disable dynamic stopping and starting of the embedded Hazelcast member.|_false_|No |`-f` `--hazelcastconfigurationfile`|File Path |The Hazelcast configuration file to use. This path is relative to the domain config directory, `<Payara Installation Directory>/glassfish/domains/<Domain Name>/config/`. 
+|`--dynamic` |Boolean|Enable or disable dynamic stopping and starting of the embedded Hazelcast member.|_false_|No |`-f` `--hazelcastconfigurationfile`|File Path |The Hazelcast configuration file to use. This path is relative to the domain config directory, `<Payara Installation Directory>/glassfish/domains/<Domain Name>/config/`.
 Using this option to point to a valid Hazelcast configuration file will cause all other options set to be ignored. Any options unset within the Hazelcast configuration file will be set to the Hazelcast defaults.|`hazelcast-config.xml`| No
 
 |`--startport` |Port Number|The port to run Hazelcast on for Payara Server Instances. If this port is busy, the port specified will be incremented until a valid port is found. |5900 |No
@@ -513,7 +513,7 @@ WARNING: There's a risk of data loss if multiple Payara Server instances are tar
 === `list-cache-keys`
 
 *Aim*::
-Lists all keys in a cache. 
+Lists all keys in a cache.
 
 TIP: If no cache is specified, keys from all caches will be returned.
 
@@ -602,3 +602,15 @@ Using this option to point to a valid Hazelcast configuration file will cause al
 ----
 asadmin> create-hazelcast-instance --webpersistence=false --lite instance2
 ----
+
+== The Hazelcast CP Subsystem
+
+The CP Subsystem is a component of a Hazelcast cluster that builds a strongly consistent layer for a set of distributed data structures. The CP Subsystem withstands server and client failures and offer special features to Payara Server applications.
+
+You can read more about the CP subsystem in the official link:https://docs.hazelcast.com/hazelcast/5.3/cp-subsystem/cp-subsystem[Hazelcast Platform documentation].
+
+To enable the CP subsystem, you will have to configure the `hazelcast.cp-subsystem.cp-member-count` system property to a value greater than zero (read the recommendations in the Hazelcast Platform documentation to pick a suitable member count). Hazelcast recommends that a minimum of `3` members need to be configured for the CP subsystem to work as intended.
+
+Additionally, the `hazelcast.cp-subsystem.auto-promote` Payara Platform system property can be used to configure an auto-promote behaviour that will allow other server instances to join the CP subsystem when detected by the DAS.
+
+CAUTION: The CP subsystem is not actively tested as a recommended feature of Payara Server and should be used with extreme caution on highly dynamic environments.
