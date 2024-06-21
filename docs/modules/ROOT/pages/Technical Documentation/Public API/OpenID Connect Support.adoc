@@ -38,10 +38,10 @@ When defining a OpenID Connect flow within an application deployed on Payara Ser
 ----
 @WebServlet("/callback")
 public class CallbackServlet extends HttpServlet {
-    
+
     @Inject
     OpenIdContext context;
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         PrintWriter out = response.getWriter();
@@ -61,7 +61,7 @@ public class CallbackServlet extends HttpServlet {
 }
 ----
 
-The original protected URL called is stored so that a redirect can be issued to this page after the callback from the OpenIdConnect provider is handled.  
+The original protected URL called is stored so that a redirect can be issued to this page after the callback from the OpenIdConnect provider is handled.
 
 NOTE: Only some basic redirect is supported namely a GET. Only the URL and query parameters are available, not the headers and the request body.
 
@@ -221,20 +221,6 @@ The annotation and MicroProfile properties has several configuration options. Th
 | groups
 | N/A.
 
-| `proxyDefinition.hostName`
-| `payara.security.openid.proxyHostname`
-| `false`
-| Defines the hostname of the proxied server.
-| 
-| N/A.
-
-| `proxyDefinition.port`
-| `payara.security.openid.proxyPort`
-| `false`
-| Defines the port of the proxied server.
-| 
-| N/A.
-
 | `extraParameters`
 |
 | `false`
@@ -247,7 +233,7 @@ The annotation and MicroProfile properties has several configuration options. Th
 | @LogoutDefinition
 | Defines the functionality that is performed when the user logs out and defines the RP Session Management configuration.
 |
-| 
+|
 |===
 
 NOTE: If both an annotation attribute and a MicroProfile Config property are defined for the same option then the MicroProfile Config property value always takes precedence over the `@OpenIdAuthenticationDefinition` annotation value.
@@ -259,12 +245,12 @@ NOTE: If both an annotation attribute and a MicroProfile Config property are def
 | `endSessionEndpoint`
 | `payara.security.openid.provider.endSessionEndpoint`
 | OIDC provider’s logout endpoint URL. If set, overrides the URL obtained via the `end_session_endpoint` element of the OIDC provider’s metadata.
-|  
+|
 
 | `disableScopeValidation`
 | `payara.security.openid.disableScopeValidation`
 | This property disables the scope validation for custom scope configurations
-| false 
+| false
 |===
 
 [[el-support]]
@@ -380,7 +366,7 @@ With the `logout` parameter of the `OpenIdAuthenticationDefinition` you can defi
 
 .Configuration Options
 |===
-| Option | MP Config property | Required | Description | Default value 
+| Option | MP Config property | Required | Description | Default value
 
 | `notifyProvider`
 | `payara.security.openid.provider.notify.logout`
@@ -395,7 +381,7 @@ If `true` then after having logged out the user from RP, redirects the End-User'
 | The post logout redirect URI to which the RP is requesting that the End-User's User Agent be redirected after a logout has been performed.
 
 If the redirect URI is empty then redirect to OpenID connect provider _authorization_endpoint_ for re-authentication.
-| 
+|
 
 | `accessTokenExpiry`
 | `payara.security.openid.logout.access.token.expiry`
@@ -415,44 +401,6 @@ A programmatic logout is performed by calling `OpenIdContext#logout()` which inv
 If `fish.payara.security.annotations.LogoutDefinition#notifyProvider` is set to true then it redirects the End-User's User Agent to the `end_session_endpoint` to notify the OP that the user has logged out of the RP's application.
 
 It will also ask the user whether they want to log out from the OP as well. After successful logout, the End-User's User Agent redirects back to the RP's `_post_redirect_uri_` configured via the `fish.payara.security.annotations.LogoutDefinition#redirectURI` property.
-
-[[proxy-support]]
-=== Proxy Definition 
-
-Using the `proxyDefinition` parameter of the `@OpenIdAuthenticationDefinition` annotation you can specify details regarding proxy mapping within the OpenID Connect client configuration. It contains attributes to specify the `hostName` and `port` of the proxied server. This addition facilitates the configuration of proxy mapping for requests traversing through reverse web proxies.
-
-Moreover, the proxy configuration details (`hostName` and `port`) can be dynamically utilized to define the `redirectURI` within the `OpenIdAuthenticationDefinition`, replacing the `baseURL` placeholder if present. This allows for a more flexible setup, especially in scenarios involving reverse web proxies.
-
-[[scenarios-without-proxy]]
-==== Scenarios without Proxy
-
-* *Case 1*
-** `redirectURI` employs the `${baseURL}` placeholder, which defaults to `${baseURL}/Callback` when `redirectURI` is not explicitly defined.
-** Proxy definition is also absent.
-** -> *Outcome:* The generated `redirectURI` should include the request's host and port. The registered Authorized Redirect URI in Google Cloud must contain a URL with the Payara Server instance's host and port.
-
-* *Case 2*
-** `redirectURI` is explicitly defined with the Payara Server instance's host and port.
-** Proxy definition is not present.
-** -> *Outcome:* The registered Authorized Redirect URI in Google Cloud must contain a URL with the Payara Server instance's host and port.
-
-[[scenarios-with-proxy]]
-==== Scenarios with Proxy
-
-* *Case 3*
-** `redirectURI` employs the `${baseURL}` placeholder, defaulting to `${baseURL}/Callback` when `redirectURI` is not explicitly defined.
-** Proxy definition is included.
-** -> *Outcome:* The generated `redirectURI` should include the proxy's host and port. The registered Authorized Redirect URI in Google Cloud must contain a URL with the proxy's host and port.
-
-* *Case 4*
-** `redirectURI` is explicitly defined with the Payara Server instance's host and port.
-** Proxy definition is also present.
-** -> *Outcome:* The registered Authorized Redirect URI in Google Cloud must contain a URL with the Payara Server instance's host and port.
-
-* *Case 5*
-** `redirectURI` is explicitly defined with the Proxy's host and port.
-** Proxy definition is included.
-** -> *Outcome:* The registered Authorized Redirect URI in Google Cloud must contain a URL with the proxy's host and port.
 
 [[provider-metadata]]
 === Provider Metadata
@@ -689,7 +637,7 @@ The Payara Public API provides built-in support for Google OpenID Provider via t
 
 [[google-refresh-token]]
 ==== Request Refresh Token
-To enable the refresh token feature, set the `tokenAutoRefresh` to true and add the `access_type` parameter value to `offline` so that application can refresh access tokens when the user is not present at the browser. 
+To enable the refresh token feature, set the `tokenAutoRefresh` to true and add the `access_type` parameter value to `offline` so that application can refresh access tokens when the user is not present at the browser.
 
 If application requests `offline` access then the application can receive access and refresh token. Once the application has a refresh token, it can obtain a new access token at any time or as older ones expire.
 
