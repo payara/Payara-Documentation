@@ -12,10 +12,6 @@ The Open Tracing API was created to allow easier tracing of the flow of a reques
 
 Breaking changes introduced in MicroProfile OpenTracing {mpOpenTracingVersion} are listed in the official specification under {mpOpenTracingSpecUrl}#_incompatible_changes[Incompatible Changes]
 
-Support for MicroProfile Open Tracing is provided via compatibility layer for OpenTelemetry.
-
-To achieve full compatibility in naming the spans with the spec a span convention needs to be configured as described in <<span-convention>>.
-
 [[text-and-binary-carriers]]
 == Text and Binary Carriers Support
 
@@ -31,23 +27,13 @@ The Payara Platform's MicroProfile implementation supports tracing of requests t
 [[opentracing-configuration]]
 == OpenTracing Configuration
 
-[[span-convention]]
-=== Span Naming Convention
-
-By default, span names for JAX-RS endpoints follow  recommendations set forth by OpenTelemetry Semantic Conventions. To have span names follow naming conventions defined by MicroProfile OpenTelemetry, following MicroProfile Config property must be set for application or globally for the server or domain:
-
-[source, ini]
-----
-payara.telemetry.span-convention=opentracing-class-method
-----
-
-All valid values for the property are documented in xref:Technical Documentation/MicroProfile/OpenTelemetry and OpenTracing.adoc#span-convention-settings[OpenTelemetry Span Convention Settings]
+You can configure the notifiers and the Request Tracing service as documented in the xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Request Tracing Service.adoc[Administering the Request Tracing Service] section.
 
 [[alternative-implementation]]
 == Using Alternate OpenTracing Implementations
 
-Currently, it is not possible to use other OpenTracing implementations in the Payara Platform.
+If you wish to use an alternative implementation of OpenTracing, i.e. Jaeger, then the alternative implementation must be provided as a jar in the lib directory of your domain. In it must be a file named `io.opentracing.Tracer` under _META-INF/services_, with the name of the class implementing `io.opentracing.Tracer`. That implementation must have a no-argument constructor. Alternate Opentracing implementations will only trace JAX-RS, JAX-WS and classes or methods annotated with `@Traced`; Payara Server's own request tracing service can trace more types of request.
 
-It is however possible to deploy and configure other OpenTelemetry exporters (i.e. Zipkin) into the server or ship them with application.
+NOTE: All other options for request tracing are ignored as the created Spans are not processed within the server runtime.
 
-Please consult xref:Technical Documentation/MicroProfile/OpenTelemetry and OpenTracing.adoc#using-additional-components[OpenTelemetry Configuration].
+As an example, see https://github.com/payara/ecosystem-jaeger-tracing, which shows how to integrate a Jaeger client tracer. This can be added as a library to Payara with the command `add-library jaeger-tracer-lib-with-dependencies`. Enabling request tracing in Payara Server is then required, which will then send traces from OpenTracing to a Jaeger collector on the same host.

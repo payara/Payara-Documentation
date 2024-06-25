@@ -8,21 +8,17 @@ The service helps users to detect application slowness and performance degradati
 
 The following types of requests are traced if the service is enabled:
 
-* JAX-RS endpoints (*)
-* JAX-RS client calls (*)
-* MicroProfile REST Client calls (*)
+* JAX-RS endpoints
+* JAX-RS client calls
+* MicroProfile REST Client calls
 * Servlets (HTTP requests)
-* SOAP Web Services (*)
+* SOAP Web Services
 * WebSockets
 * EJB timers execution
 * Inbound JMS messages received by an MDB
 * JBatch jobs creation
 * Tasks executed by injected Managed Executors.
-* Remote Invocations of EJBs (*)
-
-NOTE: Traces of request types marked in (*) are using higher-level APIs and are also available as OpenTelemetry Spans.
-
-Traces have form of nested spans following the model found in modern tracing APIs such as *OpenTelemetry* and *OpenTracing*.
+* Remote Invocations of EJBs
 
 The OpenTracing specification, found link:https://github.com/opentracing/specification/blob/master/specification.md[here], gives a more detailed description of what Spans are and the general trace format.
 Alternatively you can view a short summary xref:Technical Documentation/Application Development/Using Request Tracing in Applications.adoc#terminology[here]
@@ -34,19 +30,14 @@ The Request Tracing service has the concept of sample rates, affording you extra
 
 An option to perform this sampling before or after the threshold checks is offered, allowing you to either determine if a trace should be sampled at its inception, or only after determining that a trace has breached your configured thresholds respectively.
 
-[[opentelemetry-support]]
-== OpenTelemetry Support
-
-As Payara Platform offers support for MicroProfile Telemetry, it is possible to manually instrument your application code for creating spans.
-
-For the full details, see the xref:Technical Documentation/MicroProfile/OpenTelemetry and OpenTracing.adoc#opentelemetry-and-opentracing[OpenTelemetry support] in the Payara Platform Application Development section.
-
 [[opentracing-support]]
 == OpenTracing Support
 
 In-line with Payara Platform's support for xref:/Technical Documentation/MicroProfile/OpenTracing.adoc[MicroProfile OpenTracing], there's added support for http://opentracing.io/[OpenTracing.io] code instrumentation.
 
-NOTE: Since OpenTracing is just a wrapper around OpenTelemetry, it is advised to use OpenTelemetry APIs instead.
+In a practical sense, this means that you can instrument your code using either the new `@Traced` annotation, or by injecting and using an OpenTracing Tracer via CDI. For full details, see the xref:Technical Documentation/MicroProfile/OpenTracing.adoc[MicroProfile OpenTracing] and https://opentracing.io/docs/[OpenTracing.io] documentation. The https://github.com/opentracing/opentracing-java/blob/release-0.30.0/Overview.md[OpenTracing Java GitHub] page also has some useful information about using the OpenTracing API.
+
+NOTE: The MicroProfile `@Traced` annotation replaces the Payara Server and Payara Micro specific annotation provided previously, which will require you to either remove or refactor any code instrumented with the old annotation. The new annotation's canonical name is `org.eclipse.microprofile.opentracing.Traced`.
 
 [[configuration]]
 == Configuration

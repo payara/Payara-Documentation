@@ -914,7 +914,7 @@ EJB Timers may behave in unexpected ways if these conditions are not met.
 [[tracing-remote-ejbs]]
 == Tracing Remote EJBs
 
-Remote calls to an EJB from a Java SE client will have their active OpenTelemetry span context automatically propagated to the server, with the server-side span being created as a child of this client call. This will allow users to trace EJB calls that are originated externally from the server, and the span context will be propagated internally to any traceable components.
+Remote calls to an EJB from a Java SE client will have their active OpenTracing span context automatically propagated to the server, with the server-side span being created as a child of this client call. This will allow users to trace EJB calls that are originated externally from the server, and the span context will be propagated internally to any traceable components.
 
 [[java-se-client-tracing]]
 === Java SE Client Tracing
@@ -945,8 +945,6 @@ public class MainClass{
 }
 ----
 
-//TODO - Following sections needs updating with regards to using OpenTelemetry on client-side.
-
 [[getting-a-tracer]]
 ==== Getting a Tracer Instance
 
@@ -954,7 +952,9 @@ Injection of an OpenTracing tracer is not supported on Java SE clients, so you m
 
 WARNING: Manual registration of a tracer instance is only required if using a third-party tracer such as ZipKin or Jaeger - if using the built-in Payara Platform Request Tracing service the registration will automatically happen during creation of the initial context.
 
-NOTE: The built-in Payara Request Tracing service does not support tracing of Java SE clients (though will still propagate the active span context to the server)
+NOTE: The built-in Payara Request Tracing service does not support tracing of Java SE clients (though will still propagate the active span context to the server) +
+If you wish to trace the client itself you must set up and use a third-party tracer such as ZipKin or Jaeger. +
+Details on setting these up can be found xref:Technical Documentation/MicroProfile/OpenTracing.adoc#alternative-implementation[here].
 
 [source, java]
 ----
