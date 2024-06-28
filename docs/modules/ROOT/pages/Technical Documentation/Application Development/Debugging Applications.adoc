@@ -123,22 +123,30 @@ On UNIX platforms, you can also print a thread dump using the `jstack` command o
 [[class-loader-debugging]]
 === Class Loader Debugging
 
-To generate class loading messages, use the following `asadmin create-jvm-options` command:
+To generate class loading messages you can use the `-Xlog` JVM argument by running the following `asadmin create-jvm-options` command:
 
 [source,shell]
 ----
-asadmin create-jvm-options -verbose\:class
+asadmin create-jvm-options -Xlog\:class+load
 ----
 
-To send the JVM messages to a special JVM log file instead of `stdout`, use the following `asadmin create-jvm-options` commands:
+As classloading debugging messages will heavily populate the standard output, it is recommended to log these entries on a special log file. The `-Xlog` argument can be appended with the
+
+To send the JVM messages to a special JVM log file instead of `stdout`, use the following `asadmin create-jvm-options` command instead:
 
 [source,shell]
 ----
-asadmin create-jvm-options -XX\:+LogVMOutput
-asadmin create-jvm-options -XX\:LogFile=${com.sun.aas.instanceRoot}/logs/jvm.log
+asadmin create-jvm-options -Xlog\:class+load\:file=classloading.log
 ----
 
-To send Payara Server messages to the standard console instead of `stderr`, start the domain in verbose mode as described in xref:#enabling-verbose-mode[Enabling Verbose Mode].
+It is recommended that this log is located in the standard logs directory output like so:
+
+[source,shell]
+----
+asadmin create-jvm-options -Xlog\:class+load\:file=${com.sun.aas.instanceRoot}/logs/classloading.log
+----
+
+TIP: More information about how to configure the log levels of events to filter and other useful tags available to the `-Xlog` JVM argument cane be read on its command help output by running `java -Xlog:help`
 
 [[debugging-in-payara-micro]]
 == Debugging in Payara Micro
