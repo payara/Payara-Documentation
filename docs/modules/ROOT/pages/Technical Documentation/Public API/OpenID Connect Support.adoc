@@ -236,18 +236,18 @@ The annotation and MicroProfile properties has several configuration options. Th
 | N/A.
 
 | `extraParameters`
-| `payara.security.openid.extraParams.raw` (compatibility with older version)
+| `payara.security.openid.extraParams.raw`
 | `false`
 | An array of extra options to be sent to the OpenID Connect provider.
 |
-| This is an array of strings in the form `key=value`, can use EL expression for values `key=#{expr}`. MP Config property is a string and must follow URL query pattern, i.e. `key1=value1&key2=value2&key2=value+with+spaces`. Key entries can be repeated.
+| This is an array of strings in the form `key=value`, can use EL expression for values `key=#{expr}`. MP Config property is a string and must follow URL query pattern, i.e. `key1=value1&key2=value2&key2=value+with+spaces`. Key entries can be repeated. See the section <<extraparameters>> for more details.
 
 | `extraParametersExpression`
 | 
 | `false`
 | Overrides `extraParameters`, if specified, `extraParameters` is ignored. An array of extra options to be sent to the OpenID Connect provider.
 |
-| The content is supposed to be an EL expression. The expression must evaluate as either list of strings (apply the same rules as for `extraParameters`) or a string - this is split by comma and the strings are used as `extraParameters`. Example: `extraParametersExpression = "#{securityBean.extraParams}`
+| It corresponds to an EL expression. The expression must evaluate as either list of strings (apply the same rules as for `extraParameters`) or a string - this is split by comma and the strings are used as `extraParameters`. Example: `extraParametersExpression = "#{securityBean.extraParams}`. See the section <<extraparameters>> for more details.
 
 | `logout`
 |
@@ -275,16 +275,6 @@ then the MicroProfile Config property value always takes precedence over the `@O
 | false 
 |===
 
-=== `extraParameters` Evaluation
-
-The `extraParameters` option is syntactically an array of strings, so it cannot be directly injected by MP Config, which can only provide strings. There are ways, how to configure it:
-
-1. Backward compatibility: The annotation supports the MP Config value `payara.security.openid.extraParams.raw` in form of URL parameters. If this is specified, it takes precedence and evaluation stops.
-
-2. Expression-Based Configuration: The `extraParametersExpression` option was introduced for configuring arrays in a manner similar to Jakarta 10 and later. This option is evaluated as an EL expression. If it returns a list of strings, these strings are used in the form `"key=value"`. If the expression results in a single string, it must be in comma-separated format  (`"key1=value1,key2=value2"`). The values are split by commas and used. Any other type will result in an error.
-
-3. Default Configuration: If no other configuration is provided, `extraParameters` are resolved. Each string is split by `=`. The value can be either a direct value (`"key=value"`) or an expression (`"key=#{expression}"`).
-
 [[el-support]]
 == Expression Language Support
 
@@ -303,6 +293,49 @@ public class SecurityBean {
 ----
 
 IMPORTANT: By default, the EL expressions are evaluated only once after the application is loaded and the evaluated values are then remembered until the application is reloaded, for performance reasons. This means that although the configuration can be evaluated dynamically the first time it's needed, it's not possible to change the configuration later on. If you need to dynamically modify the configuration during the lifetime of the application, follow the next section about multi-tenancy support.
+
+[[extraparameters]]
+=== Evaluation of `extraParameters`
+
+There are several ways, how to configure `extraParameters` using Expression Language and Microprofile Config.
+
+==== Replaced by MP Config Value
+The annotation supports the MP Config value `payara.security.openid.extraParams.raw` (see `OpenIdAuthenticationDefinition.OPENID_MP_EXTRA_PARAMS_RAW`) in form of URL-encoded parameters. If specified, it takes precedence. Example of the value, e.g. in `META-INF/microprofile-config.properties` file:
+```
+payara.security.openid.extraParams.raw=key1=1%2C2&key2=value2
+```
+
+==== Replaced by `extraParametersExpression`
+The `extraParametersExpression` option was introduced in a manner similar to Jakarta 10 and later. If specified, this option is evaluated as an EL expression, e.g. it expects a bean returning the configuration. If it returns a list of strings, these strings are used in the form `"key=value"`. Values can use further expressions to be configurable at runtime.
+
+Usage:
+
+```
+extraParametersExpression = "#{securityBean.extraParametersArray}"
+```
+
+[source, java]
+----
+public class SecurityBean {
+    public String[] getExtraParametersArray() {
+        return new String[]{"key1=value1", "key2=#{value2}"};
+    }
+}
+----
+
+If the expression results in a single string (e.g. configured via MP Config), it must be in comma-separated format  (`"key1=value1,key2=value2"`). The values are split by commas. Any other type will result in an error.
+
+==== Evaluation of `extraParameters` Itself:
+If the previous steps are not present, `extraParameters` are evaluated. They must be in form `key=value`:
+
+```
+extraParameters = {"key1=value1", "key2=value2"}
+```
+
+Values can use expressions (only one in form `#{` expression `}`):
+```
+extraParameters = {"key1=#{value1}", "key2=#{value2}"}
+```
 
 [[multitenancy]]
 == Multi-tenancy Support (Session-scoped Configuration)
