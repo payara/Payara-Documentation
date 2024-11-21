@@ -1,13 +1,14 @@
-= Payara Server Remote Arquillian Container
+:ordinal: 3
+= Payara Server Remote Arquillian Container Adapter
 
-The Payara Server Remote Arquillian container connects to a running remote Payara Server instance for integration testing using a remote protocol. You can use  your normal Payara deployment to perform your test. The integration connects  Arquillian to the DAS via the REST Interfaces to manage Payara Server over HTTP or HTTPS protocol. 
+When using this adapter, the Payara Server container lifecycle is NOT managed by Arquillian. Instead, the adapter will connect to an already running Payara Server instance via a remote communication protocol by talking to the server's DAS process directly. In this scenario, the integration test setup will have to bootstrap the server's domain startup and shutdown on its own.
 
 This gives you the flexibility to use any possible deployment scenarios having your servers either on many different physical or virtual nodes, or on the same one.
 
 [[usage]]
 == Usage
 
-The Payara Server Remote Arquillian container can be found on Maven Central, and can be included in your project using the following Maven coordinates:
+The Payara Server Remote Arquillian container adapter can be found on link:https://central.sonatype.com/artifact/fish.payara.arquillian/arquillian-payara-server-remote[Maven Central], and can be included in your project using the following Maven GAV coordinates:
 
 [source, xml]
 ----
@@ -18,12 +19,10 @@ The Payara Server Remote Arquillian container can be found on Maven Central, and
 </dependency>
 ----
 
-You can find the latest artifact version https://mvnrepository.com/artifact/fish.payara.arquillian/arquillian-payara-server-remote[from here].
+[[configuration]]
+== Container Configuration
 
-[[configure]]
-== Configuring the Container
-
-The container can be configured via the arquillian.xml using the standard http://arquillian.org/arquillian-core/#container-configuration[Arquillian Container Configuration] mechanism.
+The Payara Server container can be configured via the `arquillian.xml` file using the standard http://arquillian.org/arquillian-core/#container-configuration[Arquillian Container Configuration] mechanism.
 
 The following Arquillian Container configuration options are available:
 
@@ -33,71 +32,86 @@ The following Arquillian Container configuration options are available:
 | Name | Description | Default
 
 | `adminHost`
-| The host to be used to access Payara Admin API.
+| The host to be used to access the Payara Server Admin interface.
 | `localhost`
 
 | `adminHttps`
-| You can use it to specify whether the http or https protocol shall be used 
-to access the DAS. The property value can be true or false.
+| You can use it to specify whether the HTTP or HTTPS protocol shall be used to access the DAS. The property value can be `true` or `false`.
 | `false`
 
 | `adminPort`
-| The port to be used to access Payara Admin API.
+| The port to be used to access the Payara Server Admin interface.
 | `4848`
 
 | `adminUser`
-| The name of the admin user of your DAS. If omitted, no authentication will be used to access the DAS. In this case the `adminPassword` property should also be empty.
-| 
+| The name of the admin user of your DAS.
+
+If omitted, no authentication will be used to access the DAS.
+
+In this case the `adminPassword` property should also be empty.
+|
 
 | `adminPassword`
-| The password of the admin user of your DAS. Cannot be omitted if you declare the admin user. If no authentication will be used to access the DAS you must have empty password for your admin user of your domain.
-| 
+| The password of the admin user of your DAS.
+
+Cannot be omitted if you declare the admin user.
+
+If no authentication will be used to access the DAS you must have empty password for your admin user of your domain.
+|
 
 | `authorisation`
-| If true, basic access authentication is enabled. And indicates that remote server requires an `adminUser` & `adminPassword`.
+| If true, basic access authentication is enabled.
+
+It also indicates that remote server requires an `adminUser` and `adminPassword` configuration properties.
 | `false`
 
 
 | `ignoreCertificates`
-| If true, ignores all certificate checks when connecting to the server. Useful when testing domains hosted in Docker containers and there is no way to turn off SSL.
+| If set to `true`, SSL certificate correctness is ignored.
+
+This is useful for Docker images / Testcontainers when certificates are not easily matched to internally generated ones and host names are also very hard to match.
 | `false`
 
 | `libraries`
-| A comma-separated list of library JAR files. Specify the library JAR files by their relative or absolute paths. Specify relative paths relative to `domain-dir/lib/applibs`. The libraries are made available to the application in the order specified.
-| 
+| A comma-separated list of library JAR files. Specify the library JAR files by their relative or absolute paths.
+
+Specify relative paths relative to `domain-dir/lib/applibs`. The libraries are made available to the application in the order specified.
+|
 
 | `properties`
-| Optional keyword-value pair that specify additional properties for the deployment. The available properties are determined by the implementation of the component that is being deployed.
-| 
+| Optional keyword-value pair that specify additional properties for the deployment.
+
+The available properties are determined by the implementation of the component that is being deployed.
+|
 
 | `target`
-| Payara has a notion of a target, which specifies the target to which you are 
-deploying. We use the "target" as property key with the same semantics as the standard 
-Payara utilities do.
+a| The deployment target of the applications involved in the test.
 
 Valid values of the target are:
- 
- - server: Deploys the component to the default Admin Server instance (on your DAS server). This is the default value if the property is omitted.
 
- - instance_name: Deploys the component to the specified stand-alone sever instance, which may be on the same hosts or can be on a different one as the DAS server.
+`server`:: Deploys the component to the default Admin Server instance (on your DAS server). This is the default value if the property is omitted.
 
- - cluster_name: Deploys the component to every server instance in the cluster. They can be on the same or on several other hosts as the DAS server. Note: Arquillian use only one instance to run the test case.
- 
+`instance_name`:: Deploys the component to the specified stand-alone server instance, which may be on the same hosts or can be on a different one as the DAS server.
+
+`deployment_group_name`:: Deploys the component to every server instance in the specified deployment group. They can be on the same or on several other hosts as the DAS server.
+
 The domain name as a target is not a reasonable deployment scenario in case of testing.
 
-The HOST address and port numbers of the test server instance used by Arquillian 
-(determined by the target property) been retrieved automatically from the DAS server. 
-You have to make them accessible for your test environment (consider any firewall or 
-proxy configuration).
+The HOST address and port numbers of the test server instance used by Arquillian (determined by the target property) will be automatically retrieved from the DAS server.
+
+TIP: You have to make them accessible for your test environment (consider any firewall or proxy configuration).
 
 | `server`
 
 | `type`
-| If set to `osgi`, the component is packaged as an OSGi bundle. If the component is packaged as a regular archive, do not set this option.
-| 
+| If set to `osgi`, the component is packaged as an OSGi bundle.
+
+If the component is packaged as a regular archive, do not set this option.
+|
 |===
 
-NOTE: The context root that will be used to run the tests is also retrieved automatically from the DAS server. If you do not have a `sun-web.xml`, `glassfish-web.xml` or `payara-web.xml` file in your web application, Payara will use the name of your deployment without the extension as context root. The same rule is applied for enterprise applications if there is no `application.xml` file. The jar test-deployments are treated as a web application. You can use the above standard GlassFish / Payara XML files as normal to declare your context root to be applied. You should consider the above description to avoid any conflict with your already deployed web or enterprise applications in your administrative domain. 
+The context root that will be used to run the tests is also retrieved automatically from the DAS server. If the deployed application does have a `sun-web.xml`, `glassfish-web.xml` or `payara-web.xml` deployment descriptor, the container will use the name of your deployment without the extension as context root. +
+The same rule is applied for enterprise applications if there is no `application.xml` file. The JAR test-deployments are treated as a web application.
 
 [[examples]]
 == Examples
@@ -112,7 +126,6 @@ To configure the Arquillian Container options, you need to use an `arquillian.xm
             xmlns="http://jboss.org/schema/arquillian"
             xsi:schemaLocation="http://jboss.org/schema/arquillian
                 http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
-
     <container qualifier="payara" default="true">
         <configuration>
             <property name="adminPort">4848</property>
@@ -122,10 +135,12 @@ To configure the Arquillian Container options, you need to use an `arquillian.xm
 </arquillian>
 ----
 
-If you want to configure more containers, you can switch between them by setting the `arquillian.launch` system property to the container's qualifier. This is how you can do it with the maven `surefire` plugin (`my.admin.password` system property is used to set the `adminPassword` property in `arquillian.xml`):
+If you want to configure more containers, you can switch between them by setting the `arquillian.launch` system property to the container's qualifier.
+
+This is how you can do it with the maven `surefire` plugin (`my.admin.password` system property is used to set the `adminPassword` property in `arquillian.xml`):
 
 [source, xml]
-.Example Surefire plugin configuration in a `pom.xml` file
+.Example - Surefire plugin configuration in the project's POM file
 ----
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
