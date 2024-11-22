@@ -1,26 +1,25 @@
 
-= Arquillian Containers
+= Arquillian Container Adapters
 
-The Payara Arquillian containers provide various Arquillian containers for integration testing with Payara Community.
+An *Arquillian container*, generally speaking, is a runtime with which Arquillian interacts when running an integration test. Arquillian may manage the container’s lifecycle or simply bind to it. Arquillian may deploy archives or descriptors to the container. Arquillian may transfer execution of the tests into the container, or it may simply make the URL of the deployed application available to the test which is acting as a client.
 
-In version {page-version}, the following containers are available:
+Arquillian supports multiple containers (among them Payara Platform distributions) through its extension mechanism. A *container adapter* is packaged as a JAR and is referenced, along with its dependencies, through as set of Maven GAV coordinates (`groupId`, `artifactId`, `version`). During the execution of tests, a container adapter must be present in the test classpath, allowing Arquillian to locate, load and use it.
 
-Payara Server:
+In this context, the following container adapters have been implemented within the Payara Ecosystem tools to provide integration with Payara Platform distributions containers:
 
-* xref:/Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Server Remote.adoc[Payara Server Remote]
-* xref:/Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Server Managed.adoc[Payara Server Managed]
-* xref:/Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Server Embedded.adoc[Payara Server Embedded]
+* For Payara Server:
+** xref:/Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Server Embedded.adoc[Payara Server Embedded (`server-embedded`)]
+** xref:/Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Server Managed.adoc[Payara Server Managed (`server-managed`)]
+** xref:/Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Server Remote.adoc[Payara Server Remote (`server-remote`)]
+* For Payara Micro:
+** xref:/Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Micro Managed.adoc[Payara Micro Managed (`micro-managed`)]
 
-Payara Micro:
+[[getting-the-adapters]]
+== Where can I get the adapters?
 
-* xref:/Technical Documentation/Ecosystem/Connector Suites/Arquillian Containers/Payara Micro Managed.adoc[Payara Micro Managed]
+The Payara Arquillian container adapters are freely available in Maven Central under the following GAV coordinates :
 
-
-== Obtaining the Containers
-
-Arquillian containers are included in a project via their Maven coordinates:
-
-[source,XML]
+[source, xml]
 ----
 <dependency>
     <groupId>fish.payara.arquillian</groupId>
@@ -29,20 +28,15 @@ Arquillian containers are included in a project via their Maven coordinates:
 </dependency>
 ----
 
-Some containers will be either in development or an early release version. In these cases
-the same process can be used, but the artifact will need to be built from source.
-The containers can be found in the Payara Arquillian source code repository.
+Where `$\{container-name\}` refers to the specific container in question (see their names in the previous section) and the `$\{version\}` corresponds to the specific adapter version compatible with this Payara Platform version.
 
-Clone the https://github.com/payara/ecosystem-arquillian-connectors[ecosystem-arquillian-connectors] Git repository:
+TIP: All adapters share the same version as part of their connector suite.
 
-[source,Shell]
-----
-git clone https://github.com/payara/ecosystem-arquillian-connectors.git
-----
+NOTE: For Payara Platform 6.x, adapters in version `3.x` are compatible.
 
-Build and install:
+[[general-usage]]
+== General Usage
 
-[source,Shell]
-----
-mvn clean install -DskipTests
-----
+An example application demonstrating how to create a test suite that runs the tests inside various Payara Platform distributions using Arquillian can be seen in the https://github.com/payara/Payara-Examples[Payara Examples] repository.
+
+See specifically the https://github.com/payara/Payara-Examples/tree/master/ecosystem/arquillian-example[ecosystem/arquillian-example] subproject for an example of writing integration tests using Arquillian along with the corresponding container adapters described above.
