@@ -1,0 +1,86 @@
+[[create-system-properties]]
+= create-system-properties
+
+Adds one or more system property elements that can be referenced elsewhere in the configuration.
+
+[[synopsis]]
+== Synopsis
+
+[source,shell]
+----
+asadmin [asadmin-options] create-system-property [--help]
+[--target target]
+[name=value]
+----
+
+[[description]]
+== Description
+
+The `create-system-property` subcommand adds or updates a single system property that can be referenced elsewhere on the server.
+
+Payara Server provides hooks where tokens (system properties) can be specified. Because Payara Server does not have multiple server
+elements, you can specify a particular token at any level. When a domain supports multiple servers, the override potential can be exploited. When
+a domain is started or restarted, all `<system-property>` elements are resolved and available to the Java Virtual Machine by using the
+`System.setProperty()` call on each of them (with its name and value derived from the corresponding attributes of the element). This is
+analogous to sending the elements as `-D` parameters on the Java command line.
+
+This subcommand is supported in remote mode only.
+
+[[options]]
+== Options
+
+asadmin-options::
+Options for the `asadmin` utility. For information about these options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+`--help`::
+`-?`::
+Displays the help text for the subcommand.
+`--target`::
+The target on which you are creating the system properties.
+
+[[operands]]
+== Operands
+
+target::
+The valid targets for this subcommand are instance, cluster,   configuration, domain, and server. Server is the default option. Valid values are: +
+`server`;;
+Creates the property on the default server instance. This is the default value.
+`domain`;;
+Creates the property for all server instances in the default domain.
+configuration_name;;
+Creates the property in the specified configuration.
+cluster_name;;
+Creates the property on all server instances in the specified cluster.
+instance_name;;
+Creates the property on a specified server instance.
+name=value::
+The name value pairs of the system properties to add to the specified target.
+If a system property was already defined, it is updated with the new value.
+
+[[examples]]
+== Examples
+
+*Example 1 Creating System Property*
+
+This example creates a system property associated with an HTTP listener on a server instance named `myserver`.
+
+[source,shell]
+----
+asadmin> create-system-property --target myserver http-listener-port=1088
+Command create-system-property executed successfully.
+----
+
+[[exit-status]]
+== Exit Status
+
+0::
+subcommand executed successfully
+1::
+error in executing the subcommand
+
+*See Also*
+
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-system-properties.adoc#create-system-properties[`create-system-properties`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-system-property.adoc#delete-system-property[`delete-system-property`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/list-system-properties.adoc#list-system-properties[`list-system-properties`]
+

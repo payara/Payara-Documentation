@@ -8,15 +8,16 @@ Create options for the Java application launcher.
 
 [source,shell]
 ----
-asadmin [asadmin-options] create-jvm-options [--help] 
-[--target target] [--profiler={true|false}] 
-(jvm-option-name=jvm-option-value) [:jvm-option-name=jvm-option-value*]
+asadmin [asadmin-options] create-jvm-option [--help]
+[--target target]
+[--profiler={true|false}]
+(assignment=jvm-option)
 ----
 
 [[description]]
 == Description
 
-The `create-jvm-options` subcommand creates command-line options that are passed to the Java application launcher when Payara Server is started. The options that this subcommand creates are in addition to the options that are preset with Payara Server. Java application launcher options are stored in the Java configuration `java—config` element or the profiler `profiler` element of the `domain.xml` file. The options are sent to the command line in the order they appear in the `java—config` element or the profiler `profiler` element in the `domain.xml` file.
+The `create-jvm-options` subcommand creates a single command-line option that is passed to the Java application launcher when Payara Server is started. The options that this subcommand creates are in addition to the options that are preset with Payara Server. Java application launcher options are stored in the Java configuration `java—config` element or the profiler `profiler` element of the `domain.xml` file. The options are sent to the command line in the order they appear in the `java—config` element or the profiler `profiler` element in the `domain.xml` file.
 
 Profiler options are used to record the settings that are required to start a particular profiler. The profiler must already exist. If necessary, use the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-profiler.adoc#create-profiler[`create-profiler`] subcommand to create the profiler.
 
@@ -58,62 +59,56 @@ This subcommand is supported in remote mode only.
 == Options
 
 asadmin-options::
-  Options for the `asadmin` utility. For information about these
-  options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
+Options for the `asadmin` utility. For information about these
+options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] help page.
 `--help`::
 `-?`::
-  Displays the help text for the subcommand.
+Displays the help text for the subcommand.
 `--target`::
-  Specifies the target on which you are creating Java application launcher options. +
-  Valid values are as follows: +
-  `server`;;
-    Specifies the DAS (default).
-  instance-name;;
-    Specifies a Payara Server instance.
-  cluster-name;;
-    Specifies a cluster.
-  configuration-name;;
-    Specifies a named configuration.
+Specifies the target on which you are creating Java application launcher options. +
+Valid values are as follows: +
+`server`;;
+Specifies the DAS (default).
+instance-name;;
+Specifies a Payara Server instance.
+cluster-name;;
+Specifies a cluster.
+configuration-name;;
+Specifies a named configuration.
 `--profiler`::
-  Indicates whether the Java application launcher options are for the profiler. The profiler must exist for this option to be true. Default is false.
+Indicates whether the Java application launcher options are for the profiler. The profiler must exist for this option to be true. Default is false.
 
 [[operands]]
 == Operands
 
 jvm-option-name::
-  One or more options delimited by a colon (:). The format of an option depends on the following: +
-  * If the option has a name and a value, the format is option-name=value.
-  * If the option has only a name, the format is option-name. For example, `-Xmx2048m`.
-  * If the first option name could be misinterpreted as one or more `asadmin` short options, the format is `--` option-name.
-   For example, `-server` in the following command could be misinterpreted as `-se`, the `asadmin` short forms for `--secure` and `--echo`:
+A single option where the format depends on the following: +
+* If the option has a name and a value, the format is option-name=value.
+* If the option has only a name, the format is option-name. For example, `-Xmx2048m`.
+* If the first option name could be misinterpreted as one or more `asadmin` short options, the format is `--` option-name.
+For example, `-server` in the following command could be misinterpreted as `-se`, the `asadmin` short forms for `--secure` and `--echo`:
 +
 [source,shell]
 ----
-create-jvm-options -server
+create-jvm-option -server
 ----
 To create the JVM option `-server`, instead use the command:
 +
 [source,shell]
 ----
-create-jvm-options -- -server
+create-jvm-option -- -server
 ----
-
-NOTE: If an option name or option value contains a colon, the backslash (`\`) must be used to escape the colon in the name or value. Other characters might also require an escape character.
-For more information about escape characters in subcommand options, see the xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] man page.
 
 [[examples]]
 == Examples
 
-*Example 1 Setting Java System Properties*
-
-This example sets multiple Java system properties.
+*Example 1 Setting A Java System Property*
 
 [source,shell]
 ----
-asadmin> create-jvm-options -Dunixlocation=/root/example:
--Dvariable=\$HOME:-Dwindowslocation=d\:\\sun\\appserver:-Doption1=-value1
-created 4 option(s)
-Command create-jvm-options executed successfully.
+asadmin> create-jvm-option -Dunixlocation=/root/example
+Successfully created JVM option: -Dunixlocation=/root/example
+Command create-jvm-option executed successfully.
 ----
 
 *Example 2 Setting a Startup Parameter for the Java Application Launcher*
@@ -122,47 +117,34 @@ This example sets the maximum available heap size to 1024.
 
 [source,shell]
 ----
-asadmin> create-jvm-options -Xmx1024m
-created 1 option(s)
-Command create-jvm-options executed successfully.
+asadmin> create-jvm-option -Xmx1024m
+Successfully added JVM option: -Xmx1024m
+Command create-jvm-option executed successfully.
 ----
 
-*Example 3 Setting Multiple Startup Parameters for the Java Application Launcher*
-
-This example sets the maximum available heap size to 1024 and requests details about garbage collection.
-
-[source,shell]
-----
-asadmin> create-jvm-options "-Xmx1024m:-XX\:+PrintGCDetails"
-created 1 option(s)
-Command create-jvm-options executed successfully.
-----
-
-In this case, one of the two parameters already exists, so the subcommand reports that only one option was set.
-
-*Example 4 Setting a JVM Startup Parameter for the Profiler*
+*Example 3 Setting a JVM Startup Parameter for the Profiler*
 
 This example sets a JVM startup parameter for the profiler.
 
 [source,shell]
 ----
-asadmin> create-jvm-options --profiler=true -XX\:MaxPermSize=192m
-created 1 option(s)
-Command create-jvm-options executed successfully.
+asadmin> create-jvm-option --profiler=true -XX:MaxPermSize=192m
+Successfully create JVM option: -XX:MaxPermSize=192m
+Command create-jvm-option executed successfully.
 ----
 
 [[exit-status]]
 == Exit Status
 
 0::
-  subcommand executed successfully
+subcommand executed successfully
 1::
-  error in executing the subcommand
+error in executing the subcommand
 
 *See Also*
 
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`],
-* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-jvm-option.adoc#create-jvm-option[`create-jvm-option`],
+* xref:Technical Documentation/Payara Server Documentation/Command Reference/create-jvm-options.adoc#create-jvm-options[`create-jvm-options`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/create-profiler.adoc#create-profiler[`create-profiler`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-jvm-options.adoc#delete-jvm-options[`delete-jvm-options`],
 * xref:Technical Documentation/Payara Server Documentation/Command Reference/list-jvm-options.adoc#list-jvm-options[`list-jvm-options`],
