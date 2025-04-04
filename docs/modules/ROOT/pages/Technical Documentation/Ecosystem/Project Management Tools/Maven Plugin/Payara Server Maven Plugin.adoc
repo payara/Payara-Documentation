@@ -1,0 +1,523 @@
+= Payara Server Maven Plugin
+:ordinal: 2
+
+Payara Server provides a Maven plugin that can start and stop the server and deploy Jakarta EE applications.
+
+The plugin requires JDK 17 or higher.
+
+[[goals]]
+== Configurable Goals
+
+[[start-goal]]
+=== `start`
+
+*Aim*: This goal starts Payara Server with the specified configuration.
+*Usage*: `mvn payara-server:start`
+
+Example:
+
+[source,xml]
+----
+<plugin>
+    <groupId>fish.payara.maven.plugins</groupId>
+    <artifactId>payara-server-maven-plugin</artifactId>
+    <version>${payara.server.maven.plugin.version}</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>start</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <payaraServerVersion>6.2025.3</payaraServerVersion>
+        <javaHome>/path/to/Java/Executable</javaHome>
+        <contextRoot>myApp</contextRoot>
+    </configuration>
+</plugin>
+----
+
+.Common Configuration:
+The following properties allow customization of local and remote deployments:
+[cols="2,2,2,1,7",options="header"]
+|===
+|Property Name 
+|System Property 
+|Environment Variable
+|Default Value 
+|Description
+
+|contextRoot 
+|payara.context.root
+|PAYARA_CONTEXT_PATH
+|_none_
+|Defines the context root of an application.
+
+|adminPort
+|payara.admin.port
+|PAYARA_ADMIN_PORT
+|_none_
+|Admin port for Payara server administration.
+
+|httpPort
+|payara.http.port
+|PAYARA_HTTP_PORT
+|_none_
+|HTTP port for accessing deployed applications.
+
+|httpsPort
+|payara.https.port
+|PAYARA_HTTPS_PORT
+|_none_
+|HTTPS port for accessing deployed applications securely.
+
+|protocol
+|payara.protocol
+|PAYARA_PROTOCOL
+|_none_
+|Protocol to be used for server communication (e.g., HTTP or HTTPS).
+
+|adminPassword
+|payara.admin.password
+|PAYARA_ADMIN_PASSWORD
+|_none_
+|Password for the Payara admin user.
+
+|adminPasswordFile
+|payara.admin.password.file
+|PAYARA_ADMIN_PASSWORD_FILE
+|_none_
+|Path to the file containing the Payara admin password.
+
+|adminUser
+|payara.admin.user
+|PAYARA_ADMIN_USER
+|_none_
+|Username for Payara server administration.
+
+|instanceName
+|payara.instance.name
+|PAYARA_INSTANCE
+|_none_
+|Name of the Payara server instance.
+
+|daemon
+|payara.daemon
+|PAYARA_DAEMON
+|false
+|Starts Payara Server in separate JVM process and continues with the maven build.
+
+|immediateExit
+|payara.immediate.exit
+|PAYARA_IMMEDIATE_EXIT
+|false
+|If Payara Server is executed in daemon mode, the executor thread will wait for the ready message before shutting down its process. By setting `immediateExit` to `true` you can skip this and instantly interrupt the executor thread.
+
+|autoDeploy
+|payara.auto.deploy
+|PAYARA_AUTO_DEPLOY
+|false
+|Enables automatic compilation and deployment upon saving files.
+
+|keepState
+|payara.keep.state
+|PAYARA_KEEP_STATE
+|false
+|Persists session state across multiple redeployments.
+
+|liveReload
+|payara.live.reload
+|PAYARA_LIVE_RELOAD
+|false
+|Triggers a browser refresh for an up-to-date view after each redeployment.
+
+|browser
+|payara.browser
+|PAYARA_BROWSER
+|System default browser
+|Specifies the browser used for live reload. If not explicitly set, Payara selects the best available browser based on the system: Chrome (if installed), then Firefox, followed by the system default—Edge on Windows, Safari on macOS, and Firefox on Linux.
+
+|trimLog
+|payara.trim.log
+|PAYARA_TRIM_LOG
+|false
+|Refactors log format for improved readability.
+
+|hotDeploy
+|payara.hot.deploy
+|PAYARA_HOT_DEPLOY
+|false
+|Enables the Hot Deploy mode.
+
+|webappDirectory
+|
+|
+|${project.build.directory}/${project.build.finalName}
+|The directory where the web application is built.
+
+|debug
+|payara.debug
+|PAYARA_DEBUG
+|false
+|Enables debugging mode. If true, the server waits for a debugger to attach.
+
+|debugPort
+|payara.debug.port
+|PAYARA_DEBUG_PORT
+|_none_
+|The port for remote debugging.
+
+|httpConnectionTimeout
+|payara.http.connection.timeout
+|PAYARA_HTTP_CONNECTION_TIMEOUT
+|3000
+|Socket connection timeout (in milliseconds).
+
+|httpReadTimeout
+|payara.http.read.timeout
+|PAYARA_HTTP_READ_TIMEOUT
+|3000
+|Socket read timeout (in milliseconds).
+|===
+
+.Local Configuration:
+The following properties allow customization of deployments to local instance.
+[cols="2,2,2,1,7",options="header"]
+|===
+|Property Name 
+|System Property 
+|Environment Variable
+|Default Value
+|Description
+
+|javaHome
+|payara.java.home
+|PAYARA_JAVA_HOME
+|Environment Variable `JAVA_HOME` or `JDK_HOME`
+|Absolute path to the java executable.
+
+|payaraServerVersion
+|payara.server.version
+|PAYARA_SERVER_VERSION
+|`6.2025.3`
+|By default, start mojo fetches payara-server with version `6.2025.3`.
+
+|payaraServerPath
+|payara.server.path
+|PAYARA_SERVER_PATH
+|_none_
+|Absolute path to the Payara server installation directory.
+
+|artifactItem
+|
+|
+|_none_
+|Defines payara-server artifact with its coordinates. Specified artifact should be available in local maven repository.
+
+|domainName
+|payara.domain.name
+|PAYARA_DOMAIN_NAME
+|`domain1`
+|Payara server domain to be used.
+
+|exploded
+|payara.exploded
+|PAYARA_EXPLODED
+|false
+|If true, deploys the application in an exploded (unpacked) format.
+
+|commandLineOptions
+|
+|
+|_none_
+|Defines a list of command line options that will be passed onto payara-server.
+
+|javaCommandLineOptions
+|
+|
+|_none_
+|Defines a list of command line options that will be passed to `java` executable. Command line options can either be defined as key-value pairs or just as list of values. key-value pairs will be formatted as `key=value`.
+|===
+
+.Remote Configuration:
+The following properties allow customization of deployments to remote instance.
+[cols="2,2,2,1,7",options="header"]
+|===
+|Property Name 
+|System Property 
+|Environment Variable
+|Default Value
+|Description
+
+|remote
+|payara.remote
+|PAYARA_REMOTE
+|false
+|If true, connects to a remote Payara server instance.
+
+|hostName
+|payara.host.name
+|PAYARA_HOST_NAME
+|_none_
+|Hostname or IP address of the Payara server.
+|===
+
+
+[[dev-goal]]
+=== `dev`
+
+*Aim*: The dev goal is designed to streamline development by enabling `exploded`, `autoDeploy`, `liveReload`, `keepState`, and `trimLog` to true, 
+which facilitates automatic compilation and deployment when saving files, resulting in faster iterations and a more efficient development workflow.
+
+*Usage*:
+[source, shell]
+----
+mvn payara-server:dev
+----
+
+The `dev` goal is an extended goal of `start` and is pre-configured for developing web applications in development mode which is equivalent to starting the Payara Server instance using the following command:
+
+[source, shell]
+----
+mvn payara-server:start -DautoDeploy=true -DliveReload=true -Dexploded=true -DkeepState -DtrimLog=true
+----
+
+[[dev-mode-features]]
+==== *Features in Dev Mode*:
+
+. *Auto Deploy*: The AutoDeploy feature enables automatic compilation and deployment of the application upon saving files within the project structure. Enabled by setting `autoDeploy=true`.
++
+The AutoDeploy feature relies on Java's WatchService to monitor changes in source directories, enabling continuous build and reload using Maven's Invoker. It dynamically modifies Maven goals based on file modifications, supports asynchronous execution for concurrent build tasks, and includes specifics for tracking changes in source, resources, and test directories.
+
+. *Live Reload*:
+The LiveReload feature automatically refreshes the browser upon redeployment.
+
+* `liveReload` Property: Enables or disables automatic browser refresh on redeployment. The `liveReload` property is set to `true` by default in the `dev` goal and `false` in the `start` goal.
+
+* `browser` Property: The `browser` property offers seamless configuration. If not specified, the system prioritizes Chrome and Firefox, gracefully falling back to Edge on Windows, Safari on macOS, or Firefox on other platforms. This improvement simplifies setup - no need to worry about specifying a browser; it adapts based on your system.
+
+* Cached Last Accessed URL: The last accessed Payara Server URL is stored in the `payara-maven-config.properties` file within the system's temporary directory. This ensures accessibility across application restarts, and eliminating the need for users to manually navigate back to the last accessed URL. This streamlined approach enhances the overall user experience by maintaining continuity and reducing manual intervention after each restart.
+
+. *Persistent Session State*: The `keepState` property allows for the persistence of session state across multiple re-deployments during the development process. Enabled by default in the `dev` goal and disabled in the `start` goal.
+
+. *Readable Logging*: The `trimLog` property refactors the log format for improved readability. Enabled by default in the `dev` goal and disabled in the `start` goal.
+
+NOTE: All listed features are enabled by default in the `dev` mode.
+
+[[supported-keywords]]
+== Supported Keywords
+
+The Payara Server Maven plugin provides a built-in CLI interface that accepts specific keywords 
+to interact with a running Payara Server instance. These commands can be used via terminal input.
+
+* `asadmin <command>`  
+  Executes the specified `asadmin` subcommand. This is only available when the server 
+  manager is an instance of a local server.
+
+  Example:
+  [source,shell]
+  ----
+  asadmin list-applications
+  ----
+
+* `deploy`  
+  Deploys the current application to the running server instance.
+
+* `undeploy`  
+  Undeploys the current application from the running server instance.
+
+* `exit`  
+  Exits the CLI session and terminates the running Payara server process.
+
+* AI Agent Query
+
+  If the AI agent is enabled in the plugin configuration, the CLI accepts **any natural language query**.  
+  The query will be interpreted by the AI and responded to accordingly, based on the current context.
+
+NOTE: The predefined keywords (`asadmin`, `deploy`, `undeploy`, `exit`) will take precedence over AI interpretation if matched.
+
+[[ai-agent]]
+== AI Agent (Experimental)
+The AI Agent is an experimental feature in the Payara Server Maven plugin that brings intelligent automation and observability to Jakarta EE application development.
+It is enabled by default in `dev` mode and disabled in other modes for safety. 
+To enable it manually, set the `payara.ai.agent` system property or the `PAYARA_AI_AGENT` environment variable to `true`.
+
+=== Capabilities
+
+The AI Agent enhances the developer experience by interpreting natural language instructions and extracting contextual insights from the running server. Key features include:
+
+- Generating and explaining **`asadmin` commands** from plain English instructions.
+- Querying server configuration and runtime state via the **Domain REST endpoints** and **JMX MBeans**.
+- Executing **safe, read-only `asadmin` commands**, such as listing deployed applications or viewing JDBC connection pool status.
+- Parsing and summarizing **server logs** and key configuration files like `domain.xml` to surface relevant insights.
+- Offering intelligent prompts and auto-completions for common server administration and troubleshooting tasks.
+
+==== *Configuration Properties*
+
+The AI Agent can be customized using the following properties:
+
+[cols="2,2,2,1,7",options="header"]
+|===
+|Property Name
+|System Property
+|Environment Variable
+|Default Value
+|Description
+
+|API Key
+|payara.ai.api.key
+|PAYARA_AI_API_KEY
+|_none_
+|API Key for accessing the AI provider’s services.
+
+|Provider Location
+|payara.ai.provider.location
+|PAYARA_AI_PROVIDER_LOCATION
+|_none_
+|Endpoint or URL of the AI provider. For example, for `OLLAMA`, the location is `http://localhost:11434`.
+
+|Provider
+|payara.ai.provider
+|PAYARA_AI_PROVIDER
+|`OPEN_AI`
+|Name of the AI service provider. Supported values:
+`OPEN_AI`, `CUSTOM_OPEN_AI`, `GOOGLE`, `DEEPINFRA`, `DEEPSEEK`, `GROQ`, `MISTRAL`, `OLLAMA`, `ANTHROPIC`, `LM_STUDIO`, `GPT4ALL`.
+
+|Model
+|payara.ai.model
+|PAYARA_AI_MODEL
+|`gpt-4o-mini`
+|The AI model to be used (e.g., `gpt-4`, `claude-3-opus`, etc.).
+
+|Temperature
+|payara.ai.temperature
+|PAYARA_AI_TEMPERATURE
+|_none_
+|Controls the randomness of AI responses. Range: 0.0 (deterministic) to 1.0 (creative).
+
+|Top-P
+|payara.ai.top.p
+|PAYARA_AI_TOP_P
+|_none_
+|Controls diversity via nucleus sampling. An alternative to temperature.
+
+|Stream
+|payara.ai.stream
+|PAYARA_AI_STREAM
+|_none_
+|Enable streaming responses if supported by the provider.
+
+|Timeout
+|payara.ai.timeout
+|PAYARA_AI_TIMEOUT
+|_none_
+|Timeout in milliseconds for requests made to the AI provider.
+
+|Log Requests
+|payara.ai.log.requests
+|PAYARA_AI_LOG_REQUESTS
+|_none_
+|Log outgoing AI requests.
+
+|Log Responses
+|payara.ai.log.responses
+|PAYARA_AI_LOG_RESPONSES
+|_none_
+|Log incoming AI responses.
+
+|Repeat Penalty
+|payara.ai.repeatPenalty
+|PAYARA_AI_REPEAT_PENALTY
+|_none_
+|Controls penalty for repeated tokens in generated content.
+
+|Organization ID
+|payara.ai.organizationId
+|PAYARA_AI_ORGANIZATION_ID
+|_none_
+|AI provider organization ID, if required (e.g., OpenAI).
+
+|Top-K
+|payara.ai.topK
+|PAYARA_AI_TOP_K
+|_none_
+|Limit the next token sampling to the top-K most likely tokens.
+
+|Max Tokens
+|payara.ai.maxTokens
+|PAYARA_AI_MAX_TOKENS
+|_none_
+|Maximum number of tokens for a request.
+
+|Max Completion Tokens
+|payara.ai.maxCompletionTokens
+|PAYARA_AI_MAX_COMPLETION_TOKENS
+|_none_
+|Maximum number of tokens to generate in a completion.
+
+|Max Output Tokens
+|payara.ai.maxOutputTokens
+|PAYARA_AI_MAX_OUTPUT_TOKENS
+|_none_
+|Maximum number of tokens expected in AI response.
+
+|Presence Penalty
+|payara.ai.presencePenalty
+|PAYARA_AI_PRESENCE_PENALTY
+|_none_
+|Penalty for including new topics in completions.
+
+|Frequency Penalty
+|payara.ai.frequencyPenalty
+|PAYARA_AI_FREQUENCY_PENALTY
+|_none_
+|Penalty for repeating existing words/tokens in the input.
+
+|Custom Headers
+|payara.ai.customHeaders
+|PAYARA_AI_CUSTOM_HEADERS
+|_none_
+|Comma-separated custom headers to include in requests.
+
+|Seed
+|payara.ai.seed
+|PAYARA_AI_SEED
+|_none_
+|Seed value for deterministic output from the AI provider.
+
+|Allow Code Execution
+|payara.ai.allowCodeExecution
+|PAYARA_AI_ALLOW_CODE_EXECUTION
+|_none_
+|Allow executing code snippets in the AI responses.
+
+|Include Code Execution Output
+|payara.ai.includeCodeExecutionOutput
+|PAYARA_AI_INCLUDE_CODE_EXECUTION_OUTPUT
+|_none_
+|Include the result of code execution in AI output.
+
+|Max Retries
+|payara.ai.maxRetries
+|PAYARA_AI_MAX_RETRIES
+|_none_
+|Maximum number of retries on failure when querying the AI provider.
+
+|Chat History
+|payara.ai.chat.history
+|PAYARA_AI_CHAT_HISTORY
+|false
+|Enable context history in chat-based AI requests.
+
+|Chat History Limit
+|payara.ai.chat.history.limit
+|PAYARA_AI_CHAT_HISTORY_LIMIT
+|3
+|Number of previous interactions retained in chat history.
+|===
+
+=== Usage Context
+The AI Agent operates best during development, local testing, or in isolated environments. It is **not recommended for use in production** due to its access to sensitive runtime data and its experimental nature.
+By integrating AI-driven insights into the Payara tooling, the AI Agent aims to streamline operations, accelerate diagnostics, and boost developer productivity.
+
+NOTE: As this is an experimental feature, usage and API compatibility may change in future versions.
