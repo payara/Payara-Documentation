@@ -14,6 +14,7 @@ asadmin [asadmin-options] create-local-instance [--help]
 [--lbenabled={true|false}]
 [--portbase port-number] [--checkports={true|false}]
 [--savemasterpassword={false|true}]
+[--masterpasswordlocation filepath]
 [--usemasterpassword={false|true}]
 [--systemproperties (name=value)[:name=value]* ]
 [--dataGridStartPort startPort]
@@ -106,6 +107,11 @@ When the `--portbase` option is specified, the output of this subcommand include
 `--savemasterpassword`::
   Setting this option to `true` allows the master password to be written to the file system. If the master password is written to the file system, the instance can be started without the need to prompt for the password. If this option is `true`, the `--usemasterpassword` option is also true, regardless of the value that is specified on the command line. Because writing the master password to the file system is an insecure practice, the default is `false`. +
   The master-password file for an instance is saved in the node directory, not the domain directory. Therefore, this option is required only for the first instance that is created for each node in a domain.
+`--masterpasswordlocation`::
+Only applies if the `--savemasterpassword` parameter is set to true.
+This parameter receives an absolute filepath that the master password
+will be saved to. +
+If this parameter is omitted, the default location will be used.
 `--usemasterpassword`::
   Specifies whether the key store is encrypted with a master password that is built into the system or a user-defined master password. +
   If `false` (default), the keystore is encrypted with a well-known
