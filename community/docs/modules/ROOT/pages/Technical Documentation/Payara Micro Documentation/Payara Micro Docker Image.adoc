@@ -198,3 +198,18 @@ The following is a list of variables used by the Docker image to set up the Paya
 |Variable name |Description | Value
 |`HOME_DIR` |The directory containing the Payara Micro JAR binary and the scripts used to run the instance.| `/opt/payara`|
 |===
+
+[[read-only]]
+=== Read Only Containers
+
+The Payara Micro Docker image requires write access to the `HOME_DIR`, and `/tmp` directories to function.
+If you wish to use `--read-only` Docker containers (or the equivalent `--readOnlyRootFilesystem` property in Kubernetes), you must mount volumes at these directories which the `payara` user has write access to.
+This can be done using anonymous or tmpfs volumes if you do not wish to persist the data outside the life of the container.
+Named volumes or bind mounts may be used if you wish the data to persist outside the life of the container.
+
+Here is an example `run` command for a read-only Docker container which will delete itself and its anonymous volumes when stopped, deploying all artefacts located in the `~/payara-micro/applications` directory:
+
+[source, shell]
+----
+docker run -p 8080:8080 --read-only --rm -v /opt/payara -v /tmp -v ~/payara-micro/applications:/opt/payara/deployments payara/micro
+----
