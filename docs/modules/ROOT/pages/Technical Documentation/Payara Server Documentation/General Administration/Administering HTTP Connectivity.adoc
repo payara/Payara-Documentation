@@ -996,6 +996,16 @@ There are 3 options for this property:
 This prevents malicious XSS attacks hijacking a Java session. It is enabled by default.
 | `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.sso-cookie-http-only=true/false`
 
+| Session Cookie Http Only
+| Determines whether to add the `HttpOnly` flag to the `JSESSIONID` cookie. In practice, this will disallow JavaScript access to the cookie in the browser.
+
+This prevents malicious XSS attacks hijacking a Java session. It is enabled by default.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.session-cookie-http-only=true/false`
+
+| Session Cookie Secure
+| Determines whether to add the `Secure` flag to the `JSESSIONID` cookie. In practice, this specifies that the cookie may only be transmitted using HTTPS connections.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.session-cookie-secure=true/false/dynamic`
+
 | Network Listeners
 | Comma separated list of network listeners which applications deployed to this virtual server are available on.
 | `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.network-listeners=listener-1,listener-2`
@@ -1243,6 +1253,26 @@ A string value that specifies whether the `Secure` attribute is included in `JSE
 * `true` — The `Secure` attribute is included.
 * `false` — The `Secure` attribute is not included.
 * `dynamic` — The `Secure` attribute setting is inherited from the default ports table for all HTTP listeners first session participating in SSO. This is the default value.
+
+[[to-set-jsessionid-cookie-attributes]]
+=== To Set `JSESSIONID` Cookie Attributes
+
+Use the `session-cookie-http-only` and `session-cookie-secure` virtual server attributes to set the `HttpOnly` and `Secure` attributes of any `JSESSIONID` cookies associated with web applications deployed to the virtual server.
+
+Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand to set the value of the `session-cookie-http-only` and `session-cookie-secure` virtual server attributes.
+
+The values supported for these attributes are as follows:
+
+`session-cookie-http-only`::
+A boolean value that specifies whether the `HttpOnly` attribute is included in `JSESSIONID` cookies.
++
+When set to `true`, which is the  default, the `HttpOnly` attribute is included. When set to `false`, the `HttpOnly` attribute is not included.
+`session-cookie-secure`::
+A string value that specifies whether the `Secure` attribute is included in `JSESSIONID` cookies. Allowed values are as follows:
++
+* `true` — The `Secure` attribute is included.
+* `false` — The `Secure` attribute is not included.
+* `dynamic` — The `Secure` attribute setting is determined by whether the HTTP connection is secure. This is the default value.
 
 [[http-header-validation]]
 == HTTP Header Fields Validation
