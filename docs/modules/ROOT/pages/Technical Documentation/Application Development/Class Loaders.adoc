@@ -141,6 +141,9 @@ This command accepts the `--type` argument, which accepts the following options:
 `common`:: The library is installed as a common library into the `lib` directory in the Payara Server domain
 `ext`:: The library is installed as an "extension" library into the `lib/ext` directory in the Payara Server domain
 `app`:: the library is installed as an application library into the `lib/applibs` directory in the Payara Server domain
+ifeval::["{page-site-edition}" == "community"]
+`war`:: the library is installed as a WAR library into the `lib/warlibs` directory in the Payara Server domain
+endif::[]
 
 [[common-libraries]]
 ==== Common Libraries
@@ -193,6 +196,18 @@ If multiple applications or modules refer to the same libraries, classes in thos
 
 NOTE: If you see an access control error message when you try to use a library, you may need to grant permission to the library in the
 `server.policy` file. For more information, see xref:Technical Documentation/Application Development/Securing Applications.adoc#changing-permissions-for-an-application[Changing Permissions for an Application].
+
+ifeval::["{page-site-edition}" == "community"]
+
+[[War-libraries]]
+==== WAR Libraries
+
+Libraries stored in this directory allows a developer to create and deploy skinny WARs, as the libraries stored in this directory are subject to additional annotation and extension scanning & processing for CDI, EJB, Servlet, and more.
+Unlike common and application libraries (those stored in `domain_dir/lib` and `domain_dir/lib/applibs` respectively), warlibs are cached and don't dynamically update if the files within the directory are modified.
+
+These libraries are only used by applications which are deployed with the `warlibs` property set to `true`. See the xref:Technical Documentation/Payara Server Documentation/Command Reference/deploy.adoc[deploy] command documentation.
+
+endif::[]
 
 [[packaging-the-client-jar-for-one-application-in-another-application]]
 === Packaging the Client JAR for One Application in Another Application
