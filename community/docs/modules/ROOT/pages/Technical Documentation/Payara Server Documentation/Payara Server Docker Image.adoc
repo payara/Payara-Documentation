@@ -196,3 +196,18 @@ You can override the default entrypoint if needed to test or browse the containe
 ----
 docker run -p 8080:8080 -it payara/server-full bash
 ----
+
+[[read-only]]
+=== Read Only Support Considerations
+
+The Payara Server Docker image requires write access to the `PAYARA_DIR`, `CONFIG_DIR`, and `/tmp` directories to function.
+If you wish to use `--read-only` Docker containers (or the equivalent `--readOnlyRootFilesystem` property in Kubernetes), you must mount volumes at these directories which the `payara` user has write access to.
+This can be done using anonymous or tmpfs volumes if you do not wish to persist the data outside the life of the container.
+Named volumes or bind mounts may be used if you wish the data to persist outside the life of the container.
+
+Here is an example `run` command for a read-only Docker container which will delete itself and its anonymous volumes when stopped:
+
+[source, shell]
+----
+docker run -p 8080:8080 -p 4848:4848 --read-only --rm -v /opt/payara -v /tmp payara/server-full
+----
