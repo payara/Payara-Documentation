@@ -54,42 +54,62 @@ Example:
 [cols="2,1,7",options="header"]
 |===
 |Element
+|System Property 
+|Environment Variable
 |Default
 |Notes
 
 |`autoDeployArtifact`
+|payara.auto.deploy.artifact
+|PAYARA_AUTO_DEPLOY_ARTIFACT
 |true
 |If the extension of the produced artifact is `WAR`, it will be copied automatically to the `MICRO-INF/deploy` directory when this property is set to `true`.
 
 |`autoDeployContextRoot`
+|payara.auto.deploy.context.root
+|PAYARA_AUTO_DEPLOY_CONTEXT_ROOT
 |_none_
 |Sets context root of the deployed artifact if `autoDeployArtifact` is `true`. `autoDeployContextRoot` has the higher precedence compared to the `autoDeployEmptyContextRoot`.
 
 |`autoDeployEmptyContextRoot`
+|payara.auto.deploy.empty.context.root
+|PAYARA_AUTO_DEPLOY_EMPTY_CONTEXT_ROOT
 |`true`
 |Sets context root of the deployed artifact to `/`  if `autoDeployArtifact` is `true`. If set to false, context root is derived from `project.build.finalName`. If `autoDeployContextRoot` is specified, `autoDeployEmptyContextRoot` will be ignored.
 
 |`startClass`
+|payara.start.class
+|PAYARA_START_CLASS
 |(optional):
 |Replaces the `Start-Class` definition that resides in the `MANIFEST.MF` file with the provided class.
 
 |`appendSystemProperties`
+|payara.append.system.properties
+|PAYARA_APPEND_SYSTEM_PROPERTIES
 |`true`
 |Appends all system properties defined into the `payara-boot.properties` file.
 
-|`payaraVersion`
+|`payaraMicroVersion`
+|payara.micro.version
+|PAYARA_MICRO_VERSION
 |`{page-version}`
-|By default, bundle mojo fetches Payara Micro with version {page-version}.
+|By default, bundle mojo fetches Payara Micro with version {page-version}. Note: `payaraVersion` is deprecated and has been replaced by `payaraMicroVersion` to stay in sync with the Payara Server Maven Plugin.
 
 |`deployArtifacts`
+|
+|
 |_None_
 |Can contain a list of artifactItems, which defines the dependencies with their GAVs to be copied under MICRO-INF/deploy folder.
 
 |`customJars`
+|
+|
 |_None_
 |Can contain a list of artifactItems, which defines the dependencies with their GAVs to be copied under MICRO-INF/lib folder.
 
 |`uberJarClassifier`
+|payara.uber.jar.classifier
+|PAYARA_UBER_JAR_CLASSIFIER
 |`microbundle`
 |Specifies the maven artifact classifier to use for the generated uber-jar.
 |=== 
@@ -172,78 +192,116 @@ NOTE: If you want to execute the payara-micro plugin along with maven-toolchains
 [cols="2,1,7",options="header"]
 |===
 |Element
+|System Property 
+|Environment Variable
 |Default
 |Notes
 
 |`useUberJar`
+|payara.use.uber.jar
+|PAYARA_USE_UBER_JAR
 |false
 |Use the created uber-jar that resides in the target folder. The name of the JAR artifact will be resolved automatically by evaluating its final name, artifact ID and version. This configuration element has the higher precedence compared to `payaraMicroAbsolutePath`, `payaraVersion` and `artifactItem`.
 
 |`uberJarClassifier`
+|payara.uber.jar.classifier
+|PAYARA_UBER_JAR_CLASSIFIER
 |`microbundle`
 |Specifies the maven artifact classifier to use for the Uber JAR.
 
-|`payaraMicroAbsolutePath`
+|`payaraMicroPath`
+|payara.micro.path
+|PAYARA_MICRO_PATH
 |_none_
-|Absolute path to the Payara Micro executable.
+|Absolute path to the Payara Micro executable. Note: Parameter `payaraMicroAbsolutePath` is deprecated and has been replaced by `payaraMicroPath` to stay in sync with the Payara Server Maven Plugin.
 
-|`payaraVersion`
-|{page-version}
-|By default, start mojo fetches payara-micro with version {page-version}.
+|`payaraMicroVersion`
+|payara.micro.version
+|PAYARA_MICRO_VERSION
+|`{page-version}`
+|By default, bundle mojo fetches Payara Micro with version {page-version}. Note: `payaraVersion` is deprecated and has been replaced by `payaraMicroVersion` to stay in sync with the Payara Server Maven Plugin.
 
 |`artifactItem`
+|
+|
 |_none_
 |Defines payara-micro artifact with its coordinates. Specified artifact should be available in local maven repository.
 
 |`daemon`
+|payara.daemon
+|PAYARA_DAEMON
 |false
 |Starts Payara Micro in separate JVM process and continues with the maven build.
 
 |`immediateExit`
+|payara.immediate.exit
+|PAYARA_IMMEDIATE_EXIT
 |false
 |If Payara Micro is executed in daemon mode, the executor thread will wait for the ready message before shutting down its process. By setting `immediateExit` to `true` you can skip this and instantly interrupt the executor thread.
 
-|`javaPath`
+|`javaHome`
+|payara.java.home
+|PAYARA_JAVA_HOME
 |`java`
-|Absolute path to the java executable. This has higher priority to the java executable identified via the Maven toolchain.
+|Absolute path to the java executable. This has higher priority to the java executable identified via the Maven toolchain. Note: Parameter `javaPath` is deprecated and has been replaced by `javaHome` to stay in sync with the Payara Server Maven Plugin.
 
 |`deployWar`
+|payara.deploy.war
+|PAYARA_DEPLOY_WAR
 |false
 |If the attached project is of type WAR, it will automatically be deployed if `deployWar` is set to `true`.
 
 |`contextRoot`
+|payara.context.root
+|PAYARA_CONTEXT_ROOT
 |_none_
 |Defines the context root of an application.
 
 |`javaCommandLineOptions`
+|
+|
 |_none_
 |Defines a list of command line options that will be passed to `java` executable. Command line options can either be defined as key-value pairs or just as list of values. key-value pairs will be formatted as `key=value`.
 
 |`commandLineOptions`
+|
+|
 |_none_
 |Defines a list of command line options that will be passed onto payara-micro.
 
 |`hotDeploy`
+|payara.hot.deploy
+|PAYARA_HOT_DEPLOY
 |false
 |Enables the Hot Deploy mode.
 
 |`autoDeploy`
+|payara.auto.deploy
+|PAYARA_AUTO_DEPLOY
 |false
 |Enables automatic compilation and deployment upon saving files.
 
 |`liveReload`
+|payara.live.reload
+|PAYARA_LIVE_RELOAD
 |false
 |Triggers a browser refresh for an up-to-date view after each redeployment.
 
 |`browser`
+|payara.browser
+|PAYARA_BROWSER
 |none
 |Specifies the browser for live reload. Adapted based on the system if not specified.
 
 |`keepState`
+|payara.keep.state
+|PAYARA_KEEP_STATE
 |false
 |Persists session state across multiple redeployments.
 
 |`trimLog`
+|payara.trim.log
+|PAYARA_TRIM_LOG
 |false
 |Refactors log format for improved readability.
 |===
@@ -288,26 +346,38 @@ NOTE: If you want to execute the payara-micro plugin along with maven-toolchains
 [cols="2,1,7",options="header"]
 |====
 |Element
+|System Property 
+|Environment Variable
 |Default
 |Notes
 
 |`processId`
+|payara.process.id
+|PAYARA_PROCESS_ID
 |_none_
 |Process id of the running Payara Micro instance.
 
 |`artifactItem`
+|
+|
 |_none_
 |Defines payara-micro artifact with its coordinates. This information is used to identify the process id of the running Payara Micro instance.
 
 |`useUberJar`
+|payara.use.uber.jar
+|PAYARA_USE_UBER_JAR
 |`false`
 |Use the name of the created uber-jar that resides in target folder to identify the process id of the running Payara Micro instance.
 
 |`uberJarClassifier`
+|payara.uber.jar.classifier
+|PAYARA_UBER_JAR_CLASSIFIER
 |`microbundle`
 |Specifies the maven artifact classifier of the generated uber-jar to identify the process id of the running Payara Micro instance.
 
 |`maxStopTimeoutMillis`
+|payara.max.stop.timeout.millis
+|PAYARA_MAX_STOP_TIMEOUT_MILLIS
 |5000
 |Defines the maximum timeout in milliseconds to wait for the process of Payara Micro instance to stop.
 |====
@@ -328,22 +398,32 @@ This can lead to significant savings of time when an application is redeployed a
 [cols="2,1,7",options="header"]
 |===
 |Element
+|System Property 
+|Environment Variable
 |Default
 |Notes
 
 |`hotDeploy`
+|payara.hot.deploy
+|PAYARA_HOT_DEPLOY
 |false
 |Enables the Hot Deploy mode.
 
 |`sourcesChanged`
+|payara.sources.changed
+|PAYARA_SOURCES_CHANGED
 |_none_
 |Defines a list (comma separated) of the absolute paths to the source file which need to be reloaded via the Hot Deploy feature.
 
 |`metadataChanged`
+|payara.metadata.changed
+|PAYARA_METADATA_CHANGED
 |false
 |If set to true, reloads deployment descriptors metadata in Hot Deploy mode
 
 |`keepState`
+|payara.keep.state
+|PAYARA_KEEP_STATE
 |false
 |Persists session state across multiple re-deployments.
 |===
