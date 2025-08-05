@@ -1,18 +1,19 @@
 [[building-intellij-ide-plugin]]
 = Building Payara IntelliJ Tools
 
-The process of building and testing the IntelliJ IDEA IDE Plugin, is the same for both the Ultimate and Community versions of the plugin. After cloning the appropriate repository, the following steps can be applied to either plugin.
+The process of building and testing the IntelliJ IDEA IDE Plugin is the same for both the Ultimate and Community editions.
+The Payara IntelliJ Tools source code is available in the https://github.com/payara/ecosystem-intellij-plugin[ecosystem-intellij-plugin repository].
 
-The Payara IntelliJ Community Tools source code is available in the https://github.com/payara/ecosystem-intellij-community-plugin[Ecosystem IntelliJ Community repository].
-
-The Payara IntelliJ Ultimate Tools source code is available in the https://github.com/payara/ecosystem-intellij-ultimate-plugin[Ecosystem IntelliJ Ultimate repository].
-
-[[building-intellij-plugin-prequisites]]
+[[building-intellij-plugin-prerequisites]]
 == Prerequisites
 Before building the Payara IntelliJ Tools, you will need to configure your local environment. Subsequent builds will not require these steps.
 
-Clone the relevant repository::
-You must first clone the appropriate repository for the IntelliJ IDEA plugin you are trying to build.
+Clone the repository::
+You must first clone the plugin repository:
+
+```
+    git clone https://github.com/payara/ecosystem-intellij-plugin.git
+```
 
 JDK 11::
 JDK 11 is required to build and test the IntelliJ IDEA plugin.
@@ -32,34 +33,34 @@ To build the Payara IntelliJ Tools, run the following command from the root dire
 
 . `./gradlew build`
 
-In the `/build/distributions` directory, the final zip will be present to install into IntelliJ IDEA.
+After a successful build, the final ZIP distribution will be located in the `/build/distributions` directory. This ZIP file can be installed into IntelliJ IDEA.
 
 [[install-compiled-intellij-plugin]]
 === Install Payara Tools into IntelliJ IDEA
-After Payara Tools for IntelliJ IDEA has been built successfully, you can add the output zip into the IDE via the following method:
+After the Payara Tools plugin has been built, you can install it in IntelliJ IDEA as follows:
 
-. Open the Settings menu (Ctrl + Alt + S)
+. Open the **Settings** menu (`Ctrl + Alt + S`)
 . Open the `Plugins` panel
-. Click the cog and select `Install Plugin from Disk` from the dropdown menu
-. Select the final compiled zip file
+. Click the ⚙️ cog icon and select `Install Plugin from Disk`
+. Select the compiled ZIP file from the `/build/distributions` directory
 
 image::intellij-plugin/building-plugin/install-compiled-plugin.png[Install Compiled Plugin]
 
 [[remove-compiled-intellij-plugin]]
 === Removing Payara Tools from IntelliJ IDEA
-Removing Payara Tools from IntelliJ IDEA after installing using the method above is the same as removing any extension from IntelliJ IDEA.
+To uninstall the plugin:
 
-.*Removing Payara Tools from IntelliJ IDEA*
-. Open the Settings menu (Ctrl + Alt + S)
+. Open the **Settings** menu (`Ctrl + Alt + S`)
 . Open the `Plugins` panel
-. Right click the relevant Payara IDE Plugin
-. Click Uninstall
+. Right-click the **Payara Tools** plugin
+. Click **Uninstall**
 
 image::intellij-plugin/building-plugin/remove-compiled-plugin.png[Remove Complied Plugin]
 
 [[testing-intellij-plugin]]
 == Test Payara Tools
-Instead of having to manually install the plugin every time you want to test your changes, you can use the following command to open a new IntelliJ IDEA window with the plugin installed for testing purposes.
+
+Instead of manually installing the plugin each time, you can run a test instance of IntelliJ IDEA with the plugin pre-installed using the following:
 
 *If you installed Gradle*
 
@@ -68,3 +69,5 @@ Instead of having to manually install the plugin every time you want to test you
 *If you are using the Gradle wrapper*
 
 . `./gradlew runIde`
+
+This will launch a sandboxed IntelliJ IDEA environment with the plugin enabled for testing purposes.
