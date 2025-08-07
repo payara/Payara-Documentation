@@ -1,0 +1,30 @@
+[transaction-service]
+= Transaction Service
+
+This chapter details additional Payara-specific configuration options for the Transactions service.
+
+[[configuring-the-transaction-service]]
+== Configuring the Transaction Service
+
+You can configure the transaction service in the Payara Server in the following ways:
+
+* To configure the transaction service using the Administration Console, open the Transaction Service component under the relevant configuration.
+For details, click the Help button in the Administration Console.
+
+* To configure the transaction service, use the `set`
+subcommand to set the following attributes. +
+The following examples show the `server-config` configuration, but values for any configuration can be set. For example, if you create a cluster named
+`cluster1` and a configuration named `cluster1-config` is automatically created for it, you can use `cluster1-config` in the `set` subcommand to get the transaction service
+settings for that cluster.
+
+The following properties can be set in addition to those available in GlassFish: +
+[source,text]
+----
+server-config.transaction-service.property.recover-txn-delay = -1
+----
+
+** The `recover-txn-delay` default of `-1` means that recovery will be attempted upon start of the server if `automatic-recovery` is enabled. Use this property to delay the initial execution of the recovery thread. The units are seconds.
+
+You can use the `get` subcommand to list all the transaction service attributes and the properties that have been set. +
+Changing `keypoint-interval`, `retry-timeout-in-seconds`, or `timeout-in-seconds` does not require a server restart. Changing other attributes or properties requires a
+server restart.
