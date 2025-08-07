@@ -1,7 +1,9 @@
 = Payara Server Tools in IntelliJ IDEA
 :ordinal: 1
 
-Using the Payara Tools, you can integrate Payara Server within the IntelliJ IDEA to streamline development workflows. This integration allows you to:
+IMPORTANT: This is only available in the `Payara IntelliJ Ultimate Tools` plugin which is exclusive to IntelliJ IDEA Ultimate
+
+Using the Payara IntelliJ Ultimate Tools plugin, you can integrate Payara Server within the IntelliJ IDEA and perform the following tasks:
 
 - Start and stop the Payara Server from within the IDE
 - Define the Java runtime to be used by Payara Server
@@ -9,39 +11,48 @@ Using the Payara Tools, you can integrate Payara Server within the IntelliJ IDEA
 
 [[managing-payara-server-from-intellij]]
 == Managing Payara Server from the IntelliJ IDE
-. To manage Payara Server from the IntelliJ idea, first create the new *Payara Server configuration* by selecting the *Edit Configuration* option:
+To manage Payara Server from the IntelliJ idea, first create the new *Payara Server configuration* by selecting the *Edit Configuration* option:
+
 image::intellij-plugin/payara-server/create-configuration.png[Create Configuration]
 
-. In the *Run/Debug Configurations* dialog, click *+*, select the *Payara Server*:
-image::intellij-plugin/payara-server/create-server-configuration.png[Create Server configuration]
+In the *Run/Debug Configurations* dialog, click *+*, expand the *Payara Server* node, and select *Local*:
 
+image::intellij-plugin/payara-server/create-local-server-configuration.png[Create Local Server configuration]
 
-. In the newly created configuration:
-.. Set the goal to `dev` to deploy the application in development mode or `start` to start the server without dev mode.
-.. Specify the JDK or JRE path that Payara Server should use.
+To add the Payara Server to the configuration, click the *Configure...* button and set it to the Payara Server's installation path you would like to add to the IDE.
 
-. Optionally, configure the application’s context path or exploded format.
-image::intellij-plugin/payara-server/app-configuration.png[App configuration]
+Specify the path to the JRE or JDK version you would like Payara Server to run on.
 
-. To add the Payara Server to the configuration, click the *Payara Server Settings > Payara Home* and set it to the Payara Server's installation path you would like to add to the IDE.
-image::intellij-plugin/payara-server/payara-configuration.png[Payara configuration]
+Finally, fix the debugger related warning by pressing the *Fix* button, which updates the debugger settings in the domains.xml of the selected Payara Server's domain.
 
-. Configure environment variables and system properties for the server.
-image::intellij-plugin/payara-server/env-server-properties.png[Env and Server properties]
+image::intellij-plugin/payara-server/complete-run-configuration.png[Complete run configuration]
 
-. Define Maven properties used during the build.
-image::intellij-plugin/payara-server/maven-properties.png[Maven properties]
+For now, ignore the `No artifacts marked for deployment` warning and click *OK* to save the configuration
 
-. Specify Maven tasks to run before launching the server.
-image::intellij-plugin/payara-server/before-launch-task.png[Before Launch Task]
+Click the *Run or Debug* button from top-right panel to start Payara Server, or start Payara Server in debug mode, which would allow you to debug deployed applications
 
-. Click the *Run or Debug* button from top-right panel to start Payara Server, or start Payara Server in debug mode, which would allow you to debug deployed applications
 image::intellij-plugin/payara-server/run-server.png[Start the Payara Server]
 
-. You can see the server log in the *application build console* window.
+You can see the server log in the *Run > Payara Log* window.
+
+TIP: You can filter logs by level with the dropdown menu on the right of the `Payara Log`
+
 image::intellij-plugin/payara-server/server-log.png[Payara Server log]
 
-. After application deployed to the Payara Server, IntelliJ starts a web browser and opens the application context root in the web browser.
+[[deploying-application-payara-server-from-intellij]]
+== Deploying an Application to Payara Server from IntelliJ
+To deploy an application to Payara Server you must further edit the run configuration you are using to run Payara Server from IntelliJ.
+
+. Select the Run Configurations drop down menu
+. Click on *Edit Configurations*
+. Choose the Payara Server configuration to which you want to deploy the application.
+. In the configuration settings, navigate to the *Deployment* section and click on the *+* button.
+. Select *Artifact...* then choose the non-exploded format of your application's name.
+. Click *OK*
+
+image::intellij-plugin/payara-server/add-artifact.png[Add artifact]
+
+After application deployed to the Payara Server, IntelliJ starts a web browser and opens the application context root in the web browser.
 
 [[deploy-to-docker-container]]
 == Deploy Applications in a Local Docker Container
@@ -107,10 +118,11 @@ Here's how you can make use of this feature:
 . Register the WSL-based Payara Server instance in the IntelliJ IDEA:
 .. Open Intellij IDEA Ultimate and first create the new *Payara Server configuration* by selecting the *Edit Configuration* option:
 
-.. In the *Run/Debug Configurations* dialog, click `+`, select the *Payara Server* node then go to *Payara Server Settings* and check the checkbox *Remote*.
+.. In the *Run/Debug Configurations* dialog, click `+`, expand the *Payara Server* node, and select *Remote*.
 
-.. To add the Payara Server to the configuration, click the browse button in *Payara Home* field and set it to the Payara Server's installation path running within WSL on your Windows machine.
+.. To add the Payara Server to the configuration, click the *Configure...* button and set it to the Payara Server's installation path running within WSL on your Windows machine.
 .. For WSL integration, choose the "WSL" option and make sure *Use SSL Connection* option is checked.
 .. Enter the host (fetched via the command `hostname -I` in WSL instance) and the necessary credentials.
+.. Navigate to the *Deployment* section and click on the *+* button to select *Artifact...*.
 .. Click *OK*
 .. Click the *Run or Debug* button from top-right panel to deploy the application to the registered Payara Server WSL environment.
