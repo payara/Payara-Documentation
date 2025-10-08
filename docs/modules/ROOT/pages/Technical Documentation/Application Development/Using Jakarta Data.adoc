@@ -1,0 +1,38 @@
+[[using-jakarta-data-api]]
+= Using Jakarta Data
+:ordinal: 25
+
+This chapter describes how to use the Jakarta Data API, which provides an API for easier data access.
+
+[[introducing-jakarta-data]]
+== Introducing Jakarta Data
+
+The Jakarta Data specification defines an API that simplifies data access in Java applications. It allows developers to focus on the domain model while delegating persistence and query management to the framework. Jakarta Data provides standard repository interfaces, query-by-method capabilities, and pagination strategies such as offset and cursor-based navigation.
+
+Jakarta Data can be extended to support various databases and storage technologies. It is persistence agnostic, enabling integration with relational, document, key-value, column, and graph data stores through a unified and standardized API. This design promotes a domain-centric approach, ensuring that application structure and logic align with core business concepts.
+
+The main components of Jakarta Data include:
+
+* Repository Interfaces – Define common data access operations and allow the framework to generate implementations automatically.
+* Query Definition – Support for annotations and method-based queries aligned with domain models.
+* Pagination and Streaming – Enable efficient data retrieval using offset or cursor-based strategies.
+* Extensibility Layer – Allows customization and integration with diverse storage engines.
+
+For more information, see the https://jakarta.ee/specifications/data[Jakarta Data specification].
+
+[[multiple-persistence-units]]
+== Multiple Persistence Units
+When using the Jakarta Data API with multiple persistence units, specify which one to use by setting the property `fish.payara.jakarta.data.usePU` to `true` in the desired persistence unit configuration.
+
+**Example:**
+
+```xml
+<persistence-unit name="pu2" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/__default</jta-data-source>
+
+    <properties>
+        <property name="fish.payara.jakarta.data.usePU" value="true"/>
+    </properties>
+</persistence-unit>
+```
