@@ -99,11 +99,11 @@ This example deletes the IIOP listener named `sample_iiop_listener`.
 [[configuring-new-orb-fragment-processing]]
 == Configuring the New ORB Fragment Processing
 
-The aim of this functionality is to enhance the concurrency mechanism through a new implementation utilizing the Lock API. The advantages of employing this approach in instead of the default one (which relies on synchronized code blocks) are as follows:
+The aim of this functionality is to enhance the concurrency mechanism through a new implementation that uses the Lock API. The advantages of this approach instead over relying on synchronized code blocks (default) are:
 
-* Fine-Grained Control: We are employing explicit locking and unlocking, which is more exact and efficient than the implementation utilizing synchronized blocks.
-* Use of condition variables: This enables threads to await the fulfillment of specific conditions prior to advancing.
-* Multiple Object Locking: A lock can be shared among various class instances, facilitating more flexible management of synchronization between these instances.
+* Fine-grained control: it uses explicit locking and unlocking, delivering higher accuracy and efficiency.
+* Use of condition variables: threads await the fulfillment of specific conditions prior to advancing.
+* Multiple object locking: a lock can be shared among various class instances, facilitating more flexible management of synchronization between these instances.
 
 NOTE: The Fragment processing happens when a big message is processed by the ORB. If the ORB message exceeds the default size of 1024 bytes, then the internal fragmentation of the message starts.
 
@@ -114,9 +114,9 @@ To configure the new functionality use the following properties:
 |Property |Description
 
 | `com.sun.corba.ee.protocol.enableNewFragmentProcess`
-| This property will enable the new fragment processing. By default, this property is set as `false` to use the older implementation based on synchronized blocks of code.
+| This property enables the new fragment processing. By default, this property is set as `false` to support the default implementation based on synchronized blocks of code.
 
 | `com.sun.corba.ee.protocol.newFragmentEmptyConditionTimeout`
-| You can use this property to change the wait timeout for fragments of a request. By default, the timeout is 10000 milliseconds. This property only takes effect if the `com.sun.corba.ee.protocol.enableNewFragmentProcess` is enabled. The unit for this property is milliseconds.
+| You can use this property to change the wait timeout for fragments of a request. By default, the timeout is 10000 milliseconds. This property only takes effect if the `com.sun.corba.ee.protocol.enableNewFragmentProcess` is enabled. The property value is expressed in milliseconds.
 
 |===
