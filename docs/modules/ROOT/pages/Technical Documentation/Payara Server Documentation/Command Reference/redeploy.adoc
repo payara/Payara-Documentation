@@ -33,6 +33,9 @@ asadmin [asadmin-options] redeploy [--help]
 [--target target]
 [--type pkg-type]
 [--properties(name=value)[:name=value]*]
+ifeval::["{page-site-edition}" == "community"]
+[--warlibs={false|true}]
+endif::[]
 [file_archive|filepath]
 ----
 
@@ -152,6 +155,12 @@ asadmin-options::
   redeployment is complete. However, the redeployment continues and a warning is logged. +
   To preserve active state data, Payara Server serializes the data and saves it in memory. To restore the data, the class loader of the
   newly redeployed application deserializes the data that was previously saved.
+ifeval::["{page-site-edition}" == "community"]
+`--warlibs`::
+  If set to true, enables an application to make use of shared libraries installed to `domain_dir/lib/warlibs`.
+  Default is false.
+  This parameter takes precedence over enabling warlibs in --properties.
+endif::[]
 `--libraries`::
   A comma-separated list of library JAR files. Specify the library JAR files by their relative or absolute paths. Specify relative paths
   relative to domain-dir`/lib/applibs`. The libraries are made available to the application in the order specified.
@@ -220,6 +229,15 @@ asadmin-options::
       class loader of the newly redeployed application deserializes any sessions that were previously saved.
   `preserveAppScopedResources`;;
     If set to `true`, preserves any application-scoped resources and restores them during redeployment. Default is `false`. +
+
+ifeval::["{page-site-edition}" == "community"]
+  `warlibs={false|true}`;;
+    (This property will be overriden by `--warlibs`)
+    If set to true, enables an application to make use of shared libraries installed to `domain_dir/lib/warlibs`. Default is `false`. +
+    Libraries stored in this directory allows a developer to create and deploy skinny WARs, as the libraries stored in this directory are subject to additional annotation and extension scanning & processing for CDI, EJB, Servlet, and more.
+    Unlike common and application libraries (those stored in `domain_dir/lib` and `domain_dir/lib/applibs` respectively), warlibs are cached and don't dynamically update if the files within the directory are modified.
+endif::[]
+
   Other available properties are determined by the implementation of the component that is being redeployed. +
   For components packaged as OSGi bundles (`--type=osgi`), the `deploy` subcommand accepts properties arguments to wrap a WAR file as a WAB
   (Web Application Bundle) at the time of deployment. The subcommand looks for a key named `UriScheme` and, if present, uses the key as a

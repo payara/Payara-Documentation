@@ -991,10 +991,20 @@ There are 3 options for this property:
 | `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.sso-enabled=true/false/inherit`
 
 | SSO Cookie Http Only
-| Determines whether to add the `HttpOnly` flag to the `JSESSIONIDSSO` cookie. In practice, this will disallow JavaScript access to the cookie in the browser.
+| Determines whether to add the `HttpOnly` flag to the `JSESSIONIDSSO` cookie. In practice, this disallows JavaScript access to the cookie in the browser.
 
 This prevents malicious XSS attacks hijacking a Java session. It is enabled by default.
 | `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.sso-cookie-http-only=true/false`
+
+| Session Cookie Http Only
+| Determines whether to add the `HttpOnly` flag to the `JSESSIONID` cookie. In practice, this disallows JavaScript access to the cookie in the browser.
+
+This prevents malicious XSS attacks hijacking a Java session. It is enabled by default.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.session-cookie-http-only=true/false`
+
+| Session Cookie Secure
+| Determines whether to add the `Secure` flag to the `JSESSIONID` cookie. In practice, this specifies that the cookie may only be transmitted using HTTPS connections.
+| `set configs.config.server-config.http-service.virtual-server.$+{virtual-server-name}+.session-cookie-secure=true/false/dynamic`
 
 | Network Listeners
 | Comma separated list of network listeners which applications deployed to this virtual server are available on.
@@ -1088,6 +1098,7 @@ E.g. `redirect_1="from=/fake url-prefix=http://another"`.
 | *listener_n*                | Specifies the fully qualified class name of a custom Catalina listener, where n is a positive integer that allows the specification of more than one. The listener class must implement the *`org.apache.catalina.ContainerListener`* or *`org.apache.catalina.LifecycleListener`* interface. | none
 
 | *errorReportValve*          | Specifies the fully qualified class name of a custom valve that produces default error pages for applications on this virtual server. Specify an empty string to disable the default error page mechanism for this virtual server. | *`org.apache.catalina.valves.ErrorReportValve`*
+| *cacheTTL*                  | Specifies the time to live (TTL), expressed in milliseconds, for the virtual server cache used to serve files. | 5000
 |===
 
 [[create-a-virtual-server]]
@@ -1243,3 +1254,70 @@ A string value that specifies whether the `Secure` attribute is included in `JSE
 * `true` — The `Secure` attribute is included.
 * `false` — The `Secure` attribute is not included.
 * `dynamic` — The `Secure` attribute setting is inherited from the default ports table for all HTTP listeners first session participating in SSO. This is the default value.
+
+[[to-set-jsessionid-cookie-attributes]]
+=== To Set `JSESSIONID` Cookie Attributes
+
+Use the `session-cookie-http-only` and `session-cookie-secure` virtual server attributes to set the `HttpOnly` and `Secure` attributes of any `JSESSIONID` cookies associated with web applications deployed to the virtual server.
+
+Use the xref:Technical Documentation/Payara Server Documentation/Command Reference/set.adoc[`set`] subcommand to set the value of the `session-cookie-http-only` and `session-cookie-secure` virtual server attributes.
+
+The values supported for these attributes are as follows:
+
+`session-cookie-http-only`::
+A boolean value that specifies whether the `HttpOnly` attribute is included in `JSESSIONID` cookies.
++
+When set to `true`, which is the  default, the `HttpOnly` attribute is included. When set to `false`, the `HttpOnly` attribute is not included.
+`session-cookie-secure`::
+A string value that specifies whether the `Secure` attribute is included in `JSESSIONID` cookies. Allowed values are as follows:
++
+* `true` — The `Secure` attribute is included.
+* `false` — The `Secure` attribute is not included.
+* `dynamic` — The `Secure` attribute setting depends on whether the HTTP connection is secure. This is the default value.
+
+[[http-header-validation]]
+== HTTP Header Fields Validation
+
+By default, The following characters are stipulated to be dangerous to parse in both the name and value of all headers passed down on an HTTP request:
+
+|===
+|Character |Representation
+
+|NUL character
+|This character is expressed in the following forms on a literal value: `\0  \x00` https://en.wikipedia.org/wiki/Null_character[review explanation here]
+
+|LF Character (new line)
+|This character is expressed in the following forms on a literal value: `\n \x0A` https://en.wikipedia.org/wiki/Newline[review explanation here]
+
+|CR Character (carriage return)
+|This character is expressed in the following forms on a literal value: `\r \x0D` https://en.wikipedia.org/wiki/Carriage_return[review explanation here]
+
+|===
+
+As stipulated in section 5.5 Field Values of the link:https://datatracker.ietf.org/doc/html/rfc9110#name-field-values[RFC-9110 specification], these characters are deemed invalid and as such the server, as recipient of the request WILL reject it automatically upon detecting the presence of these characters.
+
+NOTE: On previous RFC specifications that detailed HTTP 1.1 semantics, these characters were considered *acceptable*, however from RFC-9110 onwards, the use of these characters is no longer acceptable for header fields names and values.
+
+In some cases, to support backwards compatibility it might be necessary to allow these characters to be processed by the server runtime. In these instances, the following Grizzly (HTTP) system properties allow header fields character validation to be turned on/off:
+
+.Grizzly Header Field Validation Properties
+|===
+|Property |Description
+
+|`org.glassfish.grizzly.http.STRICT_HEADER_NAME_VALIDATION_RFC_9110`
+|This property enables the validation of all header field names on incoming HTTP requests to prevent any usage of invalid characters on it.
+
+When set to `true`, the presence of these characters will trigger the server to invalidate the request with a `400 - Bad Request` response.
+
+The default value is `true`.
+
+|`org.glassfish.grizzly.http.STRICT_HEADER_VALUE_VALIDATION_RFC_9110`
+|This property enables the validation of all header field values on incoming HTTP requests to prevent any usage of invalid characters on it.
+
+When set to `true`, the presence of these characters will trigger the server to invalidate the request with a `400 - Bad Request` response.
+
+The default value is `true`.
+
+|===
+
+
