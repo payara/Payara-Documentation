@@ -1,0 +1,22 @@
+= Eclipse MicroProfile JWT
+
+[[error-caching-public-ky]]
+== Retaining the Cached Public Key on Retrieval Errors
+
+When a public key is retrieved from a remote location as specified by the `mp.jwt.verify.publickey.location` configuration property, Payara caches it in memory for the duration defined by the `publicKey.cache.ttl` property (default 5 minutes).
+Once this time-to-live (TTL) period expires, the runtime will attempt to re-fetch the key from the remote location.
+
+In certain environments, however, the remote public key location may become temporarily unavailable due to network interruptions or service downtime.
+In such cases, the cached key would normally be discarded after its TTL expires, potentially causing JWT verification failures even if the cached key itself remains valid.
+
+To improve resilience in these scenarios, you can configure Payara to **retain the cached key for an additional period** if the runtime cannot reach the remote location when attempting to refresh it.
+This behavior is controlled by the `publicKey.cache.retain-on-error-duration` custom property.
+
+When this property is set, once the cached key expires and the system fails to fetch the updated key, the previously cached key will remain valid and continue to be used for the duration specified by this property.
+If the remote location becomes available again within this period, the cached key will be refreshed as normal.
+If the retain-on-error period also expires without a successful refresh, the cache will be invalidated and JWT verification will fail until the key can be fetched again.
+
+NOTE: This property must be defined in the `payara-mp-jwt.properties` configuration file described in the previous section.
+
+IMPORTANT: The value of the `publicKey.cache.retain-on-error-duration` property is defined in **milliseconds**.
+For example, a value of `3600000` will retain the cached key for an additional 1 hour in the event of a remote key retrieval failure.
