@@ -89,6 +89,27 @@ FROM nexus.payara.fish:5000/payara/micro:{page-version}
 COPY myapplication.war $DEPLOY_DIR
 ----
 
+[[custom-crac-image]]
+=== Extend Docker Images For CRaC JDK ===
+
+The above custom image can be further extended to use a CRaC JDK.
+
+First the correct CRaC JDK for x86 Alpine Linux must be downloaded. Set the version in the Dockerfile to match the name of the tar.gz you have downloaded.
+
+In the Docker container, you can verify that the Java version in use is the correct via `java -version`.
+
+[source, docker, subs=attributes+]
+----
+FROM nexus.payara.fish:5000/payara/micro:{page-version}
+ARG JDKVersion=myversion
+
+ADD $JDKVersion.tar.gz /opt
+ENV JAVA_HOME=/opt/$JDKVersion
+ENV PATH=/opt/$JDKVersion/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+COPY myapplication.war $DEPLOY_DIR
+----
+
 [[deploy-from-maven-repo]]
 === Deploy Applications from a Maven Repository
 
