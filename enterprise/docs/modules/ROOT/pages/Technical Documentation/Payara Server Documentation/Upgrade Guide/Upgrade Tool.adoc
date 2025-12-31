@@ -6,58 +6,15 @@ This tool can be used to upgrade an existing Payara Server installation to a new
 
 TIP: The upgrade tool can be manually upgraded to a newer version in case it is needed. To do so, download the latest 2.x JAR release from Nexus using https://nexus.payara.fish/#browse/browse:payara-enterprise-downloadable-artifacts:fish%2Fpayara%2Fextras%2Fpayara-upgrade-tool[this link] and then replace the older version into your Payara Server installation under the `${PAYARA_SERVER_INSTALL}/glassfish/lib/asadmin` folder.
 
-[[payara-server-6-upgrade]]
-== Upgrading to Payara Server 6
+[[payara-server-7-upgrade]]
+== Upgrading to Payara Server 7
 
-It is possible to upgrade a Payara Server `5.x` domain to version `6.x`. The process should not be any different as to upgrading between different Payara 5 minor versions, though with the following caveats:
+It is possible to upgrade a Payara Server `6.x` domain to version `7.x`. The process should not be any different as to upgrading between different Payara 6 minor versions, though with the following caveats:
 
-. The upgrade tool only supports upgrading to Payara Server 6 versions `6.x.y` or higher.
-. When performing an upgrade from Payara 5 to Payara 6, make sure that you're using JDK 11 as this is the minimum JDK version required to run Payara Server 6.
-. The upgrade tool will not adjust the `default-web.xml` configuration file (located in `${as-install}/config`) for each domain, so the following changes have are required:
-.. A `<servlet-class>` entry of `org.apache.jasper.servlet.JspServlet` must be converted to `org.glassfish.wasp.servlet.JspServlet`
-.. The `<system-jar-includes>` initialization parameter of the `jsp` servlet has had a change in value between Payara Server 5 and Payara Server 6, reflecting the change in modules from Jakarta EE 8 to Jakarta EE 10.
-+
-This is how the parameter looks on a standard Payara Server `6.4.0` domain configuration:
-+
-[source, xml]
-----
-<init-param>
-  <param-name>system-jar-includes</param-name>
-  <param-value>
-    /lib/
-    \lib\
-    expressly.jar
-    jakarta.servlet-api.jar
-    jakarta.servlet.jsp-api.jar
-    jakarta.servlet.jsp.jstl-api.jar
-    jakarta.servlet.jsp.jstl.jar
-    jakarta.jms-api.jar
-    jakarta.faces.jar
-    wasp.jar
-    jspcaching-connector.jar
-    web-glue.jar
-    hibernate-validator.jar
-    jakarta.ejb-api.jar
-    jakarta.enterprise.deploy-api.jar
-    jakarta.activation-api.jar
-    angus-activation.jar
-    jakarta.mail-api.jar
-    angus-mail.jar
-    jakarta.persistence.jar
-    jakarta.resource-api.jar
-    jakarta.security.auth.message-api.jar
-    jakarta.security.jacc-api.jar
-    jakarta.transaction-api.jar
-    webservices-osgi.jar
-    weld-osgi-bundle.jar
-    jersey-mvc-jsp.jar
-  </param-value>
-</init-param>
-----
-+
-You'll have to adjust the value of this parameter by copying the current values of a clean Payara Server 6.4.0 or newer domain after the upgrade tool completes the process.
+. The upgrade tool only supports upgrading to Payara Server 7 versions `7.x.y` or higher.
+. When performing an upgrade from Payara 6 to Payara 7, make sure that you're using JDK 21 as this is the minimum JDK version required to run Payara Server 7.
 
-IMPORTANT: It is recommended that users should run the latest version of Payara Server 5.x before attempting to upgrade to version 6.x.
+IMPORTANT: It is recommended that users should run the latest version of Payara Server 6.x before attempting to upgrade to version 7.x.
 
 [[commands]]
 == Asadmin CLI Commands
@@ -77,7 +34,7 @@ The command will also back up the old version and domains in the default locatio
 [[command-options-1]]
 ==== Command Options
 
-[cols=",,,,",options="header",]
+[cols="2,1,4,1,1",options="header",]
 |=======================================================================
 |Option |Type |Description |Default |Mandatory
 |`--username` |String | The username for the Payara Nexus server.||Yes, unless `--usedownloaded` is specified
@@ -86,16 +43,25 @@ The command will also back up the old version and domains in the default locatio
 |`--stage` |Boolean |Determines if the upgrade should be installed in-place, or staged into "_x.new_" directories. Scripts are provided that can be used to apply and rollback the staged install. This option is automatically enabled when running the command on Windows. |False on Unix, True on Windows| No
 |`--domaindir` |String |The directory containing the domains. The domains in this directory are backed up, and their config is used to determine the nodes which will also be upgraded. | `${as-install}/domains` | No
 |`--usedownloaded` |String |The path to the local Payara Server zip archive to use for upgrading instead of downloading from the Payara Enterprise repository. When this parameter is specified, the `--username`, `--password`, and `--version` parameters are not required.| |No
+|`--nodes` |String |Specifies the nodes to upgrade if you want to selectively upgrade certain nodes. Provide as a comma-separated list of node names. |All nodes in the cluster| No
 |=======================================================================
 
 [[upgrade-example]]
 ==== Example
 
-This example upgrades a Payara Web distribution to version 5.24.1
+This example upgrades a Payara Web distribution to version 7.1.0
 
 [source, shell]
 ----
-asadmin> upgrade-server --username example-user --distribution web --version 5.24.1
+asadmin> upgrade-server --username example-user --distribution web --version 7.1.0
+----
+
+To selectively upgrade specific nodes, use the `--nodes` option with a comma-separated list of node names.
+This example upgrades the domain administration server and one remote node, leaving other nodes to be upgraded later:
+
+[source, shell]
+----
+asadmin> upgrade-server --username example-user --version 7.1.0 --nodes localhost-domain1,remotehost1-node1
 ----
 
 [[rollback-server-command]]
@@ -110,10 +76,11 @@ WARNING: This command is not supported on Windows OS, please use the `rollbackUp
 [[command-options-2]]
 ==== Command Options
 
-[cols=",,,,",options="header",]
+[cols="1,1,4,1,1",options="header",]
 |=======================================================================
 |Option |Type |Description |Default |Mandatory
-|`--domaindir` |String |The directory containing the domains. The domains in this directory are backed up, and their config is used to determine the nodes which will also be upgraded. | $`{as-install}/domains` | No
+|`--domaindir` |String |The directory containing the domains. The domains in this directory are backed up, and their config is used to determine the nodes which will also be upgraded. | `${as-install}/domains` | No
+|`--nodes` |String |Specifies the nodes to rollback if you want to selectively rollback certain nodes. Provide as a comma-separated list of node names. |All nodes in the cluster| No
 |=======================================================================
 
 [[staged-upgrades]]
@@ -135,10 +102,11 @@ It will then upgrade the nodes of the domains in the default domain dir, or the 
 [[command-options-3]]
 ==== Command Options
 
-[cols=",,,,",options="header",]
+[cols="1,1,4,1,1",options="header",]
 |=======================================================================
 |Option |Type |Description |Default |Mandatory
 |`--domaindir` |String |The directory containing the domains. The config of the domains in this directory are used to determine the nodes which will also be upgraded. | ${as-install}/domains | No
+|`--nodes` |String |Specifies the nodes to upgrade if you want to selectively upgrade certain nodes. Provide as a comma-separated list of node names. |All nodes in the cluster| No
 |=======================================================================
 
 [[rollback-upgrade-script]]
@@ -155,10 +123,11 @@ It will then rollback the nodes of the domains in the default domain dir, or the
 [[command-options-4]]
 ==== Command Options
 
-[cols=",,,,",options="header",]
+[cols="1,1,4,1,1",options="header",]
 |=======================================================================
 |Option |Type |Description |Default |Mandatory
 |`--domaindir` |String |The directory containing the domains. The config of the domains in this directory are used to determine the nodes which will also be rolled back. | `${as-install}/domains` | No
+|`--nodes` |String |Specifies the nodes to rollback if you want to selectively rollback certain nodes. Provide as a comma-separated list of node names. |All nodes in the cluster| No
 |=======================================================================
 
 [[cleanup-upgrade]]
@@ -197,3 +166,59 @@ exec "$JAVA" -DAS_DEBUG=true  -XX:+IgnoreUnrecognizedVMOptions -jar "$AS_INSTALL
 ----
 
 IMPORTANT: Remember to turn off these logger level settings after executing a server upgrade, as this setting will affect all future executions of any Asadmin CLI commands, which will cause them to print out more information than usual.
+
+[[downtime-upgrade]]
+== Zero Downtime upgrade
+
+IMPORTANT: This feature requires payara-upgrade-tool.jar from Payara v5.83.0 or v6.34.0 and above and assumes you are running a minimum of two SSH nodes.
+
+By default, upgrading Payara requires that the domain and all SSH nodes are stopped. This feature allows the upgrading of individual SSH nodes, eliminating downtime. Only upgrades in the same major version are supported 6.x to 6.x, 7.x to 7.x. Zero Downtime upgrades between 6.x and 7.x are not supported however it is possible to achieve if you can avoid restarting any of the 6.x nodes while running 7.x DAS.
+
+[[command-options-3]]
+==== Steps to upgrade:
+
+stop the DAS 
+[source, shell]
+----
+asadmin> stop-domain
+----
+upgrade the domain
+[source, shell]
+----
+asadmin> upgrade-server --username example-user --distribution web --version 7.1.0 --nodes localhost-domain
+----
+Stop one SSH node to upgrade
+[source, shell]
+----
+asadmin> stop-node-ssh node1
+----
+Upgrade one SSH node
+[source, shell]
+----
+asadmin> upgrade-server --username example-user --distribution web --version 7.1.0 --nodes node1
+----
+Start the upgraded SSH node
+[source, shell]
+----
+asadmin> start-node-ssh node1
+----
+Repeat the last 3 steps with the remaining SSH nodes to upgrade.
+Start the DAS
+[source, shell]
+----
+asadmin> start-domain
+----
+
+TIP: Use the `_list-node-versions` subcommand to help keep track of the current version of each node, including staged and rollback versions.
+
+WARNING: the upgrade can cause issues if the nodes are forming a cluster with Hazelcast. When 2 versions of Payara use different versions of Hazelcast, the upgraded node will fail to start as long as nodes using the older versions are running. If the upgraded node/DAS fails to start, you may have to upgrade everything else before restarting the nodes and the DAS. Alternatively, you can avoid these issues by disabling the data grid for every nodes.
+Below are the known combinations causing issues:
+
+[[command-options-3]]
+==== Known upgrade issues
+
+[cols="1,1,4",options="header",separator=¦]
+|=======================================================================
+¦Existing ¦Upgrade ¦Result
+¦7.0.0 ¦7.1.0 ¦No issues
+|=======================================================================
