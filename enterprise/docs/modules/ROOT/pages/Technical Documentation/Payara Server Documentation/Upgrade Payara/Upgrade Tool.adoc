@@ -86,7 +86,7 @@ The command will also back up the old version and domains in the default locatio
 |`--stage` |Boolean |Determines if the upgrade should be installed in-place, or staged into "_x.new_" directories. Scripts are provided that can be used to apply and rollback the staged install. This option is automatically enabled when running the command on Windows. |False on Unix, True on Windows| No
 |`--domaindir` |String |The directory containing the domains. The domains in this directory are backed up, and their config is used to determine the nodes which will also be upgraded. | `${as-install}/domains` | No
 |`--usedownloaded` |String |The path to the local Payara Server zip archive to use for upgrading instead of downloading from the Payara Enterprise repository. When this parameter is specified, the `--username`, `--password`, and `--version` parameters are not required.| |No
-|`--nodes` |String |Names of the nodes to upgrade. Enables to upgrade nodes individually, to avoid downtime (see below for more details). Can have a list of nodes, separated by comma (eg *--nodes node1,node2*)Only available in v5.83.0 or v6.34.0 and above| |No
+|`--nodes` |String |The names of the nodes to upgrade. Allows the upgrading of nodes individually lowering potential downtime (See below for details). Supports single node or a comma separated list (e.g. --nodes node1,node2) Only available in v5.83.0 or v6.34.0 and above.| |No
 |=======================================================================
 
 [[upgrade-example]]
@@ -207,7 +207,7 @@ IMPORTANT: Remember to turn off these logger level settings after executing a se
 
 IMPORTANT: This feature requires payara-upgrade-tool.jar from Payara v5.83.0 or v6.34.0 and above.
 
-Upgrading Payara requires to stop the domain and the SSH nodes. This features enables to upgrade the SSH nodes individually, to avoid having any downtime. This is only to upgrade between 2 versions of Payara 5 or 6, not from 5 to 6.
+Upgrading Payara requires that the domain and SSH nodes are stopped. This feature allows the upgrading of individual SSH nodes, eliminating downtime. Only upgrades in the same major version are supported 5.x to 5.x, 6.x to 6.x. Upgrades between 5.x and 6.x are not supported.
 
 [[command-options-3]]
 ==== Steps to upgrade:
@@ -243,7 +243,7 @@ Start the DAS
 asadmin> start-domain
 ----
 
-WARNING: the upgrade can cause issues if the nodes are forming a cluster with Hazelcast. When 2 versions of Payara use different versions of Hazelnut, the upgraded node will fail to start as long as nodes using the older versions are running. If the upgraded node/DAS fails to start, you may have to upgrade everything else before restarting the nodes and the DAS. Alternatively, you can avoid these issues by disabling the data grid for every nodes.
+WARNING: the upgrade can cause issues if the nodes are forming a cluster with Hazelcast. When 2 versions of Payara use different versions of Hazelcast, the upgraded node will fail to start as long as nodes using the older versions are running. If the upgraded node/DAS fails to start, you may have to upgrade everything else before restarting the nodes and the DAS. Alternatively, you can avoid these issues by disabling the data grid for every nodes.
 Below are the known combinations causing issues:
 
 
