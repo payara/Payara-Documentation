@@ -86,7 +86,7 @@ The command will also back up the old version and domains in the default locatio
 |`--stage` |Boolean |Determines if the upgrade should be installed in-place, or staged into "_x.new_" directories. Scripts are provided that can be used to apply and rollback the staged install. This option is automatically enabled when running the command on Windows. |False on Unix, True on Windows| No
 |`--domaindir` |String |The directory containing the domains. The domains in this directory are backed up, and their config is used to determine the nodes which will also be upgraded. | `${as-install}/domains` | No
 |`--usedownloaded` |String |The path to the local Payara Server zip archive to use for upgrading instead of downloading from the Payara Enterprise repository. When this parameter is specified, the `--username`, `--password`, and `--version` parameters are not required.| |No
-|`--nodes` |String |The names of the nodes to upgrade. Allows the upgrading of nodes individually lowering potential downtime (See below for details). Supports single node or a comma separated list (e.g. --nodes node1,node2) Only available in v5.83.0 or v6.34.0 and above.| |No
+|`--nodes` |String |Specifies the nodes to upgrade if you want to selectively upgrade certain nodes. Provide as a comma-separated list of node names. |All nodes in the cluster| No
 |=======================================================================
 
 [[upgrade-example]]
@@ -202,12 +202,12 @@ exec "$JAVA" -DAS_DEBUG=true  -XX:+IgnoreUnrecognizedVMOptions -jar "$AS_INSTALL
 IMPORTANT: Remember to turn off these logger level settings after executing a server upgrade, as this setting will affect all future executions of any Asadmin CLI commands, which will cause them to print out more information than usual.
 
 
-[[0 Downtime upgrade]]
-== 0 Downtime upgrade
+[[downtime-upgrade]]
+== Zero Downtime upgrade
 
 IMPORTANT: This feature requires payara-upgrade-tool.jar from Payara v5.83.0 or v6.34.0 and above.
 
-Upgrading Payara requires that the domain and SSH nodes are stopped. This feature allows the upgrading of individual SSH nodes, eliminating downtime. Only upgrades in the same major version are supported 5.x to 5.x, 6.x to 6.x. Upgrades between 5.x and 6.x are not supported.
+By default, upgrading Payara requires that the domain and all SSH nodes are stopped. This feature allows the upgrading of individual SSH nodes, eliminating downtime. Only upgrades in the same major version are supported 5.x to 5.x, 6.x to 6.x. Upgrades between 5.x and 6.x are not supported.
 
 [[command-options-3]]
 ==== Steps to upgrade:
@@ -219,7 +219,7 @@ asadmin> stop-domain
 upgrade the domain
 [source, shell]
 ----
-asadmin> upgrade-server --username example-user --distribution web --version 5.84.0 --nodes localhost-domain
+asadmin> upgrade-server --username example-user --distribution web --version 5.24.1 --nodes localhost-domain
 ----
 Stop one SSH node to upgrade
 [source, shell]
@@ -229,7 +229,7 @@ asadmin> stop-node-ssh node1
 Upgrade one SSH node
 [source, shell]
 ----
-asadmin> upgrade-server --username example-user --distribution web --version 5.84.0 --nodes node1
+asadmin> upgrade-server --username example-user --distribution web --version 5.24.1 --nodes node1
 ----
 Start the upgraded SSH node
 [source, shell]
@@ -248,14 +248,25 @@ Below are the known combinations causing issues:
 
 
 [[command-options-3]]
-==== Known issues with Payara5
+==== Known upgrade issues
 
-[cols=",,,,",options="header",]
+[cols="1,1,4",options="header",separator=¦]
 |=======================================================================
-|Existing |Upgrade |Result
-|5.32.0 |5.38.0|No issues
-|5.38.0|5.39.0|Waiting for domain1 to start .Error starting domain domain1. The server exited prematurely with exit code 1. Before it died, it produced the following output: Launching Payara Server on Felix platform ERROR: Bundle fish.payara.server.internal.core.glassfish [27] Error starting file:/home/payara/5.38/payara5/glassfish/modules/glassfish.jar (org.osgi.framework.BundleException: Unable to resolve fish.payara.server.internal.core.glassfish [27](R 27.0): missing requirement [fish.payara.server.internal.core.glassfish [27](R 27.0)] osgi.wiring.package; (&(osgi.wiring.package=org.osgi.framework)(version>=1.9.0)(!(version>=2.0.0))) Unresolved requirements: [[fish.payara.server.internal.core.glassfish [27](R 27.0)] osgi.wiring.package; (&(osgi.wiring.package=org.osgi.framework)(version>=1.9.0)(!(version>=2.0.0)))])
-|5.39.0|5.50.0|[#|2025-05-29T08:28:00.518+0000|SEVERE|Payara 5.50.0|com.hazelcast.security|_ThreadID=38;_ThreadName=hz.quizzical_pike.generic-operation.thread-0;_TimeMillis=1748507280518;_LevelValue=1000;|  [192.168.122.180]:4900 [development] [5.2.2] Reason of failure for node join: Joining node's version 5.2.2 is not compatible with cluster version 4.2 (Rolling Member Upgrades are only supported for the same major version) (Rolling Member Upgrades are only supported in Hazelcast Enterprise)|#]|5.50.0|5.53.0|  [#|2025-05-29T08:45:24.146+0000|SEVERE|Payara 5.53.0|com.hazelcast.security|_ThreadID=40;_ThreadName=hz.loving_sanderson.generic-operation.thread-1;_TimeMillis=1748508324146;_LevelValue=1000;|  [192.168.122.180]:4900 [development] [5.3.1] Reason of failure for node join: Joining node's version 5.3.1 is not compatible with cluster version 5.2 (Rolling Member Upgrades are only supported in Hazelcast Enterprise)|#]|5.53.0|5.58.0|  [#|2025-05-29T10:09:27.449+0000|SEVERE|Payara 5.58.0|com.hazelcast.cluster|_ThreadID=37;_ThreadName=hz.mystifying_saha.priority-generic-operation.thread-0;_TimeMillis=1748513367449;_LevelValue=1000;|  [192.168.122.180]:4900 [development] [5.3.6] Node could not join cluster. A Configuration mismatch was detected: Incompatible partition groups! expected: HOST_AWARE, found: SPI Node is going to shutdown now!|#]
-|5.58.0|5.64.0|No issues but existing user sessions get:[2025-05-29T15:06:09.342+0000] [Payara 5.65.0] [WARNING] [AS-WEB-HA-00005] [javax.enterprise.web.ha] [tid: _ThreadID=89 _ThreadName=http-thread-pool::jk-connector(1)] [timeMillis: 1748531169342] [levelValue: 900] [[  Exception occurred in getSessionjava.io.InvalidClassException: org.apache.catalina.session.StandardSession; local class incompatible: stream classdesc serialVersionUID = -5533172448459370383, local class serialVersionUID = 7816479940240670908
-|5.64.0|5.83.0|No issues
+¦Existing ¦Upgrade ¦Result
+¦5.32.0 ¦5.38.0 ¦No issues
+¦5.38.0¦5.39.0 a¦
+----
+Waiting for domain1 to start .Error starting domain domain1. The server exited prematurely with exit code 1. Before it died, it produced the following output: Launching Payara Server on Felix platform ERROR: Bundle fish.payara.server.internal.core.glassfish [27] Error starting file:/home/payara/5.38/payara5/glassfish/modules/glassfish.jar (org.osgi.framework.BundleException: Unable to resolve fish.payara.server.internal.core.glassfish [27](R 27.0): missing requirement [fish.payara.server.internal.core.glassfish [27](R 27.0)] osgi.wiring.package; (&(osgi.wiring.package=org.osgi.framework)(version>=1.9.0)(!(version>=2.0.0))) Unresolved requirements: [[fish.payara.server.internal.core.glassfish [27](R 27.0)] osgi.wiring.package; (&(osgi.wiring.package=org.osgi.framework)(version>=1.9.0)(!(version>=2.0.0)))])
+----
+
+¦5.39.0 ¦5.50.0 a¦
+----
+[#|2025-05-29T08:28:00.518+0000|SEVERE|Payara 5.50.0|com.hazelcast.security|_ThreadID=38;_ThreadName=hz.quizzical_pike.generic-operation.thread-0;_TimeMillis=1748507280518;_LevelValue=1000;|  [192.168.122.180]:4900 [development] [5.2.2] Reason of failure for node join: Joining node's version 5.2.2 is not compatible with cluster version 4.2 (Rolling Member Upgrades are only supported for the same major version) (Rolling Member Upgrades are only supported in Hazelcast Enterprise)|#]|5.50.0|5.53.0|  [#|2025-05-29T08:45:24.146+0000|SEVERE|Payara 5.53.0|com.hazelcast.security|_ThreadID=40;_ThreadName=hz.loving_sanderson.generic-operation.thread-1;_TimeMillis=1748508324146;_LevelValue=1000;|  [192.168.122.180]:4900 [development] [5.3.1] Reason of failure for node join: Joining node's version 5.3.1 is not compatible with cluster version 5.2 (Rolling Member Upgrades are only supported in Hazelcast Enterprise)|#]|5.53.0|5.58.0|  [#|2025-05-29T10:09:27.449+0000|SEVERE|Payara 5.58.0|com.hazelcast.cluster|_ThreadID=37;_ThreadName=hz.mystifying_saha.priority-generic-operation.thread-0;_TimeMillis=1748513367449;_LevelValue=1000;|  [192.168.122.180]:4900 [development] [5.3.6] Node could not join cluster. A Configuration mismatch was detected: Incompatible partition groups! expected: HOST_AWARE, found: SPI Node is going to shutdown now!|#]
+----
+¦5.58.0 ¦5.64.0 a¦
+----
+No issues but existing user sessions get:[2025-05-29T15:06:09.342+0000] [Payara 5.65.0] [WARNING] [AS-WEB-HA-00005] [javax.enterprise.web.ha] [tid: _ThreadID=89 _ThreadName=http-thread-pool::jk-connector(1)] [timeMillis: 1748531169342] [levelValue: 900] [[  Exception occurred in getSessionjava.io.InvalidClassException: org.apache.catalina.session.StandardSession; local class incompatible: stream classdesc serialVersionUID = -5533172448459370383, local class serialVersionUID = 7816479940240670908
+----
+
+¦5.64.0¦5.83.0¦No issues
 |=======================================================================
