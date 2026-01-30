@@ -15,11 +15,11 @@ In most cases this means that users that are migrating their applications from a
 
 Fortunately, Payara Enterprise distributions (_Server_ and _Micro_, explicitly) include a *Deployment Transformer* tool that automatically executes the conversion of a Jakarta EE 8 application's components using at deployment time,  allowing users to have their Jakarta EE 8 applications transformed on the fly into the Jakarta EE 10 namespace.
 
-NOTE: The deployment transformer is enabled by default on both Payara Platform distributions.
+NOTE: The deployment transformer is enabled by default on both Payara Enterprise distributions.
 
 Because the deployment transformer operates at the archive level, it may repackage application archives and nested JARs as part of the transformation process. This can result in metadata such as `META-INF/MANIFEST.MF` being regenerated, which may invalidate existing cryptographic signatures on vendor-signed JARs included in the application (for example, resource adapters or security providers).
 
-Users can disable the deployment transformer by setting the `fish.payara.deployment.transform.namespace` system property to `false` and restart the corresponding server instances. This might be desired if users have no intention on deploying Jakarta EE 8 applications and want to spare the extra overhead of the deployment transformer scanning their applications in vain.
+Users can disable the deployment transformer by running the command `asadmin create-system-properties fish.payara.deployment.transform.namespace=false` and restart the corresponding server instances. This might be desired if users have no intention on deploying Jakarta EE 8 applications and want to spare the extra overhead of the deployment transformer scanning their applications in vain.
 
 IMPORTANT: The deployment transformer will allow most Jakarta EE 8 applications to run on a Payara Platform 6 distribution with no changes, however, in some cases user intervention will be required to fix breaking changes introduced in Jakarta EE 10 (like pruned APIs, for example).
 
