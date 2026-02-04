@@ -1,0 +1,378 @@
+[[payara-dev-console]]
+= Payara Dev Console
+:ordinal: 3
+
+Payara Dev Console provides an integrated development console for inspecting and debugging Jakarta EE applications running on Payara Platform.
+
+It is designed to help developers understand CDI wiring, bean lifecycle behavior, interception chains, injection resolution, and security metadata during development.
+
+The diagnosis console exposes runtime insights directly from the container, making it easier to troubleshoot configuration problems, dependency issues, and unexpected application behavior without requiring external profiling tools.
+
+---
+
+== Overview
+
+When Payara Dev Console is enabled, Payara instruments key Jakarta EE subsystems and presents structured inspection views through the Dev Console UI.
+
+This includes visibility into:
+
+* CDI bean discovery and resolution
+* Scoped lifecycle activity
+* Dependency wiring and injection diagnostics
+* Interceptors and decorators applied at runtime
+* Observer event registrations
+* Security annotation usage
+
+These insights are especially useful when diagnosing:
+
+* Unsatisfied or ambiguous injections
+* Unexpected bean recreation
+* Circular dependencies
+* Missing or misapplied interceptors
+* Decorators not being activated
+* REST security misconfiguration
+
+---
+
+== CDI Diagnosis
+
+The CDI Diagnosis console provides detailed visibility into the container’s bean registry and runtime behavior.
+
+=== Bean Registry Inspection
+
+Developers can explore all beans discovered in the deployment, including:
+
+* Scope annotations (`@ApplicationScoped`, `@RequestScoped`, etc.)
+* Qualifiers and stereotypes
+* Bean types and declaring classes
+* Producer-based and synthetic beans
+
+This helps validate whether CDI beans are being discovered and registered correctly.
+
+---
+
+=== Scoped Bean Lifecycle Analysis
+
+Payara Dev Console includes scope-aware lifecycle summaries showing:
+
+* Total beans per scope
+* Created vs active instances
+* Destroyed lifecycle events
+* Runtime scope distribution
+
+image::dev-console/scoped-bean.png[Scoped Bean]
+
+This makes it easier to detect scope misuse, such as excessive request-scoped recreation or unintended application-scoped singletons.
+
+---
+
+=== Dependency Graph Visualization
+
+For selected beans, the console can render an interactive dependency graph showing:
+
+* Direct injection relationships
+* Downstream dependencies
+* Circular dependency detection
+* Resolution paths between beans
+
+image::dev-console/dependency-graph.png[Dependency Graph]
+
+This helps developers understand complex CDI wiring in larger applications.
+
+---
+
+== Injection Diagnostics
+
+One of the most common sources of deployment and runtime errors in CDI applications is incorrect injection resolution.
+
+Payara Dev Console provides a dedicated Injection Points console that reports:
+
+* Total injection points discovered
+* Resolved injection points
+* Unsatisfied dependencies
+* Ambiguous resolution conflicts
+
+---
+
+=== Unsatisfied Injection Detection
+
+Unsatisfied injection points occur when no bean matches the required type and qualifiers.
+
+The console reports:
+
+* Required injection type
+* Declared qualifiers
+* Status (`UNSATISFIED`)
+* Resolution details explaining the mismatch
+
+This is especially useful when debugging:
+
+* Missing bean discovery
+* Incorrect qualifier usage
+* Disabled alternatives
+* Unavailable producers
+
+---
+
+=== Ambiguous Injection Reporting
+
+When multiple beans match the same injection point, CDI reports an ambiguity error.
+
+Payara Dev Console highlights these conflicts so developers can apply:
+
+* Proper qualifiers
+* Specialization
+* Alternatives
+
+---
+
+== Producer Diagnosis
+
+The Producers view provides insight into producer methods and fields registered in the container.
+
+It includes:
+
+* Producer origin class and member signature
+* Produced types
+* Runtime production counts
+* Disposal tracking (when applicable)
+
+image::dev-console/producer.png[Producer]
+
+This is useful when validating custom resource factories, configuration producers, or integration beans.
+
+---
+
+== Interceptors & Decorators
+
+Payara Dev Console provides dedicated inspection views for CDI interception infrastructure.
+
+---
+
+=== Interceptor Discovery
+
+Developers can review:
+
+* All enabled interceptors
+* Binding annotations and activation rules
+* Execution priorities
+* Invocation statistics
+
+image::dev-console/interceptor.png[Interceptor]
+
+This helps confirm that transactional, security, or tracing interceptors are applied correctly.
+
+---
+
+=== Intercepted Class Analysis
+
+In addition to listing interceptors, Payara Dev Console shows exactly which application classes are intercepted at runtime.
+
+This view provides:
+
+* Intercepted bean classes discovered in the deployment
+* Interceptors applied to each class
+* Per-class interceptor resolution counts
+
+image::dev-console/intercepted-class.png[Intercepted Class]
+
+This is useful when troubleshooting:
+
+* Interceptors not firing as expected
+* Unexpected framework interceptors being activated
+* Multiple bindings applied simultaneously
+
+---
+
+=== Decorator Discovery
+
+Decorators wrap CDI beans with additional behavior.
+
+The Decorators view allows developers to inspect:
+
+* All decorators enabled in the application
+* Decorated interfaces and bean types
+* Delegate injection targets
+* Associated scopes and lifecycle activity
+
+image::dev-console/decorator.png[Decorator]
+
+This helps validate decorator resolution and activation.
+
+---
+
+=== Decorated Class Mapping
+
+The Decorated Classes view highlights:
+
+* Which classes are currently being decorated
+* Decorators applied to each target type
+* Number of decorator layers involved
+
+image::dev-console/decorated-class.png[Decorated Class]
+
+This is especially helpful in applications where decorators are enabled indirectly through extensions or libraries.
+
+---
+
+== Observer Event Diagnosis
+
+CDI event-driven applications rely heavily on observer methods.
+
+Payara Dev Console provides an Observer Events console exposing metadata such as:
+
+* Observed event types
+* Observer bean classes
+* Qualifier information
+* Reception mode (`ALWAYS`, conditional)
+* Transaction phase participation
+
+This allows developers to verify:
+
+* Observers are registered correctly
+* Events are delivered in the expected transaction phase
+* Qualifier mismatches are not preventing notifications
+
+---
+
+== REST Payara Dev Console
+
+The REST diagnosis console provides visibility into Jakarta REST registrations.
+
+It includes:
+
+=== Resource Discovery
+
+Developers can inspect:
+
+* Registered REST resource classes
+* Available REST methods and verbs
+* Application path mappings
+
+This helps confirm that REST endpoints are being deployed correctly.
+
+---
+
+=== Exception Mapper Visibility
+
+The console also lists registered exception mappers, allowing developers to verify:
+
+* Custom error handling activation
+* Mapper priority and applicability
+
+---
+
+== Security Annotation Audit
+
+Payara Dev Console includes a Security Audit view that inspects Jakarta Security annotations applied across REST endpoints.
+
+It highlights usage of:
+
+* `@RolesAllowed`
+* `@PermitAll`
+* `@DenyAll`
+
+For each secured entry, the console displays:
+
+* HTTP method and resource path
+* Applied security annotation
+* Declaring class and method
+
+This provides a quick way to review security configuration during development and detect unsecured or unintentionally restricted endpoints.
+
+---
+
+== Runtime Metrics Dashboard
+
+In addition to application introspection, Payara Dev Console provides a lightweight Metrics Dashboard.
+
+This includes:
+
+* Loaded/unloaded class counts
+* Heap and non-heap memory usage
+* Live and daemon thread tracking
+* CPU load summaries
+* Auto-refresh monitoring during development
+
+This offers quick feedback on runtime pressure without requiring external profilers.
+
+---
+
+== Asadmin Commands
+
+The Dev Console can be configured and managed using dedicated `asadmin` commands.
+
+---
+
+=== Get Dev Console Configuration
+
+Retrieves the effective Dev Console configuration for the specified target.
+
+[source,shell]
+----
+asadmin get-dev-console-configuration --target <target>
+----
+
+Returned properties include:
+
+* `enabled`
+* `dynamic`
+* `endpoint`
+* `virtualServers`
+* `securityEnabled`
+* `roles`
+
+---
+
+=== Set Dev Console Configuration
+
+Updates Dev Console configuration attributes.
+
+[source,shell]
+----
+asadmin set-dev-console-configuration \
+  --enabled=true|false \
+  --dynamic=true|false \
+  --endpoint=/dev \
+  --virtualServers=server \
+  --securityEnabled=true|false \
+  --roles=admin
+----
+
+---
+
+== Accessing the Dev Console
+
+Once enabled, the Dev Console becomes accessible through the configured endpoint.
+
+For example, with the default configuration, it can be reached at:
+
+----
+http://localhost:8080/dev
+----
+
+---
+
+== Usage Notes
+
+* Payara Dev Console is intended for development and debugging environments.
+* It provides deep container introspection and should not be enabled unnecessarily in production deployments.
+* When diagnosing deployment issues, redeploying the application may be required to refresh instrumentation state.
+
+---
+
+== Summary
+
+Payara Dev Console provides an integrated troubleshooting console covering:
+
+* CDI bean discovery and lifecycle visibility
+* Dependency graphs and scoped activity
+* Interceptor and decorator mapping
+* Observer event inspection
+* Security annotation auditing
+* Injection resolution failure reporting
+* Lightweight runtime metrics
+
+These capabilities reduce the need for manual logging and significantly improve the developer experience when debugging Jakarta EE applications in Payara.
+
+---
