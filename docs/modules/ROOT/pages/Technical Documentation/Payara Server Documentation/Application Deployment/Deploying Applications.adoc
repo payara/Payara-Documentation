@@ -479,7 +479,7 @@ This listing shows the structure of the deployment plan JAR file for an EAR file
 ----
 $ jar -tvf mydeployplan.jar
 420 Thu Mar 13 15:37:48 PST 2003 glassfish-application.xml
-370 Thu Mar 13 15:37:48 PST 2003 RosterClient.war.glassfish-web.xml
+370 Thu Mar 13 15:37:48 PST 2003 RosterClient.war.payara-web.xml
 418 Thu Mar 13 15:37:48 PST 2003 roster-ac.jar.glassfish-application-client.xml
 1281 Thu Mar 13 15:37:48 PST 2003 roster-ejb.jar.glassfish-ejb-jar.xml
 2317 Thu Mar 13 15:37:48 PST 2003 team-ejb.jar.glassfish-ejb-jar.xml
@@ -879,7 +879,7 @@ The domain administration server (DAS) in Payara Server supports the deployment 
 +
 IMPORTANT: Deploying multiple applications using the same context root within a single instance produces an error.
 
-* *Data Source*. If a web application accesses a `DataSource` that is not specified in a `resource-ref` in `glassfish-web.xml` or `payara-web.xml`, or there is no `glassfish-web.xml` or `payara-web.xml` files, the `resource-ref-name` defined in `web.xml` is used.
+* *Data Source*. If a web application accesses a `DataSource` that is not specified in a `resource-ref` in `payara-web.xml`, or there is no `payara-web.xml` files, the `resource-ref-name` defined in `web.xml` is used.
 +
 A warning message is logged, recording the JNDI name that was used to look up the resource.
 
@@ -895,17 +895,17 @@ For information about HTTP session persistence, see the xref:Technical Documenta
 
 * *JSP Precompilation*. You can precompile JSP files during deployment by checking the appropriate box in the Administration Console, or by using the `--precompilejsp` option of the `deploy` subcommand.
 +
-You can keep the generated source for JSP files by adding the `keepgenerated` flag to the `jsp-config` element in `glassfish-web.xml` or `payara-web.xml`.
+You can keep the generated source for JSP files by adding the `keepgenerated` flag to the `jsp-config` element in `payara-web.xml`.
 +
 For example:
 +
 [source,xml]
 ----
-<glassfish-web-app>
+<payara-web-app>
    <jsp-config>
       <property name="keepgenerated" value="true" />
    </jsp-config>
-</glassfish-web-app>
+</payara-web-app>
 ----
 +
 If you include this property when you deploy the WAR file, the generated source is kept in `domain-dir/generated/jsp/app-name/module-name` for an application, or `domain-dir/generated/jsp/module-name` for an individually-deployed web module.
@@ -1144,7 +1144,7 @@ NOTE: If the `--failurefatal` option of `create-lifecycle-module` is set to `tru
 == Web Service Deployment Guidelines
 
 NOTE: If you installed the Web Profile, web services are not supported unless the optional Metro Web Services Stack add-on component is downloaded. +
-Without the Metro add-on component, a servlet or EJB component cannot be a web service endpoint, and the `glassfish-web.xml`/`payara-web.xml` and `glassfish-ejb-jar.xml` elements related to web services are ignored.
+Without the Metro add-on component, a servlet or EJB component cannot be a web service endpoint, and the `payara-web.xml` and `glassfish-ejb-jar.xml` elements related to web services are ignored.
 
 The following guidelines apply when deploying a web service in Payara Server:
 
@@ -1152,7 +1152,7 @@ The following guidelines apply when deploying a web service in Payara Server:
 +
 If the deployed application or module has a web service endpoint, the endpoint is detected automatically during deployment.
 +
-The Payara Server specific deployment descriptor files, `glassfish-web.xml`, `payara-web.xml` and `glassfish-ejb-jar.xml`, provide optional web service enhancements in their xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#webservice-endpoint[`webservice-endpoint`] and xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#webservice-description[`webservice-description`] elements.
+The Payara Server specific deployment descriptor files, `payara-web.xml` and `glassfish-ejb-jar.xml`, provide optional web service enhancements in their xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#webservice-endpoint[`webservice-endpoint`] and xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#webservice-description[`webservice-description`] elements.
 
 * *Web Service Management*. Web service management is fully supported in the Administration Console. After the application or module is deployed, click the Web Service component. The table in the right frame lists deployed web service endpoints.
 

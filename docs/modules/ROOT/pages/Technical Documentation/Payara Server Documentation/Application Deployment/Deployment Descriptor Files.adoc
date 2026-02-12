@@ -30,11 +30,8 @@ The following table lists the Payara Platform deployment descriptors and their D
 | `glassfish-application_6_0-1.dtd`
 | Configures an entire Jakarta EE application (EAR file).
 
-|
-`glassfish-web.xml`
-
-`payara-web.xml`
-| `glassfish-web-app_3_0-1.dtd`
+|`payara-web.xml`
+|`payara-web-app_4.dtd`
 | Configures a web application (WAR file).
 
 | `glassfish-ejb-jar.xml`
@@ -156,18 +153,16 @@ GlassFish Application Server 3.1 Java EE Application 6.0//EN"
 </glassfish-application>
 ----
 
-[[the-glassfish-web.xml-file]]
-== The `glassfish-web.xml` and `payara-web.xml` Files
+[[the-payara-web.xml-file]]
+== The `payara-web.xml` File
 
-The `glassfish-web.xml` file configures a web application (WAR file). It is an original Eclipse GlassFish deployment descriptor.
+The `payara-web.xml` file configures a web application (WAR file).
 
-The `payara-web.xml` is a matching Payara Platform variant which is recommended to be used whenever possible.
-
-Their element hierarchy is as follows:
+Its element hierarchy is as follows:
 
 [source,text]
 ----
-glassfish-web-app
+payara-web-app
 .  context-root
 .  security-role-mapping
 .  .  role-name
@@ -952,202 +947,4 @@ alter table PLAYEREJBTEAMEJB add constraint FK_PLAYERS foreign key (TEAMEJB_TEAM
     </entity-mapping>
 </sun-cmp-mapping>
 </sun-cmp-mappings>
-----
-
-//TODO - Assess whether such support should be properly removed in the future
-
-[[weblogic-server-deployment-descriptor-support-in-payara-server]]
-== WebLogic Server Deployment Descriptor Support in Payara Server
-
-Payara Server offers limited support for the `weblogic-application.xml`, `weblogic.xml`, and `weblogic-webservices.xml` deployment descriptor files.
-
-The only element in `weblogic-application.xml` that Payara Server supports is `security`. The equivalent element in the `glassfish-application.xml` file is `security-role-mapping`.
-
-The elements of `weblogic.xml` that Payara Server supports are explained in the following table.
-
-.`weblogic.xml` Support in Payara Server
-
-[cols="2,6",options="header"]
-|===
-| *`weblogic.xml` Element Name* | *Payara Server Support*
-
-| `role-name` under `security-role-assignment`
-| `role-name` under `security-role-mapping` `glassfish-web.xml` equivalent
-
-| `principal-name` under `security-role-assignment`
-| `principal-name` under `security-role-mapping` `glassfish-web.xml` equivalent
-
-| `resource-description`
-| `resource-ref` `glassfish-web.xml` equivalent, but `resource-link` not supported
-
-| `resource-env-description`
-| `resource-env-ref` `glassfish-web.xml` equivalent, but `resource-link` not supported
-
-| `ejb-reference-description`
-| `ejb-ref` `glassfish-web.xml` equivalent
-
-| `service-reference-description`
-|`service-ref` `glassfish-web.xml` equivalent
-
-| `timeout-secs` under `session-descriptor`
-| `timeoutSeconds` property of `session-properties` `glassfish-web.xml` equivalent
-
-| `invalidation-interval-secs` under `session-descriptor`
-| `reapIntervalSeconds` property of `manager-properties` `glassfish-web.xml` equivalent
-
-| `max-in-memory-sessions` under `session-descriptor`
-| `maxSessions` property of `manager-properties` `glassfish-web.xml` equivalent
-
-| `persistent-store-dir` under `session-descriptor`
-| `directory` property of `store-properties` `glassfish-web.xml` equivalent
-
-| `prefer-web-inf-classes` under `container-descriptor`
-| `delegate` attribute of `class-loader` `glassfish-web.xml` equivalent
-
-| `context-root`
-| `context-root` `glassfish-web.xml` equivalent
-
-| `cookies-enabled` under `session-descriptor`
-| Servlet 3.0
-
-| `cookie-name` under `session-descriptor`
-| Servlet 3.0
-
-| `cookie-path` under `session-descriptor`
-| Servlet 3.0
-
-| `cookie-domain` under `session-descriptor`
-| Servlet 3.0
-
-| `cookie-comment` under `session-descriptor`
-| Servlet 3.0
-
-| `cookie-secure` under `session-descriptor`
-| Servlet 3.0
-
-| `cookie-max-age-secs` under `session-descriptor`
-| Servlet 3.0
-
-| `cookie-http-only` under `session-descriptor`
-| Servlet 3.0
-
-| `url-rewriting-enabled` under `session-descriptor`
-| Servlet 3.0
-
-| `persistent-store-cookie-name` under `session-descriptor`
-| Cookie-based persistence is supported
-
-| `keepgenerated` under `jsp-descriptor`
-| keep generated init parameter of `JspServlet`
-
-| `working-dir` under `jsp-descriptor`
-| scratchdir init parameter of `JspServlet`
-
-| `compress-html-template` under `jsp-descriptor`
-| trimSpaces init parameter of `JspServlet`
-
-| `index-directory-enabled` under `container-descriptor`
-| listings init parameter of `DefaultServlet`
-
-| `index-directory-sort-by` under `container-descriptor`
-| sortedBy init parameter of `DefaultServlet`
-
-| `save-sessions-enabled` under `container-descriptor`
-| Same as `asadmin redeploy` `--keepstate=true` or `keep-state` in `glassfish-web.xml`
-
-| `run-as-principal-name` under `servlet-descriptor`
-| `principal-name` under `servlet` `glassfish-web.xml` equivalent
-
-|===
-
-The elements of `weblogic-webservices.xml` that Payara Server supports are explained in the following table.
-
-.`weblogic-webservices.xml` Support in Payara Server
-[cols="3,6",options="header"]
-|===
-| *`weblogic-webservices.xml` Element Name* | *Payara Server Support*
-
-| `webservice-type`
-| Possible values are `JAXRPC` or `JAXWS`. Payara Server does not support JAX-RPC web services with Jakarta Web Services Metadata annotations.
-The use of this element is limited, because the container can find out if the type is JAX-WS or JAX-RPC based on presence of Jakarta Web Services Metadata annotations.
-
-| `wsdl-publish-file`
-| Same as `wsdl-publish-location` in `glassfish-web.xml`
-
-| `service-endpoint-address`
-| Similar to `endpoint-address-uri` in `glassfish-web.xml`, except that `webservice-contextpath` and `webservice-serviceuri` are specified separately
-
-| `j2ee:login-config`
-| Same as `login-config` in `glassfish-web.xml`
-
-| `j2ee:transport-guarantee`
-| Same as `transport-guarantee` in `glassfish-web.xml`
-
-| `exposed` under `wsdl`
-| Accepts `true` or `false`, defaults to `true`. Controls the publishing of WSDL to clients.
-
-| `stream-attachments`
-| Accepts `true` or `false`, defaults to `true`. Only for JAX-WS web services. Configures the JAX-WS runtime to send attachments in streaming fashion.
-
-| `validate-request`
-|Accepts `true` or `false`, defaults to `false`. Only for JAX-WS web services. Configures the JAX-WS runtime to validate that request messages are as the WSDL definitions specify.
-
-| `http-response-buffersize`
-| Property of `ReliabilityMessagingFeature` configuration, similar to `ReliableMessagingFeature.setDestinationBufferQuota()`
-
-| `reliability-config`
-| Partially supported. Sub-elements map to Metro's `ReliabilityMessagingFeature`.
-
-| `inactivity-timeout` under `reliability-config`
-| Maps to `ReliableMessagingFeature.getSequenceInactivityTimeout()`
-
-| `base-retransmission-interval` under `reliability-config`
-| Maps to `ReliableMessagingFeature.``getMessageRetransmissionInterval()`
-
-| `retransmission-exponential-``backoff` under `reliability-config`
-| Maps to `ReliableMessagingFeature.``getRetransmissionBackoffAlgorithm()`. Returns enum values, one of them is `exponential`.
-
-| `acknowledgement-interval` under `reliability-config`
-| Maps to `ReliableMessagingFeature.``getAcknowledgementTransmissionInterval()`
-
-| `sequence-expiration` under `reliability-config`
-| Maps to `ReliableMessagingFeature.``getSequenceInactivityTimeout()`. In WebLogic Server this value applies regardless of activity.
-In Metro it applies only to inactive sequences.
-
-| `buffer-retry-count` under `reliability-config`
-| Maps to `ReliableMessagingFeature.``getMaxMessageRetransmissionCount()`
-
-| `buffer-retry-delay` under `reliability-config`
-| Maps to `ReliableMessagingFeature.``getMessageRetransmissionInterval()`
-|===
-
-[[deployment-descriptor-precedence-order]]
-== Deployment Descriptor Precedence Order
-
-When multiple vendor deployment descriptors are present in the same module (including deployment descriptors of the original *Eclipse GlassFish* and of the old *Sun Application Server*), the descriptors are processed with the following precedence order in default mode:
-
-----
-WebLogic Server > Payara Platform > Eclipse GlassFish Server > Sun Application Server
-----
-
-The default precedence order can be customized and configured via the system properties documented in the following sections.
-
-[[gfdd-over-wlsdd]]
-=== `gfdd.over.wlsdd`
-
-This system property controls the precedence between original GlassFish Server and WebLogic Server deployment descriptors when they are both present.
-
-When the `gfdd.over.wlsdd` property is set to true, the descriptors are processed in this order:
-
-----
-Payara Platform > GlassFish Server > WebLogic Server > Sun Application Server
-----
-
-[[ignore-wlsdd]]
-=== `ignore.wlsdd`
-
-When the `ignore.wlsdd` property is set to true, the WebLogic Server deployment descriptors will be completely ignored and other descriptors will be processed in the following order:
-
-----
-GlassFish Server > Payara Platform > Sun Application Server
 ----
