@@ -2,6 +2,15 @@
 = Enabling Centralized Administration of Payara Server Instances
 :ordinal: 1
 
+[IMPORTANT]
+====
+At the moment of the publication of this documentation, using the natively provided SSH utilities by Windows OS environments doesn't work. The main reason for this is significant issues with file transfers not working correctly across nodes.
+
+We have discovered that when SSH is provided using a Cygwin-based OpenSSH and Bash shell from Cygwin is used to manage Payara Server, remote nodes can be created and operated without issues.
+
+Until the problems with natively provided OpenSSH implementation are addressed, we recommend you configure SSH nodes using the Cygwin-based OpenSSH toolset in production environments.
+====
+
 Payara Server uses the secure shell (SSH) to ensure that instances that span multiple hosts can be administered centrally.
 
 To perform administrative operations on Payara Server instances that are remote from the domain administration server (DAS), the DAS must be able to communicate with those instances.
@@ -93,47 +102,6 @@ Account Control (UAC)] (`http://technet.microsoft.com/en-us/library/cc709691%28W
 You might be using a UAC-enabled Windows system and choose to store files for Payara Server instances in a directory other than the SSH user's home directory. In this situation, the SSH user must have native (that is, non-virtual) read and write access to the file system where the instances are to be stored. The OS-level administrator has such access by default.
 
 You can also configure the system to grant such access to other users. For more information, see the documentation for the Windows operating system.
-
-[[to-enable-the-windows-user-to-run-scripts-on-a-remote-host]]
-=== To Enable the Windows User to Run Scripts on a Remote Host
-
-To run scripts on a remote host, full control over the following Windows registry keys must be allowed for the Windows user or the group that contains the Windows user:
-
-* One of the following keys, depending on the processor architecture of the host:
-
-** 32-bit architecture: `HKEY_LOCAl_MACHINE\SOFTWARE\Classes\Wow6432Node\CLSID\\{76A64158-CB41-11D1-8B02-00600806D9B6}`
-** 64-bit architecture: `HKEY_LOCAl_MACHINE\SOFTWARE\Classes\CLSID\\{76A64158-CB41-11D1-8B02-00600806D9B6}`
-* `HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\\{72C24DD5-D70A-438B-8A42-98424B88AFB8}`
-
-In some versions of Windows, only the `NT SERVICE\TrustedInstaller` user has full control over these Windows registry keys. If your version of Windows is configured in this way, you must modify these keys to allow full control over them for the Windows user or the group that contains the Windows user.
-
-WARNING: Remember that only an administrator user can edit the Windows registry.
-
-Perform this procedure for each Windows registry key that you are modifying on each host where instances in your Deployment Groups will reside.
-
-. If necessary, start the *Registry Editor*.
-+
-[source,shell]
-----
-$ regedit.exe
-----
-
-. In the *Registry Editor* window, navigate to the registry key that you are modifying.
-. Select the key, click mouse button 3, and from the pop-up menu that opens, select _Permissions_.
-. Determine whether full control is allowed for the Windows user or the group that contains the Windows user.
-* If full control is allowed, no further action is required.
-* If full control is not allowed, allow full control as follows:
-..  In the _Permissions_ window, click _Advanced_.
-..  In the _Advanced Security Settings_ window, select the _Owner_ tab.
-..  From the _Change owner to_ list, select the Windows user or the group that contains the Windows user.
-..  Ensure that the _Replace owner on subcontainer and objects_ option is selected.
-..  Click _Apply_, then _OK_.
-+
-The Advanced Security Settings window closes. The Permissions window shows that full control is allowed for the Windows user or the group that contains the Windows user.
-..  In the Permissions window, click OK.
-+
-The Permissions window closes.
-.  After modifying all the Windows registry keys over which full control is required, quit the Registry Editor.
 
 [[setting-up-cygwin-ssh-on-windows]]
 == Setting Up Cygwin SSH on Windows
