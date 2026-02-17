@@ -19,12 +19,6 @@ The following topics are addressed here:
 
 Each Payara Server node is one of the following types of node:
 
-`DCOM`::
-A `DCOM` node supports communication over the Distributed Component Object Model (DCOM) remote protocol. The DCOM remote protocol is available only on Windows systems. If DCOM is set up, and you plan to administer your Payara Server instances centrally, the instances must reside on `DCOM` nodes.
-+
-IMPORTANT: DCOM nodes are not recommended to be used in production environments. +
-See xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc[Enabling Centralized Administration of Payara Server Instances] for more information.
-
 `SSH`::
 An `SSH` node supports communication over secure shell (SSH). If SSH is set up, and you plan to administer your Payara Server instances centrally, the instances must reside on `SSH` nodes.
 +
@@ -34,217 +28,9 @@ A `CONFIG` node does not support remote communication. If SSH is set up, and you
 +
 Each domain contains a predefined `CONFIG` node that is named `localhost-`domain, where domain is the name of the domain. On the host where the domain administration server (DAS) is running, this node represents the local host.
 `DOCKER`::
-A Docker node is similar to the existing SSH, DCOM, and CONFIG nodes in that it is a virtual representation of a Payara Server installation, providing connection details that the Domain Administration Server (DAS) uses to communicate with the installation to create, stop, start, and delete instances.
+A Docker node is similar to the existing SSH and CONFIG nodes in that it is a virtual representation of a Payara Server installation, providing connection details that the Domain Administration Server (DAS) uses to communicate with the installation to create, stop, start, and delete instances.
 +
 Where it differs from these existing node types is that instances created against it are actually housed in Docker containers, and so also contains details on how to communicate with the Docker engine of the remote machine.
-
-[[creating-listing-testing-and-deleting-dcom-nodes]]
-== Creating, Listing, Testing, and Deleting `DCOM` Nodes
-
-A `DCOM` node supports communication over DCOM. If DCOM is set up and, you plan to administer your Payara Server instances centrally, the instances must reside on `DCOM` nodes.
-
-Payara Server enables you to create `DCOM` nodes for use by instances, obtain information about `DCOM` nodes, test if `DCOM` nodes are reachable, and delete `DCOM` nodes that are no longer required.
-
-[[to-create-a-dcom-node]]
-=== To Create a `DCOM` Node
-
-Use the `create-node-dcom` subcommand in remote mode to create a `DCOM` node.
-
-*Before You Begin*
-
-Ensure that the Windows user can use DCOM to connect to the host that the node will represent. By default, the `create-node-dcom` subcommand validates the node's parameters and the DCOM connection to the host. If the Windows user cannot use DCOM to connect to the host, the validation fails.
-
-NOTE: For information about how to determine whether the Windows user can use DCOM to connect to the host, see xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-test-the-connection-over-dcom-to-a-remote-host[To Test the Connection Over DCOM to a Remote Host].
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Run the `create-node-dcom` subcommand.
-+
-Specify the file that contains the alias for the Windows user's password through the `--passwordfile` option of the `asadmin` utility. For more information about this file, see xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-set-up-password-authentication-for-the-windows-user[To Set Up Password Authentication for the Windows User]. +
-+
-NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for configuring the node, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-node-dcom.adoc[`create-node-dcom`] help page.
-+
-[source,shell]
-----
-C:\> asadmin --passwordfile filename create-node-dcom --nodehost node-host [--installdir install-dir] node-name
-----
-+
-filename::
-The name of the file that contains the alias for the Windows user's password.
-node-host::
-The name of the host that the node represents. The name of the host must be specified. Otherwise, an error occurs.
-install-dir::
-The full path to the parent of the base installation directory of the Payara Server software on the host, for example, `C:\payara`.
-+
-If the Payara Server software is installed in the same directory on the node's host and the DAS host, you can omit this option.
-node-name::
-Your choice of name for the node that you are creating.
-
-The following example creates the `DCOM` node `wpmdl1` to represent the host `wpmdl1.example.com`. The Payara Server software is installed in the same directory on the DAS host and on the host `wpmdl1.example.com`.
-
-[source,shell]
-----
-C:\> asadmin --passwordfile aspwalias.txt create-node-dcom --nodehost wpmdl1.example.com wpmdl1
-
-Command create-node-dcom executed successfully.
-----
-
-**See Also**
-
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc[`asadmin`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-node-dcom.adoc[`create-node-dcom`]
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help create-node-dcom` at the command line.
-
-[[to-list-dcom-nodes-in-a-domain]]
-=== To List `DCOM` Nodes in a Domain
-
-Use the `list-nodes-dcom` subcommand in remote mode to obtain information about existing `DCOM` nodes in a domain.
-
-NOTE: To obtain information about all existing nodes in a domain, use the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc[`list-nodes`] subcommand.
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-dcom.adoc#list-nodes-dcom[`list-nodes-dcom`] subcommand. +
-+
-[source,shell]
-----
-asadmin> list-nodes-dcom
-----
-
-The following example lists the name, type, and host of all `DCOM` nodes in the current domain.
-
-[source,shell]
-----
-asadmin> list-nodes-dcom
-
-xkyd  DCOM  xkyd.example.com
-wpmdl2  DCOM  wpmdl2.example.com
-wpmdl1  DCOM  wpmdl1.example.com
-Command list-nodes-dcom executed successfully.
-----
-
-The following example lists detailed information about all `DCOM` nodes in the current domain.
-
-[source,shell]
-----
-asadmin> list-nodes-dcom --long=true
-NODE NAME    TYPE   NODE HOST            INSTALL DIRECTORY   REFERENCED BY
-xkyd         DCOM   xkyd.example.com     C:\payara
-wpmdl2       DCOM   wpmdl2.example.com   C:\payara       wdi2
-wpmdl1       DCOM   wpmdl1.example.com   C:\payara       wdi1
-Command list-nodes-dcom executed successfully.
-----
-
-*See Also*
-
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes.adoc[`list-nodes`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-dcom.adoc[`list-nodes-dcom`]
-
-You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
-
-* `asadmin help list-nodes`
-* `asadmin help list-nodes-dcom`
-
-[[to-test-if-a-dcom-node-is-reachable]]
-=== To Test if a `DCOM` Node is Reachable
-
-Use the `ping-node-dcom` subcommand in remote mode to test if a `DCOM` node is reachable.
-
-*Before You Begin*
-
-Ensure that DCOM is configured on the host where the DAS is running and on the host that the node represents.
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Run the `ping-node-dcom` subcommand.
-+
-NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for testing the node, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/ping-node-dcom.adoc[`ping-node-dcom`] help page.
-+
-[source,shell]
-----
-asadmin> ping-node-dcom node-name
-----
-+
-node-name:: The name of the node to test.
-
-The following example tests if the `DCOM` node `wpmdl2` is reachable.
-
-[source,shell]
-----
-asadmin> ping-node-dcom wpmdl2
-
-Successfully made DCOM connection to node wpmdl2 (wpmdl2.example.com)
-Command ping-node-dcom executed successfully.
-----
-
-*See Also*
-
-xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/ping-node-dcom.adoc[`ping-node-dcom`]
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help ping-node-dcom` at the command line.
-
-[[to-delete-a-dcom-node]]
-=== To Delete a `DCOM` Node
-
-Use the `delete-node-dcom` subcommand in remote mode to delete a `DCOM` node.
-
-Deleting a node removes the node from the configuration of the DAS. The node's directories and files are deleted when the last Payara Server instance that resides on the node is deleted.
-
-*Before You Begin*
-
-Ensure that no Payara Server instances reside on the node that you are deleting. For information about how to delete an instance, see the following sections.
-
-* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Confirm that no instances reside on the node that you are deleting.
-+
-[source,shell]
-----
-asadmin> list-nodes-dcom --long=true
-----
-
-.  Run the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-dcom.adoc[`delete-node-dcom`] subcommand.
-+
-[source,shell]
-----
-asadmin> delete-node-dcom node-name
-----
-+
-node-name::
-The name of the node that you are deleting.
-
-The following example confirms that no instances reside on the `DCOM` node `xkyd` and deletes the node `xkyd`.
-
-[source,shell]
-----
-asadmin> list-nodes-dcom --long=true
-NODE NAME    TYPE   NODE HOST            INSTALL DIRECTORY   REFERENCED BY
-xkyd         DCOM   xkyd.example.com     C:\payara
-wpmdl2       DCOM   wpmdl2.example.com   C:\payara       wdi2
-wpmdl1       DCOM   wpmdl1.example.com   C:\payara       wdi1
-Command list-nodes-dcom executed successfully.
-asadmin> delete-node-dcom xkyd
-Command delete-node-dcom executed successfully.
-----
-
-*See also*
-
-* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-centrally[To Delete an Instance Centrally]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-delete-an-instance-locally[To Delete an Instance Locally]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/delete-node-dcom.adoc[`delete-node-dcom`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/list-nodes-dcom.adoc[`list-nodes-dcom`]
-
-You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
-
-* `asadmin help delete-node-dcom`
-* `asadmin help list-nodes-dcom`
-
-[[creating-listing-testing-and-deleting-ssh-nodes]]
-== Creating, Listing, Testing, and Deleting `SSH` Nodes
-
-An `SSH` node supports communication over SSH. If SSH is set up, and you plan to administer your Payara Server instances centrally, the instances must reside on `SSH` nodes. For information about setting up SSH, see xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#enabling-centralized-administration-of-payara-server-instances[Enabling Centralized Administration of Payara Server Instances].
-
-Payara Server enables you to create `SSH` nodes for use by instances, obtain information about `SSH` nodes, test if `SSH` nodes are reachable, and delete `SSH` nodes that are no longer required.
 
 [[to-create-an-ssh-node]]
 === To Create an `SSH` Node
@@ -608,7 +394,7 @@ You can also view the full syntax and options of the subcommands by typing the f
 [[creating-listing-and-deleting-docker-nodes]]
 == Creating, Listing and Deleting Docker Nodes
 
-As previously explained, a Docker node shares similarities with existing SSH, DCOM, and CONFIG nodes as it serves as a virtual representation of a Payara Server installation.
+As previously explained, a Docker node shares similarities with existing SSH and CONFIG nodes as it serves as a virtual representation of a Payara Server installation.
 
 IMPORTANT: The Docker engine must expose its REST admin service on an HTTP port that is reacheable by the DAS to configure a DOCKER node.
 
