@@ -4,20 +4,14 @@
 
 [IMPORTANT]
 ====
-Distributed Component Object Model (DCOM) remote protocol support has been deprecated and as such may not function as intended.
-
-Initially, DCOM was the recommended solution for remote node management in Windows OS systems. However, over the years, DCOM has proven to be extremely unreliable in most scenarios. This in conjunction with Microsoft's lack of support for the technology on newer versions of Windows systems has deemed it fairly unusable.
-
-Due to the issues with DCOM and Windows officially starting to support its own native SSH server by including an OpenSSH implementation, SSH nodes *should be used* instead of DCOM nodes.
-
-However, at the moment of the publication of this documentation, using the natively provided SSH utilities by Windows OS environments doesn't work. The main reason for this is significant issues with file transfers not working correctly across nodes.
+At the moment of the publication of this documentation, using the natively provided SSH utilities by Windows OS environments doesn't work. The main reason for this is significant issues with file transfers not working correctly across nodes.
 
 We have discovered that when SSH is provided using a Cygwin-based OpenSSH and Bash shell from Cygwin is used to manage Payara Server, remote nodes can be created and operated without issues.
 
 Until the problems with natively provided OpenSSH implementation are addressed, we recommend you configure SSH nodes using the Cygwin-based OpenSSH toolset in production environments.
 ====
 
-Payara Server uses the Distributed Component Object Model (DCOM) remote protocol or secure shell (SSH) to ensure that instances that span multiple hosts can be administered centrally.
+Payara Server uses the secure shell (SSH) to ensure that instances that span multiple hosts can be administered centrally.
 
 To perform administrative operations on Payara Server instances that are remote from the domain administration server (DAS), the DAS must be able to communicate with those instances.
 
@@ -25,12 +19,12 @@ If an instance is running, the DAS connects to the running instance directly. Fo
 
 However, the DAS cannot connect to an instance to perform operations on an instance that is not running, such as creating or starting the instance.
 
-For these operations, the DAS uses DCOM or SSH to contact a remote host and administer instances there. DCOM or SSH provides confidentiality and security for data that is exchanged between the DAS and remote hosts.
+For these operations, the DAS uses SSH to contact a remote host and administer instances there. SSH provides confidentiality and security for data that is exchanged between the DAS and remote hosts.
 
 [[about-centralized-administration-of-payara-server-instances]]
 == About Centralized Administration of Payara Server Instances
 
-The use of DCOM or SSH to enable centralized administration of remote instances is optional and is required only for specific operations. Instances local to the DAS can be administered without DCOM or SSH. If DCOM or SSH is not a possibility in your environment, you can administer remote instances locally instead.
+The use of SSH to enable centralized administration of remote instances is optional and is required only for specific operations. Instances local to the DAS can be administered without SSH. If SSH is not a possibility in your environment, you can administer remote instances locally instead.
 
 [[determining-whether-to-enable-centralized-administration]]
 === Determining Whether to Enable Centralized Administration
@@ -48,7 +42,6 @@ How you administer instances and the nodes on which they reside varies depending
 |=======================================================================
 |Protocol |Node Administration Instructions |Instance Administration Instructions
 
-|DCOM |xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Nodes.adoc#creating-listing-testing-and-deleting-dcom-nodes[Creating, Listing, Testing, and Deleting `DCOM` Nodes] +
 |xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#administering-payara-server-instances-centrally[Administering Payara Server Instances Centrally] +
 
 |SSH |xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Nodes.adoc#creating-listing-testing-and-deleting-ssh-nodes[Creating, Listing, Testing, and Deleting `SSH` Nodes] +
@@ -58,23 +51,6 @@ How you administer instances and the nodes on which they reside varies depending
 |xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#administering-payara-server-instances-locally[Administering Payara Server Instances Locally] +
 
 |=======================================================================
-
-[[considerations-for-using-dcom-for-centralized-administration]]
-=== Considerations for Using DCOM for Centralized Administration
-
-CAUTION: As stated in the opening paragraph of this document, DCOM support has fallen out of favor in Windows Operating systems, so the instructions detailed in this section may not apply to newer Windows releases.
-
-DCOM enables communications between Windows hosts. In a typical Payara Server deployment, the DAS acts as a DCOM client, and hosts where instances reside act as DCOM servers.
-To create or start an instance on a remote host, the DAS instructs the DCOM server on the host to start the `asadmin` utility of Payara Server. The `asadmin` utility then performs the required operation on the host to create or start the instance.
-
-The DCOM service must be running on hosts where instances reside, but is not required to be running on the DAS host. The DAS uses its own DCOM client for communicating with hosts where instances reside. On Windows hosts, the DCOM server is typically running by default as a Windows Service.
-
-DCOM is available in older Windows operating system distributions. Because DCOM is typically installed and preconfigured, minimal additional setup is required to use DCOM with Payara Server.
-
-Before setting up DCOM, decide which Windows user Payara Server will use when connecting to remote hosts. For the following reasons, administration is simplest if the Windows user is the user that starts the DAS:
-
-* Remote instances are started as the Windows user.
-* By default, the DAS assumes that the Windows user is the user that is running the DAS.
 
 [[considerations-for-using-ssh-for-centralized-administration]]
 === Considerations for Using SSH for Centralized Administration
@@ -126,209 +102,6 @@ Account Control (UAC)] (`http://technet.microsoft.com/en-us/library/cc709691%28W
 You might be using a UAC-enabled Windows system and choose to store files for Payara Server instances in a directory other than the SSH user's home directory. In this situation, the SSH user must have native (that is, non-virtual) read and write access to the file system where the instances are to be stored. The OS-level administrator has such access by default.
 
 You can also configure the system to grant such access to other users. For more information, see the documentation for the Windows operating system.
-
-[[setting-up-dcom-and-testing-the-dcom-set-up]]
-== Setting Up DCOM and Testing the DCOM Set Up
-
-Setting up DCOM on a host involves the following tasks:
-
-* Verifying Windows operating system settings for the host
-* Enabling the Windows user to run scripts on the host
-* Setting up password authentication for the Windows user on the host
-
-Set up DCOM on all hosts where instances in your Deployment Groups or clusters will reside.
-
-After setting up DCOM on a host, test the connection over DCOM to the host.
-
-[[windows-operating-system-settings]]
-=== Windows Operating System Settings
-
-To enable access to a host over DCOM, ensure that the following items in the Windows operating system are set as follows on the host:
-
-* The following services are in the started state and are set to start automatically:
-** Server
-** Remote Registry
-* Network Access: Sharing security model for local accounts is set to Classic.
-* The following ports are open:
-** DCOM port `135` or `139`
-** Windows Shares port `445`
-
-[[to-enable-the-windows-user-to-run-scripts-on-a-remote-host]]
-=== To Enable the Windows User to Run Scripts on a Remote Host
-
-To run scripts on a remote host, full control over the following Windows registry keys must be allowed for the Windows user or the group that contains the Windows user:
-
-* One of the following keys, depending on the processor architecture of the host:
-
-** 32-bit architecture: `HKEY_LOCAl_MACHINE\SOFTWARE\Classes\Wow6432Node\CLSID\\{76A64158-CB41-11D1-8B02-00600806D9B6}`
-** 64-bit architecture: `HKEY_LOCAl_MACHINE\SOFTWARE\Classes\CLSID\\{76A64158-CB41-11D1-8B02-00600806D9B6}`
-* `HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\\{72C24DD5-D70A-438B-8A42-98424B88AFB8}`
-
-In some versions of Windows, only the `NT SERVICE\TrustedInstaller` user has full control over these Windows registry keys. If your version of Windows is configured in this way, you must modify these keys to allow full control over them for the Windows user or the group that contains the Windows user.
-
-WARNING: Remember that only an administrator user can edit the Windows registry.
-
-Perform this procedure for each Windows registry key that you are modifying on each host where instances in your Deployment Groups will reside.
-
-. If necessary, start the *Registry Editor*.
-+
-[source,shell]
-----
-$ regedit.exe
-----
-
-. In the *Registry Editor* window, navigate to the registry key that you are modifying.
-. Select the key, click mouse button 3, and from the pop-up menu that opens, select _Permissions_.
-. Determine whether full control is allowed for the Windows user or the group that contains the Windows user.
-* If full control is allowed, no further action is required.
-* If full control is not allowed, allow full control as follows:
-..  In the _Permissions_ window, click _Advanced_.
-..  In the _Advanced Security Settings_ window, select the _Owner_ tab.
-..  From the _Change owner to_ list, select the Windows user or the group that contains the Windows user.
-..  Ensure that the _Replace owner on subcontainer and objects_ option is selected.
-..  Click _Apply_, then _OK_.
-+
-The Advanced Security Settings window closes. The Permissions window shows that full control is allowed for the Windows user or the group that contains the Windows user.
-..  In the Permissions window, click OK.
-+
-The Permissions window closes.
-.  After modifying all the Windows registry keys over which full control is required, quit the Registry Editor.
-
-*Next Steps*
-
-Set up password authentication for the Windows user as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-set-up-password-authentication-for-the-windows-user[To Set Up Password Authentication for the Windows User].
-
-[[to-set-up-password-authentication-for-the-windows-user]]
-=== To Set Up Password Authentication for the Windows User
-
-When a Payara Server subcommand uses DCOM to log in to a remote host, Payara Server requires the Windows user's password to authenticate the Windows user.
-
-To provide this password securely to Payara Server, create a Payara Server password alias to represent the password and store this alias in a password file that is passed to the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`] utility.
-
-*Before You Begin*
-
-Ensure that the following prerequisites are met:
-
-* The Windows user is a valid user on the host to which you are testing the connection over DCOM.
-* Items in the Windows operating system are set on the host as described in xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#windows-operating-system-settings[Windows Operating System Settings].
-* The Windows user is able to run scripts on the host. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-enable-the-windows-user-to-run-scripts-on-a-remote-host[To Enable the Windows User to Run Scripts on a Remote Host].
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Create an alias for the Windows user's password.
-+
-NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for creating a password alias, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-password-alias.adoc#create-password-alias[`create-password-alias`] help page.
-+
-[source,shell]
-----
-asadmin> create-password-alias alias-name
-----
-+
-alias-name::
-  Your choice of name for the alias that you are creating. The `create-password-alias` subcommand prompts you to type the password for which you are creating an alias.
-
-.  In response to the prompt, type the Windows user's password.
-+
-The `create-password-alias` subcommand prompts you to type the password again.
-. In response to the prompt, type the Windows user's password again.
-. Create a plain text file that contains the following entry for the password alias:
-+
-[source, properties]
-----
-AS_ADMIN_WINDOWSPASSWORD=${ALIAS=alias-name}
-----
-alias-name:: The alias name that you specified in Step *2*.
-+
-NOTE: When you create a `DCOM` node, pass this file as the `--passwordfile` option of the `asadmin` utility. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Nodes.adoc#to-create-a-dcom-node[To Create a `DCOM` Node].
-
-The following example creates an alias that is named `winuser-password` for the Windows user's password.
-
-[source,shell]
-----
-$ asadmin create-password-alias winuser-password
-Enter the alias password>
-Enter the alias password again>
-Command create-password-alias executed successfully.
-----
-
-The entry in the password file for the `winuser-password` alias is as follows:
-
-[source,properties]
-----
-AS_ADMIN_WINDOWSPASSWORD=${ALIAS=winuser-password}
-----
-
-*See Also*
-
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`(1M)]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/create-password-alias.adoc#create-password-alias[`create-password-alias`(1)]
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help create-password-alias` at the command line.
-
-*Next Steps*
-
-Test the DCOM setup as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-test-the-connection-over-dcom-to-a-remote-host[To Test the Connection Over DCOM to a Remote Host].
-
-[[to-test-the-connection-over-dcom-to-a-remote-host]]
-=== To Test the Connection Over DCOM to a Remote Host
-
-Testing the connection over DCOM to a remote host verifies that the required Windows services are running, the required ports are open, and the Windows user has a valid user account on the host.
-
-Before attempting to perform any task that requires for the DAS to contact the DCOM server on a remote host, test the connection over DCOM to the host. If this test fails, any attempt to perform a task that requires the DAS to contact the DCOM server on the host will also fail.
-
-Examples of such tasks are creating a DCOM node to represent the host or creating an instance that resides on the host. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Nodes.adoc#to-create-a-dcom-node[To Create a `DCOM` Node] and xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally].
-
-If you cannot connect to the host over DCOM, troubleshoot the DCOM setup before proceeding.
-
-*Before You Begin*
-
-Ensure that the following prerequisites are met:
-
-* The Windows user is a valid user on the host to which you are testing the connection over DCOM.
-* Items in the Windows operating system are set on the host as described in xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#windows-operating-system-settings[Windows Operating System Settings].
-* The Windows user is able to run scripts on the host. For more information, see xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-enable-the-windows-user-to-run-scripts-on-a-remote-host[To Enable the Windows User to Run Scripts on a Remote Host].
-* Password authentication is set up for the Windows user as explained in xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-set-up-password-authentication-for-the-windows-user[To Set Up Password Authentication for the Windows User].
-
-. Ensure that the DAS is running. Remote subcommands require a running server.
-. Run the `validate-dcom` subcommand.
-+
-Specify the file that contains the alias for the Windows user's password through the `--passwordfile` option of the `asadmin` utility.
-+
-For more information about this file, see xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-set-up-password-authentication-for-the-windows-user[To Set Up Password Authentication for the Windows User].
-+
-NOTE: Only the options that are required to complete this task are provided in this step.
-For information about all the options for configuring the node, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/validate-dcom.adoc#validate-dcom[`validate-dcom`(1)] help page.
-+
-[source,shell]
-----
-C:\>asadmin --passwordfile filename validate-dcom host-name
-----
-+
-filename::
-  The name of the file that contains the alias for the Windows user's password.
-host-name::
-  The name of the host to which you are testing the connection over DCOM.
-
-[[example-2-2]]
-*_Example 2-2 Testing the Connection Over DCOM to a Remote Host_*
-
-This example tests the connection over DCOM to the host `wpmdl2`.
-
-[source,shell]
-----
-$ asadmin --passwordfile aspwalias.txt validate-dcom wpmdl2
-Command validate-dcom executed successfully.
-----
-
-*See Also*
-
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/asadmin.adoc#asadmin-1m[`asadmin`]
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/validate-dcom.adoc#validate-dcom[`validate-dcom`(1)]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#windows-operating-system-settings[Windows Operating System Settings]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/Enabling Centralized Administration of Server Instances.adoc#to-enable-the-windows-user-to-run-scripts-on-a-remote-host[To Enable the Windows User to Run Scripts on a Remote Host]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Nodes.adoc#to-create-a-dcom-node[To Create a `DCOM` Node]
-* xref:Technical Documentation/Payara Server Documentation/High Availability/Administering Payara Server Instances.adoc#to-create-an-instance-centrally[To Create an Instance Centrally]
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help validate-dcom` at the command line.
 
 [[setting-up-cygwin-ssh-on-windows]]
 == Setting Up Cygwin SSH on Windows
@@ -1094,24 +867,13 @@ Payara Server also enables you to remove Payara Server software from multiple ho
 [[to-copy-a-payara-server-installation-to-multiple-hosts]]
 === To Copy a Payara Server Installation to Multiple Hosts
 
-Use the `install-node-dcom` subcommand or the `install-node-ssh` subcommand in local mode to copy an installation of Payara Server software to multiple hosts.
+Use the `install-node-ssh` subcommand in local mode to copy an installation of Payara Server software to multiple hosts.
 
 *Before You Begin*
 
-Ensure that DCOM or SSH is set up on the host where you are running the subcommand and on each host where you are copying the Payara Server software.
+Ensure that SSH is set up on the host where you are running the subcommand and on each host where you are copying the Payara Server software.
 
 Run the appropriate subcommand for the protocol that is set up for communication between the hosts.
-
-* If DCOM is set up for communication between the hosts, run the `install-node-dcom` subcommand.
-+
-NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for copying an installation of Payara Server software, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/install-node-dcom.adoc#install-node-dcom[`install-node-dcom`(1)] help page.
-+
-[source,shell]
-----
-asadmin> install-node-dcom host-list
-----
-host-list::
-  A space-separated list of the names of the hosts where you are copying the installation of Payara Server software.
 
 * If SSH is set up for communication between the hosts, run the `install-node-ssh` subcommand.
 +
@@ -1123,39 +885,6 @@ asadmin> install-node-ssh host-list
 ----
 host-list::
   A space-separated list of the names of the hosts where you are copying the installation of Payara Server software.
-
-The following example copies the Payara Server software on the host where the subcommand is run to the default location on the DCOM-enabled hosts `wpmdl1.example.com` and `wpmdl2.example.com`.
-
-Some lines of output are omitted from this example for readability.
-
-[source,shell]
-----
-asadmin> install-node-dcom wpmdl1.example.com wpmdl2.example.com
-
-Created installation zip C:\payara8107276692860773166.zip
-Copying 85760199 bytes..........................................................
-
-WROTE FILE TO REMOTE SYSTEM: C:/payara/payara_install.zip and C:/payara/unpack.bat
-Output from Windows Unpacker:
-
-C:\Windows\system32>C:
-
-C:\Windows\system32>cd "C:\payara"
-
-C:\payara7>jar xvf payara_install.zip
- inflated: bin/asadmin
- inflated: bin/asadmin.bat
- inflated: glassfish/bin/appclient
- inflated: glassfish/bin/appclient.bat
- inflated: glassfish/bin/appclient.js
- inflated: glassfish/bin/asadmin
- inflated: glassfish/bin/asadmin.bat
-...
- inflated: mq/lib/props/broker/default.properties
- inflated: mq/lib/props/broker/install.properties
-
-Command install-node-dcom executed successfully.
-----
 
 The following example copies the Payara Server software on the host where the subcommand is run to the default location on the SSH-enabled hosts `sj03.example.com` and `sj04.example.com`.
 
@@ -1183,29 +912,24 @@ Command install-node-ssh executed successfully
 
 *See Also*
 
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/install-node-dcom.adoc#install-node-dcom[`install-node-dcom`(1)]
 * xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/install-node-ssh.adoc#install-node-ssh[`install-node-ssh`(1)]
 
 You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
 
-* `asadmin help install-node-dcom`
 * `asadmin help install-node-ssh`
 
 [[to-remove-payara-server-software-from-multiple-hosts]]
 === To Remove Payara Server Software From Multiple Hosts
 
-Use the `uninstall-node-dcom` subcommand or the `uninstall-node-ssh` subcommand in local mode to remove Payara Server software from multiple hosts.
+Use the `uninstall-node-ssh` subcommand in local mode to remove Payara Server software from multiple hosts.
 
 *Before You Begin*
 
 Ensure that the following prerequisites are met:
 
-* DCOM or SSH is set up on the host where you are running the subcommand and on each host from which you are removing the Payara Server software.
+* SSH is set up on the host where you are running the subcommand and on each host from which you are removing the Payara Server software.
 * No process is accessing the parent of the base installation directory for the Payara Server software or any subdirectory of this directory.
 * The parent of the base installation directory for the Payara Server software is the same on each host from which you are removing the Payara Server software.
-* For hosts that use DCOM for remote communication, the configuration of the following items is the same on each host:
-** Windows Domain
-** Windows User
 * For hosts that use SSH for remote communication, the configuration of the following items is the same on each host:
 
 ** SSH port
@@ -1213,17 +937,6 @@ Ensure that the following prerequisites are met:
 ** SSH key file
 
 Run the appropriate subcommand for the protocol that is set up for communication between the hosts.
-
-* If DCOM is set up for communication between the hosts, run the `uninstall-node-dcom` subcommand.
-+
-NOTE: Only the options that are required to complete this task are provided in this step. For information about all the options for removing Payara Server software, see the xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/uninstall-node-dcom.adoc#uninstall-node-dcom[`uninstall-node-dcom`(1)] help page.
-
-[source,shell]
-----
-asadmin> uninstall-node-dcom host-list
-----
-host-list::
-  A space-separated list of the names of the hosts from which you are removing Payara Server software.
 
 * If SSH is set up for communication between the hosts, run the `uninstall-node-ssh` subcommand.
 +
@@ -1235,14 +948,6 @@ asadmin> uninstall-node-ssh host-list
 ----
 host-list::
   A space-separated list of the names of the hosts from which you are removing Payara Server software.
-
-The following example removes Payara Server software on the DCOM-enabled hosts `wpmdl1.example.com` and `wpmdl2.example.com` from the default location.
-
-[source,shell]
-----
-asadmin> uninstall-node-dcom wpmdl1 wpmdl2
-Command uninstall-node-dcom executed successfully.
-----
 
 The following example removes Payara Server software on the SSH-enabled hosts `sj03.example.com` and `sj04.example.com` from the default location.
 
@@ -1258,10 +963,8 @@ Command uninstall-node-ssh executed successfully.
 
 *See Also*
 
-* xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/uninstall-node-dcom.adoc#uninstall-node-dcom[`uninstall-node-dcom`(1)]
 * xref:ROOT:Technical Documentation/Payara Server Documentation/Command Reference/uninstall-node-ssh.adoc#uninstall-node-ssh[`uninstall-node-ssh`(1)]
 
 You can also view the full syntax and options of the subcommands by typing the following commands at the command line:
 
-* `asadmin help uninstall-node-dcom`
 * `asadmin help uninstall-node-ssh`

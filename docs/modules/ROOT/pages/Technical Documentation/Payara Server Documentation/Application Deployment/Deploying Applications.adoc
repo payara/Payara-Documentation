@@ -1123,23 +1123,6 @@ After application clients are downloaded, they remain on the client until they a
 
 If you undeploy an application client, you can no longer download that application client because it might be in an inconsistent state. If you try to launch an application client that was previously downloaded (even though the server side of the application client is no longer present), the results are unpredictable unless the application client has been written to tolerate such situations.
 
-[[lifecycle-module-deployment-guidelines]]
-== Lifecycle Module Deployment Guidelines
-
-A lifecycle module, also called a lifecycle listener module, provides a means of running long or short Java-based tasks within the Payara Server environment, such as instantiation of singletons or RMI servers.
-
-Lifecycle modules are automatically initiated at server startup and are notified at various phases of the server life cycle. All lifecycle module interfaces are in the `as-install/modules/glassfish-api.jar` file.
-
-For general information about lifecycle modules, see "xref:Technical Documentation/Application Development/Developing Lifecycle Listeners.adoc#developing-lifecycle-listeners[Developing Lifecycle Listeners]" in the Application Development section.
-
-You can deploy a lifecycle module using the `create-lifecycle-module` subcommand. Do not use `asadmin deploy` or related commands.
-
-You do not need to specify a classpath for the lifecycle module if you place it in the `domain-dir/lib` or `domain-dir/lib/classes` directory for the Domain Administration Server (DAS). Do not place it in the `lib` directory for a particular server instance, or it will be deleted when that instance synchronizes with Payara Server.
-
-After you deploy a lifecycle module, you must restart the server. During server initialization, the server instantiates the module and registers it as a lifecycle event listener.
-
-NOTE: If the `--failurefatal` option of `create-lifecycle-module` is set to `true` (the default is `false`), lifecycle module failure prevents server initialization or startup, but not shutdown or termination.
-
 [[web-service-deployment-guidelines]]
 == Web Service Deployment Guidelines
 
