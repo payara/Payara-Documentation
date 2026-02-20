@@ -10,7 +10,7 @@ Creates a Payara Server instance on the host where the subcommand is run.
 ----
 asadmin [asadmin-options] create-local-instance [--help]
 [--node node-name] [--nodedir node-dir]
-[--config config-name | --cluster cluster-name]
+[--config config-name | --deploymentGroup group-name]
 [--lbenabled={true|false}]
 [--portbase port-number] [--checkports={true|false}]
 [--savemasterpassword={false|true}]
@@ -38,22 +38,22 @@ A Payara Server instance requires a reference to the following items:
 ** If no nodes exist, the subcommand creates a node for the instance. The name of the node is the name of the host on which the subcommand is run.
 ** If only one node exists, the subcommand creates a reference to the existing node for the instance.
 ** If two or more nodes exist, an error occurs.
-* The named configuration that defines the configuration of the instance. The configuration can be specified in the command to create the instance, but is not required. If no configuration is specified for an instance that is not joining a cluster, the subcommand creates a configuration for the instance. An instance that is joining a cluster receives its configuration from its parent cluster.
+* The named configuration that defines the configuration of the instance. The configuration can be specified in the command to create the instance, but is not required. If no configuration is specified for an instance, the subcommand creates a configuration for the instance.
 
 Each Payara Server instance is one of the following types of instance:
 
 Standalone instance::
-A standalone instance does not share its configuration with any other instances or clusters. A standalone instance is created if either of the following conditions is met: +
-* No configuration or cluster is specified in the command to create the instance.
-* A configuration that is not referenced by any other instances or clusters is specified in the command to create the instance.
+A standalone instance does not share its configuration with any other instances. A standalone instance is created if either of the following conditions is met: +
+* No configuration is specified in the command to create the instance.
+* A configuration that is not referenced by any other instances is specified in the command to create the instance.
 +
-When no configuration or cluster is specified, a copy of the `default-config` configuration is created for the instance. The name of this configuration is instance-name`-config`, where instance-name represents the name of an unclustered server instance.
+When no configuration is specified, a copy of the `default-config` configuration is created for the instance. The name of this configuration is instance-name`-config`, where instance-name represents the name of an unclustered server instance.
 Shared instance::
-A shared instance shares its configuration with other instances or clusters. A shared instance is created if a configuration that is referenced by other instances or clusters is specified in the command to create the instance.
+A shared instance shares its configuration with other instances. A shared instance is created if a configuration that is referenced by other instances is specified in the command to create the instance.
 Clustered instance::
-A clustered instance inherits its configuration from the cluster to which the instance belongs and shares its configuration with other instances in the cluster. A clustered instance is created if a cluster is specified in the command to create the instance.
+A clustered instance is an instance within a deployment group. A clustered instance is created if a deployment group is specified in the command to create the instance.
 +
-Any instance that is not part of a cluster is considered an unclustered server instance. Therefore, standalone instances and shared instances are unclustered server instances.
+Any instance that is not part of a deployment group is considered an unclustered server instance. Therefore, standalone instances and shared instances are unclustered server instances.
 
 By default, this subcommand attempts to resolve possible port conflicts for the instance that is being created. The subcommand also assigns ports that are currently not in use and not already assigned to other instances on the same node.
 
@@ -79,9 +79,9 @@ The name of the node is the name of the host on which the subcommand is run.
 `--nodedir`::
 The path to the directory in which the files for instance's node is to be stored. The default is as-install`/nodes`.
 `--config`::
-  Specifies the named configuration that the instance references. The configuration must exist and must not be named `default-config` or `server-config`. Specifying the `--config` option creates a shared instance. The `--config` option and the `--cluster` option are mutually exclusive. If both options are omitted, a standalone instance is created.
-`--cluster`::
-  Specifies the cluster from which the instance inherits its configuration. Specifying the `--cluster` option creates a clustered instance. The `--config` option and the `--cluster` option are mutually exclusive. If both options are omitted, a standalone instance is created.
+  Specifies the named configuration that the instance references. The configuration must exist and must not be named `default-config` or `server-config`. Specifying the `--config` option creates a shared instance. If the `--config` option is omitted, a standalone instance is created.
+`--deploymentGroup`::
+  Specifies the deployment group the instance will join.
 `--lbenabled`::
   Specifies whether the instance is enabled for load balancing. Possible values are as follows: +
   `true`;;
@@ -123,7 +123,7 @@ If this parameter is omitted, the default location will be used.
   The master password must be the same for all instances in a domain.
 `--systemproperties`::
   Defines system properties for the instance. These properties override property definitions for port settings in the instance's
-  configuration. Predefined port settings must be overridden if, for example, two clustered instances reside on the same host. In this situation, port settings for one instance must be overridden because
+  configuration. Predefined port settings must be overridden if, for example, two instances reside on the same host. In this situation, port settings for one instance must be overridden because
   both instances share the same configuration. +
   The following properties are available: +
   `ASADMIN_LISTENER_PORT`;;
@@ -171,7 +171,7 @@ The name must meet the following requirements:
 ** Hyphen
 ** Period
 ** Underscore
-* The name must be unique in the domain and must not be the name of another Payara Server instance, a cluster, a named configuration, or a node.
+* The name must be unique in the domain and must not be the name of another Payara Server instance, a deployment group, a named configuration, or a node.
 * The name must not be `domain`, `server`, or any other keyword that is reserved by Payara Server.
 
 [[examples]]
@@ -201,14 +201,14 @@ Command create-local-instance executed successfully.
 
 *Example 2 Creating a Clustered Payara Server Instance on a Specific Node*
 
-This example creates the clustered instance `ymli2` on node `sj02`. The instance is a member of the cluster `ymlclust`.
+This example creates the clustered instance `ymli2` on node `sj02`. The instance is a member of the deployment group `ymlclust`.
 
 The command is run on the host `sj02`, which is the host that the node `sj02` represents. The DAS is running on the host `sr04` and uses the default HTTP port for administration. Because no instances exist on the
 node, the host on which the DAS is running is provided through the `--host` option of the `asadmin` utility.
 
 [source,shell]
 ----
-sj02# asadmin --host sr04 create-local-instance --cluster ymlclust --node sj02 ymli2
+sj02# asadmin --host sr04 create-local-instance --deploymentGroup ymlclust --node sj02 ymli2
 Rendezvoused with DAS on sr04:4848.
 Port Assignments for server instance ymli2:
 JMX_SYSTEM_CONNECTOR_PORT=28686
