@@ -22,7 +22,7 @@ For example, if your servlet returns a stock quote that updates every *5 minutes
 
 Whether to cache results and how to cache them depends on the data involved. For example, it makes no sense to cache the results of a quiz submission, because the input to the servlet is different each time. However, it makes sense to cache a high level report showing demographic data taken from quiz results that is updated once an hour.
 
-To define how a web application handles response caching, you'll have to modify specific attributes in the `payara-web.xml` deployment descriptor file.
+To define how a web application handles response caching, you'll have to modify specific attributes in the `glassfish-web.xml` or `payara-web.xml` deployment descriptor file.
 
 WARNING: A servlet that uses caching is not portable.
 
@@ -117,14 +117,14 @@ Here is an example cache element in the `payara-web.xml` file:
 </cache>
 ----
 
-For more information about the `payara-web.xml` caching settings, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cache[cache]" in the Payara Server Application Deployment section.
+For more information about the `glassfish-web.xml`/`payara-web.xml` caching settings, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cache[cache]" in the Payara Server Application Deployment section.
 
 [[the-cachekeygenerator-interface]]
 ==== The CacheKeyGenerator Interface
 
 The built-in default `CacheHelper` implementation allows web applications to customize the key generation. An application component (in a servlet or JSP) can set up a custom `CacheKeyGenerator` implementation as an attribute in the `ServletContext`.
 
-The name of the context attribute is configurable as the `value` of the `cacheKeyGeneratorAttrName` property in the `default-helper` element of the `payara-web.xml` deployment descriptor.
+The name of the context attribute is configurable as the `value` of the `cacheKeyGeneratorAttrName` property in the `default-helper` element of the `glassfish-web.xml`/`payara-web.xml` deployment descriptor.
 
 For more information, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#default-helper[default-helper]" in the Payara Server Application Deployment section.
 
@@ -358,7 +358,7 @@ This section describes how to create and manage HTTP sessions that allows users 
 [[http-sessions-cookies-and-url-rewriting]]
 ==== HTTP Sessions, Cookies, and URL Rewriting
 
-To configure whether and how HTTP sessions use cookies and URL rewriting, edit the `session-properties` and `cookie-properties elements in the `payara-web.xml` file for an individual web application. For more details about the properties you can configure, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#session-properties[session-properties]" "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cookie-properties[cookie-properties]" and in the Payara Server Application Deployment section.
+To configure whether and how HTTP sessions use cookies and URL rewriting, edit the `session-properties` and `cookie-properties elements in the `glassfish-web.xml` or `payara-web.xml` file for an individual web application. For more details about the properties you can configure, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#session-properties[session-properties]" "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cookie-properties[cookie-properties]" and in the Payara Server Application Deployment section.
 
 For information about configuring default session properties for the
 entire web container, see xref:#using-the-default-web.xml-file[Using the `default-web.xml` File].
@@ -377,7 +377,7 @@ The default for the `--keepstate` is `false`. This option is supported only on t
 
 NOTE: This option is not supported and ignored for other targets (clusters and deployment groups included).
 
-For web applications, this feature is applicable only if in the `payara-web.xml` deployment descriptor files when the `persistence-type` attribute of the `session-manager` element is set to `file`.
+For web applications, this feature is applicable only if in the `payara-web.xml` / `glassfish-web.xml` deployment descriptor files when the `persistence-type` attribute of the `session-manager` element is set to `file`.
 
 If any active web session fails to be preserved or restored, none of the sessions will be available when the redeployment is complete. However, the redeployment continues and a warning is logged.
 
@@ -454,7 +454,7 @@ correctly rolled back or committed.
 
 A session manager automatically creates new session objects whenever a new session starts. In some circumstances, clients do not join the session, for example, if the session manager uses cookies and the client does not accept cookies.
 
-The Payara Platform offers these session management options, determined by the `session-manager` element's `persistence-type` attribute in the `payara-web.xml` file:
+The Payara Platform offers these session management options, determined by the `session-manager` element's `persistence-type` attribute in the `glassfish-web.xml`/`payara-web.xml` file:
 
 * xref:#the-memory-persistence-type[The `memory` Persistence Type]
 * xref:#the-file-persistence-type[The `file` Persistence Type], which uses a file to store session data
@@ -469,7 +469,7 @@ For more information, see "xref:Technical Documentation/Payara Server Documentat
 
 This persistence type is not designed for a production environment that requires session persistence as it provides no actual session persistence. However, you can configure it so that the session state in memory is written to the file system prior to server shutdown.
 
-To specify the `memory` persistence type for a specific web application, edit the `payara-web.xml` file as in the following example. The `persistence-type` attribute is optional, but must be set to `memory` if included. This overrides the web container availability settings for the web application.
+To specify the `memory` persistence type for a specific web application, edit the `glassfish-web.xml` or `payara-web.xml` file as in the following example. The `persistence-type` attribute is optional, but must be set to `memory` if included. This overrides the web container availability settings for the web application.
 
 [source,xml]
 ----
@@ -498,7 +498,7 @@ The store also provides passivation and activation of the session state to help 
 
 NOTE: Make sure the `delete` option is set in the `server.policy` file, or expired file-based sessions might not be deleted properly. For more information about `server.policy`, see xref:Technical Documentation/Application Development/Securing Applications.adoc#the-server.policy-file[The`server.policy` File].
 
-To specify the `file` persistence type for a specific web application, edit the `payara-web.xml` file as in the following example. Note that `persistence-type` must be set to `file`. This overrides the web container availability settings for the web application.
+To specify the `file` persistence type for a specific web application, edit the `glassfish-web.xml` or `payara-web.xml` file as in the following example. Note that `persistence-type` must be set to `file`. This overrides the web container availability settings for the web application.
 
 [source,xml]
 ----
@@ -668,8 +668,8 @@ This section explains how the server runtime determines the character encoding f
 When processing a servlet request, the server uses the following order of precedence, first to last, to determine the request character encoding:
 
 * The `getCharacterEncoding` method.
-* A hidden field in the form, specified by the `form-hint-field` attribute of the `parameter-encoding` element in the `payara-web.xml` deployment descriptor
-* The `default-charset` attribute of the `parameter-encoding` element in the `payara-web.xml` deployment descriptor
+* A hidden field in the form, specified by the `form-hint-field` attribute of the `parameter-encoding` element in the `glassfish-web.xml` or `payara-web.xml` deployment descriptor
+* The `default-charset` attribute of the `parameter-encoding` element in the `glassfish-web.xml` or `payara-web.xml` deployment descriptor
 * The default encoding, which is `ISO-8859-1`
 
 For details about the `parameter-encoding` element, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#parameter-encoding[parameter-encoding]" in the Payara Server Application Deployment section.
@@ -768,7 +768,7 @@ A listener class for a web module must implement one the following interfaces:
 * `org.apache.catalina.LifecycleListener`
 * `org.apache.catalina.InstanceListener`
 
-In the `payara-web.xml` deployment descriptor, valve and listener properties for a web module look like this:
+In the `glassfish-web.xml`/`payara-web.xml` deployment descriptor, valve and listener properties for a web module look like this:
 
 [source,xml]
 ----
@@ -816,7 +816,7 @@ NOTE: Not all context definitions are supported by the Payara Platform.
 [[enabling-webdav]]
 ==== Enabling WebDav
 
-To enable WebDav in Payara Server, you edit the `web.xml` and `payara-web.xml` files as follows.
+To enable WebDav in Payara Server, you edit the `web.xml` and `glassfish-web.xml`/`payara-web.xml` files as follows.
 
 First, enable the WebDav servlet in your `web.xml` file:
 
@@ -875,7 +875,7 @@ To protect the WebDav servlet so other users can't modify it, you must add a sec
 </security-constraint>
 ----
 
-Then define a security role mapping in your `payara-web.xml` deployment descriptor:
+Then define a security role mapping in your `glassfish-web.xml` or `payara-web.xml` deployment descriptor:
 
 [source,xml]
 ----
@@ -1024,7 +1024,7 @@ An alternate document root (`docroot`) allows a web application to serve request
 
 To specify an alternate document root for a web application or a virtual server, use the `alternatedocroot_n` property, where n is a positive integer greater than zero that allows specifying more than one.
 
-This property can be a sub-element of a `payara-web-app` element in the `payara-web.xml` file or a virtual server property.
+This property can be a sub-element of a `glassfish-web-app`/`payara-web-app` element in the `glassfish-web.xml`/`payara-web.xml` file or a virtual server property.
 
 For more information about this element, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#glassfish-web-app[payara-web-app]" in the Payara Server Application Deployment section.
 

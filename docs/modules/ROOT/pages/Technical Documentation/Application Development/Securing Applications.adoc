@@ -77,7 +77,7 @@ These role names are scoped to the EJB XML deployment descriptors (`ejb-jar.xml`
 
 For an individually deployed web or EJB module, you define roles using `@DeclareRoles` annotations or `role-name` elements in the Jakarta EE deployment descriptor files `web.xml` or `ejb-jar.xml`.
 
-To map roles to principals and groups, define matching `security-role-mapping` elements in the `glassfish-application.xml`, `glassfish-ejb-jar.xml`, or `payara-web.xml` file for each `role-name` used by the application.
+To map roles to principals and groups, define matching `security-role-mapping` elements in the `glassfish-application.xml`, `glassfish-ejb-jar.xml`, or `glassfish-web.xml`/`payara-web.xml` file for each `role-name` used by the application.
 
 By default, group principal names are mapped to roles of the same name.
 Accordingly, the *Default Principal To Role Mapping* setting is enabled by default on the _Security_ page of the Payara Server Administration Console.
@@ -89,7 +89,7 @@ TIP: This default role mapping definition is in effect if you do not define your
 
 Component level security encompasses web components and EJB components.
 
-A secure web container authenticates users and authorizes access to a servlet or JSP by using the security policy laid out in the servlet XML deployment descriptors (`web.xml`, `payara-web.xml` files).
+A secure web container authenticates users and authorizes access to a servlet or JSP by using the security policy laid out in the servlet XML deployment descriptors (`web.xml`, `glassfish-web.xml` and `payara-web.xml` files).
 
 The EJB container is responsible for authorizing access to a bean method by using the security policy laid out in the EJB XML deployment descriptors (`ejb-jar.xml` and `glassfish-ejb-jar.xml` files).
 
@@ -117,11 +117,11 @@ Therefore, the *Default Principal To Role Mapping* setting is enabled by default
 
 For applications, you define roles in `@DeclareRoles` annotations or the Jakarta EE deployment descriptor file `application.xml`. You define the corresponding role mappings in the Payara Server deployment descriptor file `glassfish-application.xml`.
 
-For individually deployed web or EJB modules, you define roles in `@DeclareRoles` annotations or the Jakarta EE deployment descriptor files `web.xml` or `ejb-jar.xml`. You define the corresponding role mappings in the Payara Server deployment descriptor files `payara-web.xml` or `glassfish-ejb-jar.xml`.
+For individually deployed web or EJB modules, you define roles in `@DeclareRoles` annotations or the Jakarta EE deployment descriptor files `web.xml` or `ejb-jar.xml`. You define the corresponding role mappings in the Payara Server deployment descriptor files `glassfish-web.xml`/`payara-web.xml` or `glassfish-ejb-jar.xml`.
 
 For more information regarding Jakarta EE deployment descriptors, see the Jakarta EE Specification. For more information regarding Payara Server deployment descriptors, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#elements-of-the-payara-platform-deployment-descriptors[Elements of the Payara Server Deployment Descriptors]" in the Application Deployment section.
 
-Each `security-role-mapping` element in the `glassfish-application.xml`, `payara-web.xml`, or `glassfish-ejb-jar.xml` file maps a role name permitted by the application or module to principals and groups.
+Each `security-role-mapping` element in the `glassfish-application.xml`, `glassfish-web.xml`/`payara-web.xml`, or `glassfish-ejb-jar.xml` file maps a role name permitted by the application or module to principals and groups.
 
 For example, a `payara-web.xml` file for an individually deployed web module might contain the following:
 
@@ -1537,7 +1537,7 @@ You can configure a SAM in one of these ways:
 
 After you install and configure the SAM, you can bind it for use by the container on behalf of one or more of your applications. You have two options in how you bind the SAM, depending on whether you are willing to repackage and redeploy your application:
 
-* If you are willing to repackage and redeploy, you can bind the SAM using the `payara-web.xml` deployment descriptor file. Set the value of the `httpservlet-security-provider` attribute of the `payara-web-app` element to the SAM's configured provider ID, for example, `MySAM`. This option leverages the native `AuthConfigProvider` implementation that ships with Payara Server.
+* If you are willing to repackage and redeploy, you can bind the SAM using the `glassfish-web.xml` or `payara-web.xml` deployment descriptor file. Set the value of the `httpservlet-security-provider` attribute of the `glassfish-web-app`/`payara-web-app` element to the SAM's configured provider ID, for example, `MySAM`. This option leverages the native `AuthConfigProvider` implementation that ships with Payara Server.
 
 * Another approach is to develop your own `AuthConfigProvider` and register it with the server's `AuthConfigFactory` for use on behalf of your applications. For example, a simple `AuthConfigProvider` can obtain, through its initialization properties, the classname of a SAM to configure on behalf of the applications for which the provider is registered.
 

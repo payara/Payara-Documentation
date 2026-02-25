@@ -30,8 +30,13 @@ The following table lists the Payara Platform deployment descriptors and their D
 | `glassfish-application_6_0-1.dtd`
 | Configures an entire Jakarta EE application (EAR file).
 
-|`payara-web.xml`
-|`payara-web-app_4.dtd`
+|
+`glassfish-web.xml`
+
+`payara-web.xml`
+| `glassfish-web-app_3_0-1.dtd`
+
+`payara-web-app_4.dtd`
 | Configures a web application (WAR file).
 
 | `glassfish-ejb-jar.xml`
@@ -156,11 +161,13 @@ GlassFish Application Server 3.1 Java EE Application 6.0//EN"
 ----
 
 [[the-payara-web.xml-file]]
-== The `payara-web.xml` File
+== The `glassfish-web.xml` and `payara-web.xml` Files
 
-The `payara-web.xml` file configures a web application (WAR file).
+The `glassfish-web.xml` file configures a web application (WAR file). It is an original Eclipse GlassFish deployment descriptor.
 
-Its element hierarchy is as follows:
+The `payara-web.xml` is a matching Payara Platform variant which is recommended to be used whenever possible.
+
+Their element hierarchy is as follows:
 
 [source,text]
 ----
@@ -949,4 +956,13 @@ alter table PLAYEREJBTEAMEJB add constraint FK_PLAYERS foreign key (TEAMEJB_TEAM
     </entity-mapping>
 </sun-cmp-mapping>
 </sun-cmp-mappings>
+----
+
+[[deployment-descriptor-precedence-order]]
+== Deployment Descriptor Precedence Order
+
+When multiple vendor deployment descriptors are present in the same module (including deployment descriptors of the original *Eclipse GlassFish* and of the old *Sun Application Server*), the descriptors are processed with the following precedence order in default mode:
+
+----
+Payara Platform > Eclipse GlassFish Server > Sun Application Server
 ----
