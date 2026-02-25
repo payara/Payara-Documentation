@@ -969,7 +969,7 @@ The following topics are addressed here:
 [[to-deploy-and-configure-a-stand-alone-connector-module]]
 === To Deploy and Configure a Stand-Alone Connector Module
 
-As an alternative to Step 3 through Step 6, you can define application-scoped resources in the `payara-resources.xml` deployment descriptor.
+As an alternative to Step 3 through Step 6, you can define application-scoped resources in the `glassfish-resources.xml` or `payara-resources.xml` deployment descriptor.
 
 For more information, see xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deploying Applications.adoc#application-scoped-resources[Application-Scoped Resources].
 
@@ -1170,7 +1170,7 @@ To enable transparent pool reconfiguration, set the `dynamic-reconfiguration-wai
 In-progress connection requests must complete before this timeout expires, or they must be retried. New connection requests wait for this timeout to expire before acquiring connections to the reconfigured pool.
 If this property exists and has a positive value, it is enabled.
 
-You can set this property in the `payara-resources.xml` file. For more information, see the property descriptions under xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#jdbc-connection-pool[`jdbc-connection-pool`].
+You can set this property in the `glassfish-resources.xml` or `payara-resources.xml` file. For more information, see the property descriptions under xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#jdbc-connection-pool[`jdbc-connection-pool`].
 
 For JDBC connection pools that are not application-scoped, use the `set` subcommand to set this property. For example, to configure `mypool` on `myserver`, type the following all on one line:
 
@@ -1203,13 +1203,13 @@ The following resource types can be application-scoped:
 * Admin object resources
 * Jakarta resources
 
-*Deployment Descriptor*: An application-scoped resource is defined in the `payara-resources.xml` deployment descriptor file.
+*Deployment Descriptor*: An application-scoped resource is defined in the `glassfish-resources.xml` or `payara-resources.xml` deployment descriptor file.
 This file is placed in the `META-INF` directory of the module or application archive.
 
 For web applications or modules, this file is placed in the `WEB-INF` directory.
-If any submodule archives of an enterprise application archive have their own `payara-resources.xml` files, the resource definitions are scoped to those modules only.
+If any submodule archives of an enterprise application archive have their own `glassfish-resources.xml` or `payara-resources.xml` files, the resource definitions are scoped to those modules only.
 
-For more information about the `payara-resources.xml` file, see xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-resources.xml-file[Payara Server Deployment Descriptor Files] and xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc[Elements of the Payara Server Deployment Descriptors].
+For more information about the `glassfish-resources.xml` and `payara-resources.xml` file, see xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-resources.xml-file[Payara Server Deployment Descriptor Files] and xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc[Elements of the Payara Server Deployment Descriptors].
 
 *Naming*: Application-scoped resource JNDI names begin with `java:app` or `java:module`. If one of these prefixes is not specified in the JNDI name, it is added. For example, application-scoped databases have JNDI names in the following format: `java:app/jdbc/DataSourceName` or `java:module/jdbc/DataSourceName`.
 
@@ -1217,7 +1217,7 @@ For more information about the `payara-resources.xml` file, see xref:Technical D
 
 Definitions with the same resource name and type but different attributes or properties are conflicts and cause deployment failure. When an application or module tries to look up a scoped resource that does not belong to it, a naming exception is thrown.
 
-*Redeployment*: When an application or module is un-deployed, its scoped resources are deleted. During redeployment, resources are destroyed and recreated based on changes in the `payara-resources.xml` file.
+*Redeployment*: When an application or module is un-deployed, its scoped resources are deleted. During redeployment, resources are destroyed and recreated based on changes in the `glassfish-resources.xml` or `payara-resources.xml` file.
 
 To preserve old resource definitions during redeployment, use the `preserveAppScopedResources` property of the `redeploy` (or `deploy --force=true`) subcommand. For example:
 
@@ -1238,9 +1238,9 @@ For more information, see xref:Technical Documentation/Payara Server Documentati
 
 *Restrictions*. Use of application-scoped resources is subject to the following restrictions:
 
-* `resource-adapter-config` and `connector-work-security-map` — These can only be specified in the `payara-resources.xml` file of the corresponding connector module.
+* `resource-adapter-config` and `connector-work-security-map` — These can only be specified in the `glassfish-resources.xml` or `payara-resources.xml` file of the corresponding connector module.
 +
-In an enterprise application, the `resource-adapter-config` or `connector-work-security-map` for an embedded connector module must be specified in the `payara-resources.xml` file of the connector module.
+In an enterprise application, the `resource-adapter-config` or `connector-work-security-map` for an embedded connector module must be specified in the `glassfish-resources.xml` or `payara-resources.xml` file of the connector module.
 +
 You cannot specify a `resource-adapter-config` or `connector-work-security-map` in an application for a connector module that is not part of the application.
 
