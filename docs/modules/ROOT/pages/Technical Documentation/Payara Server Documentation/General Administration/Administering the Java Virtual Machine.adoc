@@ -14,8 +14,7 @@ The commands can be used to configure the JVM settings for Payara Server.
 [[to-create-jvm-options]]
 === To Create JVM Options
 
-Use the `create-jvm-options` subcommand in remote mode to create JVM options in the Java configuration or the profiler elements of the `domain.xml` file.
-If JVM options are created for a profiler, these options are used to record the settings that initiate the profiler.
+Use the `create-jvm-options` subcommand in remote mode to create JVM options in the Java configuration element of the `domain.xml` file.
 
 . Ensure that the server is running. Remote subcommands require a running server.
 . Create JVM options by using the `create-jvm-options` subcommand. To create more than one JVM option, use a colon (:) to separate the options.
@@ -79,7 +78,7 @@ You can also view the full syntax and options of the subcommand by typing `asadm
 [[to-delete-jvm-options]]
 === To Delete JVM Options
 
-Use the `delete-jvm-options` subcommand in remote mode to delete JVM options from the Java configuration or profiler elements of the `domain.xml` file.
+Use the `delete-jvm-options` subcommand in remote mode to delete JVM options from the Java configuration element of the `domain.xml` file.
 
 . Ensure that the server is running. Remote subcommands require a running server.
 . List JVM options by using the `list-jvm-options` subcommand.
@@ -227,57 +226,3 @@ Command generate-jvm-report executed successfully.
 ----
 
 You can also view the full syntax and options of the subcommand by typing `asadmin help generate-jvm-report` at the command line.
-
-[[administering-the-profiler]]
-== Administering the Profiler
-
-A profiler generates information used to analyze server performance.
-
-[[to-create-a-profiler]]
-=== To Create a Profiler
-
-A server instance is tied to a particular profiler by the profiler element in the Java configuration. If JVM options are created for a profiler, the options are
-used to record the settings needed to activate a particular profiler. Use the `create-profiler` subcommand in remote mode to create the profiler element in the Java
-configuration.
-
-Only one profiler can exist. If a profiler already exists, you receive an error message that directs you to delete the existing profiler before creating a new one.
-
-. Ensure that the server is running. Remote subcommands require a running server.
-. Create a profiler by using the `create-profiler` subcommand. Information about properties for the subcommand is included in this help page.
-. To apply your changes, restart Payara Server.
-
-[[creating-a-profiler-example]]
-==== Example 4-6 Creating a Profiler
-
-This example creates a profiler named `sample_profiler`.
-
-[source,shell]
-----
-asadmin> create-profiler --classpath=/home/appserver/ --nativelibrarypath=/u/home/lib
---enabled=false --property=defaultuser=admin:password=adminadmin sample_profiler
-Command create-profiler executed successfully.
-----
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help create-profiler` at the command line.
-
-[[to-delete-a-profiler]]
-=== To Delete a Profiler
-
-Use the `delete-profiler` subcommand in remote mode to delete the profiler element from the Java configuration. You can then create a new profiler.
-
-. Ensure that the server is running. Remote subcommands require a running server.
-. Delete the profiler by using the `delete-profiler` subcommand.
-. To apply your changes, restart Payara Server.
-
-[[deleting-a-profiler-example]]
-==== *Deleting a Profiler Example*
-
-This example deletes the previously created profiler named `sample_profiler`.
-
-[source,shell]
-----
-asadmin> delete-profiler
-Command delete-profiler executed successfully.
-----
-
-You can also view the full syntax and options of the subcommand by typing `asadmin help delete-profiler` at the command line.
