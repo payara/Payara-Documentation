@@ -263,17 +263,20 @@ To disable class loading delegation globally, you can set the system property `f
 It's possible to disable class loading delegation directly at the application level. This can be done for both WAR and EAR applications.
 
 [[disabling-classloading-delegation-on-webapps]]
-For *Web* applications, you can include `<class-loader delegate="false"/>` element in the `payara-web.xml`/`glassfish-web.xml` deployment descriptors.
+For *Web* applications, you can include `<class-loader delegate="false"/>` element in the `payara-web.xml`/`glassfish-web.xml` deployment descriptor.
+
+IMPORTANT: glassfish-web.xml is deprecated and support will be removed in a future release.
+It is recommended to use payara-web.xml instead.
 
 Here's an example:
 
 [source, xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE glassfish-web-app PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Servlet 3.0//EN" "http://glassfish.org/dtds/glassfish-web-app_3_0-1.dtd">
-<glassfish-web-app error-url="">
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "https://docs.payara.fish/schemas/payara-web-app_4.dtd">
+<payara-web-app error-url="">
   <class-loader delegate="false"/>
-</glassfish-web-app>
+</payara-web-app>
 ----
 
 [[disabling-classloading-delegation-on-ears]]
@@ -297,17 +300,20 @@ It's possible to configure an extreme isolation level on the class loading deleg
 
 To configure whitelist packaging you can use the `<whitelist-package>` element on the `payara-web.xml` / `glassfish-web.xml` (for WAR artifacts) or the `glassfish-application.xml` (for EAR artifacts) deployment descriptors. This element can be included multiple times to whitelist multiple packages.
 
+IMPORTANT: glassfish-web.xml is deprecated and support will be removed in a future release.
+It is recommended to use payara-web.xml instead.
+
 Here is an example of whitelisting both the *Google Guava*, *Jackson* and *Faces Config* packages for a WAR application:
 
 [source, xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE glassfish-web-app PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Servlet 3.0//EN" "http://glassfish.org/dtds/glassfish-web-app_3_0-1.dtd">
-<glassfish-web-app error-url="">
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 4 Servlet 3.0//EN" "https://docs.payara.fish/schemas/payara-web-app_4.dtd">
+<payara-web-app error-url="">
   <whitelist-package>com.google.guava</whitelist-package>
   <whitelist-package>com.fasterxml.jackson</whitelist-package>
   <whitelist-package>com.sun.faces.spi.FacesConfigResourceProvider</whitelist-package>
-</glassfish-web-app>
+</payara-web-app>
 ----
 
 The whitelist syntax is simple: Define the name of the package which contains the classes or resources in question. For example writing `com.google` would whitelist all Google libraries included on the server, while writing `com.google.guava` would only whitelist the Google Guava library instead.
