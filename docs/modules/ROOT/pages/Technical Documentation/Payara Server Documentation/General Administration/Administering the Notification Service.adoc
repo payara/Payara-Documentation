@@ -114,17 +114,6 @@ asadmin set-jms-notifier-configuration --dynamic=true --enabled=true --contextFa
 
 For verification purposes, it may be useful to enable a service to push notifications through the JMS notifier to demonstrate that it is working. To do this, you will also need to set up a Message-Driven Bean (MDB) to consume the notifications and demonstrate that they are being stored in the queue.
 
-. First, enable a service to push data through the notifier. For example, the HealthCheck service's CPU metric can be configured to push CPU metrics to a notifier every _5 seconds_:
-+
-[source, shell]
-----
-asadmin healthcheck-configure --enabled=true --dynamic=true --enableNotifiers=jms-notifier
-
-asadmin healthcheck-configure-service --serviceName=healthcheck-cpu --enabled=true --dynamic=true --time=5 --unit=SECONDS
-----
-+
-This also configures the HealthCheck service to send notifications to the JMS notifier, which will cause the messages to be sent right away.
-
 . To consume the messages using a Jakarta Messaging compliant MDB, the following class will work for a pre-configured queue named `notifierQueue`:
 +
 [source, java]
