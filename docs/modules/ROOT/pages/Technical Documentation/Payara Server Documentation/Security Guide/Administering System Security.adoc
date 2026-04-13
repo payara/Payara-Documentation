@@ -327,13 +327,6 @@ grant codeBase "file:${com.sun.aas.instanceRoot}/applications/MyApp/-"{
 
 For any application that needs to read and write additional directories, you would then have to explicitly allow such permissions by adding specific grants. In general, you should add extra permissions only to the applications or modules that require them, not to all applications deployed to a domain.
 
-[[auditing]]
-=== Auditing
-
-Auditing is the means used to capture security-related events for the purpose of evaluating the effectiveness of security measures. Payara Server uses audit modules to capture audit trails of all authentication and authorization decisions. Payara Server provides a default audit module, as well as the ability to plug in custom audit modules. The scope of the audit module is the entire server, which means that all the applications on the server will use the same audit module.
-
-For administration instructions, see xref:Technical Documentation/Payara Server Documentation/Security Guide/Administering System Security.adoc#administering-audit-modules[Administering Audit Modules].
-
 [[firewalls]]
 === Firewalls
 
@@ -922,68 +915,6 @@ image::password-aliases/password-aliases-deleting.png[Deleting password alias]
 === MicroProfile Config support
 
 Password aliases can also be accessed using MicroProfile Config, as detailed xref:/Technical Documentation/MicroProfile/Config/Overview.adoc[here].
-
-[[administering-audit-modules]]
-== Administering Audit Modules
-
-Payara Server allows the integration of special audit modules that can be used to create audit trails of all authentication and authorization decisions made by the container. Audit modules are simple POJO (Plain Old Java Object) classes that can be used to programmatically take special actions when authentication or authorization events are triggered.
-
-Every Audit module must extend the `com.sun.appserv.security.AuditModule` class, which is an abstract class that offers a collection of operation methods that can be used to identify successful or unsuccessful authentication and authorization events.
-
-[[to-create-an-audit-module]]
-=== To Create an Audit Module
-
-Use the `create-audit-module` subcommand in remote mode to create an audit module for the add-on component that implements the audit capabilities.
-
-Create an audit module by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/create-audit-module.adoc[`create-audit-module`] subcommand.
-
-This example creates an audit module named `sampleAuditModule`:
-
-[source,shell]
-----
-asadmin create-audit-module --classname com.sun.appserv.auditmodule --property defaultuser=admin:Password=admin sampleAuditModule
-
-Command create-audit-module executed successfully.
-----
-
-[[to-list-audit-modules]]
-=== To List Audit Modules
-
-Use the `list-audit-modules` subcommand in remote mode to list the audit modules on one of the following targets:
-
-* The DAS, `server` (the default)
-* A specified server instance
-* A specified configuration object.
-
-List registered audit modules by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/list-audit-modules.adoc#list-audit-modules[`list-audit-modules`] subcommand.
-
-This example lists the audit modules registered on the DAS:
-
-[source,shell]
-----
-asadmin list-audit-modules
-
-audit-module : default
-audit-module : sampleAuditModule
-
-Command list-audit-modules executed successfully.
-----
-
-[[to-delete-an-audit-module]]
-=== To Delete an Audit Module
-
-Use the `delete-audit-module` subcommand in remote mode to delete an existing audit module.
-
-Delete an audit module by using the xref:Technical Documentation/Payara Server Documentation/Command Reference/delete-audit-module.adoc#delete-audit-module[`delete-audit-module`] subcommand.
-
-This example deletes the `sampleAuditModule` audit module:
-
-[source,shell]
-----
-asadmin delete-audit-module sampleAuditModule
-
-Command delete-audit-module executed successfully.
-----
 
 [[administering-jsse-certificates]]
 == Administering JSSE Certificates
