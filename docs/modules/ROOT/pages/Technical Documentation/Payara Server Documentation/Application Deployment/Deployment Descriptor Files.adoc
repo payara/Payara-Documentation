@@ -63,10 +63,6 @@ The following table lists the Payara Platform deployment descriptors and their D
 This is more of a configuration file than a deployment descriptor. Payara Server provides a default file in the `domain-dir/config` directory.
 
 Specifying a different file is optional.
-
-| `sun-cmp-mappings.xml`
-| `sun-cmp-mapping_1_2.dtd`
-| Configures container-managed persistence for an EJB 2.0 or 2.1 entity bean.
 |===
 
 IMPORTANT: Deployment descriptors whose names start with the `glassfish-` prefix are referred as "original" deployment descriptor files from Eclipse GlassFish, since these files names and DTDs were created while supporting Eclipse GlassFish and their support has been inherited by the Payara Platform.
@@ -397,21 +393,6 @@ glassfish-ejb-jar
 .  .  .  .  message-destination-ref-name
 .  .  .  .  jndi-name
 .  .  .  pass-by-reference
-.  .  .  cmp
-.  .  .  .  mapping-properties
-.  .  .  .  is-one-one-cmp
-.  .  .  .  one-one-finders
-.  .  .  .  .  finder
-.  .  .  .  .  .  method-name
-.  .  .  .  .  .  query-params
-.  .  .  .  .  .  query-filter
-.  .  .  .  .  .  query-variables
-.  .  .  .  .  .  query-ordering
-.  .  .  .  prefetch-disabled
-.  .  .  .  .  query-method
-.  .  .  .  .  .  method-name
-.  .  .  .  .  .  method-params
-.  .  .  .  .  .  .  method-param
 .  .  .  principal
 .  .  .  .  name
 .  .  .  mdb-connection-factory
@@ -506,21 +487,6 @@ glassfish-ejb-jar
 .  .  .  .  .  .  method-param
 .  .  .  per-request-load-balancing
 .  .  pm-descriptors
-.  .  cmp-resource
-.  .  .  jndi-name
-.  .  .  default-resource-principal
-.  .  .  .  name
-.  .  .  .  password
-.  .  .  property (with subelements)
-.  .  .  .  name
-.  .  .  .  value
-.  .  .  create-tables-at-deploy
-.  .  .  drop-tables-at-undeploy
-.  .  .  database-vendor-name
-.  .  .  schema-generator-properties
-.  .  .  .  property (with subelements)
-.  .  .  .  .  name
-.  .  .  .  .  value
 .  .  message-destination
 .  .  .  message-destination-name
 .  .  .  jndi-name
@@ -563,11 +529,6 @@ DTD GlassFish Application Server 3.1 EJB 3.1//EN"
                 <victim-selection-policy>LRU</victim-selection-policy>
             </bean-cache>
         </ejb>
-        <cmp-resource>
-            <jndi-name>jdbc/__default</jndi-name>
-            <create-tables-at-deploy>true</create-tables-at-deploy>
-            <drop-tables-at-undeploy>true</drop-tables-at-undeploy>
-        </cmp-resource>
     </enterprise-beans>
     <keep-state>true</keep-state>
 </glassfish-ejb-jar>
@@ -767,201 +728,6 @@ client-container
 .  .  .  response-policy
 .  .  .  property (with attributes)
 .  property (with attributes)
-----
-
-[[the-sun-cmp-mappings.xml-file]]
-== The `sun-cmp-mappings.xml` File
-
-The `sun-cmp-mappings.xml` file configures container-managed persistence for an EJB 2.0 or 2.1 entity bean on older versions of the Jakarta EE specification.
-
-The element hierarchy is as follows:
-
-[source,text]
-----
-sun-cmp-mappings
-.  sun-cmp-mapping
-.  .  schema
-.  .  entity-mapping
-.  .  .  ejb-name
-.  .  .  table-name
-.  .  .  cmp-field-mapping
-.  .  .  .  field-name
-.  .  .  .  column-name
-.  .  .  .  read-only
-.  .  .  .  fetched-with
-.  .  .  .  .  default
-.  .  .  .  .  level
-.  .  .  .  .  named-group
-.  .  .  .  .  none
-.  .  .  cmr-field-mapping
-.  .  .  .  cmr-field-name
-.  .  .  .  column-pair
-.  .  .  .  .  column-name
-.  .  .  .  fetched-with
-.  .  .  .  .  default
-.  .  .  .  .  level
-.  .  .  .  .  named-group
-.  .  .  .  .  none
-.  .  .  secondary-table
-.  .  .  .  table-name
-.  .  .  .  column-pair
-.  .  .  .  .  column-name
-.  .  .  consistency
-.  .  .  .  none
-.  .  .  .  check-modified-at-commit
-.  .  .  .  lock-when-loaded
-.  .  .  .  check-all-at-commit
-.  .  .  .  lock-when-modified
-.  .  .  .  check-version-of-accessed-instances
-.  .  .  .  .  column-name
-----
-
-.A sample database schema definition:
-[source, mysql]
-----
-create table TEAMEJB(
-   TEAMID varchar2(256) not null,
-   NAME varchar2(120) null,
-   CITY char(30) not null,
-   LEAGUEEJB_LEAGUEID varchar2(256) null,
-   constraint PK_TEAMEJB primary key (TEAMID)
-);
-
-create table PLAYEREJB(
-   POSITION varchar2(15) null,
-   PLAYERID varchar2(256) not null,
-   NAME char(64) null,
-   SALARY number(10, 2) not null,
-   constraint PK_PLAYEREJB primary key (PLAYERID)
-);
-
-create table LEAGUEEJB(
-   LEAGUEID varchar2(256) not null,
-   NAME varchar2(256) null,
-   SPORT varchar2(256) null,
-);
-
-create table PLAYEREJBTEAMEJB (
-   PLAYEREJB_PLAYERID varchar2(256) null,
-   TEAMEJB_TEAMID varchar2(256) null
-);
-
-alter table TEAMEJB add constraint FK_LEAGUE foreign key (LEAGUEEJB_LEAGUEID) references LEAGUEEJB (LEAGUEID);
-
-alter table PLAYEREJBTEAMEJB add constraint FK_TEAMS foreign key (PLAYEREJB_PLAYERID) references PLAYEREJB (PLAYERID);
-
-alter table PLAYEREJBTEAMEJB add constraint FK_PLAYERS foreign key (TEAMEJB_TEAMID) references TEAMEJB (TEAMID);
-----
-
-.A corresponding sample `sun-cmp-mappings.xml` file:
-[source,xml]
-----
-<?xml version="1.0" encoding="UTF-8"?>
-<sun-cmp-mappings>
-<sun-cmp-mapping>
-    <schema>Roster</schema>
-    <entity-mapping>
-        <ejb-name>TeamEJB</ejb-name>
-        <table-name>TEAMEJB</table-name>
-        <cmp-field-mapping>
-            <field-name>teamId</field-name>
-            <column-name>TEAMEJB.TEAMID</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>name</field-name>
-            <column-name>TEAMEJB.NAME</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>city</field-name>
-            <column-name>TEAMEJB.CITY</column-name>
-        </cmp-field-mapping>
-        <cmr-field-mapping>
-            <cmr-field-name>league</cmr-field-name>
-            <column-pair>
-                <column-name>TEAMEJB.LEAGUEEJB_LEAGUEID</column-name>
-                <column-name>LEAGUEEJB.LEAGUEID</column-name>
-            </column-pair>
-            <fetched-with>
-                <none/>
-            </fetched-with>
-        </cmr-field-mapping>
-        <cmr-field-mapping>
-            <cmr-field-name>players</cmr-field-name>
-            <column-pair>
-                <column-name>TEAMEJB.TEAMID</column-name>
-                <column-name>PLAYEREJBTEAMEJB.TEAMEJB_TEAMID</column-name>
-            </column-pair>
-            <column-pair>
-                <column-name>PLAYEREJBTEAMEJB.PLAYEREJB_PLAYERID</column-name>
-                <column-name>PLAYEREJB.PLAYERID</column-name>
-            </column-pair>
-            <fetched-with>
-                <none/>
-            </fetched-with>
-        </cmr-field-mapping>
-    </entity-mapping>
-    <entity-mapping>
-        <ejb-name>PlayerEJB</ejb-name>
-        <table-name>PLAYEREJB</table-name>
-        <cmp-field-mapping>
-            <field-name>position</field-name>
-            <column-name>PLAYEREJB.POSITION</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>playerId</field-name>
-            <column-name>PLAYEREJB.PLAYERID</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>name</field-name>
-            <column-name>PLAYEREJB.NAME</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>salary</field-name>
-            <column-name>PLAYEREJB.SALARY</column-name>
-        </cmp-field-mapping>
-        <cmr-field-mapping>
-            <cmr-field-name>teams</cmr-field-name>
-            <column-pair>
-                <column-name>PLAYEREJB.PLAYERID</column-name>
-                <column-name>PLAYEREJBTEAMEJB.PLAYEREJB_PLAYERID</column-name>
-            </column-pair>
-            <column-pair>
-                <column-name>PLAYEREJBTEAMEJB.TEAMEJB_TEAMID</column-name>
-                <column-name>TEAMEJB.TEAMID</column-name>
-            </column-pair>
-            <fetched-with>
-                <none/>
-            </fetched-with>
-        </cmr-field-mapping>
-    </entity-mapping>
-    <entity-mapping>
-        <ejb-name>LeagueEJB</ejb-name>
-        <table-name>LEAGUEEJB</table-name>
-        <cmp-field-mapping>
-            <field-name>leagueId</field-name>
-            <column-name>LEAGUEEJB.LEAGUEID</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>name</field-name>
-            <column-name>LEAGUEEJB.NAME</column-name>
-        </cmp-field-mapping>
-        <cmp-field-mapping>
-            <field-name>sport</field-name>
-            <column-name>LEAGUEEJB.SPORT</column-name>
-        </cmp-field-mapping>
-        <cmr-field-mapping>
-            <cmr-field-name>teams</cmr-field-name>
-            <column-pair>
-                <column-name>LEAGUEEJB.LEAGUEID</column-name>
-                <column-name>TEAMEJB.LEAGUEEJB_LEAGUEID</column-name>
-            </column-pair>
-            <fetched-with>
-                <none/>
-            </fetched-with>
-        </cmr-field-mapping>
-    </entity-mapping>
-</sun-cmp-mapping>
-</sun-cmp-mappings>
 ----
 
 [[deployment-descriptor-precedence-order]]
