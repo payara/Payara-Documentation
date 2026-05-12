@@ -74,7 +74,7 @@ A read-only bean can be used to cache a database entry that is frequently access
 
 When the data that is cached by a read-only bean is updated by another bean, the read-only bean can be notified to refresh its cached data.
 
-Payara Server provides a number of ways by which a read-only bean's state can be refreshed. By setting the `refresh-period-in-seconds` element in the `glassfish-ejb-jar.xml` file and the `trans-attribute` element (or `@TransactionAttribute` annotation) in the `ejb-jar.xml` file, it is easy to configure a read-only bean that is one of the following:
+Payara Server provides a number of ways by which a read-only bean's state can be refreshed. By setting the `refresh-period-in-seconds` element in the `payara-ejb-jar.xml` file and the `trans-attribute` element (or `@TransactionAttribute` annotation) in the `ejb-jar.xml` file, it is easy to configure a read-only bean that is one of the following:
 
 * Always refreshed
 * Periodically refreshed
@@ -86,7 +86,7 @@ NOTE: Read-only beans are best suited for situations where the underlying data n
 [[the-pass-by-reference-element]]
 === The `pass-by-reference` Element
 
-The `pass-by-reference` element in the `glassfish-ejb-jar.xml` file allows you to specify the parameter passing semantics for co-located remote EJB invocations. This is an opportunity to improve performance.
+The `pass-by-reference` element in the `payara-ejb-jar.xml` file allows you to specify the parameter passing semantics for co-located remote EJB invocations. This is an opportunity to improve performance.
 
 However, use of this feature results in non-portable applications. See "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#pass-by-reference[pass-by-reference]" in the Payara Server Application Deployment section.
 
@@ -98,13 +98,13 @@ The EJB container of Payara Server pools anonymous instances (message-driven bea
 The EJB container maintains the free pool for each bean that is deployed.
 Bean instances in the free pool have no identity (that is, no primary key associated) and are used to serve method calls. The free beans are also used to serve all methods for stateless session beans.
 
-Bean instances in the free pool transition from a *Pooled* state to a *Cached* state after `ejbCreate` and the business methods run. The size and behavior of each pool is controlled using pool-related properties in the EJB container or the `glassfish-ejb-jar.xml` file.
+Bean instances in the free pool transition from a *Pooled* state to a *Cached* state after `ejbCreate` and the business methods run. The size and behavior of each pool is controlled using pool-related properties in the EJB container or the `payara-ejb-jar.xml` file.
 
 In addition, Payara Server supports a number of tunable parameters that can control the number of "stateful" instances (stateful session beans and entity beans) cached as well as the duration they are cached. Multiple bean instances that refer to the same database row in a table can be cached. The EJB container maintains a cache for each bean that is deployed.
 
-To achieve scalability, the container selectively evicts some bean instances from the cache, usually when it overflows. These evicted bean instances return to the free bean pool. The size and behavior of each cache can be controlled using the cache-related properties in the EJB container or the `glassfish-ejb-jar.xml` file.
+To achieve scalability, the container selectively evicts some bean instances from the cache, usually when it overflows. These evicted bean instances return to the free bean pool. The size and behavior of each cache can be controlled using the cache-related properties in the EJB container or the `payara-ejb-jar.xml` file.
 
-Pooling and caching parameters for the `glassfish-ejb-jar.xml` file are described in "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#bean-cache[bean-cache]" in the Payara Server Application Deployment section.
+Pooling and caching parameters for the `payara-ejb-jar.xml` file are described in "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#bean-cache[bean-cache]" in the Payara Server Application Deployment section.
 
 [[pooling-parameters]]
 ==== Pooling Parameters
@@ -130,7 +130,7 @@ Caches can also passivate beans that are idle (not accessed for a specified dura
 === Priority Based Scheduling of Remote Bean Invocations
 
 You can create multiple thread pools, each having its own work queues.
-An optional element in the `glassfish-ejb-jar.xml` file, `use-thread-pool-id`, specifies the thread pool that processes the requests for the bean.
+An optional element in the `payara-ejb-jar.xml` file, `use-thread-pool-id`, specifies the thread pool that processes the requests for the bean.
 The bean must have a remote interface, or `use-thread-pool-id` is ignored. You can create different thread pools and specify the appropriate thread pool ID for a bean that requires a quick response time.
 
 NOTE: If there is no such thread pool configured or if the element is absent, the default thread pool is used.
@@ -140,7 +140,7 @@ NOTE: If there is no such thread pool configured or if the element is absent, th
 
 Normally, all entity bean updates within a transaction are batched and executed at the end of the transaction. The only exception is the database flush that precedes execution of a finder or select query.
 
-Since a transaction often spans many method calls, you might want to find out if the updates made by a method succeeded or failed immediately after method execution. To force a flush at the end of a method's execution, use the `flush-at-end-of-method` element in the `glassfish-ejb-jar.xml` file.
+Since a transaction often spans many method calls, you might want to find out if the updates made by a method succeeded or failed immediately after method execution. To force a flush at the end of a method's execution, use the `flush-at-end-of-method` element in the `payara-ejb-jar.xml` file.
 Only non-finder methods in an entity bean can be flush-enabled. (For an EJB 2.1 bean, these methods must be in the Local, Local Home, Remote, or Remote Home interface).
 See "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#flush-at-end-of-method[flush-at-end-of-method]" in the Payara Server Application Deployment section.
 
@@ -329,15 +329,14 @@ A container managing stateless session beans has a different charter from a cont
 
 The stateless container manages stateless session beans, which, by definition, do not carry client-specific states. All session beans (of a particular type) are considered equal.
 
-A stateless session bean container uses a bean pool to service requests. The Payara Server specific deployment descriptor file, `glassfish-ejb-jar.xml`, contains the properties that define the pool:
+A stateless session bean container uses a bean pool to service requests. The Payara Server specific deployment descriptor file, `payara-ejb-jar.xml`, contains the properties that define the pool:
 
 * `steady-pool-size`
 * `resize-quantity`
 * `max-pool-size`
-* `max-wait-time-in-millis`
 * `pool-idle-timeout-in-seconds`
 
-For more information about `glassfish-ejb-jar.xml`, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in the Payara Server Application Deployment section.
+For more information about `glassfish-ejb-jar.xml`/`payara-ejb-jar.xml`, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-ejb-jar.xml-file[The payara-ejb-jar.xml File]" in the Payara Server Application Deployment section.
 
 Payara Server provides the `wscompile` and `wsdeploy` tools to help you implement a web service endpoint as a stateless session bean.
 
@@ -347,24 +346,21 @@ This is done regardless of the maximum number of instances available in a bean's
 
 NOTE: The system property `fish.payara.ejb-container.max-wait-time-in-millis` can be set to change the default global value of `<max-wait-time-in-millis>` for *_ALL_* Stateless EJB bean pools.
 
-IMPORTANT: Unless overridden in the deployment descriptor file, this will become the new default value and can be used to cap the upper bound of all concurrent invocations of any Stateless EJB pools.
-
 [[example]]
 ===== Example
 
-The following is a sample `glassfish-ejb-jar.xml` deployment descriptor that configures 2 EJBs with the settings mentioned beforehand.
+The following is a sample `glassfish-ejb-jar.xml`/`payara-ejb-jar.xml` deployment descriptor that configures 2 EJBs with the settings mentioned beforehand.
 
 [source, xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE glassfish-ejb-jar PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 EJB 3.1//EN" "http://glassfish.org/dtds/glassfish-ejb-jar_3_1-1.dtd">
-<glassfish-ejb-jar>
+<!DOCTYPE payara-ejb-jar PUBLIC "-//Payara.fish//DTD Payara Application Server 7 EJB 4.0//EN" "https://raw.githubusercontent.com/payara/Payara-Documentation/main-7/docs/modules/ROOT/pages/Appendix/Schemas/payara-ejb-jar_4_0-0.dtd">
+<payara-ejb-jar>
   <enterprise-beans>
     <ejb>
       <ejb-name>PooledStatelessBean</ejb-name>
       <bean-pool>
           <max-pool-size>1</max-pool-size>
-          <max-wait-time-in-millis>0</max-wait-time-in-millis>
           <steady-pool-size>1</steady-pool-size>
       </bean-pool>
     </ejb>
@@ -376,7 +372,7 @@ The following is a sample `glassfish-ejb-jar.xml` deployment descriptor that con
       </bean-pool>
     </ejb>
   </enterprise-beans>
-</glassfish-ejb-jar>
+</payara-ejb-jar>
 ----
 
 [[stateful-container]]
@@ -384,7 +380,7 @@ The following is a sample `glassfish-ejb-jar.xml` deployment descriptor that con
 
 The stateful container manages the stateful session beans, which, by definition, carry the client-specific state. There is a one-to-one relationship between the client and the stateful session beans. At creation, each stateful session bean (SFSB) is given a unique session ID that is used to access the session bean so that an instance of a stateful session bean is accessed by a single client only.
 
-Stateful session beans are managed using an internal cache. The size and behavior of stateful session beans cache are controlled by specifying the following `glassfish-ejb-jar.xml` parameters:
+Stateful session beans are managed using an internal cache. The size and behavior of stateful session beans cache are controlled by specifying the following `payara-ejb-jar.xml` parameters:
 
 * `max-cache-size`
 * `resize-quantity`
@@ -394,7 +390,7 @@ Stateful session beans are managed using an internal cache. The size and behavio
 
 The `max-cache-size` element specifies the maximum number of session beans that are held in cache. If the cache overflows (when the number of beans exceeds `max-cache-size`), the container then passivates some beans or writes out the serialized state of the bean into a file. The directory in which the file is created is obtained from the EJB container using the configuration APIs.
 
-For more information about `glassfish-ejb-jar.xml`, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in the Payara Server Application Deployment section.
+For more information about `payara-ejb-jar.xml`, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-ejb-jar.xml-file[The payara-ejb-jar.xml File]" in the Payara Server Application Deployment section.
 
 The passivated beans are stored on the file system. The Session Store Location setting in the EJB container allows an administrator to specify the directory where passivated beans are stored. By default, passivated stateful session beans are stored in application-specific subdirectories created under `${domain-dir}/session-store`.
 
@@ -524,11 +520,11 @@ To enable SFSB checkpointing at the application or EJB module level during deplo
 [[sfsb-level]]
 ===== SFSB Level
 
-To enable SFSB checkpointing at the bean level, set `availability-enabled="true"` in the `ejb` element of the bean definition in the `glassfish-ejb-jar.xml` file as follows:
+To enable SFSB checkpointing at the bean level, set `availability-enabled="true"` in the `ejb` element of the bean definition in the `payara-ejb-jar.xml` file as follows:
 
 [source,xml]
 ----
-<glassfish-ejb-jar>
+<payara-ejb-jar>
    ...
    <enterprise-beans>
       ...
@@ -537,7 +533,7 @@ To enable SFSB checkpointing at the bean level, set `availability-enabled="true"
       </ejb>
    ...
    </enterprise-beans>
-</glassfish-ejb-jar>
+</payara-ejb-jar>
 ----
 
 [[specifying-methods-to-be-checkpointed]]
@@ -545,13 +541,13 @@ To enable SFSB checkpointing at the bean level, set `availability-enabled="true"
 
 If SFSB checkpointing is enabled, checkpointing generally occurs after any transaction involving the SFSB is completed, even if the transaction rolls back.
 
-To specify additional optional checkpointing of SFSBs at the end of non-transactional business methods that cause important modifications to the bean's state, use the `checkpoint-at-end-of-method` element within the `ejb` element in `glassfish-ejb-jar.xml`.
+To specify additional optional checkpointing of SFSBs at the end of non-transactional business methods that cause important modifications to the bean's state, use the `checkpoint-at-end-of-method` element within the `ejb` element in `payara-ejb-jar.xml`.
 
 For example:
 
 [source,xml]
 ----
-<glassfish-ejb-jar>
+<payara-ejb-jar>
    ...
    <enterprise-beans>
       ...
@@ -565,7 +561,7 @@ For example:
       </ejb>
       ...
    </enterprise-beans>
-</glassfish-ejb-jar>
+</payara-ejb-jar>
 ----
 
 For details, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#checkpoint-at-end-of-method[checkpoint-at-end-of-method]" in the Payara Server Application Deployment section.
@@ -628,7 +624,7 @@ Read-only beans have the following characteristics:
 * Only container-managed transactions are allowed; read-only beans cannot start their own transactions.
 * Read-only beans don't update any bean state.
 * `ejbStore` is never called by the container.
-* `ejbLoad` is called only when a transactional method is called or when the bean is initially created (in the cache), or at regular intervals controlled by the bean's `refresh-period-in-seconds` element in the `glassfish-ejb-jar.xml` file.
+* `ejbLoad` is called only when a transactional method is called or when the bean is initially created (in the cache), or at regular intervals controlled by the bean's `refresh-period-in-seconds` element in the `payara-ejb-jar.xml` file.
 * The home interface can have any number of find methods. The return type of the find methods must be the primary key for the same bean type (or a collection of primary keys).
 * If the data that the bean represents can change, then `refresh-period-in-seconds` must be set to refresh the beans at regular intervals. `ejbLoad` is called at this regular interval.
 
@@ -664,7 +660,7 @@ Invoking any transactional method invokes `ejbLoad`.
 [[refreshing-periodically]]
 ==== Refreshing Periodically
 
-Use the `refresh-period-in-seconds` element in the `glassfish-ejb-jar.xml` file to refresh a read-only bean periodically.
+Use the `refresh-period-in-seconds` element in the `payara-ejb-jar.xml` file to refresh a read-only bean periodically.
 
 * If the value specified in `refresh-period-in-seconds` is zero or not specified, which is the default, the bean is never refreshed (unless a transactional method is accessed).
 * If the value is greater than zero, the bean is refreshed at the rate specified.
@@ -685,19 +681,19 @@ asadmin create-jvm-options -Dcom.sun.ejb.containers.readonly.relative.refresh.mo
 [[deploying-read-only-beans]]
 === Deploying Read-Only Beans
 
-Read-only beans are deployed in the same manner as other entity beans. However, in the entry for the bean in the `glassfish-ejb-jar.xml` file, the `is-read-only-bean` element must be set to `true`. That is:
+Read-only beans are deployed in the same manner as other entity beans. However, in the entry for the bean in the `payara-ejb-jar.xml` file, the `is-read-only-bean` element must be set to `true`. That is:
 
 [source, xml]
 ----
 <is-read-only-bean>true</is-read-only-bean>
 ----
 
-Also, the `refresh-period-in-seconds` element in the `glassfish-ejb-jar.xml` file can be set to some value that specifies the rate at which the bean is refreshed. If this element is missing, no refresh occurs.
+Also, the `refresh-period-in-seconds` element in the `payara-ejb-jar.xml` file can be set to some value that specifies the rate at which the bean is refreshed. If this element is missing, no refresh occurs.
 
 All requests in the same transaction context are routed to the same read-only bean instance. Set the `allow-concurrent-access` element to
 either `true` (to allow concurrent accesses) or `false` (to serialize concurrent access to the same read-only bean). The default is `false`.
 
-For further information on these elements, refer to "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in the Payara Server Application Deployment section.
+For further information on these elements, refer to "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-ejb-jar.xml-file[The payara-ejb-jar.xml File]" in the Payara Server Application Deployment section.
 
 [[using-message-driven-beans]]
 == Using Message-Driven Beans
@@ -716,21 +712,21 @@ A message-driven bean is a client to a Connector inbound resource adapter. The m
 JMS clients use JMS Connection Factory- and Destination-administered objects.
 A JMS Connection Factory administered object is a resource manager Connection Factory object that is used to create connections to the JMS provider.
 
-The `mdb-connection-factory` element in the `glassfish-ejb-jar.xml` file for a message-driven bean specifies the connection factory that creates the container connection to the JMS provider.
+The `mdb-connection-factory` element in the `payara-ejb-jar.xml` file for a message-driven bean specifies the connection factory that creates the container connection to the JMS provider.
 
-The `jndi-name` element of the `ejb` element in the `glassfish-ejb-jar.xml` file specifies the JNDI name of the administered object for the JMS Queue or Topic destination that is associated with the message-driven bean.
+The `jndi-name` element of the `ejb` element in the `payara-ejb-jar.xml` file specifies the JNDI name of the administered object for the JMS Queue or Topic destination that is associated with the message-driven bean.
 
 [[message-driven-bean-pool]]
 ==== *Message-Driven Bean Pool*
 
-The container manages a pool of message-driven beans for the concurrent processing of a stream of messages. The `glassfish-ejb-jar.xml` file contains the elements that define the pool (that is, the `bean-pool` element):
+The container manages a pool of message-driven beans for the concurrent processing of a stream of messages. The `payara-ejb-jar.xml` file contains the elements that define the pool (that is, the `bean-pool` element):
 
 * `steady-pool-size`
 * `resize-quantity`
 * `max-pool-size`
 * `pool-idle-timeout-in-seconds`
 
-For more information about `glassfish-ejb-jar.xml`, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-ejb-jar.xml-file[The glassfish-ejb-jar.xml File]" in the Payara Server Application Deployment section.
+For more information about `payara-ejb-jar.xml`, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-ejb-jar.xml-file[The payara-ejb-jar.xml File]" in the Payara Server Application Deployment section.
 
 [[domain-level-settings]]
 ==== Domain-Level Settings
@@ -767,7 +763,7 @@ Therefore, a large pool size also means a high number of threads, which impacts 
 
 When configuring message-driven bean pool properties, make sure to consider factors such as message arrival rate and pattern, `onMessage` method processing time, overall server resources (threads, memory, and so on), and any concurrency requirements and limitations from other resources that the message-driven bean accesses.
 
-When tuning performance and resource usage, make sure to consider potential JMS provider properties for the connection factory used by the container (the `mdb-connection-factory` element in the `glassfish-ejb-jar.xml` file). For example, you can tune the Open Message Queue flow control related properties for connection factory in situations where the message incoming rate is much higher than `max-pool-size` can handle.
+When tuning performance and resource usage, make sure to consider potential JMS provider properties for the connection factory used by the container (the `mdb-connection-factory` element in the `payara-ejb-jar.xml` file). For example, you can tune the Open Message Queue flow control related properties for connection factory in situations where the message incoming rate is much higher than `max-pool-size` can handle.
 
 Refer to "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Monitoring Service.adoc#administering-the-monitoring-service[Administering the Monitoring Service]" in the Payara Server General Administration section for information on how to get message-driven bean pool statistics.
 

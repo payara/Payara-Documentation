@@ -78,16 +78,16 @@ If load balancing is enabled as in Step 7 and the EJB components being accessed 
 ----
 corbaname:host1:port1,host2:port2,.../NameService#ejb/jndi-name
 ----
-. Define the `@EJB` annotations or the `ejb-ref` elements in the `application-client.xml` file. Define the corresponding `ejb-ref` elements in the`glassfish-application-client.xml` file. +
-For more information on the `glassfish-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in the Payara Server Application Deployment section. For a general explanation of how to map JNDI names using reference elements, see xref:Technical Documentation/Application Development/Using the Java Naming and Directory Interface.adoc#mapping-references[Mapping References].
+. Define the `@EJB` annotations or the `ejb-ref` elements in the `application-client.xml` file. Define the corresponding `ejb-ref` elements in the`payara-application-client.xml` file. +
+For more information on the `payara-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-application-client.xml-file[The payara-application-client.xml file]" in the Payara Server Application Deployment section. For a general explanation of how to map JNDI names using reference elements, see xref:Technical Documentation/Application Development/Using the Java Naming and Directory Interface.adoc#mapping-references[Mapping References].
 . Deploy the application client and EJB component together in an application. +
 To get the client JAR file, use the `--retrieve` option of the `asadmin deploy` command. +
 To retrieve the stubs and ties generated during deployment, use the `asadmin get-client-stubs` command.
 .  Ensure that the client JAR file includes the following files:
 * A Java class to access the bean.
 * The `application-client.xml` - (optional) Jakarta EE application client deployment descriptor.
-* `glassfish-application-client.xml` - (optional) Payara Server specific client deployment descriptor. For information on the
-`glassfish-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in the Payara Server Application Deployment section.
+* `payara-application-client.xml` - (optional) Payara Server specific client deployment descriptor. For information on the
+`payara-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-application-client.xml-file[The payara-application-client.xml file]" in the Payara Server Application Deployment section.
 * The `MANIFEST.MF` file. This file contains a reference to the `main` class, which states the complete package prefix and class name of the Java client.
 .  Prepare the client machine. +
 If you are using the `appclient` script, package the Payara Server system files required to launch application clients on remote systems using the `package-appclient` script, then retrieve the application client itself using the `asadmin get-client-stubs` command.
@@ -131,13 +131,13 @@ For detailed instructions on developing a JMS client, see "https://eclipse-ee4j.
 +
 For information on configuring JMS resources, see "xref:Technical Documentation/Payara Server Documentation/General Administration/Administering the Java Message Service.adoc#administering-jms-connection-factories-and-destinations[Administering JMS Connection Factories and Destinations]" in the Payara Server General Administration section.
 
-. Define the `@Resource` or `@Resources` annotations or the `resource-ref` elements in the `application-client.xml` file. Define the corresponding `resource-ref` elements in the `glassfish-application-client.xml` file. +
-For more information on the `glassfish-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in the Payara Server Application Deployment section. For a general explanation of how to map JNDI names using reference elements, see xref:Technical Documentation/Application Development/Using the Java Naming and Directory Interface.adoc#mapping-references[Mapping References].
+. Define the `@Resource` or `@Resources` annotations or the `resource-ref` elements in the `application-client.xml` file. Define the corresponding `resource-ref` elements in the `payara-application-client.xml` file. +
+For more information on the `payara-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-application-client.xml-file[The payara-application-client.xml file]" in the Payara Server Application Deployment section. For a general explanation of how to map JNDI names using reference elements, see xref:Technical Documentation/Application Development/Using the Java Naming and Directory Interface.adoc#mapping-references[Mapping References].
 
 . Ensure that the client JAR file includes the following files:
 * A Java class to access the resource.
 * `application-client.xml` - (optional) Jakarta EE application client deployment descriptor.
-* `glassfish-application-client.xml` - (optional) Payara Server specific client deployment descriptor. For information on the `glassfish-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-glassfish-application-client.xml-file[The glassfish-application-client.xml file]" in the Payara Server Application Deployment section.
+* `payara-application-client.xml` - (optional) Payara Server specific client deployment descriptor. For information on the `payara-application-client.xml` file, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-payara-application-client.xml-file[The payara-application-client.xml file]" in the Payara Server Application Deployment section.
 * The `MANIFEST.MF` file. This file contains a reference to the `main` class, which states the complete package prefix and class name of the Java client.
 .  Prepare the client machine.
 +
@@ -164,7 +164,7 @@ Java Web Start allows your application client to be easily launched and automati
 
 NOTE: Java Web Start is enabled for all application clients by default.
 
-The application developer or deployer can specify that Java Web Start is always disabled for an application client by setting the value of the `eligible` element to `false` in the `glassfish-application-client.xml` file.
+The application developer or deployer can specify that Java Web Start is always disabled for an application client by setting the value of the `eligible` element to `false` in the `payara-application-client.xml` file.
 
 The server administrator can disable Java Web Start for a previously deployed eligible application client using the `asadmin set` command.
 
@@ -237,7 +237,7 @@ If the application client module or application is not in JAR or EAR file format
 Regardless of how the context-root or id is determined, it is written to the server log when you deploy the application.
 For details about naming, see "xref:Technical Documentation/Payara Server Documentation/Application Deployment/Overview.adoc#naming-standards[Naming Standards]" in the Payara Server Application Deployment section.
 
-To set a different URL for an application client, use the `context-root` sub-element of the `java-web-start-access` element in the `glassfish-application-client.xml` file. This overrides the `appclient-module-id` or `application-id`.
+To set a different URL for an application client, use the `context-root` sub-element of the `java-web-start-access` element in the `payara-application-client.xml` file. This overrides the `appclient-module-id` or `application-id`.
 
 You can also pass arguments to the ACC or to the application client's `main` method as query parameters in the URL. If multiple application client arguments are specified, they are passed in the order specified.
 
@@ -345,7 +345,7 @@ This display appears if an error occurs even before the application client logic
 [[vendor-icon-splash-screen-and-text]]
 ==== Vendor Icon, Splash Screen, and Text
 
-To specify a vendor-specific icon, splash screen, text string, or a combination of these for Java Web Start download and launch screens, use the `vendor`element in the `glassfish-application-client.xml` file. The complete format of this element's data is as follows:
+To specify a vendor-specific icon, splash screen, text string, or a combination of these for Java Web Start download and launch screens, use the `vendor`element in the `payara-application-client.xml` file. The complete format of this element's data is as follows:
 
 [source,xml]
 ----
@@ -394,7 +394,7 @@ For more information about JNLP, see the https://jcp.org/en/jsr/detail?id=56[JNL
 [[specifying-the-jnlp-file-in-the-deployment-descriptor]]
 ==== Specifying the JNLP File in the Deployment Descriptor
 
-To specify a custom JNLP file for Java Web Start, use the `jnlp-doc` element in the `glassfish-application-client.xml` file. If `none` is specified, a default JNLP file is generated.
+To specify a custom JNLP file for Java Web Start, use the `jnlp-doc` element in the `payara-application-client.xml` file. If `none` is specified, a default JNLP file is generated.
 
 The value of the `jnlp-doc` element is a relative path with the following format:
 
@@ -423,7 +423,7 @@ For example, if the JNLP file is in a JAR file at `other/myLib.jar`, the element
 </java-web-start-access>
 ----
 
-For more information about the `glassfish-application-client.xml` file, see the Payara Server Application Deployment section.
+For more information about the `payara-application-client.xml` file, see the Payara Server Application Deployment section.
 
 [[referring-to-jar-files-from-the-jnlp-file]]
 ==== Referring to JAR Files from the JNLP File
@@ -452,7 +452,7 @@ Use one of these formats for these `href` references:
 path-to-JNLP-in-EAR
 ----
 
-Note that these formats are not equivalent to the format of the `jnlp-doc` element in the `glassfish-application-client.xml` file.
+Note that these formats are not equivalent to the format of the `jnlp-doc` element in the `payara-application-client.xml` file.
 
 WARNING: These formats follow the standard entry-within-a-JAR URI syntax and semantics. +
 Support for this syntax comes from the automated Java Web Start support in Payara Server. This is not a feature of Java Web Start or the JNLP standard.
@@ -741,7 +741,7 @@ For more information about the permissions you can set in the `client.policy` fi
 
 You can configure RMI/IIOP over SSL in two ways: using a username and password, or using a client certificate.
 
-To use a username and password, configure the `ior-security-config` element in the `glassfish-ejb-jar.xml` file. The following configuration establishes SSL between an application client and an EJB component using a username and password.
+To use a username and password, configure the `ior-security-config` element in the `payara-ejb-jar.xml` file. The following configuration establishes SSL between an application client and an EJB component using a username and password.
 
 The user has to log in to the ACC using either the `sun-acc.xml` mechanism or the xref:Technical Documentation/Application Development/Securing Applications.adoc#programmatic-login-using-the-programmaticlogin-class[Programmatic Login Using the `ProgrammaticLogin` Class] mechanism.
 
@@ -765,7 +765,7 @@ The user has to log in to the ACC using either the `sun-acc.xml` mechanism or th
 </ior-security-config>
 ----
 
-To use a client certificate, configure the `ior-security-config` element in the `glassfish-ejb-jar.xml` file.
+To use a client certificate, configure the `ior-security-config` element in the `payara-ejb-jar.xml` file.
 
 The following configuration establishes secure transport between an application client and an EJB component using a client certificate.
 

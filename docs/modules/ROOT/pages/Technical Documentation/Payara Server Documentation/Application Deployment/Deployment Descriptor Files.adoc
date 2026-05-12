@@ -9,7 +9,7 @@ This appendix describes the element hierarchies in the Payara Platform deploymen
 
 Each deployment descriptor XML file has a corresponding Document Type Definition (DTD) file, which defines the elements, data, and attributes that the deployment descriptor file can contain.
 
-For example, the `glassfish-application_6_0-1.dtd` file defines the structure of the `glassfish-application.xml` file. The DTD files for the Payara Server deployment descriptors are located in the `as-install/lib/dtds` directory.
+For example, the `payara-application_11_0-0.dtd` file defines the structure of the `payara-application.xml` file. The DTD files for the Payara Server deployment descriptors are located in the `as-install/lib/dtds` directory.
 
 The Platform Server deployment descriptor files must be readable and writable by the file owners. In each deployment descriptor file, sub-elements must be defined in the order in which they are listed under each Sub-elements heading, unless otherwise noted.
 
@@ -21,13 +21,16 @@ The following table lists the Payara Platform deployment descriptors and their D
 
 .Payara Platform Deployment Descriptors and DTDs
 
-//TODO - Add DTDs for Payara Platform dd files
 [cols="3,3,4",options="header"]
 |===
 |Deployment Descriptor |DTD File |Description
 
-| `glassfish-application.xml`
+| `glassfish-application.xml` (deprecated)
+
+`payara-application.xml`
 | `glassfish-application_6_0-1.dtd`
+
+`payara-application_11_0-0.dtd`
 | Configures an entire Jakarta EE application (EAR file).
 
 |
@@ -39,12 +42,20 @@ The following table lists the Payara Platform deployment descriptors and their D
 `payara-web-app_4.dtd`
 | Configures a web application (WAR file).
 
-| `glassfish-ejb-jar.xml`
+| `glassfish-ejb-jar.xml` (deprecated)
+
+`payara-ejb-jar.xml`
 | `glassfish-ejb-jar_3_1-1.dtd`
+
+`payara-ejb-jar_4_0-0.dtd`
 |Configures an enterprise bean (EJB JAR file).
 
-| `glassfish-application-client.xml`
+| `glassfish-application-client.xml` (deprecated)
+
+`payara-application-client.xml`
 | `glassfish-application-client_6_0-1.dtd`
+
+`payara-application-client_11_0-0.dtd`
 | Configures an Application Client Container (ACC) client (JAR file).
 
 |
@@ -56,8 +67,16 @@ The following table lists the Payara Platform deployment descriptors and their D
 `payara-resources_1_8.dtd`
 | Configures application-scoped resources.
 
-| `sun-acc.xml`
+| `sun-acc.xml` (deprecated)
+
+`glassfish-acc.xml` (deprecated)
+
+`payara-acc.xml`
 | `sun-application-client-container_1_2.dtd`
+
+`glassfish-application-client-container_1_3.dtd`
+
+`payara-application-client-container_1_4.dtd`
 | Configures the Application Client Container.
 
 This is more of a configuration file than a deployment descriptor. Payara Server provides a default file in the `domain-dir/config` directory.
@@ -67,14 +86,17 @@ Specifying a different file is optional.
 
 IMPORTANT: Deployment descriptors whose names start with the `glassfish-` prefix are referred as "original" deployment descriptor files from Eclipse GlassFish, since these files names and DTDs were created while supporting Eclipse GlassFish and their support has been inherited by the Payara Platform.
 
-[[the-glassfish-application.xml-file]]
-== The glassfish-application.xml File
+[[the-payara-application.xml-file]]
+== The payara-application.xml File
 
-The `glassfish-application.xml` file configures an entire Jakarta EE application (EAR file). The element hierarchy is as follows:
+IMPORTANT: glassfish-application.xml is deprecated and support will be removed in a future release.
+It is recommended to use payara-application.xml instead.
+
+The `payara-application.xml` file configures an entire Jakarta EE application (EAR file). The element hierarchy is as follows:
 
 [source,text]
 ----
-glassfish-application
+payara-application
 .  web
 .  .  web-uri
 .  .  context-root
@@ -145,15 +167,15 @@ glassfish-application
 .  scanning-include
 ----
 
-.sample `glassfish-application.xml` file:
+.sample `payara-application.xml` file:
 [source,xml]
 ----
-<!DOCTYPE glassfish-application PUBLIC "-//GlassFish.org//DTD
-GlassFish Application Server 3.1 Java EE Application 6.0//EN"
-"http://glassfish.org/dtds/glassfish-application_6_0-1.dtd">
-<glassfish-application>
+<!DOCTYPE payara-application PUBLIC "-//Payara.fish//DTD
+Payara Application Server 7 Jakarta EE Application 11//EN"
+"https://raw.githubusercontent.com/payara/Payara-Documentation/main-7/docs/modules/ROOT/pages/Appendix/Schemas/payara-application_11-0.dtd">
+<payara-application>
    <unique-id>67488732739338240</unique-id>
-</glassfish-application>
+</payara-application>
 ----
 
 [[the-payara-web.xml-file]]
@@ -310,7 +332,7 @@ payara-web-app
 .A sample `payara-web.xml` file:
 [source,xml,subs=attributes+]
 ----
-<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server {page-version}//EN" "{payaraWebDtd}">
+<!DOCTYPE payara-web-app PUBLIC "-//Payara.fish//DTD Payara Server 7 Servlet 6.1//EN" "https://raw.githubusercontent.com/payara/Payara-Documentation/main-7/docs/modules/ROOT/pages/Appendix/Schemas/payara-web-app_6_1-0.dtd">
 <payara-web-app>
     <session-config>
         <session-manager/>
@@ -323,14 +345,18 @@ payara-web-app
 </payara-web-app>
 ----
 
-[[the-glassfish-ejb-jar.xml-file]]
-== The `glassfish-ejb-jar.xml` File
+[[the-payara-ejb-jar.xml-file]]
+== The `payara-ejb-jar.xml` File
 
-The `glassfish-ejb-jar.xml` file configures an enterprise bean (EJB JAR file). The element hierarchy is as follows:
+
+IMPORTANT: glassfish-ejb-jar.xml is deprecated and support will be removed in a future release.
+It is recommended to use payara-ejb-jar.xml instead.
+
+The `payara-ejb-jar.xml` file configures an enterprise bean (EJB JAR file). The element hierarchy is as follows:
 
 [source,text]
 ----
-glassfish-ejb-jar
+payara-ejb-jar
 .  security-role-mapping
 .  .  role-name
 .  .  principal-name
@@ -429,7 +455,6 @@ glassfish-ejb-jar
 .  .  .  .  resize-quantity
 .  .  .  .  max-pool-size
 .  .  .  .  pool-idle-timeout-in-seconds
-.  .  .  .  max-wait-time-in-millis
 .  .  .  bean-cache
 .  .  .  .  max-cache-size
 .  .  .  .  resize-quantity
@@ -503,15 +528,15 @@ glassfish-ejb-jar
    webservice-default-login-config
 ----
 
-NOTE: If any configuration information for an enterprise bean is not specified in the `glassfish-ejb-jar.xml` file, it defaults to a corresponding setting in the EJB container if an equivalency exists.
+NOTE: If any configuration information for an enterprise bean is not specified in the `payara-ejb-jar.xml` file, it defaults to a corresponding setting in the EJB container if an equivalency exists.
 
-.A sample `glassfish-ejb-jar.xml` file:
+.A sample `payara-ejb-jar.xml` file:
 [source,xml]
 ----
-<!DOCTYPE glassfish-ejb-jar PUBLIC "-//GlassFish.org//
-DTD GlassFish Application Server 3.1 EJB 3.1//EN"
-"http://glassfish.org/dtds/glassfish-ejb-jar_3_1-1.dtd">
-<glassfish-ejb-jar>
+<!DOCTYPE payara-ejb-jar PUBLIC "-//Payara.fish//
+DTD Payara Application Server 7 EJB 4.0//EN"
+"https://raw.githubusercontent.com/payara/Payara-Documentation/main-7/docs/modules/ROOT/pages/Appendix/Schemas/payara-ejb-jar_4_0-0.dtd}">
+<payara-ejb-jar>
     <enterprise-beans>
         <ejb>
             <ejb-name>CustomerEJB</ejb-name>
@@ -531,17 +556,20 @@ DTD GlassFish Application Server 3.1 EJB 3.1//EN"
         </ejb>
     </enterprise-beans>
     <keep-state>true</keep-state>
-</glassfish-ejb-jar>
+</payara-ejb-jar>
 ----
 
-[[the-glassfish-application-client.xml-file]]
-== The `glassfish-application-client.xml` file
+[[the-payara-application-client.xml-file]]
+== The `payara-application-client.xml` file
 
-The `glassfish-application-client.xml` file configures an Application Client Container (ACC) client (JAR file). The element hierarchy is as follows:
+IMPORTANT: glassfish-application-client.xml is deprecated and support will be removed in a future release.
+It is recommended to use payara-application-client.xml instead.
+
+The `payara-application-client.xml` file configures an Application Client Container (ACC) client (JAR file). The element hierarchy is as follows:
 
 [source,text]
 ----
-glassfish-application-client
+payara-application-client
 .  ejb-ref
 .  .  ejb-ref-name
 .  .  jndi-name
@@ -599,18 +627,17 @@ glassfish-application-client
 .  version-identifier
 ----
 
-.A sample `glassfish-application-client.xml` file:
+.A sample `payara-application-client.xml` file:
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE glassfish-application-client
-"http://glassfish.org/dtds/glassfish-application-client_6_0-2.dtd">
-<glassfish-application-client>
+<!DOCTYPE payara-application-client PUBLIC "-//Payara.fish//DTD Payara Application Server 7 Jakarta EE Application Client 11//EN" "{payaraApplicationClientDtd}">
+<payara-application-client>
   <message-destination-ref>
     <message-destination-ref-name>ClientQueue</message-destination-ref-name>
     <jndi-name>jms/security_mdb_OutQueue</jndi-name>
   </message-destination-ref>
-</glassfish-application-client>
+</payara-application-client>
 ----
 
 [[the-payara-resources.xml-file]]
