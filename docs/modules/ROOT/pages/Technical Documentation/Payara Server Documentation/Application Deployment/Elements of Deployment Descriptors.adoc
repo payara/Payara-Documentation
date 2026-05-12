@@ -751,66 +751,6 @@ The following table describes attributes for the `cert-db` element.
 
 |===
 
-
-[[check-all-at-commit]]
-== `check-all-at-commit`
-
-This element is not implemented. Do not use.
-
-[[superelements-20]]
-=== Superelements
-
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#consistency[`consistency`] (`sun-cmp-mappings.xml`)
-
-[[bearm]][[GSDPG00106]][[check-modified-at-commit]]
-
-=== `check-modified-at-commit`
-
-Checks concurrent modification of fields in modified beans at commit
-time.
-
-[[superelements-21]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#consistency[`consistency`] (`sun-cmp-mappings.xml`)
-
-[[subelements-20]]
-=== Subelements
-
-none - element is present or absent
-
-[[check-version-of-accessed-instances]]
-== `check-version-of-accessed-instances`
-
-Checks the version column of the modified beans.
-
-Version consistency allows the bean state to be cached between transactions instead of read from a database. The bean state is verified by primary key and version column values.
-This occurs during a custom query (for dirty instances only) or commit (for both clean and dirty instances).
-
-The version column must be a numeric type, and must be in the primary table. You must provide appropriate update triggers for this column.
-
-[[superelements-22]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#consistency[`consistency`] (`sun-cmp-mappings.xml`)
-
-[[subelements-21]]
-=== Subelements
-
-The following table describes subelements for the `check-version-of-accessed-instances` element.
-
-.`check-version-of-accessed-instances` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#column-name[`column-name`]
-|only one
-|Specifies the name of the version column.
-
-|===
-
 [[checkpoint-at-end-of-method]]
 == `checkpoint-at-end-of-method`
 
@@ -1146,185 +1086,6 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 === Subelements
 
 none
-
-[[cmp]]
-== `cmp`
-
-Describes runtime information for a CMP entity bean object for EJB 1.1 and EJB 2.1 beans.
-
-[[superelements-28]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#ejb[`ejb`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-26]]
-=== Subelements
-
-The following table describes subelements for the `cmp` element.
-
-.`cmp` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#mapping-properties[`mapping-properties`]
-|zero or one
-|This element is not implemented.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#is-one-one-cmp[`is-one-one-cmp`]
-|zero or one
-|This element is not implemented.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#one-one-finders[`one-one-finders`]
-|zero or one
-|Describes the finders for CMP 1.1 beans.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#prefetch-disabled[`prefetch-disabled`]
-|zero or one
-|Disables prefetching of entity bean states for the specified query methods.
-
-|===
-
-[[cmp-field-mapping]]
-== `cmp-field-mapping`
-
-The `cmp-field-mapping` element associates a field with one or more columns to which it maps. The column can be from a bean's primary table or any defined secondary table.
-If a field is mapped to multiple columns, the column listed first in this element is used as a source for getting the value from the database.
-The columns are updated in the order they appear. There is one `cmp-field-mapping` element for each `cmp-field` element defined in the `ejb-jar.xml` file.
-
-[[superelements-29]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#entity-mapping[`entity-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-27]]
-=== Subelements
-
-The following table describes subelements for the `cmp-field-mapping` element.
-
-.`cmp-field-mapping` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#field-name[`field-name`]
-|only one
-|Specifies the Java identifier of a field. This identifier must match the value of the `field-name` subelement of the `cmp-field` that is being mapped.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#column-name[`column-name`]
-|one or more
-|Specifies the name of a column from the primary table, or the qualified table name (TABLE.COLUMN) of a column from a secondary or related table.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#read-only[`read-only`]
-|zero or one
-|Specifies that a field is read-only.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#fetched-with[`fetched-with`]
-|zero or one
-|Specifies the fetch group for this CMP field's mapping.
-
-|===
-
-[[cmp-resource]]
-== `cmp-resource`
-
-Specifies the database to be used for storing CMP beans.
-For more information about this element, see "xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#configuring-the-cmp-resource[Configuring the CMP Resource]" in the Payara Server Application Development section.
-
-[[superelements-30]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#enterprise-beans[`enterprise-beans`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-28]]
-=== Subelements
-
-The following table describes subelements for the `cmp-resource` element.
-
-.`cmp-resource` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#jndi-name[`jndi-name`]
-|only one
-|Specifies the absolute `jndi-name` of a JDBC resource.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#default-resource-principal[`default-resource-principal`]
-|zero or one
-|Specifies the default runtime bindings of a resource reference.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#property-with-subelements[`property` (with subelements)]
-|zero or more
-|Specifies a property name and value. Used to configure `PersistenceManagerFactory` properties.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#create-tables-at-deploy[`create-tables-at-deploy`]
-|zero or one
-|If `true`, specifies that database tables are created for beans that are automatically mapped by the EJB container.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#drop-tables-at-undeploy[`drop-tables-at-undeploy`]
-|zero or one
-|If `true`, specifies that database tables that were automatically created when the bean(s) were last deployed are dropped when the bean(s) are undeployed.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#database-vendor-name[`database-vendor-name`]
-|zero or one
-|Specifies the name of the database vendor for which tables can be created.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#schema-generator-properties[`schema-generator-properties`]
-|zero or one
-|Specifies field-specific type mappings and allows you to set the `use-unique-table-names` property.
-
-|===
-
-[[cmr-field-mapping]]
-== `cmr-field-mapping`
-
-A container-managed relationship field has a name and one or more column pairs that define the relationship.
-There is one `cmr-field-mapping` element for each `cmr-field` element in the `ejb-jar.xml` file. A relationship can also participate in a fetch group.
-
-[[superelements-31]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#entity-mapping[`entity-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-29]]
-=== Subelements
-
-The following table describes subelements for the `cmr-field-mapping` element.
-
-.`cmr-field-mapping` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmr-field-name[`cmr-field-name`]
-|only one
-|Specifies the Java identifier of a field. Must match the value of the `cmr-field-name` subelement of the `cmr-field` that is being mapped.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#column-pair[`column-pair`]
-|one or more
-|Specifies the pair of columns that determine the relationship between two database tables.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#fetched-with[`fetched-with`]
-|zero or one
-|Specifies the fetch group for this CMR field's relationship.
-
-|===
-
-[[cmr-field-name]]
-== `cmr-field-name`
-
-Specifies the Java identifier of a field. Must match the value of the `cmr-field-name` subelement of the `cmr-field` element in the `ejb-jar.xml` file.
-
-[[superelements-32]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmr-field-mapping[`cmr-field-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-30]]
-=== Subelements
-
-none - contains data
-
 [[cmt-timeout-in-seconds]]
 == `cmt-timeout-in-seconds`
 
@@ -1342,51 +1103,6 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 === Subelements
 
 none - contains data
-
-[[column-name]]
-== `column-name`
-
-Specifies the name of a column from the primary table, or the qualified table name (TABLE.COLUMN) of a column from a secondary or related table.
-
-[[superelements-34]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#check-version-of-accessed-instances[`check-version-of-accessed-instances`],
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-field-mapping[`cmp-field-mapping`],  xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#column-pair[`column-pair`] (`sun-cmp-mappings.xml`)
-
-[[subelements-32]]
-=== Subelements
-
-none - contains data
-
-[[column-pair]]
-=== `column-pair`
-
-Specifies the pair of columns that determine the relationship between two database tables. Each `column-pair` must contain exactly two `column-name` subelements, which specify the column's names.
-The first `column-name` element names the table that this bean is mapped to, and the second `column-name` names the column in the related table.
-
-[[superelements-35]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmr-field-mapping[`cmr-field-mapping`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#secondary-table[`secondary-table`] (`sun-cmp-mappings.xml`)
-
-[[subelements-33]]
-=== Subelements
-
-The following table describes subelements for the `column-pair` element.
-
-.`column-pair` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#column-name[`column-name`]
-|two
-|Specifies the name of a column from the primary table, or the
-qualified table name (TABLE.COLUMN) of a column from a secondary or
-related table.
-
-|===
 
 [[commit-option]]
 == `commit-option`
@@ -1687,52 +1403,6 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 
 |===
 
-[[consistency]]
-== `consistency`
-
-Specifies container behavior in guaranteeing transactional consistency of the data in the bean.
-
-[[superelements-41]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#entity-mapping[`entity-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-39]]
-=== Subelements
-
-The following table describes subelements for the `consistency` element.
-
-.`consistency` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#none[`none`]
-|exactly one subelement is required
-|No consistency checking occurs.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#check-modified-at-commit[`check-modified-at-commit`]
-|exactly one subelement is required
-|Checks concurrent modification of fields in modified beans at commit time.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#lock-when-loaded[`lock-when-loaded`]
-|exactly one subelement is required
-|Obtains an exclusive lock when the data is loaded.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#check-all-at-commit[`check-all-at-commit`]
-|
-|This element is not implemented. Do not use.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#lock-when-modified[`lock-when-modified`]
-|
-|This element is not implemented. Do not use.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#check-version-of-accessed-instances[`check-version-of-accessed-instances`]
-|exactly one subelement is required
-|Checks the version column of the modified beans.
-
-|===
-
 [[constraint-field]]
 == `constraint-field`
 
@@ -1932,24 +1602,6 @@ For details, see xref:Technical Documentation/Payara Server Documentation/Comman
 
 |===
 
-[[create-tables-at-deploy]]
-== `create-tables-at-deploy`
-
-Specifies whether database tables are created for beans that are automatically mapped by the EJB container.
-If `true`, creates tables in the database. If `false` (the default if this element is not present), does not create tables.
-
-This element can be overridden during deployment. See "xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#generation-options-for-cmp[Generation Options for CMP]" in the Payara Server Application Development section.
-
-[[superelements-46]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-resource[`cmp-resource`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-44]]
-=== Subelements
-
-none - contains data
-
 [[custom-resource]]
 == `custom-resource`
 
@@ -2014,27 +1666,6 @@ enabled at runtime.
 
 //TODO - Consider removing JavaDB/Derby support
 
-[[database-vendor-name]]
-== `database-vendor-name`
-
-Specifies the name of the database vendor for which tables can be created. Allowed values are `javadb`, `db2`, `mssql`, `mysql`, `oracle`, `postgresql`, `pointbase`, `H2`, `derby` (also for CloudScape), and `sybase`, case-insensitive.
-
-If no value is specified, a connection is made to the resource specified
-by the xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#jndi-name[`jndi-name`] subelement of the xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-resource[`cmp-resource`] element, and the database vendor name is read. If the connection cannot be established, or if the value is not recognized, SQL-92 compliance is presumed.
-
-This element can be overridden during deployment. See
-"xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#generation-options-for-cmp[Generation Options for CMP]" in the Payara Server Application Development section.
-
-[[superelements-48]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-resource[`cmp-resource`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-46]]
-=== Subelements
-
-none - contains data
-
 [[debugging-enabled]]
 == `debugging-enabled`
 
@@ -2050,20 +1681,6 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 
 none - contains data
 
-[[default]]
-== `default`
-
-Specifies that a field belongs to the default hierarchical fetch group, and enables prefetching for a CMR field. To disable prefetching for specific query methods, use a xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#prefetch-disabled[`prefetch-disabled`] element in the `glassfish-ejb-jar.xml` file.
-
-[[superelements-50]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#fetched-with[`fetched-with`] (`sun-cmp-mappings.xml`)
-
-[[subelements-48]]
-=== Subelements
-
-none - element is present or absent
 
 [[default-helper]]
 == `default-helper`
@@ -2124,7 +1741,7 @@ If this element is used in conjunction with a JMS Connection Factory resource, t
 
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#resource-ref[`resource-ref`] (`glassfish-web.xml` (deprecated) and `payara-web.xml`,
 `glassfish-ejb-jar.xml`, `glassfish-application-client.xml`);
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-resource[`cmp-resource`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#mdb-connection-factory[`mdb-connection-factory`]
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#mdb-connection-factory[`mdb-connection-factory`]
 (`glassfish-ejb-jar.xml`)
 
 [[subelements-50]]
@@ -2210,24 +1827,6 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 
 none - contains data
 
-[[drop-tables-at-undeploy]]
-== `drop-tables-at-undeploy`
-
-Specifies whether database tables that were automatically created when the bean(s) were last deployed are dropped when the bean(s) are undeployed.
-If `true`, drops tables from the database. If `false` (the default if this element is not present), does not drop tables.
-
-This element can be overridden during deployment. See "xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#generation-options-for-cmp[Generation Options for CMP]" in the Payara Server Application Development section.
-
-[[superelements-56]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-resource[`cmp-resource`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-54]]
-=== Subelements
-
-none - contains data
-
 [[ejb]]
 == `ejb`
 
@@ -2240,7 +1839,7 @@ Defines runtime properties for a single enterprise bean within the application. 
 * Stateless session beans: `bean-pool`, `webservice-endpoint`
 * Stateful session beans: `bean-cache`, `webservice-endpoint`,
 `checkpoint-at-end-of-method`
-* Entity beans: `commit-option`, `bean-cache`, `bean-pool`, `cmp`,
+* Entity beans: `commit-option`, `bean-cache`, `bean-pool`,
 `is-read-only-bean`, `refresh-period-in-seconds`,
 `flush-at-end-of-method`
 * Message-driven beans: `mdb-resource-adapter`,
@@ -2295,10 +1894,6 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 |Specifies the passing method used by an enterprise bean
 calling a remote interface method in another bean that is colocated
 within the same process.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp[`cmp`]
-|zero or one
-|Specifies runtime information for a container-managed persistence (CMP) entity bean for EJB 1.1 and EJB 2.1 beans.
 
 a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#principal[`principal`]
 |zero or one |Specifies the principal (user) name in an enterprise bean that has the `run-as` role specified.
@@ -2443,13 +2038,10 @@ In the `glassfish-ejb-jar.xml` file, matches the `ejb-name` in the corresponding
 
 There is no architected relationship between the `ejb-name` in the deployment descriptor and the JNDI name that the deployer assigns to the EJB component's home.
 
-In the `sun-cmp-mappings.xml` file, specifies the `ejb-name` of the entity bean in the `ejb-jar.xml` file to which the container-managed persistence (CMP) bean corresponds.
-
 [[superelements-58]]
 === Superelements
 
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#ejb[`ejb`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#method[`method`] (`glassfish-ejb-jar.xml`);
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#entity-mapping[`entity-mapping`] (`sun-cmp-mappings.xml`)
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#ejb[`ejb`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#method[`method`] (`glassfish-ejb-jar.xml`)
 
 [[subelements-56]]
 === Subelements
@@ -2627,9 +2219,6 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 |Defines runtime properties for a single enterprise bean
 within the application.
 
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-resource[`cmp-resource`]
-|zero or one |Specifies the database to be used for storing container-managed persistence (CMP) beans in an EJB JAR file.
-
 a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#message-destination[`message-destination`]
 |zero or more
 |Specifies the name of a logical message destination.
@@ -2698,53 +2287,6 @@ With this property, you can set whether to enable the default group to role mapp
 ----
 
 Enabling the default group to role mappings will cause all named groups in the module's linked *security realm* to be mapped to a role of the same name. This will save you the time of having to redefine the same roles and map them to the realm groups each time they are modified.
-|===
-
-[[entity-mapping]]
-== `entity-mapping`
-
-Specifies the mapping a bean to database columns.
-
-[[superelements-64]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#sun-cmp-mapping[`sun-cmp-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-62]]
-=== Subelements
-
-The following table describes subelements for the `entity-mapping`
-element.
-
-.`entity-mapping` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#ejb-name[`ejb-name`]
-|only one
-|Specifies the name of the entity bean in the `ejb-jar.xml` file to which the CMP bean corresponds.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#table-name[`Table-name`]
-|only one
-|Specifies the name of a database table. The table must be present in the database schema file.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-field-mapping[`cmp-field-mapping`]
-|one or more
-|Associates a field with one or more columns to which it maps.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmr-field-mapping[`cmr-field-mapping`]
-|zero or more
-|A container-managed relationship field has a name and one or more column pairs that define the relationship.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#secondary-table[`secondary-table`]
-|zero or more
-|Describes the relationship between a bean's primary and secondary table.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#consistency[`consistency`]
-|zero or one
-|Specifies container behavior in guaranteeing transactional consistency of the data in the bean.
-
 |===
 
 [[establish-trust-in-client]]
@@ -2848,139 +2390,6 @@ server.
 |`enabled` |`true` |(optional) Determines whether this resource is
 enabled at runtime.
 |===
-
-
-[[fetched-with]]
-== `fetched-with`
-
-Specifies the fetch group configuration for fields and relationships.
-The `fetched-with` element has different allowed and default subelements
-based on its parent element and the data types of the fields.
-
-* If there is no `fetched-with` subelement of a
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-field-mapping[`cmp-field-mapping`], and the data type is not BLOB, CLOB,
-VARBINARY, LONGVARBINARY, or OTHER, `fetched-with` can have any valid
-subelement. The default subelement is as follows: +
-[source,xml]
-----
-<fetched-with><default/></fetched-with>
-----
-* If there is no `fetched-with` subelement of a
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-field-mapping[`cmp-field-mapping`], and the data type is BLOB, CLOB,
-VARBINARY, LONGVARBINARY, or OTHER, `fetched-with` can have any valid
-subelement except `<default/>`. The default subelement is as follows: +
-[source,xml]
-----
-<fetched-with><none/></fetched-with>
-----
-* If there is no `fetched-with` subelement of a
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmr-field-mapping[`cmr-field-mapping`], `fetched-with` can have any valid
-subelement. The default subelement is as follows: +
-[source,xml]
-----
-<fetched-with><none/></fetched-with>
-----
-
-Managed fields are multiple CMP or CMR fields that are mapped to the same column. A managed field can have any `fetched-with` subelement except `<default/>`.
-For additional information, see "xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#managed-fields[Managed Fields]" in the Payara Server Application Development section.
-
-[[superelements-68]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-field-mapping[`cmp-field-mapping`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmr-field-mapping[`cmr-field-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-66]]
-=== Subelements
-
-The following table describes subelements for the `fetched-with` element.
-
-.`fetched-with` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#default[`default`]
-|exactly one subelement is required
-|Specifies that a CMP field belongs
-to the default hierarchical fetch group, which means it is fetched any
-time the bean is loaded from a database. Enables prefetching of a CMR
-field.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#level[`level`]
-|exactly one subelement is required
-|Specifies the level number of a
-hierarchical fetch group.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#named-group[`named-group`]
-|exactly one subelement is required |Specifies the name of an
-independent fetch group.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#none[`none`]
-|exactly one subelement is required
-|Specifies that this field or
-relationship is placed into its own individual fetch group, which means
-it is loaded from a database the first time it is accessed in this
-transaction.
-
-|===
-
-[[field-name]]
-== `field-name`
-
-Specifies the Java identifier of a field. This identifier must match the value of the `field-name` subelement of the `cmp-field` element in the `ejb-jar.xml` file.
-
-[[superelements-69]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-field-mapping[`cmp-field-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-67]]
-=== Subelements
-
-none - contains data
-
-[[finder]]
-== `finder`
-
-Describes the finders for CMP 1.1 with a method name and query.
-
-[[superelements-70]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#one-one-finders[`one-one-finders`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-68]]
-==== Subelements
-
-The following table describes subelements for the `finder` element.
-
-.`finder` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#method-name[`method-name`]
-|only one
-|Specifies the method name for the finder.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#query-params[`query-params`]
-|zero or one
-|Specifies the query parameters for the CMP 1.1 finder.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#query-filter[`query-filter`]
-|zero or one
-|Specifies the query filter for the CMP 1.1 finder.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#query-variables[`query-variables`]
-|zero or one
-|Specifies variables in query expression for the CMP 1.1 finder.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#query-ordering[`query-ordering`]
-|zero or one
-|Specifies the query ordering for the CMP 1.1 finder.
-
-|===
-
 
 [[flush-at-end-of-method]]
 == `flush-at-end-of-method`
@@ -3705,16 +3114,6 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#bean-cache[`bean-cache`] (`glassfish-ejb-jar.xml`)
 
-[[is-one-one-cmp]]
-== `is-one-one-cmp`
-
-This element is not used.
-
-[[superelements-84]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp[`cmp`] (`glassfish-ejb-jar.xml`)
-
 [[is-read-only-bean]]
 === `is-read-only-bean`
 
@@ -4197,7 +3596,7 @@ For more information about JMS resources, see "xref:Technical Documentation/Appl
 
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#ejb-ref[`ejb-ref`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#message-destination[`message-destination`],
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#resource-env-ref[`resource-env-ref`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#resource-ref[`resource-ref`] (`glassfish-web.xml` (deprecated) and `payara-web.xml`, `glassfish-ejb-jar.xml`,
-`glassfish-application-client.xml`); xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-resource[`cmp-resource`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#ejb[`ejb`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#mdb-connection-factory[`mdb-connection-factory`] (`glassfish-ejb-jar.xml`)
+`glassfish-application-client.xml`); xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#ejb[`ejb`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#mdb-connection-factory[`mdb-connection-factory`] (`glassfish-ejb-jar.xml`)
 
 [[subelements-88]]
 === Subelements
@@ -4424,21 +3823,6 @@ The following table describes attributes for the `key-field` element.
 
 |===
 
-[[level]]
-== `level`
-
-Specifies the name of a hierarchical fetch group. The name must be an integer. Fields and relationships that belong to a hierarchical fetch group of equal (or lesser) value are fetched at the same time.
-The value of level must be greater than zero. Only one is allowed.
-
-[[superelements-97]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#fetched-with[`fetched-with`] (`sun-cmp-mappings.xml`)
-
-[[subelements-93]]
-=== Subelements
-
-none - contains data
 
 [[local-home-impl]]
 == `local-home-impl`
@@ -4489,32 +3873,6 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 === Subelements
 
 none - contains data
-
-[[lock-when-loaded]]
-== `lock-when-loaded`
-
-Places a database update lock on the rows corresponding to the bean whenever the bean is loaded. How the lock is placed is database-dependent. The lock is released when the transaction finishes (commit or rollback).
-While the lock is in place, other database users have read access to the bean.
-
-[[superelements-103]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#consistency[`consistency`] (`sun-cmp-mappings.xml`)
-
-[[subelements-99]]
-=== Subelements
-
-none - element is present or absent
-
-[[lock-when-modified]]
-== `lock-when-modified`
-
-This element is not implemented. Do not use.
-
-[[superelements-104]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#consistency[`consistency`] (`sun-cmp-mappings.xml`)
 
 [[log-service]]
 == `log-service`
@@ -4773,16 +4131,6 @@ However, it can provide a significant performance improvement because the state 
 Applicable only if the `persistence-type` attribute of the parent xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#session-manager[`session-manager`] element is `hazelcast`.
 
 |===
-
-[[mapping-properties]]
-== `mapping-properties`
-
-This element is not implemented.
-
-[[superelements-109]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp[`cmp`] (`glassfish-ejb-jar.xml`)
 
 [[max-cache-size]]
 == `max-cache-size`
@@ -5234,7 +4582,7 @@ Specifies a method name or `*` (an asterisk) for all methods. If a method is ove
 [[superelements-125]]
 === Superelements
 
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#java-method[`java-method`] (`glassfish-web.xml` (deprecated) and `payara-web.xml`, `glassfish-ejb-jar.xml`, `glassfish-application-client.xml`); xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#finder[`finder`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#query-method[`query-method`] , xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#method[`method`] (`glassfish-ejb-jar.xml`)
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#java-method[`java-method`] (`glassfish-web.xml` (deprecated) and `payara-web.xml`, `glassfish-ejb-jar.xml`, `glassfish-application-client.xml`); xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#method[`method`] (`glassfish-ejb-jar.xml`)
 
 [[subelements-118]]
 === Subelements
@@ -5272,7 +4620,7 @@ Specifies fully qualified Java type names of method parameters.
 === Superelements
 
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#java-method[`java-method`] (`glassfish-web.xml` (deprecated) and `payara-web.xml`, `glassfish-ejb-jar.xml`, `glassfish-application-client.xml`);
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#query-method[`query-method`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#method[`method`] (`glassfish-ejb-jar.xml`)
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#method[`method`] (`glassfish-ejb-jar.xml`)
 
 [[subelements-120]]
 === Subelements
@@ -5305,22 +4653,6 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 
 none - contains data
 
-[[named-group]]
-== `named-group`
-
-Specifies the name of one independent fetch group. All the fields and relationships that are part of a named group are fetched at the same time.
-A field belongs to only one fetch group, regardless of what type of fetch group is used.
-
-[[superelements-129]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#fetched-with[`fetched-with`] (`sun-cmp-mappings.xml`)
-
-[[subelements-122]]
-=== Subelements
-
-none - contains data
-
 [[namespaceuri]]
 == `namespaceURI`
 
@@ -5335,47 +4667,6 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 === Subelements
 
 none - contains data
-
-[[none]]
-== `none`
-
-Specifies that this field or relationship is fetched by itself, with no other fields or relationships.
-
-[[superelements-131]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#consistency[`consistency`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#fetched-with[`fetched-with`] (`sun-cmp-mappings.xml`)
-
-[[subelements-124]]
-=== Subelements
-
-none - element is present or absent
-
-[[one-one-finders]]
-== `one-one-finders`
-
-Describes the finders for CMP 1.1 beans.
-
-[[superelements-132]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp[`cmp`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-125]]
-=== Subelements
-
-The following table describes subelements for the `one-one-finders` element.
-
-.`one-one-finders` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#finder[`finder`]
-|one or more
-|Describes the finders for CMP 1.1 with a method name and query.
-
-|===
 
 [[operation-name]]
 == `operation-name`
@@ -5576,32 +4867,6 @@ a| xref:Technical Documentation/Payara Server Documentation/Application Deployme
 
 |===
 
-[[prefetch-disabled]]
-== `prefetch-disabled`
-
-Disables prefetching of entity bean states for the specified query methods. Container-managed relationship fields are prefetched if their xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#fetched-with[`fetched-with`] element is set to xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#default[`default`].
-
-[[superelements-142]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp[`cmp`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-134]]
-=== Subelements
-
-The following table describes subelements for the `prefetch-disabled` element.
-
-.`prefetch-disabled` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#query-method[`query-method`]
-|one or more
-|Specifies a query method.
-
-|===
-
 [[principal]]
 == `principal`
 
@@ -5773,8 +5038,7 @@ Specifies the name and value of a property. A property adds configuration inform
 [[superelements-147]]
 === Superelements
 
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#enterprise-beans[`enterprise-beans`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-resource[`cmp-resource`],
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#schema-generator-properties[`schema-generator-properties`],
+xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#enterprise-beans[`enterprise-beans`],
 xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#webservice-endpoint[`webservice-endpoint`] (`glassfish-ejb-jar.xml`)
 
 [[subelements-139]]
@@ -5864,111 +5128,6 @@ The following table describes attributes for the `provider-config` element.
 Server authentication providers must implement the com.sun.enterprise.security.jauth.ServerAuthModule interface. Client-server providers must implement both interfaces.
 
 |===
-
-[[query-filter]]
-== `query-filter`
-
-Specifies the query filter for the CMP 1.1 finder.
-
-[[superelements-149]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#finder[`finder`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-141]]
-=== Subelements
-
-none - contains data
-
-[[query-method]]
-== `query-method`
-
-Specifies a query method.
-
-[[superelements-150]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#prefetch-disabled[`prefetch-disabled`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-142]]
-=== Subelements
-
-The following table describes subelements for the `query-method` element.
-
-.`query-method` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#method-name[`method-name`]
-|only one
-|Specifies a method name.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#method-params[`method-params`]
-|only one
-|Specifies the fully qualified Java type names of method parameters.
-
-|===
-
-[[query-ordering]]
-== `query-ordering`
-
-Specifies the query ordering for the CMP 1.1 finder.
-
-[[superelements-151]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#finder[`finder`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-143]]
-=== Subelements
-
-none - contains data
-
-[[query-params]]
-== `query-params`
-
-Specifies the query parameters for the CMP 1.1 finder.
-
-[[superelements-152]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#finder[`finder`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-144]]
-=== Subelements
-
-none - contains data
-
-[[query-variables]]
-== `query-variables`
-
-Specifies variables in the query expression for the CMP 1.1 finder.
-
-[[superelements-153]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#finder[`finder`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-145]]
-=== Subelements
-
-none - contains data
-
-[[read-only]]
-== `read-only`
-
-Specifies that a field is read-only if `true`. If this element is absent, the default value is `false` .
-
-[[superelements-154]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-field-mapping[`cmp-field-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-146]]
-=== Subelements
-
-none - contains data
 
 [[realm]]
 == `realm`
@@ -6608,152 +5767,6 @@ xref:Technical Documentation/Payara Server Documentation/Application Deployment/
 
 none
 
-[[schema]]
-== `schema`
-
-Specifies the file that contains a description of the database schema to which the beans in this `sun-cmp-mappings.xml` file are mapped. If this element is empty, the database schema file is automatically generated at deployment time. Otherwise, the `schema` element names a `.dbschema` file with a pathname relative to the directory containing the `sun-cmp-mappings.xml` file, but without the `.dbschema` extension.
-
-See "xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#automatic-database-schema-capture[Automatic Database Schema Capture]" in the Payara Server Application Development section.
-
-[[superelements-176]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#sun-cmp-mapping[`sun-cmp-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-168]]
-=== Subelements
-
-none - contains data
-
-[[examples-1]]
-=== Examples
-
-[source,xml]
-----
-<schema/> <!-- use automatic schema generation -->
-----
-
-[source,xml]
-----
-<schema>CompanySchema</schema> <!-- use "CompanySchema.dbschema" -->
-----
-
-[[schema-generator-properties]]
-== `schema-generator-properties`
-
-Specifies field-specific column attributes in `property` subelements.
-
-[[superelements-177]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#cmp-resource[`cmp-resource`] (`glassfish-ejb-jar.xml`)
-
-[[subelements-169]]
-=== Subelements
-
-The following table describes subelements for the `schema-generator-properties` element.
-
-.`schema-generator-properties` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#property-with-subelements[`property` (with subelements)]
-|zero or more
-|Specifies a property name and value.
-
-|===
-
-[[properties-12]]
-=== Properties
-
-The following table describes properties for the `schema-generator-properties` element.
-
-.`schema-generator-properties` Properties
-[cols="3,2,6",options="header"]
-|===
-|Property |Default |Description
-
-|`use-unique-table-names` |`false` |Specifies that generated table names are unique within each Payara Server domain. This property can be overridden during deployment.
-See "xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#generation-options-for-cmp[Generation Options for CMP]" in the Payara Server Application Development section.
-
-|`bean-name.field-name.attribute` |none |Defines a column attribute. For attribute descriptions, see Table C-130.
-
-|===
-
-The following table lists the column attributes for properties defined in the `schema-generator-properties` element.
-
-.`schema-generator-properties` Column Attributes
-[cols="2,6",options="header"]
-|===
-|Attribute |Description
-
-|`jdbc-type` |Specifies the JDBC type of the column created for the CMP field. The actual SQL type generated is based on this JDBC type but is database vendor specific.
-
-|`jdbc-maximum-length` a| Specifies the maximum number of characters stored in the column corresponding to the CMP field. Applies only when the actual SQL that is generated for the column requires a length.
-
-For example, a `jdbc-maximum-length` of `32` on a CMP `String` field such as `firstName` normally results in a column definition such as VARCHAR(32).
-But if the `jdbc-type` is `CLOB` and you are deploying on Oracle, the resulting column definition is CLOB. No length is given, because in an Oracle database, a CLOB has no length.
-
-|`jdbc-precision` |Specifies the maximum number of digits stored in a column which represents a numeric type.
-
-|`jdbc-scale` |Specifies the number of digits stored to the right of the decimal point in a column that represents a floating point number.
-
-|`jdbc-nullable` |Specifies whether the column generated for the CMP field allows null values.
-
-|===
-
-[[example-11]]
-=== Example
-
-[source,xml]
-----
-<schema-generator-properties>
-   <property>
-         <name>Employee.firstName.jdbc-type</name>
-         <value>char</value>
-   </property>
-   <property>
-         <name>Employee.firstName.jdbc-maximum-length</name>
-         <value>25</value>
-   </property>
-   <property>
-         <name>use-unique-table-names</name>
-         <value>true</value>
-   </property>
-</schema-generator-properties>
-----
-
-[[secondary-table]]
-== `secondary-table`
-
-Specifies a bean's secondary table(s).
-
-[[superelements-178]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#entity-mapping[`entity-mapping`] (`sun-cmp-mappings.xml`)
-
-[[subelements-170]]
-=== Subelements
-
-The following table describes subelements for the `secondary-table` element.
-
-.`secondary table` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#table-name[`table-name`]
-|only one
-|Specifies the name of a database table.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#column-pair[`column-pair`]
-|one or more
-|Specifies the pair of columns that determine the relationship between two database tables.
-
-|===
-
 [[security]]
 == `security`
 
@@ -7387,81 +6400,6 @@ The following table describes properties for the `stub-property` element.
   </port-info>
 </service-ref>
 ----
-
-[[sun-cmp-mapping]]
-== `sun-cmp-mapping`
-
-Specifies beans mapped to a particular database schema.
-
-NOTE: A bean cannot be related to a bean that maps to a different database schema, even if the beans are deployed in the same EJB JAR file.
-
-[[superelements-197]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#sun-cmp-mappings[`sun-cmp-mappings`] (`sun-cmp-mappings.xml`)
-
-[[subelements-189]]
-=== Subelements
-
-The following table describes subelements for the `sun-cmp-mapping` element.
-
-.`sun-cmp-mapping` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#schema[`schema`]
-|only one
-|Specifies the file that contains a description of the database schema.
-
-a| xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#entity-mapping[`entity-mapping`]
-|one or more
-|Specifies the mapping of a bean to database columns.
-
-|===
-
-[[sun-cmp-mappings]]
-== `sun-cmp-mappings`
-
-Defines the Payara Server specific CMP mapping configuration for an EJB JAR file. This is the root element; there can only be one `sun-cmp-mappings` element in a `sun-cmp-mappings.xml` file.
-
-See xref:Technical Documentation/Payara Server Documentation/Application Deployment/Deployment Descriptor Files.adoc#the-sun-cmp-mappings.xml-file[The sun-cmp-mappings.xml File].
-
-[[superelements-198]]
-=== Superelements
-
-none
-
-[[subelements-190]]
-=== Subelements
-
-The following table describes subelements for the `sun-cmp-mappings` element.
-
-.`sun-cmp-mappings` Subelements
-[cols="3,2,6",options="header"]
-|===
-|Element |Required |Description
-
-a|  xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#sun-cmp-mapping[`sun-cmp-mapping`]
-|one or more
-|Specifies beans mapped to a particular database schema.
-
-|===
-
-[[table-name]]
-== `table-name`
-
-Specifies the name of a database table. The table must be present in the database schema file. See "xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#automatic-database-schema-capture[Automatic Database Schema Capture]" in the Payara Server Application Development section.
-
-[[superelements-199]]
-=== Superelements
-
-xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#entity-mapping[`entity-mapping`], xref:Technical Documentation/Payara Server Documentation/Application Deployment/Elements of Deployment Descriptors.adoc#secondary-table[`secondary-table`] (`sun-cmp-mappings.xml`)
-
-[[subelements-191]]
-=== Subelements
-
-none - contains data
 
 [[target-server]]
 === `target-server`

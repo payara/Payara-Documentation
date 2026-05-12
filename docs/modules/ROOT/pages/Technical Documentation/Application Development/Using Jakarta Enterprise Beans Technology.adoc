@@ -625,7 +625,6 @@ Read-only beans are best suited for situations where the underlying data never c
 Read-only beans have the following characteristics:
 
 * Only entity beans can be read-only beans.
-* Either bean-managed persistence (BMP) or container-managed persistence (CMP) is allowed. If CMP is used, do not create the database schema during deployment. Instead, work with your database administrator to populate the data into the tables. See xref:Technical Documentation/Application Development/Using Container Managed Persistence.adoc#using-container-managed-persistence[Using Container-Managed Persistence].
 * Only container-managed transactions are allowed; read-only beans cannot start their own transactions.
 * Read-only beans don't update any bean state.
 * `ejbStore` is never called by the container.
@@ -682,52 +681,6 @@ To set this flag, use the `asadmin create-jvm-options` command. For example:
 ----
 asadmin create-jvm-options -Dcom.sun.ejb.containers.readonly.relative.refresh.mode=true
 ----
-
-[[refreshing-programmatically]]
-==== Refreshing Programmatically
-
-Typically, beans that update any data that is cached by read-only beans need to notify the read-only beans to refresh their state. Use the `ReadOnlyBeanNotifier` interface to force the refresh of read-only beans.
-
-To do this, invoke the following methods on the ReadOnlyBeanNotifier bean:
-
-[source,java]
-----
-public interface ReadOnlyBeanNotifier extends java.rmi.Remote {
-   refresh(Object PrimaryKey) throws RemoteException;
- }
-----
-
-The implementation of the `ReadOnlyBeanNotifier` interface is provided by the container. The bean looks up `ReadOnlyBeanNotifier` using a fragment of code such as the following example:
-
-[source,java]
-----
-public class MyEJB{
-
-    public void execute(){
-        var helper = new com.sun.appserv.ejb.ReadOnlyBeanHelper();
-        var notifier = helper.getReadOnlyBeanNotifier("java:comp/env/ejb/ReadOnlyCustomer");
-        //Assume entity is a CMP entity bean
-        notifier.refresh(entity);
-    }
-}
-----
-
-For a local read-only bean notifier, the lookup has this modification:
-
-[source,java]
-----
-public class MyEJB{
-
-    public void execute(){
-        var helper = new com.sun.appserv.ejb.ReadOnlyBeanHelper();
-        var notifier = helper.getReadOnlyBeanNotifier("java:comp/env/ejb/LocalReadOnlyCustomer");
-        //Assume entity is a CMP entity bean
-        notifier.refresh(entity);
-    }
-}
-----
-
-Beans that update any data that is cached by read-only beans need to call the `refresh` methods. The next (non-transactional) call to the read-only bean invokes `ejbLoad`.
 
 [[deploying-read-only-beans]]
 === Deploying Read-Only Beans

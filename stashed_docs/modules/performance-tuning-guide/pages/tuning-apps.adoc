@@ -596,11 +596,6 @@ performance to the lowest:
 
 1.  Stateless Session Beans and Message Driven Beans
 2.  Stateful Session Beans
-3.  Container Managed Persistence (CMP) entity beans configured as
-read-only
-4.  Bean Managed Persistence (BMP) entity beans configured as read-only
-5.  CMP beans
-6.  BMP beans
 
 For more information about configuring high availability session
 persistence, see "link:../ha-administration-guide/session-persistence-and-failover.html#GSHAG00011[Configuring High Availability Session
@@ -672,9 +667,6 @@ response for initial requests.
 * Cache bean-specific resources: Use the `setEntityContext()` method to
 cache bean specific resources and release them using the
 `unSetEntityContext()` method.
-* Load related data efficiently for container-managed relationships
-(CMRs). For more information, see link:#abedc[Pre-Fetching Container
-Managed Relationship (CMR) Beans].
 * Identify read-only beans: Configure read-only entity beans for read
 only operations. For more information, see link:#abeda[Read-Only Entity
 Beans].
@@ -888,113 +880,7 @@ Using Special Techniques
 Special performance-enhancing techniques are discussed in the following
 sections:
 
-* link:#abect[Version Consistency]
 * link:#abecu[Request Partitioning]
-
-[[abect]][[GSPTG00102]][[version-consistency]]
-
-Version Consistency
-+++++++++++++++++++
-
-
-[width="100%",cols="<100%",]
-|=======================================================================
-a|
-Note:
-
-The technique in section applies only to the EJB 2.1 architecture. In
-the EJB 3.0 architecture, use the Java Persistence API (JPA).
-
-|=======================================================================
-
-
-Use version consistency to improve performance while protecting the
-integrity of data in the database. Since the application server can use
-multiple copies of an EJB component simultaneously, an EJB component's
-state can potentially become corrupted through simultaneous access.
-
-The standard way of preventing corruption is to lock the database row
-associated with a particular bean. This prevents the bean from being
-accessed by two simultaneous transactions and thus protects data.
-However, it also decreases performance, since it effectively serializes
-all EJB access.
-
-Version consistency is another approach to protecting EJB data
-integrity. To use version consistency, you specify a column in the
-database to use as a version number. The EJB lifecycle then proceeds
-like this:
-
-* The first time the bean is used, the `ejbLoad()` method loads the bean
-as normal, including loading the version number from the database.
-* The `ejbStore()` method checks the version number in the database
-versus its value when the EJB component was loaded.
-
-** If the version number has been modified, it means that there has been
-simultaneous access to the EJB component and `ejbStore()` throws a
-`ConcurrentModificationException`.
-
-** Otherwise, `ejbStore()` stores the data and completes as normal. +
-The `ejbStore()` method performs this validation at the end of the
-transaction regardless of whether any data in the bean was modified.
-
-Subsequent uses of the bean behave similarly, except that the
-`ejbLoad()` method loads its initial data (including the version number)
-from an internal cache. This saves a trip to the database. When the
-`ejbStore()` method is called, the version number is checked to ensure
-that the correct data was used in the transaction.
-
-Version consistency is advantageous when you have EJB components that
-are rarely modified, because it allows two transactions to use the same
-EJB component at the same time. Because neither transaction modifies the
-data, the version number is unchanged at the end of both transactions,
-and both succeed. But now the transactions can run in parallel. If two
-transactions occasionally modify the same EJB component, one will
-succeed and one will fail and can be retried using the new values—which
-can still be faster than serializing all access to the EJB component if
-the retries are infrequent enough (though now your application logic has
-to be prepared to perform the retry operation).
-
-To use version consistency, the database schema for a particular table
-must include a column where the version can be stored. You then specify
-that table in the `sun-cmp-mapping.xml` deployment descriptor for a
-particular bean:
-
-[source,oac_no_warn]
-----
-<entity-mapping>
-    <cmp-field-mapping>
-        ...
-    </cmp-field-mapping>
-    <consistency>
-        <check-version-of-accessed-instances>
-            <column-name>OrderTable.VC_VERSION_NUMBER</column-name>
-        </check-version-of-accessed-instances>
-    </consistency>
-</entity-mapping>
-----
-
-In addition, you must establish a trigger on the database to
-automatically update the version column when data in the specified table
-is modified. The GlassFish Server requires such a trigger to use version
-consistency. Having such a trigger also ensures that external
-applications that modify the EJB data will not conflict with EJB
-transactions in progress.
-
-For example, the following DDL illustrates how to create a trigger for
-the `Order` table:
-
-[source,oac_no_warn]
-----
-CREATE TRIGGER OrderTrigger
-  BEFORE UPDATE ON OrderTable
-  FOR EACH ROW
-  WHEN (new.VC_VERSION_NUMBER = old.VC_VERSION_NUMBER)
-  DECLARE
-  BEGIN
-    :NEW.VC_VERSION_NUMBER := :OLD.VC_VERSION_NUMBER + 1;
-  END;
-----
-
 [[abecu]][[GSPTG00103]][[request-partitioning]]
 
 Request Partitioning
@@ -1072,7 +958,6 @@ components:
 * link:#abecx[Stateful Session Beans]
 * link:#abecz[Stateless Session Beans]
 * link:#abeda[Read-Only Entity Beans]
-* link:#abedc[Pre-Fetching Container Managed Relationship (CMR) Beans]
 
 These components can all be configured in the GlassFish Server
 Administration Console from the Configurations>configuration-name>EJB
@@ -1146,182 +1031,6 @@ behaves like an exponential decay. Setting a small `max-pool-size` can
 cause excessive object destruction (and as a result excessive object
 creation) as instances are destroyed from the pool if the current pool
 size exceeds `max-pool-size`.
-
-[[abeda]][[GSPTG00107]][[read-only-entity-beans]]
-
-Read-Only Entity Beans
-++++++++++++++++++++++
-
-Read-only entity beans cache data from the database. GlassFish Server
-supports read-only beans that use both bean-managed persistence (BMP)
-and container-managed persistence (CMP). Of the two types, CMP read-only
-beans provide significantly better performance. In the EJB lifecycle,
-the EJB container calls the `ejbLoad()` method of a read-only bean once.
-The container makes multiple copies of the EJB component from that data,
-and since the beans do not update the database, the container never
-calls the `ejbStore()` method. This greatly reduces database traffic for
-these beans.
-
-If there is a bean that never updates the database, use a read-only bean
-in its place to improve performance. A read-only bean is appropriate if
-either:
-
-* Database rows represented by the bean do not change.
-* The application can tolerate using out-of-date values for the bean.
-
-For example, an application might use a read-only bean to represent a
-list of best-seller books. Although the list might change occasionally
-in the database (say, from another bean entirely), the change need not
-be reflected immediately in an application.
-
-The `ejbLoad()` method of a read-only bean is handled differently for
-CMP and BMP beans. For CMP beans, the EJB container calls `ejbLoad()`
-only once to load the data from the database; subsequent uses of the
-bean just copy that data. For BMP beans, the EJB container calls
-`ejbLoad()` the first time a bean is used in a transaction. Subsequent
-uses of that bean within the transaction use the same values. The
-container calls `ejbLoad()` for a BMP bean that doesn't run within a
-transaction every time the bean is used. Therefore, read-only BMP beans
-still make a number of calls to the database.
-
-To create a read-only bean, add the following to the EJB deployment
-descriptor `sun-ejb-jar.xml`:
-
-[source,oac_no_warn]
-----
-<is-read-only-bean>true</is-read-only-bean>
-<refresh-period-in-seconds>600</refresh-period-in-seconds>
-----
-
-[[abedb]][[GSPTG00012]][[refresh-period]]
-
-Refresh Period
-
-An important parameter for tuning read-only beans is the refresh period,
-represented by the deployment descriptor entity
-`refresh-period-in-seconds`. For CMP beans, the first access to a bean
-loads the bean's state. The first access after the refresh period
-reloads the data from the database. All subsequent uses of the bean uses
-the newly refreshed data (until another refresh period elapses). For BMP
-beans, an `ejbLoad()` method within an existing transaction uses the
-cached data unless the refresh period has expired (in which case, the
-container calls `ejbLoad()` again).
-
-This parameter enables the EJB component to periodically refresh its
-"snapshot" of the database values it represents. If the refresh period
-is less than or equal to 0, the bean is never refreshed from the
-database (the default behavior if no refresh period is given).
-
-[[abedc]][[GSPTG00108]][[pre-fetching-container-managed-relationship-cmr-beans]]
-
-Pre-Fetching Container Managed Relationship (CMR) Beans
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-If a container-managed relationship (CMR) exists in your application,
-loading one bean will load all its related beans. The canonical example
-of CMR is an order-orderline relationship where you have one `Order` EJB
-component that has related `OrderLine` EJB components. In previous
-releases of the application server, to use all those beans would require
-multiple database queries: one for the `Order` bean and one for each of
-the `OrderLine` beans in the relationship.
-
-In general, if a bean has n relationships, using all the data of the
-bean would require n+1 database accesses. Use CMR pre-fetching to
-retrieve all the data for the bean and all its related beans in one
-database access.
-
-For example, you have this relationship defined in the `ejb-jar.xml`
-file:
-
-[source,oac_no_warn]
-----
-<relationships>
-    <ejb-relation>
-        <description>Order-OrderLine</description>
-        <ejb-relation-name>Order-OrderLine</ejb-relation-name>
-        <ejb-relationship-role>
-            <ejb-relationship-role-name>
-                Order-has-N-OrderLines
-            </ejb-relationship-role-name>
-            <multiplicity>One</multiplicity>
-            <relationship-role-source>
-                <ejb-name>OrderEJB</ejb-name>
-            </relationship-role-source>
-            <cmr-field>
-                <cmr-field-name>orderLines</cmr-field-name>
-                <cmr-field-type>java.util.Collection</cmr-field-type>
-            </cmr-field>
-        </ejb-relationship-role>
-    </ejb-relation>
-</relationships>
-----
-
-When a particular `Order` is loaded, you can load its related
-`OrderLines` by adding this to the `sun-cmp-mapping.xml` file for the
-application:
-
-[source,oac_no_warn]
-----
-<entity-mapping>
-    <ejb-name>Order</ejb-name>
-    <table-name>...</table-name>
-    <cmp-field-mapping>...</cmp-field-mapping>
-    <cmr-field-mapping>
-        <cmr-field-name>orderLines</cmr-field-name>
-        <column-pair>
-            <column-name>OrderTable.OrderID</column-name>
-            <column-name>OrderLineTable.OrderLine_OrderID</column-name>
-        </column-pair>
-        <fetched-with>
-            <default>
-        </fetched-with>
-    </cmr-field-mapping>
-</entity-mappping>
-----
-
-Now when an `Order` is retrieved, the CMP engine issues SQL to retrieve
-all related `OrderLines` with a `SELECT` statement that has the
-following `WHERE` clause:
-
-[source,oac_no_warn]
-----
-OrderTable.OrderID = OrderLineTable.OrderLine_OrderID
-----
-
-This clause indicates an outer join. These `OrderLines` are pre-fetched.
-
-Pre-fetching generally improves performance because it reduces the
-number of database accesses. However, if the business logic often uses
-`Orders` without referencing their `OrderLines`, then this can have a
-performance penalty, that is, the system has spent the effort to
-pre-fetch the `OrderLines` that are not actually needed.
-
-Avoid pre-fetching for specific finder methods; this can often avoid
-that penalty. For example, consider an order bean has two finder
-methods: a `findByPrimaryKey` method that uses the `Orderlines`, and a
-`findByCustomerId` method that returns only order information and
-therefore does not use the `Orderlines`. If you have enabled CMR
-pre-fetching for the `Orderlines`, both finder methods will pre-fetch
-the `Orderlines`. However, you can prevent pre-fetching for the
-`findByCustomerId` method by including this information in the
-`sun-ejb-jar.xml` descriptor:
-
-[source,oac_no_warn]
-----
-<ejb>
-    <ejb-name>OrderBean</ejb-name>
-    ...
-    <cmp>
-        <prefetch-disabled>
-            <query-method>
-                <method-name>findByCustomerId</method-name>
-            </query-method>
-        </prefetch-disabled>
-     </cmp>
-</ejb>
-----
-
-[[abedd]][[GSPTG00178]][[jdbc-and-database-access]]
 
 JDBC and Database Access
 ^^^^^^^^^^^^^^^^^^^^^^^^
