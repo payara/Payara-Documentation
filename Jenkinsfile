@@ -71,12 +71,15 @@ pipeline {
                     def communityUrl = "${baseUrl}/Community_20Documentation/"
                     def enterpriseUrl = "${baseUrl}/Enterprise_20Documentation/"
                     def commentMarker = "<!-- jenkins-doc-preview -->"
-                    def commentBody = "${commentMarker}\\n## Documentation Preview\\n\\n" +
-                        "| Variant | Link |\\n" +
+                    def commentBody = "${commentMarker}\\n" +
+                        "##  Documentation Preview\\n\\n" +
+                        "> Preview links are updated automatically on every commit push.\\n\\n" +
+                        "| Variant | Preview Link |\\n" +
                         "|---|---|\\n" +
-                        "| Community | ${communityUrl} |\\n" +
-                        "| Enterprise | ${enterpriseUrl} |\\n\\n" +
-                        "*Updated by Jenkins build [#${env.BUILD_NUMBER}](${env.BUILD_URL})*"
+                        "|  **Community** | [:arrow_upper_right: Open Community Docs](${communityUrl}) |\\n" +
+                        "|  **Enterprise** | [:arrow_upper_right: Open Enterprise Docs](${enterpriseUrl}) |\\n\\n" +
+                        "---\\n" +
+                        " *Updated by Jenkins build [#${env.BUILD_NUMBER}](${env.BUILD_URL})*"
                     withCredentials([usernamePassword(credentialsId: 'payara-devops-github-personal-access-token-as-username-password',
                                                      passwordVariable: 'GITHUB_TOKEN',
                                                      usernameVariable: 'GITHUB_USER')]) {
