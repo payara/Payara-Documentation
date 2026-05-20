@@ -80,7 +80,7 @@ pipeline {
                         "|  **Community** | [:arrow_upper_right: Open Community Docs](${communityUrl}) |\\n" +
                         "|  **Enterprise** | [:arrow_upper_right: Open Enterprise Docs](${enterpriseUrl}) |\\n\\n" +
                         "---\\n" +
-                        ":arrows_counterclockwise: *Updated by Jenkins build [#${env.BUILD_NUMBER}](${env.BUILD_URL})*"
+                        " *Updated by Jenkins build [#${env.BUILD_NUMBER}](${env.BUILD_URL})*"
                     withCredentials([usernamePassword(credentialsId: 'payara-devops-github-personal-access-token-as-username-password',
                                                      passwordVariable: 'GITHUB_TOKEN',
                                                      usernameVariable: 'GITHUB_USER')]) {
