@@ -77,7 +77,9 @@ pipeline {
                         "| Community | ${communityUrl} |\\n" +
                         "| Enterprise | ${enterpriseUrl} |\\n\\n" +
                         "*Updated by Jenkins build [#${env.BUILD_NUMBER}](${env.BUILD_URL})*"
-                    withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                    withCredentials([usernamePassword(credentialsId: 'payara-devops-github-personal-access-token-as-username-password',
+                                                     passwordVariable: 'GITHUB_TOKEN',
+                                                     usernameVariable: 'GITHUB_USER')]) {
                         sh """
                         # Delete existing preview comment if present
                         COMMENT_ID=\$(curl -s \\
