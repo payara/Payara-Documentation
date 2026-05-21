@@ -77,8 +77,11 @@ pipeline {
                         "> Preview links are updated automatically on every commit push.\\n\\n" +
                         "| Variant | Preview Link |\\n" +
                         "|---|---|\\n" +
-                        "|  **Community** | [:arrow_upper_right: Open Community Docs](${communityUrl}) |\\n" +
-                        "|  **Enterprise** | [:arrow_upper_right: Open Enterprise Docs](${enterpriseUrl}) |\\n\\n" +
+                        "|  **Community** | [ Open Community Docs](${communityUrl}) |\\n" +
+                        "|  **Enterprise** | [ Open Enterprise Docs](${enterpriseUrl}) |\\n\\n" +
+
+                        "### For Reviewers\\n" +
+                        "Please open the preview link above and verify that the documentation changes render correctly before approving. " +
                         "---\\n" +
                         " *Updated by Jenkins build [#${env.BUILD_NUMBER}](${env.BUILD_URL})*"
                     withCredentials([usernamePassword(credentialsId: 'payara-devops-github-personal-access-token-as-username-password',
