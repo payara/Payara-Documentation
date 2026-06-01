@@ -65,6 +65,50 @@ pipeline {
     post {
         success {
             echo 'Documentation previews generated and archived successfully.'
+            script {
+                def prNumber = env.CHANGE_ID ?: env.ghprbPullId
+                if (prNumber) {
+                    def baseUrl = "https://jenkins.payara.fish/view/Documentation/job/Documentation/job/Payara-Documentation%20PR%20Deploy%20Preview/view/change-requests/job/PR-${prNumber}"
+                    def communityUrl = "${baseUrl}/Community_20Documentation/"
+                    def enterpriseUrl = "${baseUrl}/Enterprise_20Documentation/"
+                    def commentMarker = "<!-- jenkins-doc-preview -->"
+                    def commentBody = "${commentMarker}\\n" +
+                        "##  Documentation Preview\\n\\n" +
+                        "> Preview links are updated automatically on every commit push.\\n\\n" +
+                        "| Variant | Preview Link |\\n" +
+                        "|---|---|\\n" +
+                        "|  **Community** | [ Open Community Docs](${communityUrl}) |\\n" +
+                        "|  **Enterprise** | [ Open Enterprise Docs](${enterpriseUrl}) |\\n\\n" +
+
+                        "### For Reviewers\\n" +
+                        "Please open the preview link above and verify that the documentation changes render correctly before approving. " +
+                        "---\\n" +
+                        " *Updated by Jenkins build [#${env.BUILD_NUMBER}](${env.BUILD_URL})*"
+                    withCredentials([usernamePassword(credentialsId: 'payara-devops-github-personal-access-token-as-username-password',
+                                                     passwordVariable: 'GITHUB_TOKEN',
+                                                     usernameVariable: 'GITHUB_USER')]) {
+                        sh """
+                        # Delete existing preview comment if present
+                        COMMENT_ID=\$(curl -s \\
+                          -H "Authorization: token \${GITHUB_TOKEN}" \\
+                          "https://api.github.com/repos/payara/Payara-Documentation/issues/${prNumber}/comments?per_page=100" | \\
+                          python3 -c "import sys,json; comments=json.load(sys.stdin); ids=[str(c['id']) for c in comments if '<!-- jenkins-doc-preview -->' in c.get('body','')]; print(ids[0] if ids else '')")
+                        if [ -n "\$COMMENT_ID" ]; then
+                          curl -s -X DELETE \\
+                            -H "Authorization: token \${GITHUB_TOKEN}" \\
+                            "https://api.github.com/repos/payara/Payara-Documentation/issues/comments/\${COMMENT_ID}"
+                        fi
+
+                        # Post fresh preview comment
+                        curl -s -X POST \\
+                          -H "Authorization: token \${GITHUB_TOKEN}" \\
+                          -H "Content-Type: application/json" \\
+                          -d '{"body":"${commentBody}"}' \\
+                          "https://api.github.com/repos/payara/Payara-Documentation/issues/${prNumber}/comments"
+                        """
+                    }
+                }
+            }
         }
         failure {
             echo 'Failed to generate documentation previews.'
