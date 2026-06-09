@@ -1,0 +1,308 @@
+= Payara AI Agent
+:ordinal: 3
+
+The Payara AI Agent is an intelligent assistant for Payara Server that lets developers query, diagnose, and administer a running server using plain English.
+It is built on https://docs.langchain4j.dev[LangChain4j] and supports any OpenAI-compatible model provider.
+
+The agent is embedded in the xref:/Technical Documentation/Ecosystem/Project Management Tools/Maven Plugin/Payara Server Maven Plugin.adoc[Payara Server Maven Plugin] and is also available as a standalone CLI and MCP server.
+
+NOTE: The AI Agent is an experimental feature. Usage and API compatibility may change in future versions. It is not recommended for use in production environments.
+
+[[capabilities]]
+== Capabilities
+
+* Generating and explaining **`asadmin` commands** from plain English instructions.
+* Querying server configuration and runtime state via the **Admin REST API** and **JMX MBeans**.
+* Automatically executing **read-only `asadmin` commands** (e.g. `list-applications`, `get-config-property`) without user confirmation; write commands are gated unless `PAYARA_AI_ASADMIN_AUTOEXEC=all`.
+* Parsing and summarizing **server logs** (`server.log`) and key configuration files such as `domain.xml`.
+* Searching **Payara documentation** via a local RAG (Retrieval-Augmented Generation) vector index built from the official Payara Documentation and Jakarta EE Tutorial.
+* Checking **MicroProfile Health** and **Metrics** endpoints.
+* Enabling and querying the **Monitoring Service** REST tree.
+* Cross-referencing server log errors with known **GitHub issues** on `payara/Payara`.
+
+[[quickstart]]
+== Quick Start (Maven Plugin)
+
+Enable the agent by setting `PAYARA_AI_AGENT=true` and supplying an API key:
+
+[source,shell]
+----
+export PAYARA_AI_AGENT=true
+export PAYARA_AI_PROVIDER=OPEN_AI          # or OLLAMA, ANTHROPIC, GOOGLE, etc.
+export PAYARA_AI_API_KEY=<your-key>
+export PAYARA_AI_MODEL=gpt-4o-mini
+mvn payara-server:start
+----
+
+Once the server is running, a highlighted `payara` prompt appears in the terminal.
+Type any natural language query and press Enter:
+
+[source,shell]
+----
+ payara  why is heap usage so high?
+----
+
+The predefined keywords `asadmin`, `deploy`, `undeploy`, and `exit` take priority over AI interpretation when typed exactly.
+
+[[configuration]]
+== Configuration
+
+[[model-config]]
+=== Model & Provider
+
+[cols="2,2,2,1,3",options="header"]
+|===
+|Property Name
+|System Property
+|Environment Variable
+|Default Value
+|Description
+
+|AI Agent Enabled
+|payara.ai.agent
+|PAYARA_AI_AGENT
+|false
+|Set to `true` to enable the AI Agent.
+
+|API Key
+|payara.ai.api.key
+|PAYARA_AI_API_KEY
+|_none_
+|API key for the AI provider.
+
+|Provider Location
+|payara.ai.provider.location
+|PAYARA_AI_PROVIDER_LOCATION
+|_none_
+|Endpoint URL of the AI provider. Required for `OLLAMA`, `LM_STUDIO`, `GPT4ALL`, and `CUSTOM_OPEN_AI`.
+Example: `http://localhost:11434` for Ollama.
+
+|Provider
+|payara.ai.provider
+|PAYARA_AI_PROVIDER
+|`OPEN_AI`
+|AI service provider. Supported values:
+`OPEN_AI`, `CUSTOM_OPEN_AI`, `GOOGLE`, `DEEPINFRA`, `DEEPSEEK`, `GROQ`, `MISTRAL`, `OLLAMA`, `ANTHROPIC`, `LM_STUDIO`, `GPT4ALL`.
+
+|Model
+|payara.ai.model
+|PAYARA_AI_MODEL
+|`gpt-4o-mini`
+|The AI model to use (e.g. `gpt-4o`, `claude-3-5-sonnet`, `gemini-2.0-flash`, `llama3`).
+
+|Temperature
+|payara.ai.temperature
+|PAYARA_AI_TEMPERATURE
+|_none_
+|Randomness of responses. Range: `0.0` (deterministic) to `1.0` (creative).
+
+|Top-P
+|payara.ai.top.p
+|PAYARA_AI_TOP_P
+|_none_
+|Nucleus sampling parameter. Alternative to temperature.
+
+|Stream
+|payara.ai.stream
+|PAYARA_AI_STREAM
+|false
+|Enable streaming (token-by-token) responses if supported by the provider.
+
+|Timeout
+|payara.ai.timeout
+|PAYARA_AI_TIMEOUT
+|_none_
+|Request timeout in milliseconds.
+
+|Max Tokens
+|payara.ai.maxTokens
+|PAYARA_AI_MAX_TOKENS
+|_none_
+|Maximum tokens per request.
+
+|Max Output Tokens
+|payara.ai.maxOutputTokens
+|PAYARA_AI_MAX_OUTPUT_TOKENS
+|_none_
+|Maximum tokens in the AI response.
+
+|Repeat Penalty
+|payara.ai.repeatPenalty
+|PAYARA_AI_REPEAT_PENALTY
+|_none_
+|Penalty for repeated tokens in the generated output.
+
+|Presence Penalty
+|payara.ai.presencePenalty
+|PAYARA_AI_PRESENCE_PENALTY
+|_none_
+|Penalty for introducing new topics in completions.
+
+|Frequency Penalty
+|payara.ai.frequencyPenalty
+|PAYARA_AI_FREQUENCY_PENALTY
+|_none_
+|Penalty for repeating tokens that already appear in the input.
+
+|Top-K
+|payara.ai.topK
+|PAYARA_AI_TOP_K
+|_none_
+|Limit next-token sampling to the top-K most likely tokens.
+
+|Seed
+|payara.ai.seed
+|PAYARA_AI_SEED
+|_none_
+|Seed for deterministic output.
+
+|Organization ID
+|payara.ai.organizationId
+|PAYARA_AI_ORGANIZATION_ID
+|_none_
+|Provider organization ID (e.g. OpenAI organizations).
+
+|Custom Headers
+|payara.ai.customHeaders
+|PAYARA_AI_CUSTOM_HEADERS
+|_none_
+|Comma-separated custom HTTP headers to include in provider requests.
+
+|Max Retries
+|payara.ai.maxRetries
+|PAYARA_AI_MAX_RETRIES
+|_none_
+|Maximum retry attempts on provider failure.
+
+|Log Requests
+|payara.ai.log.requests
+|PAYARA_AI_LOG_REQUESTS
+|false
+|Log outgoing requests to the AI provider.
+
+|Log Responses
+|payara.ai.log.responses
+|PAYARA_AI_LOG_RESPONSES
+|false
+|Log incoming responses from the AI provider.
+
+|Chat History
+|payara.ai.chat.history
+|PAYARA_AI_CHAT_HISTORY
+|false
+|Retain conversation context across turns.
+
+|Chat History Limit
+|payara.ai.chat.history.limit
+|PAYARA_AI_CHAT_HISTORY_LIMIT
+|3
+|Number of previous turns to retain in chat context.
+|===
+
+[[server-connection]]
+=== Server Connection
+
+These properties tell the agent how to reach the running Payara instance.
+When started via the Maven plugin, `adminPort`, `httpPort`, `domainName`, and `payaraServerPath` are wired automatically; they only need to be set explicitly when targeting a remote server or a non-standard installation layout.
+
+[cols="2,2,2,1,3",options="header"]
+|===
+|Property Name
+|System Property
+|Environment Variable
+|Default Value
+|Description
+
+|Admin REST URL
+|payara.ai.admin.url
+|PAYARA_AI_ADMIN_URL
+|`http://localhost:4848`
+|Base URL for Payara's administration REST API.
+
+|HTTP Listener URL
+|payara.ai.http.url
+|PAYARA_AI_HTTP_URL
+|`http://localhost:8080`
+|Base URL used for MicroProfile Health and Metrics endpoints.
+
+|JMX Service URL
+|payara.ai.jmx.url
+|PAYARA_AI_JMX_URL
+|`service:jmx:rmi:///jndi/rmi://localhost:8686/jmxrmi`
+|JMX connector URL for querying MBeans.
+
+|Domain XML Path
+|payara.ai.domain.xml.path
+|PAYARA_AI_DOMAIN_XML_PATH
+|Derived from `payaraServerPath` + `domainName`
+|Absolute path to `domain.xml`. Derived automatically when starting a local server.
+
+|Server Log Path
+|payara.ai.server.log.path
+|PAYARA_AI_SERVER_LOG_PATH
+|Derived from `payaraServerPath` + `domainName`
+|Absolute path to `server.log`. Derived automatically when starting a local server.
+
+|Asadmin Path
+|payara.ai.asadmin.path
+|PAYARA_AI_ASADMIN_PATH
+|Derived from `payaraServerPath`
+|Absolute path to the `asadmin` (or `asadmin.bat`) binary. Derived automatically when starting a local server.
+
+|Asadmin Auto-Exec
+|payara.ai.asadmin.autoexec
+|PAYARA_AI_ASADMIN_AUTOEXEC
+|`readonly`
+a|Controls whether the agent auto-executes asadmin commands.
+
+* `readonly` _(default)_ — auto-execute read-only commands (`list-*`, `get-*`, `ping-*`, `show-*`, `generate-*`, `monitor-*`, `version`, `uptime`). All others are returned as a suggested command text.
+* `all` — auto-execute every command without confirmation.
+* `off` — never auto-execute; always return the suggested command text.
+|===
+
+[[rag-index]]
+=== RAG Documentation Index
+
+The agent builds a local vector index from the Payara Documentation and Jakarta EE Tutorial to answer questions about configuration and APIs.
+On first use the prebuilt index is downloaded from GitHub Releases (a few seconds).
+If the download fails, a local build starts in the background (5–20 minutes on CPU; cached in `<tmpdir>` afterward).
+
+[cols="2,2,2,1,3",options="header"]
+|===
+|Property Name
+|System Property
+|Environment Variable
+|Default Value
+|Description
+
+|Payara Version
+|payara.ai.payara.version
+|PAYARA_AI_PAYARA_VERSION
+|Auto-detected via Admin REST
+|Override the Payara major version used to select the correct documentation branch and index. Accepts a bare major (`6`) or a full version string (`6.2025.3`).
+
+|Disable RAG
+|payara.ai.disable.rag
+|PAYARA_AI_DISABLE_RAG
+|false
+|Set to `true` to skip the documentation index entirely and save startup time.
+
+|RAG Index URL
+|payara.ai.rag.index.url
+|PAYARA_AI_RAG_INDEX_URL
+|Auto-selected by Jakarta EE version
+a|URL template for the prebuilt RAG index. By default the agent selects the correct index automatically based on the detected Payara version and its corresponding Jakarta EE version:
+
+* Payara 5 → Jakarta EE 8 → `payara-docs-index-jakartaee-8.json`
+* Payara 6 → Jakarta EE 10 → `payara-docs-index-jakartaee-10.json`
+* Payara 7 → Jakarta EE 11 → `payara-docs-index-jakartaee-11.json`
+
+The template supports an `{ee}` placeholder substituted at runtime.
+Override this property to point at a custom or internally hosted index file.
+|===
+
+[[usage-notes]]
+== Usage Notes
+
+* The AI Agent operates best during development, local testing, or in isolated environments.
+* It is **not recommended for use in production** due to its access to sensitive runtime data (logs, domain.xml, MBeans) and its experimental nature.
