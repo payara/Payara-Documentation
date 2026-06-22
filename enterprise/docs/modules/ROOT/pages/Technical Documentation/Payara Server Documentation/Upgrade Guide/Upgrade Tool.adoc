@@ -213,7 +213,7 @@ IMPORTANT: Remember to turn off these logger level settings after executing a se
 [[downtime-upgrade]]
 == Zero Downtime upgrade
 
-IMPORTANT: This feature requires payara-upgrade-tool.jar from Payara v5.83.0 or v6.34.0 and above.
+IMPORTANT: This feature requires payara-upgrade-tool.jar from Payara v5.83.0 or v6.34.0 and above and assumes you are running a minimum of two SSH nodes.
 
 By default, upgrading Payara requires that the domain and all SSH nodes are stopped. This feature allows the upgrading of individual SSH nodes, eliminating downtime. Only upgrades in the same major version are supported 5.x to 5.x, 6.x to 6.x. Upgrades between 5.x and 6.x are not supported.
 
@@ -251,6 +251,8 @@ Start the DAS
 ----
 asadmin> start-domain
 ----
+
+TIP: Use the `_list-node-versions` subcommand to help keep track of the current version of each node, including staged and rollback versions.
 
 WARNING: the upgrade can cause issues if the nodes are forming a cluster with Hazelcast. When 2 versions of Payara use different versions of Hazelcast, the upgraded node will fail to start as long as nodes using the older versions are running. If the upgraded node/DAS fails to start, you may have to upgrade everything else before restarting the nodes and the DAS. Alternatively, you can avoid these issues by disabling the data grid for every nodes.
 Below are the known combinations causing issues:
