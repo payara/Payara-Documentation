@@ -3,7 +3,7 @@
 
 Using the Payara Tools VS Code extension, you can integrate Payara Micro within the VS Code IDE to create new Payara Micro Maven applications, start, stop and deploy applications to Payara Micro.
 
-The extension also allows you to use the Hot Deploy and AutoDeploy features for a better developer experience.
+The extension also allows you to use the Hot Deploy and AutoDeploy features for a better developer experience. Any Maven project appears in the *Micro Projects* panel — no plugin declaration in `pom.xml` is required to run with the full plugin coordinates.
 
 [[create-micro-maven-project]]
 == Creating new Payara Micro Maven Application
@@ -36,6 +36,34 @@ image::vscode-extension/payara-micro/new-project-running.png[Application running
 To redeploy the application, right-click on the listed Payara Micro instance and select *Reload*.
 
 image::vscode-extension/payara-micro/project-redeploy.png[Application redeploy]
+
+[[dev-mode]]
+== Dev Mode
+
+Dev mode enables automatic hot deployment of changes without restarting the Payara Micro instance. Click the *Start (Dev Mode)* button (lightning bolt icon) in the *Micro Projects* panel to start in dev mode.
+
+[[debug-mode]]
+== Debug Mode
+
+The extension supports attaching the VS Code Java debugger to a running Payara Micro instance. Use *Start in Debug Mode* or *Start (Dev Mode) in Debug* from the toolbar or right-click menu.
+
+The default debug port is *5005*. On the first debug launch, the extension automatically creates a `payara-micro` entry in `.vscode/launch.json`. To use a different port, edit that entry:
+
+[source,json]
+----
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "request": "attach",
+      "name": "payara-micro",
+      "hostName": "localhost",
+      "port": 8000
+    }
+  ]
+}
+----
 
 [[see-also]]
 == See Also
