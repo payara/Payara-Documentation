@@ -6,14 +6,20 @@
 * Jakarta EE 8 Applications
 * MicroProfile 4.1
 
+== Behaviour Changes
+The default (undefined) value of the `fish.payara.ready-after-applications` system property has changed from `false` to `true`, aligning Enterprise 5 with Community and Enterprise 7.
+The server now marks itself as ready after post-boot configuration is applied and previously deployed applications are loaded, rather than after the `server_startup` event.
+This may change the timing of post-boot scripts and transaction recovery.
+To restore the previous behaviour, set `fish.payara.ready-after-applications=false`.
+
 == Security Fixes
-* [FISH-13637] Investigate and Fix CSRF + SSRF in Admin Console / REST Management Interface
+* [FISH-13637] Fix CSRF + SSRF in Admin Console / REST Management Interface
 
 == Bug Fixes
 * [FISH-10485] Fix Payara Micro Boot Properties Not Applied With the Right Timing
 * [FISH-11896] Fix Quoted-Argument Parsing in `prebootCommandFile` (asadmin) and `PREBOOT_COMMANDS` (Docker)
 * [FISH-12270] Fix Misleading Log Entries Generated While Configuring Additional Properties for Virtual Servers
-* [FISH-13091] Port Assorted Deployment Group Fixes
+* [FISH-13091] Assorted Deployment Group Fixes
 * [FISH-13137] Fix Prometheus Metrics to Report Histogram Times in Seconds
 * [FISH-13138] Fix Payara Micro's `--outputlauncher` to Respect `payara-boot.properties`
 * [FISH-13447] Fix Micro `NullPointerException` with `log-to-console` Access Log Option
@@ -22,9 +28,7 @@
 * [FISH-13097] Add Default OpenMQ Credentials Warning
 
 == Component Upgrades
-* [FISH-13402] Upgrade `com.fasterxml.jackson:jackson-bom` from 2.21.0 to 2.21.2
-* [FISH-13404] Upgrade `jline.version` from 3.30.6 to 3.30.9
-* [FISH-13543] Upgrade `com.fasterxml.jackson:jackson-bom` from 2.21.2 to 2.21.3
-* [FISH-13576] Upgrade `jline.version` from 3.30.9 to 3.30.13
+* [FISH-13543] Upgrade `com.fasterxml.jackson:jackson-bom` from 2.21.0 to 2.21.3
+* [FISH-13576] Upgrade `jline.version` from 3.30.6 to 3.30.13
 * [FISH-13618] Upgrade `org.yaml:snakeyaml` from 2.5 to 2.6
 * [FISH-13720] Upgrade `asm.version` from 9.9.1 to 9.10.1
