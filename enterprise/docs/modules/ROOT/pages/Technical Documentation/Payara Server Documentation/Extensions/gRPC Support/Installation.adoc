@@ -1,0 +1,84 @@
+[[installing-grpc-server-support-module]]
+= gRPC Server Support
+
+gRPC support is bundled with Payara Server 7 Enterprise, Payara Micro 7 Enterprise, and the Payara 7 Embedded distributions. No separate installation is required.
+
+The `grpc-support.jar` module is automatically deployed to `glassfish/modules` as part of the standard server distribution.
+
+[[application-dependencies]]
+== Application Dependencies
+
+Applications that implement gRPC services should declare gRPC dependencies with `provided` scope, as the runtime is supplied by the server:
+
+[source, xml]
+----
+<dependency>
+    <groupId>io.grpc</groupId>
+    <artifactId>grpc-api</artifactId>
+    <version>1.81.0</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>io.grpc</groupId>
+    <artifactId>grpc-stub</artifactId>
+    <version>1.81.0</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>io.grpc</groupId>
+    <artifactId>grpc-protobuf</artifactId>
+    <version>1.81.0</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>com.google.protobuf</groupId>
+    <artifactId>protobuf-java</artifactId>
+    <version>4.35.0</version>
+    <scope>provided</scope>
+</dependency>
+----
+
+If you are using the Payara BOM, version management is handled automatically:
+
+[source, xml]
+----
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>fish.payara.api</groupId>
+            <artifactId>payara-bom</artifactId>
+            <version>${payara.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+----
+
+Then declare dependencies without explicit versions:
+
+[source, xml]
+----
+<dependency>
+    <groupId>io.grpc</groupId>
+    <artifactId>grpc-api</artifactId>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>io.grpc</groupId>
+    <artifactId>grpc-stub</artifactId>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>io.grpc</groupId>
+    <artifactId>grpc-protobuf</artifactId>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>com.google.protobuf</groupId>
+    <artifactId>protobuf-java</artifactId>
+    <scope>provided</scope>
+</dependency>
+----
+
+NOTE: Do not bundle gRPC or Protobuf JARs inside your WAR. Declaring them as `provided` ensures the server's bundled version is used at runtime, avoiding classpath conflicts.
