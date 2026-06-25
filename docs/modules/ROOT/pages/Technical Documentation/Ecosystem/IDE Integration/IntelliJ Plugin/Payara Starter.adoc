@@ -1,0 +1,107 @@
+= Payara Starter in IntelliJ IDEA
+
+The Payara IntelliJ Ultimate Tools plugin integrates with xref:Technical Documentation/Ecosystem/Project Management Tools/Payara Starter.adoc[Payara Starter] to let you generate new Jakarta EE projects directly from the *New Project* wizard in IntelliJ IDEA. The wizard supports both *Payara Server* and *Payara Micro* as the target platform and can optionally scaffold a full application layer from an ER diagram.
+
+[[create-new-project]]
+== Creating a New Project
+
+. Open IntelliJ IDEA and select *File > New > Project*.
+. In the *New Project* dialog, scroll down the left-hand generator list and select *Payara Starter*.
+. The wizard opens with four configuration tabs: *Project*, *Platform*, *MicroProfile*, and *ER Diagram*.
+. Fill in each tab as required and click *Next* to proceed.
+
+[[project-tab]]
+== Project Tab
+
+image::intellij-plugin/payara-starter/project-tab.png[Payara Starter — Project Tab]
+
+Configure the project coordinates and build options:
+
+* *Build Tool* — Select *Maven* or *Gradle*.
+* *Group Id* — Maven group identifier (e.g. `fish.payara.example`).
+* *Artifact Id* — Maven artifact identifier (e.g. `starter`).
+* *Version* — Project version (e.g. `1.0-SNAPSHOT`).
+* *Package* — Root Java package for generated sources (defaults to the Group Id).
+* *Include sample tests* — When checked, generates Arquillian integration test templates (Maven only).
+* *Docker support* — When checked, includes a `Dockerfile` in the generated project.
+
+[[platform-tab]]
+== Platform Tab
+
+image::intellij-plugin/payara-starter/platform-tab.png[Payara Starter — Platform Tab]
+
+Configure the Jakarta EE specification and Payara runtime:
+
+* *Jakarta EE Version* — The Jakarta EE version to target (e.g. `10`).
+* *Jakarta EE Profile* — Choose one of:
+** *Full Platform* — Full Jakarta EE API set.
+** *Web Profile* — Web-focused subset of the Jakarta EE APIs.
+** *Core Profile* — Minimal profile for cloud-native / microservices use cases.
+* *Payara Platform* — Choose *Payara Server* or *Payara Micro* as the deployment target.
+* *Payara Platform Version* — The Payara release to use (fetched live from `start.payara.fish`, e.g. `6.2025.11`).
+* *Authentication* — Optionally configure Jakarta Security form-based authentication (None, Form — File Realm, Form — Database, Form — LDAP).
+
+[[microprofile-tab]]
+== MicroProfile Tab
+
+Select individual MicroProfile APIs to include in the generated project:
+
+* MicroProfile Config
+* MicroProfile Open API
+* MicroProfile Fault Tolerance
+* MicroProfile Metrics
+
+[[er-diagram-tab]]
+== ER Diagram Tab
+
+image::intellij-plugin/payara-starter/er-diagram-tab.png[Payara Starter — ER Diagram Tab]
+
+Optionally define an entity-relationship model to scaffold application layers automatically:
+
+* *Search ER Diagram* — Select a predefined domain template from the dropdown (e.g. Healthcare System, E-Commerce) or type a custom domain name.
+* *Diagram Builder & Live Preview* — Opens the xref:#er-diagram-builder[ER Diagram Builder] dialog to author or AI-generate the Mermaid ER source and preview the diagram visually.
+* *Generate Code For* — Choose which layers to scaffold from the diagram:
+** *JPA entities* — Generates JPA entity classes (default package: `domain`).
+** *Repository layer* — Generates repository/service classes (default package: `service`).
+** *REST resources* — Generates JAX-RS resource classes (default package: `resource`).
+* *Web layer* — Optionally generate a web front-end layer (None, HTML, Jakarta Faces).
+
+NOTE: If no diagram is loaded, the status reads _"No diagram loaded — CRUD scaffolding will be skipped."_ and no entity code will be generated.
+
+[[er-diagram-builder]]
+=== ER Diagram Builder & Live Preview
+
+image::intellij-plugin/payara-starter/er-diagram-builder.png[Payara Starter — ER Diagram Builder & Live Preview]
+
+Click *Diagram Builder & Live Preview* to open the full editor dialog:
+
+* *Source dropdown* — Pick a predefined domain template (e.g. `Healthcare System`) and click *Load* to populate the Mermaid source.
+* *Source panel* — Edit the Mermaid ER diagram source directly.
+* *Live Preview panel* — Renders the diagram visually in real time as you edit the source.
+* *AI update bar* — Type a natural-language instruction (e.g. _"Add customer address"_) and press Send to have the upstream AI update the diagram source automatically.
+* Toolbar buttons provide undo/redo of diagram versions, zoom in/out, fullscreen toggle, and diagram export.
+
+Click *Apply* to save the diagram back to the wizard, or *Cancel* to discard changes.
+
+[[generated-project]]
+== Generated Project
+
+After clicking *Finish*, the plugin contacts `start.payara.fish`, downloads the generated project archive, extracts it into the chosen directory, and imports it as a Maven or Gradle project.
+
+For a *Payara Server* project, run the application with:
+
+[source,shell]
+----
+mvn clean package payara-server:dev
+----
+
+See xref:Technical Documentation/Ecosystem/IDE Integration/IntelliJ Plugin/Payara Server Maven Plugin.adoc[Payara Server Maven Plugin Tools] for managing the server and deploying applications from IntelliJ IDEA.
+
+For a *Payara Micro* project, run the application with:
+
+[source,shell]
+----
+mvn clean package payara-micro:dev
+----
+
+See xref:Technical Documentation/Ecosystem/IDE Integration/IntelliJ Plugin/Payara Micro.adoc[Payara Micro Tools] for running and debugging Payara Micro applications from IntelliJ IDEA.
