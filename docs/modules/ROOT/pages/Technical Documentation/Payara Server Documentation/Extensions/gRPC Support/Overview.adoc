@@ -4,23 +4,29 @@
 [[what-is-grpc]]
 == What is gRPC?
 
-gRPC is a modern open-source high performance Remote Procedure Call (RPC) framework that use HTTP2 and simplifies the communication with protocol
-buffers to share data between client and server. By enabling gRPC Payara Server gives more options to create binary adaptable services. gRPC comes
- bundled with Payara Server Enterprise Edition and can be used to create gRPC services in your web applications.
+gRPC is a modern open-source high performance Remote Procedure Call (RPC) framework that uses HTTP/2 and simplifies the communication with protocol buffers to share data between client and server. By enabling gRPC, Payara Server gives more options to create binary-compatible services. gRPC comes bundled with Payara Server Enterprise Edition and can be used to create gRPC services in your web applications.
 
 [[what-can-we-do-with-it]]
 == What can we do with it?
 
-* We can create services more efficient than REST.
+* Create services more efficient than REST.
 * Use HTTP/2 to provide full duplex communication between the client and the service.
 * Use protocol buffers to optimize and simplify communication.
-* Enables bidirectional streaming out-of-the-box.
+* Enable bidirectional streaming out-of-the-box.
 
-gRPC supports the means for users to implement gRPC style service programming.
+[[availability]]
+== Availability
+
+gRPC support is bundled with Payara Server Enterprise, Payara Micro Enterprise, and the Payara Embedded distributions. No separate installation is required. The `grpc-support.jar` module is automatically included in `glassfish/modules`.
+
+[[how-it-works]]
+== How it works
+
+When a WAR application is deployed, Payara Server automatically detects whether it contains a gRPC service by scanning for implementations of `io.grpc.BindableService`. If detected, the server registers a servlet filter that routes all `application/grpc` HTTP/2 requests to the appropriate service implementation via CDI.
 
 [[see-also]]
 == See also
 
-* You can find detailed information about gRPC here: https://grpc.io/docs/what-is-grpc/introduction/
-* You can find detailed information about to define a grpc service and client here: https://grpc.io/docs/languages/java/basics/ .
-* You can find detailed information about `protobuf` protocol here: https://grpc.io/docs/what-is-grpc/introduction/#working-with-protocol-buffers.
+* Detailed information about gRPC: https://grpc.io/docs/what-is-grpc/introduction/
+* Defining a gRPC service and client in Java: https://grpc.io/docs/languages/java/basics/
+* Protocol Buffers: https://grpc.io/docs/what-is-grpc/introduction/#working-with-protocol-buffers
