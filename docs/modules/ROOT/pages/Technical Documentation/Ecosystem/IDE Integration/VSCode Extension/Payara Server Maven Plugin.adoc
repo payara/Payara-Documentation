@@ -21,6 +21,12 @@ Any Maven project in the workspace appears in the *Server Projects* panel of the
 * *Start (Dev Mode) in Debug* — dev mode with the Java debugger attached
 * *Stop* — stops the running server process
 
+image::vscode-extension/payara-server-maven/server-projects-panel.png[Server Projects panel showing inline action buttons]
+
+Server output streams into a dedicated VS Code *Terminal* panel. The terminal is interactive — you can type input directly and it is forwarded to the running Maven process.
+
+image::vscode-extension/payara-server-maven/dev-mode-terminal.png[Dev mode running in the Terminal panel]
+
 [[dev-mode]]
 == Dev Mode
 
@@ -62,6 +68,13 @@ The default debug port is *5005*. On the first debug launch, the extension autom
 
 Keep the `name` field as `payara-server-maven` — the extension matches configurations by name.
 
+[[jdk-home]]
+== Configuring the JDK
+
+To override the JDK used when running Maven goals, right-click a project in the *Server Projects* panel and select *Configure JDK Home*. The selected path is set as `JAVA_HOME` for the Maven process and is also reflected in the VS Code `java.home` setting for that workspace.
+
+If no JDK is configured, the extension inherits `JAVA_HOME` from the environment.
+
 [[customizing-build-commands]]
 == Customizing Build Commands
 
@@ -98,6 +111,128 @@ Available task labels:
 |`payara-server-maven-stop`
 |`mvn fish.payara.maven.plugins:payara-server-maven-plugin:stop`
 |===
+
+If your project has a Maven wrapper (`mvnw` / `mvnw.bat`) under `.mvn/wrapper/`, the extension uses it automatically instead of the system Maven.
+
+[[ai-agent]]
+== Payara AI Agent
+
+The Payara AI Agent provides an interactive console during server runtime, allowing you to query server state, diagnose issues, and perform operations using natural language or direct `asadmin` commands.
+
+An API key (or local provider location) must always be configured in VS Code settings to activate the agent. Dev mode enables the agent by default once the API key is set; for `start` mode it is also enabled automatically when an API key is configured.
+
+AI agent configuration is passed to Maven as system properties (`-Dpayara.ai.*`) at launch time. The API key is supplied via the `PAYARA_AI_API_KEY` environment variable.
+
+=== Configuration
+
+Set the following in VS Code settings (*File > Preferences > Settings*, search for *Payara*):
+
+[cols="1,2"]
+|===
+|Setting |Description
+
+|`payara.ai.agent`
+|Enable or disable the AI agent (`true` / `false`)
+
+|`payara.ai.apiKey`
+|API key for the AI provider (passed as `PAYARA_AI_API_KEY` environment variable)
+
+|`payara.ai.provider`
+|AI provider name. One of: `OPEN_AI`, `GOOGLE`, `DEEPINFRA`, `DEEPSEEK`, `GROQ`, `MISTRAL`, `OLLAMA`, `ANTHROPIC`, `LM_STUDIO`, `GPT4ALL`, `CUSTOM_OPEN_AI`
+
+|`payara.ai.model`
+|Model name to use with the selected provider
+
+|`payara.ai.providerLocation`
+|Base URL for local providers such as Ollama (`http://localhost:11434`) or LM Studio
+
+|`payara.ai.organizationId`
+|Organization ID for providers that require it (e.g., OpenAI)
+
+|`payara.ai.customHeaders`
+|Custom HTTP headers sent to the provider
+
+|`payara.ai.temperature`
+|Sampling temperature (decimal)
+
+|`payara.ai.topP`
+|Top-P sampling parameter (decimal)
+
+|`payara.ai.topK`
+|Top-K sampling parameter (integer)
+
+|`payara.ai.maxTokens`
+|Maximum tokens for the completion
+
+|`payara.ai.maxCompletionTokens`
+|Maximum completion tokens (provider-specific)
+
+|`payara.ai.maxOutputTokens`
+|Maximum output tokens (provider-specific)
+
+|`payara.ai.presencePenalty`
+|Presence penalty (decimal)
+
+|`payara.ai.frequencyPenalty`
+|Frequency penalty (decimal)
+
+|`payara.ai.repeatPenalty`
+|Repeat penalty (decimal, for Ollama-compatible providers)
+
+|`payara.ai.seed`
+|Random seed for reproducible outputs
+
+|`payara.ai.timeout`
+|Request timeout in seconds
+
+|`payara.ai.maxRetries`
+|Maximum number of retry attempts on failure
+
+|`payara.ai.chatHistoryLimit`
+|Number of previous messages to include in each request
+
+|`payara.ai.stream`
+|Enable streaming responses (`true` / `false`)
+
+|`payara.ai.chatHistory`
+|Enable conversation history (`true` / `false`)
+
+|`payara.ai.logRequests`
+|Log outgoing AI requests to the terminal (`true` / `false`)
+
+|`payara.ai.logResponses`
+|Log AI responses to the terminal (`true` / `false`)
+
+|`payara.ai.allowCodeExecution`
+|Allow the AI agent to execute generated code (`true` / `false`)
+
+|`payara.ai.includeCodeExecutionOutput`
+|Include code execution output in AI responses (`true` / `false`)
+|===
+
+=== Payara AI Agent Panel
+
+When the AI Agent is active, a dedicated *Payara AI Agent* tab appears in the bottom panel alongside the Terminal. It provides:
+
+* A chat interface — type any question or instruction in the input field and press *Send* (or Shift+Enter for multi-line input)
+* Live server metrics such as CPU usage gauges
+* Suggested quick actions displayed as buttons on the right side of the panel
+
+image::vscode-extension/payara-server-maven/ai-agent.png[Payara AI Agent panel showing CPU metrics and chat interface]
+
+The status bar at the bottom of the panel confirms connectivity: *Connected to Payara AI Agent*.
+
+=== Sending Commands
+
+You can interact with the running server in two ways:
+
+* Type directly in the *Terminal* panel — keystrokes are forwarded to the Maven process stdin. Supported commands:
+** `asadmin <command>` — runs an asadmin command (e.g., `asadmin list-applications`)
+** `deploy` / `undeploy` — redeploys or undeploys the application
+** `exit` — stops the server
+** Any other text — routed to the AI Agent for an intelligent response
+
+* Use the *Payara AI Agent* chat panel to send natural language queries or instructions to the AI Agent directly.
 
 [[see-also]]
 == See Also
