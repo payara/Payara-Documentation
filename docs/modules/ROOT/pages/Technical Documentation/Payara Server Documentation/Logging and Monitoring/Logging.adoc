@@ -182,6 +182,34 @@ The logging properties file supports environment variables like
 
 Whenever the server starts up or the logging properties are changed, the value for the `.level` property will be taken from the environment variable `logLevel`.
 
+[[access-logging-handlers]]
+== Access Logging Handlers
+
+Payara Server offers multiple options for how access log files should be written.
+
+The **Log Handler** field takes the values: Default, Common, Combined, JSON, and Custom.
+
+The Default and JSON handlers respect the **Pattern** field and will only write data from the fields it lists.
+
+These fields may be set from the Admin Console, under server-config/Http Service, or via the Asadmin CLI.
+
+[source, shell]
+----
+asadmin> set configs.config.server-config.http-service.access-log.log-handler=JSON
+----
+
+[[custom-access-log-handlers]]
+=== Custom Access Log Handlers
+If the "Custom" handler is selected, then the server will use the handler specified by the **Custom Log Handler** field. This field accepts a fully-qualified classname of a class that implements `fish.payara.web.accesslog.AccessLogHandler`.
+
+To add a custom access log handler to your environment you can use the `add-library` asadmin command.
+
+[source, shell]
+----
+asadmin> set configs.config.server-config.http-service.access-log.log-handler=Custom
+asadmin> set configs.config.server-config.http-service.access-log.custom-log-handler=name.of.your.CustomLogHandler
+----
+
 [[access-logging-max-file-size]]
 == Access Logging Max File Size
 
